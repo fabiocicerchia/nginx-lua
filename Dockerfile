@@ -1,6 +1,21 @@
 FROM nginx:1.19.0-alpine
 
 MAINTAINER Fabio Cicerchia <info@fabiocicerchia.it>
+LABEL maintainer="info@fabiocicerchia.it"
+
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG VCS_REF
+
+LABEL org.label-schema.schema-version="1.0"
+LABEL org.label-schema.build-date=$BUILD_DATE
+LABEL org.label-schema.name="fabiocicerchia/nginx-lua"
+LABEL org.label-schema.description="Nginx 1.19+ with LUA support based on Alpine Linux."
+LABEL org.label-schema.url="https://github.com/fabiocicerchia/nginx-lua"
+LABEL org.label-schema.vcs-url="https://github.com/fabiocicerchia/nginx-lua"
+LABEL org.label-schema.vcs-ref=$VCS_REF
+LABEL org.label-schema.version=$BUILD_VERSION
+LABEL org.label-schema.docker.cmd="docker run -p 80:80 -d fabiocicerchia/nginx-lua"
 
 # https://github.com/openresty/luajit2
 ENV VER_LUAJIT 2.1-20200102
@@ -28,23 +43,23 @@ ENV LUAJIT_LIB /usr/local/lib
 ENV LUAJIT_INC /usr/local/include/luajit-2.1
 
 RUN apk update \
-    && apk add --no-cache g++ make zlib-dev pcre-dev openssl-dev geoip-dev \
+    && apk add --no-cache --virtual .build-deps g++ make zlib-dev pcre-dev openssl-dev geoip-dev \
     && wget https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz -O /luajit.tar.gz \
        && tar xvzf /luajit.tar.gz && rm /luajit.tar.gz \
        && cd /luajit2-${VER_LUAJIT} \
-       && make \
+       && make -j $(nproc) \
        && make install \
        && cd / \
     && wget https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz -O /lua-resty-core.tar.gz \
        && tar xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
        && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-       && make \
+       && make -j $(nproc) \
        && make install \
        && cd / \
     && wget https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz -O /lua-resty-lrucache.tar.gz \
        && tar xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
        && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-       && make \
+       && make -j $(nproc) \
        && make install \
        && cd / \
     && wget https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz -O /ngx_devel_kit.tar.gz \
@@ -77,13 +92,14 @@ RUN apk update \
           --with-ipv6 \
           --with-ld-opt='-Wl,-Bsymbolic-functions -Wl,-z,relro' \
           --with-pcre-jit \
-       && make build \
+       && make -j $(nproc) build \
        && make install \
     && rm -rf /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
     && rm -rf /lua-resty-core-${VER_LUA_RESTY_CORE} \
     && rm -rf /luajit2-${VER_LUAJIT} \
     && rm -rf /nginx-${VER_NGINX} \
-    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT}
+    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+    && apk del .build-deps
 
 EXPOSE 443
 EXPOSE 80
