@@ -1,4 +1,4 @@
-FROM nginx:1.19.0-alpine
+FROM alpine:3.12.0
 
 MAINTAINER Fabio Cicerchia <info@fabiocicerchia.it>
 LABEL maintainer="info@fabiocicerchia.it"
@@ -27,6 +27,7 @@ ENV VER_LUA_NGINX_MODULE 0.10.15
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
 ENV VER_LUA_RESTY_CORE 0.1.17
+ENV LUA_LIB_DIR /usr/local/share/lua/5.1
 
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
@@ -43,7 +44,8 @@ ENV LUAJIT_LIB /usr/local/lib
 ENV LUAJIT_INC /usr/local/include/luajit-2.1
 
 RUN apk update \
-    && apk add --no-cache --virtual .build-deps g++ make zlib-dev pcre-dev openssl-dev geoip-dev \
+    && apk add --no-cache zlib-dev pcre-dev openssl-dev geoip-dev \
+    && apk add --no-cache --virtual .build-deps g++ make \
     && wget https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz -O /luajit.tar.gz \
        && tar xvzf /luajit.tar.gz && rm /luajit.tar.gz \
        && cd /luajit2-${VER_LUAJIT} \
