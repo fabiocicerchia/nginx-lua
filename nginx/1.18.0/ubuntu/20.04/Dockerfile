@@ -141,20 +141,12 @@ RUN set -x \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
    && apt-get remove -y \
       g++ \
-      gcc \
-      libc-dev \
-      libedit-dev \
-      libxslt-dev \
-      linux-headers \
       make \
-      mercurial \
       wget \
    && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 80
 EXPOSE 443
-
-COPY nginx.conf /etc/nginx/nginx.conf
 
 STOPSIGNAL SIGTERM
 

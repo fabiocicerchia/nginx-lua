@@ -139,20 +139,12 @@ RUN set -x \
    && rm -rf /nginx-${VER_NGINX} \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
    && yum remove -y \
-      g++ \
-      gcc \
-      libc-dev \
-      libedit-dev \
-      libxslt-dev \
-      linux-headers \
+      gcc-c++ \
       make \
-      mercurial \
       wget
 
 EXPOSE 80
 EXPOSE 443
-
-COPY nginx.conf /etc/nginx/nginx.conf
 
 STOPSIGNAL SIGTERM
 
