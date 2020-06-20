@@ -88,8 +88,8 @@ RUN set -x \
 # NGINX OFFICIAL DOCKERFILE COMMANDS
 # ##############################################################################
 # create nginx user/group first, to be consistent throughout docker variants
-   && addgroup -g 101 -S nginx \
-   && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+   && addgroup -g 1001 -S nginx \
+   && adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
       && apk add --no-cache --virtual .nginx-build-deps \

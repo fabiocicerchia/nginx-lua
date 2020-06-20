@@ -8,6 +8,7 @@ function tag() {
     OS_VER=$3
     VER_TAGS=$4
     OS_TAGS=$5
+    DEFAULT=$6
 
     DOCKERFILE_PATH=nginx/$NGINX_VER/$OS/$OS_VER
     DOCKERFILE=$DOCKERFILE_PATH/Dockerfile
@@ -18,12 +19,16 @@ function tag() {
     
     STR=""
 
-    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+    if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
         STR="$STR \`$MAJOR\`"
-        STR="$STR \`$MAJOR-$OS\`"
-        STR="$STR \`$MAJOR-$OS$OS_VER\`"
         STR="$STR \`$MINOR\`"
         STR="$STR \`$PATCH\`"
+        STR="$STR,\`latest\`"
+    fi
+
+    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+        STR="$STR \`$MAJOR-$OS\`"
+        STR="$STR \`$MAJOR-$OS$OS_VER\`"
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
@@ -35,10 +40,6 @@ function tag() {
     STR="$STR \`$PATCH-$OS$OS_VER\`"
 
     STR=$(echo $STR | tr ' ' '\n' | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | tr '\n', ',' | sed 's/.$//')    
-    
-    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        STR="$STR,\`latest\`"
-    fi
 
     STR=" - [$STR](https://github.com/fabiocicerchia/nginx-lua/blob/master/$DOCKERFILE)"
     echo $STR
@@ -49,6 +50,24 @@ for (( I=0; I<$NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"
 
     VER_TAGS=0
+    if [ "$((I+1))" == "$NLEN" ]; then
+        VER_TAGS=1
+    fi
+
+    # Default image is Alpine
+    DEFAULT=1
+    OS=alpine
+    DLEN=${#ALPINE[@]}
+    for (( J=0; J<$DLEN; J++ )); do
+        OS_VER="${ALPINE[$J]}"
+        OS_TAGS=0
+        if [ "$((J+1))" == "$DLEN" ]; then
+            OS_TAGS=1
+        fi
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
+    done
+
+    DEFAULT=0
 
     OS=amazonlinux
     DLEN=${#AMAZONLINUX[@]}
@@ -58,7 +77,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
     done
 
     OS=centos
@@ -69,7 +88,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
     done
 
     OS=debian
@@ -80,7 +99,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
     done
 
     OS=fedora
@@ -91,7 +110,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
     done
 
     OS=ubuntu
@@ -102,23 +121,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
-    done
-
-    # Default image is Alpine
-    if [ "$((I+1))" == "$NLEN" ]; then
-        VER_TAGS=1
-    fi
-
-    OS=alpine
-    DLEN=${#ALPINE[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${ALPINE[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS
+        tag $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
     done
 
 done

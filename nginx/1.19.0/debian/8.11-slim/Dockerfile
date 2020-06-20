@@ -91,8 +91,8 @@ RUN set -x \
 # NGINX
 # ##############################################################################
 # create nginx user/group first, to be consistent throughout docker variants
-   && addgroup --system --gid 101 nginx \
-   && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
+   && addgroup --system --gid 1001 nginx \
+   && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 1001 nginx \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
       && wget https://nginx.org/download/nginx-${VER_NGINX}.tar.gz -O /nginx.tar.gz \

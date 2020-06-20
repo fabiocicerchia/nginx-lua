@@ -92,8 +92,8 @@ RUN set -x \
 # NGINX
 # ##############################################################################
 # create nginx user/group first, to be consistent throughout docker variants
-   && groupadd --system --gid 101 nginx \
-   && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+   && groupadd --system --gid 1001 nginx \
+   && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 1001 nginx \
    && yum makecache \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
@@ -139,6 +139,7 @@ RUN set -x \
    && rm -rf /luajit2-${VER_LUAJIT} \
    && rm -rf /nginx-${VER_NGINX} \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+   && yum clean all \
    && yum remove -y \
       gcc-c++ \
       make \
