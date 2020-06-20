@@ -10,7 +10,7 @@ ARG VCS_REF
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.build-date=$BUILD_DATE
 LABEL org.label-schema.name="fabiocicerchia/nginx-lua"
-LABEL org.label-schema.description="Nginx 1.19.0 with LUA support based on Alpine Linux."
+LABEL org.label-schema.description="Nginx 1.19.0 with LUA support based on Alpine Linux 3.10.5."
 LABEL org.label-schema.url="https://github.com/fabiocicerchia/nginx-lua"
 LABEL org.label-schema.vcs-url="https://github.com/fabiocicerchia/nginx-lua"
 LABEL org.label-schema.vcs-ref=$VCS_REF
@@ -33,7 +33,7 @@ ENV LUA_LIB_DIR /usr/local/share/lua/5.1
 # This library is considered production ready.
 ENV VER_LUA_RESTY_LRUCACHE 0.09
 
-# https://nginx.org/en/download.html
+# https://github.com/nginx/nginx
 ENV VER_NGINX 1.19.0
 
 # https://github.com/vision5/ngx_devel_kit

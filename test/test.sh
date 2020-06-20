@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ../supported_versions
+source supported_versions
 
 function runtest() {
     NGINX_VER=$1

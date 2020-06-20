@@ -21,8 +21,9 @@ function build() {
         return
     fi
 
-    docker build -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER -f $DOCKERFILE .
-    IMAGE_ID=$(docker images ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER)
+    VCS_REF=$(git rev-parse --short HEAD)
+    docker build --build-arg BUILD_DATE=$(date +%Y%m%d%H%M%S) --build-arg BUILD_VERSION=$(date +%s) --build-arg VCS_REF=$VCS_REF -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER -f $DOCKERFILE .
+    IMAGE_ID=$(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER)
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
         docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR
