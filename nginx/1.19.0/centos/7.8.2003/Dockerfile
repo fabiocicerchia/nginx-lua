@@ -142,6 +142,10 @@ RUN set -x \
    && yum remove -y \
       gcc-c++ \
       make \
+      wget \
+   || rpm -e --nodeps \
+      gcc-c++ \
+      make \
       wget
 
 EXPOSE 80

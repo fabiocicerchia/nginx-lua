@@ -142,6 +142,12 @@ RUN set -x \
       gzip \
       make \
       tar \
+      wget \
+   || rpm -e --nodeps \
+      gcc-c++ \
+      gzip \
+      make \
+      tar \
       wget
 
 EXPOSE 80

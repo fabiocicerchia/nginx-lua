@@ -25,18 +25,18 @@ function build() {
     IMAGE_ID=$(docker images ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER)
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:latest
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:latest
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH-$OS
-        docker build $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH-$OS
+        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
     fi
 }
 
