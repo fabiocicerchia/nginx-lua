@@ -14,34 +14,34 @@ function runtest() {
     PATCH=$NGINX_VER
 
     docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER \
-        ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+        && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
         ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
         ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
         ; docker rm -f nginx_lua_test
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR-$OS \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
@@ -49,17 +49,17 @@ function runtest() {
 
     if [ "$OS_TAGS" == "1" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR-$OS \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH-$OS \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            &* until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
@@ -67,7 +67,7 @@ function runtest() {
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:latest \
-            ; until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
