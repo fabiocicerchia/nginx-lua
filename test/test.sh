@@ -2,6 +2,17 @@
 
 source supported_versions
 
+function test() {
+    DOCKER_TAG=$1
+
+    docker image ls -q fabiocicerchia/nginx:$DOCKER_TAG \
+        || (docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG \
+        && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+        ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
+        ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
+        ; docker rm -f nginx_lua_test)
+}
+
 function runtest() {
     NGINX_VER=$1
     OS=$2
@@ -13,64 +24,24 @@ function runtest() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER \
-        && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-        ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-        ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-        ; docker rm -f nginx_lua_test
+    test $PATCH-$OS$OS_VER
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR-$OS \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
+        test $MAJOR
+        test $MAJOR-$OS
+        test $MAJOR-$OS$OS_VER
+        test $MINOR
+        test $PATCH
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR-$OS \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$PATCH-$OS \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
+        test $MINOR-$OS
+        test $PATCH-$OS
+        test $MINOR-$OS$OS_VER
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:latest \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
+        test latest
     fi
 
 }

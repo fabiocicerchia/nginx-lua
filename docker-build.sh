@@ -2,6 +2,10 @@
 
 source supported_versions
 
+function docker_tag_exists() {
+    curl --silent -f -lSL https://index.docker.io/v1/repositories/$1/tags/$2 > /dev/null
+}
+
 function build() {
     NGINX_VER=$1
     OS=$2
@@ -17,9 +21,7 @@ function build() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    NOT_FOUND=$(docker pull fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER; echo $?)
-
-    if [ "$NOT_FOUND" == "0" ]; then
+    if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
         return
     fi
 
@@ -48,6 +50,16 @@ function build() {
 
 set -x
 
+OS=$1
+VERSIONS=()
+if [ "$OS" == "alpine" ]; then VERSIONS=$ALPINE
+elif [ "$OS" == "amazonlinux" ]; then VERSIONS=$AMAZONLINUX
+elif [ "$OS" == "centos" ]; then VERSIONS=$CENTOS
+elif [ "$OS" == "debian" ]; then VERSIONS=$DEBIAN
+elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
+elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
+fi
+
 NLEN=${#NGINX[@]}
 for (( I=0; I<$NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"
@@ -58,68 +70,12 @@ for (( I=0; I<$NLEN; I++ )); do
     fi
 
     # Default image is Alpine
-    DEFAULT=1
-    OS=alpine
-    DLEN=${#ALPINE[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${ALPINE[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
     DEFAULT=0
+    if [ "$OS" == "alpine" ]; then DEFAULT=1; fi
 
-    OS=amazonlinux
-    DLEN=${#AMAZONLINUX[@]}
+    DLEN=${#VERSIONS[@]}
     for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${AMAZONLINUX[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
-    OS=centos
-    DLEN=${#CENTOS[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${CENTOS[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
-    OS=debian
-    DLEN=${#DEBIAN[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${DEBIAN[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
-    OS=fedora
-    DLEN=${#FEDORA[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${FEDORA[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
-    OS=ubuntu
-    DLEN=${#UBUNTU[@]}
-    for (( J=0; J<$DLEN; J++ )); do
-        OS_VER="${UBUNTU[$J]}"
+        OS_VER="${VERSIONS[$J]}"
         OS_TAGS=0
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
