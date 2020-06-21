@@ -59,7 +59,7 @@ function runtest() {
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER \
-            &* until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
+            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
             ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
             ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
             ; docker rm -f nginx_lua_test
