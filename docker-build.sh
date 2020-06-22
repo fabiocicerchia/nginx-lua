@@ -25,39 +25,46 @@ function build() {
         return
     fi
 
-    VCS_REF=$(git rev-parse --short HEAD)
-    docker build --build-arg BUILD_DATE=$(date +%Y%m%d%H%M%S) --build-arg BUILD_VERSION=$(date +%s) --build-arg VCS_REF=$VCS_REF -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER -f $DOCKERFILE .
-    IMAGE_ID=$(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER)
-
+    TAGS="-t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:latest
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:latest"
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$PATCH-$OS
-        docker tag $IMAGE_ID fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
     fi
+
+    BUILD_DATE=$(date +%Y%m%d%H%M%S)
+    BUILD_VERSION=$(date +%s)
+    VCS_REF=$(git rev-parse --short HEAD)
+    docker build \
+        --build-arg BUILD_DATE=$BUILD_DATE \
+        --build-arg BUILD_VERSION=$BUILD_VERSION \
+        --build-arg VCS_REF=$VCS_REF \
+        $TAGS \
+        -f $DOCKERFILE .
 }
 
 set -x
 
 OS=$1
 VERSIONS=()
-if [ "$OS" == "alpine" ]; then VERSIONS=$ALPINE
-elif [ "$OS" == "amazonlinux" ]; then VERSIONS=$AMAZONLINUX
-elif [ "$OS" == "centos" ]; then VERSIONS=$CENTOS
-elif [ "$OS" == "debian" ]; then VERSIONS=$DEBIAN
-elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
-elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
+if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
+elif [ "$OS" == "amazonlinux" ]; then VERSIONS=("${AMAZONLINUX[@]}")
+elif [ "$OS" == "centos" ]; then VERSIONS=("${CENTOS[@]}")
+elif [ "$OS" == "debian" ]; then VERSIONS=("${DEBIAN[@]}")
+elif [ "$OS" == "fedora" ]; then VERSIONS=("${FEDORA[@]}")
+elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
 fi
 
 NLEN=${#NGINX[@]}
