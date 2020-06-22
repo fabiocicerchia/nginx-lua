@@ -21,13 +21,13 @@ function push() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    docker_tag_exists fabiocicerchia/nginx-lua $MAJOR-$OS$OS_VER || docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
-    docker_tag_exists fabiocicerchia/nginx-lua $MINOR-$OS$OS_VER || docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
-    docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER || docker push fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER
-
     if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
         return
     fi
+
+    docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
+    docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
+    docker push fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER
 
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
         docker push fabiocicerchia/nginx-lua:$MAJOR
