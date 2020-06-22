@@ -52,6 +52,7 @@ RUN set -x \
       openssl-devel \
       pcre-devel \
       zlib-devel \
+      shadow-utils \
    && yum install -y \
       gcc-c++ \
       gzip \
@@ -92,6 +93,10 @@ RUN set -x \
       && tar xvzf /lua-nginx.tar.gz && rm /lua-nginx.tar.gz \
 # NGINX
 # ##############################################################################
+# create nginx user/group first, to be consistent throughout docker variants
+   && addgroup -g 1001 -S nginx \
+   && adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+   && yum makecache \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
       && wget https://nginx.org/download/nginx-${VER_NGINX}.tar.gz -O /nginx.tar.gz \
@@ -166,6 +171,7 @@ RUN set -x \
    && rm -rf /luajit2-${VER_LUAJIT} \
    && rm -rf /nginx-${VER_NGINX} \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+   && yum clean all \
    && yum remove -y \
       gcc-c++ \
       gzip \
@@ -178,6 +184,8 @@ RUN set -x \
       make \
       tar \
       wget
+
+HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
 EXPOSE 80
 EXPOSE 443
