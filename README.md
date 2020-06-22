@@ -107,7 +107,11 @@ configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-p
 ## Run Container
 
 ```sh
-docker run -it --rm -p 80:80 fabiocicerchia/nginx-lua
+docker run -it --rm -p 80:80 \
+  --health-cmd='curl --fail http://example.com || exit 1' \
+  --health-interval=30s \
+  --health-timeout=3s \
+  fabiocicerchia/nginx-lua:latest
 ```
 
 ## Example

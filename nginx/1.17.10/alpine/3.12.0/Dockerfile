@@ -187,6 +187,8 @@ RUN set -x \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
    && apk del .build-deps .nginx-build-deps
 
+HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
+
 EXPOSE 80
 EXPOSE 443
 
