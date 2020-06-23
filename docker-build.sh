@@ -41,13 +41,13 @@ function build() {
     if [ "$OS_TAGS" == "1" ]; then
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS"
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
     fi
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
 
     BUILD_DATE=$(date +%Y%m%d%H%M%S)
     BUILD_VERSION=$(date +%s)
     VCS_REF=$(git rev-parse --short HEAD)
-    docker build \
+    time docker build \
         --build-arg BUILD_DATE=$BUILD_DATE \
         --build-arg BUILD_VERSION=$BUILD_VERSION \
         --build-arg VCS_REF=$VCS_REF \
