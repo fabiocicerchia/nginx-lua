@@ -1,6 +1,5 @@
 FROM alpine:3.10.5
 
-MAINTAINER Fabio Cicerchia <info@fabiocicerchia.it>
 LABEL maintainer="info@fabiocicerchia.it"
 
 ARG BUILD_DATE
@@ -40,6 +39,9 @@ ENV VER_NGINX 1.18.0
 # The NDK is now considered to be stable.
 ENV VER_NGX_DEVEL_KIT 0.3.1
 
+# https://github.com/Yelp/dumb-init
+ENV VER_DUMBINIT 1.2.2
+
 ENV LUAJIT_LIB /usr/local/lib
 ENV LUAJIT_INC /usr/local/include/luajit-2.1
 ENV LD_LIBRARY_PATH /usr/local/lib/:$LD_LIBRARY_PATH
@@ -49,7 +51,7 @@ RUN set -x \
    && apk add --no-cache \
       geoip-dev \
       openssl-dev \
-      pcre3-dev \
+      pcre-dev \
       zlib-dev \
    && apk add --no-cache --virtual .build-deps \
       curl \
@@ -92,8 +94,8 @@ RUN set -x \
 # NGINX
 # ##############################################################################
 # create nginx user/group first, to be consistent throughout docker variants
-   && addgroup -g 1001 -S nginx \
-   && adduser -S -D -H -u 1001 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+   && addgroup -g 32548 -S nginx \
+   && adduser -S -D -H -u 32548 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
       && apk add --no-cache --virtual .nginx-build-deps \
@@ -110,7 +112,7 @@ RUN set -x \
             make \
             mercurial \
             openssl-dev \
-            pcre3-dev \
+            pcre-dev \
             perl-dev \
             zlib-dev \
       && curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz \
@@ -177,6 +179,16 @@ RUN set -x \
 # forward request and error logs to docker log collector
    && ln -sf /dev/stdout /var/log/nginx/access.log \
    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# UID & GID
+# ##############################################################################
+   && chown -R 32548:32548 \
+      /etc/nginx \
+      /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+      /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+      /var/log/nginx \
+# dumb-init
+# ##############################################################################
+   && apk add dumb-init \
 # Cleanup
 # ##############################################################################
    && rm -rf /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
@@ -189,9 +201,13 @@ RUN set -x \
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
+USER nginx
+
 EXPOSE 80
 EXPOSE 443
 
 STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["dumb-init"]
 
 CMD ["nginx", "-g", "daemon off;"]

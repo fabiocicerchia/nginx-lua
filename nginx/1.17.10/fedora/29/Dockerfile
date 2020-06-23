@@ -1,6 +1,5 @@
 FROM fedora:29
 
-MAINTAINER Fabio Cicerchia <info@fabiocicerchia.it>
 LABEL maintainer="info@fabiocicerchia.it"
 
 ARG BUILD_DATE
@@ -40,6 +39,9 @@ ENV VER_NGINX 1.17.10
 # The NDK is now considered to be stable.
 ENV VER_NGX_DEVEL_KIT 0.3.1
 
+# https://github.com/Yelp/dumb-init
+ENV VER_DUMBINIT 1.2.2
+
 ENV LUAJIT_LIB /usr/local/lib
 ENV LUAJIT_INC /usr/local/include/luajit-2.1
 ENV LD_LIBRARY_PATH /usr/local/lib/:$LD_LIBRARY_PATH
@@ -50,7 +52,7 @@ RUN set -x \
       GeoIP-devel \
       ca-certificates \
       openssl-devel \
-      pcre3-devel \
+      pcre-devel \
       zlib-devel \
    && yum install -y \
       gcc-c++ \
@@ -92,8 +94,8 @@ RUN set -x \
 # NGINX
 # ##############################################################################
 # create nginx user/group first, to be consistent throughout docker variants
-   && groupadd --system --gid 1001 nginx \
-   && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 1001 nginx \
+   && groupadd --system --gid 32548 nginx \
+   && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 32548 nginx \
    && yum makecache \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
@@ -161,6 +163,16 @@ RUN set -x \
 # forward request and error logs to docker log collector
    && ln -sf /dev/stdout /var/log/nginx/access.log \
    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# UID & GID
+# ##############################################################################
+   && chown -R 32548:32548 \
+      /etc/nginx \
+      /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+      /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+      /var/log/nginx \
+# dumb-init
+# ##############################################################################
+   && yum install -y dumb-init \
 # Cleanup
 # ##############################################################################
    && rm -rf /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
@@ -170,15 +182,20 @@ RUN set -x \
    && rm -rf /nginx-${VER_NGINX} \
    && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
    && yum clean all \
+   && rm -rf /var/cache/yum \
    && yum remove -y \
       gcc-c++ \
       make
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
+USER nginx
+
 EXPOSE 80
 EXPOSE 443
 
 STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["dumb-init"]
 
 CMD ["nginx", "-g", "daemon off;"]

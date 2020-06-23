@@ -24,12 +24,6 @@ jobs:
       - name: Test images
         run: ./test/test.sh alpine
 
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh alpine
-
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
@@ -48,12 +42,6 @@ jobs:
 
       - name: Test images
         run: ./test/test.sh amazonlinux
-
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh amazonlinux
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -74,12 +62,6 @@ jobs:
       - name: Test images
         run: ./test/test.sh centos
 
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh centos
-
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
@@ -98,12 +80,6 @@ jobs:
 
       - name: Test images
         run: ./test/test.sh debian
-
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh debian
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -124,12 +100,6 @@ jobs:
       - name: Test images
         run: ./test/test.sh fedora
 
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh fedora
-
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
@@ -148,12 +118,6 @@ jobs:
 
       - name: Test images
         run: ./test/test.sh ubuntu
-
-      - name: Security Check
-        run: |
-            npm install -g snyk
-            snyk auth $SNYK_AUTH_TOKEN
-            ./test/security.sh ubuntu
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin

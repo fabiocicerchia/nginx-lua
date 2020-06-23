@@ -23,7 +23,6 @@ function tag() {
         STR="$STR \`$MAJOR\`"
         STR="$STR \`$MINOR\`"
         STR="$STR \`$PATCH\`"
-        STR="$STR,\`latest\`"
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
@@ -34,12 +33,16 @@ function tag() {
     if [ "$OS_TAGS" == "1" ]; then
         STR="$STR \`$MINOR-$OS\`"
         STR="$STR \`$PATCH-$OS\`"
-        STR="$STR \`$MINOR-$OS$OS_VER\`"
     fi
 
     STR="$STR \`$PATCH-$OS$OS_VER\`"
+    STR="$STR \`$MINOR-$OS$OS_VER\`"
 
     STR=$(echo $STR | tr ' ' '\n' | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | tr '\n', ',' | sed 's/.$//')    
+
+    if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
+        STR="$STR,\`latest\`"
+    fi
 
     STR=" - [$STR](https://github.com/fabiocicerchia/nginx-lua/blob/master/$DOCKERFILE)"
     echo $STR
