@@ -64,7 +64,7 @@ RUN set -x \
    && curl -Lo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz \
       && tar xvzf /luajit.tar.gz && rm /luajit.tar.gz \
       && cd /luajit2-${VER_LUAJIT} \
-      && make -j $(nproc) \
+      && make -j "$(nproc)" \
       && make install \
       && cd / \
 # LUA Resty Core
@@ -72,7 +72,7 @@ RUN set -x \
    && curl -Lo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz \
       && tar xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
       && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-      && make -j $(nproc) \
+      && make -j "$(nproc)" \
       && make install \
       && cd / \
 # LUA Resty LRUCache
@@ -80,7 +80,7 @@ RUN set -x \
    && curl -Lo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz \
       && tar xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
       && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-      && make -j $(nproc) \
+      && make -j "$(nproc)" \
       && make install \
       && cd / \
 # NGX Devel Kit
@@ -169,7 +169,7 @@ RUN set -x \
          --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
          --with-http_dav_module \
          --with-http_geoip_module \
-      && make -j $(nproc) build \
+      && make -j "$(nproc)" build \
       && make install \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
@@ -179,16 +179,9 @@ RUN set -x \
 # forward request and error logs to docker log collector
    && ln -sf /dev/stdout /var/log/nginx/access.log \
    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# UID & GID
-# ##############################################################################
-   && chown -R 32548:32548 \
-      /etc/nginx \
-      /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-      /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-      /var/log/nginx \
 # dumb-init
 # ##############################################################################
-   && apk add dumb-init \
+   && apk add --no-cache dumb-init \
 # Cleanup
 # ##############################################################################
    && rm -rf /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
@@ -200,8 +193,6 @@ RUN set -x \
    && apk del .build-deps .nginx-build-deps
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
-
-USER nginx
 
 EXPOSE 80
 EXPOSE 443

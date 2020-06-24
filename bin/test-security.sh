@@ -34,6 +34,14 @@ elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
 elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
 fi
 
+docker run -it --net host --pid host --userns host --cap-add audit_control \
+    -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
+    -v /etc:/etc \
+    -v /var/lib:/var/lib:ro \
+    -v /var/run/docker.sock:/var/run/docker.sock:ro \
+    --label docker_bench_security \
+    docker/docker-bench-security
+
 NLEN=${#NGINX[@]}
 for (( I=0; I<$NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"

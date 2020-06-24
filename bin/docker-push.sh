@@ -21,9 +21,9 @@ function push() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
-        return
-    fi
+    #if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
+    #    return
+    #fi
 
     docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
     docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
