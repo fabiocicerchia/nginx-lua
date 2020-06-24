@@ -36,7 +36,6 @@ Nginx 1.17, 1.18 and 1.19 with LUA support based on Alpine Linux, Amazon Linux, 
 - [`1.19-debian9.12-slim`,`1.19.0-debian9.12-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/debian/9.12-slim/Dockerfile)
 - [`1.19-debian8.11-slim`,`1.19.0-debian8.11-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/debian/8.11-slim/Dockerfile)
 - [`1.19-centos7.8.2003`,`1.19.0-centos7.8.2003`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/centos/7.8.2003/Dockerfile)
-- [`1.19-centos6.10`,`1.19.0-centos6.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/centos/6.10/Dockerfile)
 - [`1.19-amazonlinux2018.03.0.20200318.1`,`1.19.0-amazonlinux2018.03.0.20200318.1`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/amazonlinux/2018.03.0.20200318.1/Dockerfile)
 - [`1.19-alpine3.11.6`,`1.19.0-alpine3.11.6`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/alpine/3.11.6/Dockerfile)
 - [`1.19-alpine3.10.5`,`1.19.0-alpine3.10.5`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.0/alpine/3.10.5/Dockerfile)
@@ -51,7 +50,6 @@ Nginx 1.17, 1.18 and 1.19 with LUA support based on Alpine Linux, Amazon Linux, 
 - [`1.18-debian8.11-slim`,`1.18.0-debian8.11-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/debian/8.11-slim/Dockerfile)
 - [`1.18-centos`,`1.18.0-centos`,`1.18-centos8.2.2004`,`1.18.0-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/centos/8.2.2004/Dockerfile)
 - [`1.18-centos7.8.2003`,`1.18.0-centos7.8.2003`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/centos/7.8.2003/Dockerfile)
-- [`1.18-centos6.10`,`1.18.0-centos6.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/centos/6.10/Dockerfile)
 - [`1.18-amazonlinux`,`1.18.0-amazonlinux`,`1.18-amazonlinux2.0.20200406.0`,`1.18.0-amazonlinux2.0.20200406.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/amazonlinux/2.0.20200406.0/Dockerfile)
 - [`1.18-amazonlinux2018.03.0.20200318.1`,`1.18.0-amazonlinux2018.03.0.20200318.1`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/amazonlinux/2018.03.0.20200318.1/Dockerfile)
 - [`1.18-alpine`,`1.18.0-alpine`,`1.18-alpine3.12.0`,`1.18.0-alpine3.12.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.18.0/alpine/3.12.0/Dockerfile)
@@ -68,7 +66,6 @@ Nginx 1.17, 1.18 and 1.19 with LUA support based on Alpine Linux, Amazon Linux, 
 - [`1.17-debian8.11-slim`,`1.17.10-debian8.11-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/debian/8.11-slim/Dockerfile)
 - [`1.17-centos`,`1.17.10-centos`,`1.17-centos8.2.2004`,`1.17.10-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/centos/8.2.2004/Dockerfile)
 - [`1.17-centos7.8.2003`,`1.17.10-centos7.8.2003`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/centos/7.8.2003/Dockerfile)
-- [`1.17-centos6.10`,`1.17.10-centos6.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/centos/6.10/Dockerfile)
 - [`1.17-amazonlinux`,`1.17.10-amazonlinux`,`1.17-amazonlinux2.0.20200406.0`,`1.17.10-amazonlinux2.0.20200406.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/amazonlinux/2.0.20200406.0/Dockerfile)
 - [`1.17-amazonlinux2018.03.0.20200318.1`,`1.17.10-amazonlinux2018.03.0.20200318.1`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/amazonlinux/2018.03.0.20200318.1/Dockerfile)
 - [`1.17-alpine`,`1.17.10-alpine`,`1.17-alpine3.12.0`,`1.17.10-alpine3.12.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.17.10/alpine/3.12.0/Dockerfile)
@@ -152,15 +149,6 @@ docker run -it --rm -p 80:80 \
   --health-interval=30s \
   --health-timeout=3s \
   fabiocicerchia/nginx-lua:latest
-```
-
-## User and group id
-
-Images variants use the same user and group ids to drop the privileges for worker processes:
-
-```console
-$ id
-uid=32548(nginx) gid=32548(nginx) groups=32548(nginx)
 ```
 
 ## Image Variants

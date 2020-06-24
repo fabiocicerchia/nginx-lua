@@ -21,9 +21,9 @@ function build() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
-        return
-    fi
+    #if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
+    #    return
+    #fi
 
     TAGS="-t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
