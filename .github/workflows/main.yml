@@ -22,7 +22,7 @@ jobs:
         run: ./bin/docker-build.sh alpine
 
       - name: Test images
-        run: ./test/test.sh alpine
+        run: ./bin/test.sh alpine
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -41,7 +41,7 @@ jobs:
         run: ./bin/docker-build.sh amazonlinux
 
       - name: Test images
-        run: ./test/test.sh amazonlinux
+        run: ./bin/test.sh amazonlinux
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -60,7 +60,7 @@ jobs:
         run: ./bin/docker-build.sh centos
 
       - name: Test images
-        run: ./test/test.sh centos
+        run: ./bin/test.sh centos
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -79,7 +79,7 @@ jobs:
         run: ./bin/docker-build.sh debian
 
       - name: Test images
-        run: ./test/test.sh debian
+        run: ./bin/test.sh debian
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -98,7 +98,7 @@ jobs:
         run: ./bin/docker-build.sh fedora
 
       - name: Test images
-        run: ./test/test.sh fedora
+        run: ./bin/test.sh fedora
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -117,7 +117,7 @@ jobs:
         run: ./bin/docker-build.sh ubuntu
 
       - name: Test images
-        run: ./test/test.sh ubuntu
+        run: ./bin/test.sh ubuntu
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
