@@ -47,7 +47,7 @@ function build() {
     TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
     TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
 
-    BUILD_DATE=$(date +%Y%m%d%H%M%S)
+    BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     BUILD_VERSION=$(date +%s)
     VCS_REF=$(git rev-parse --short HEAD)
     time docker build \
