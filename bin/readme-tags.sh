@@ -37,6 +37,7 @@ function tag() {
 
     STR="$STR \`$PATCH-$OS$OS_VER\`"
     STR="$STR \`$MINOR-$OS$OS_VER\`"
+    STR="$STR \`$MAJOR-$OS$OS_VER\`"
 
     STR=$(echo $STR | tr ' ' '\n' | awk '{ print length($0) " " $0; }' | sort -n | cut -d ' ' -f 2- | tr '\n', ',' | sed 's/.$//')    
 
