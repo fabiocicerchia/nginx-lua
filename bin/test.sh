@@ -9,11 +9,15 @@ function test() {
 
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:$DOCKER_TAG | wc -l)
     if [ $FOUND -ne 0 ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG \
-            && until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do echo -n '.'; sleep 0.5; done \
-            ; curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1 \
-            ; curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1 \
-            ; docker rm -f nginx_lua_test
+        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG
+        COUNT=0
+        until [ $COUNT -eq 20 -o "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
+            echo -n '.'; sleep 0.5;
+            COUNT=$((COUNT+1))
+        done
+        curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1
+        curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1
+        docker rm -f nginx_lua_test
      else
         echo "Image not found: fabiocicerchia/nginx-lua:$DOCKER_TAG"
      fi
