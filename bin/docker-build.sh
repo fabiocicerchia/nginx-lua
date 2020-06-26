@@ -25,7 +25,7 @@ function build() {
     #    return
     #fi
 
-    TAGS="-t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
+    TAGS=""
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR"
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR"
@@ -42,7 +42,10 @@ function build() {
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS"
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS"
     fi
+
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
     TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
 
     BUILD_DATE=$(date +%Y%m%d%H%M%S)
     BUILD_VERSION=$(date +%s)

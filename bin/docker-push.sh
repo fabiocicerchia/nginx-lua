@@ -44,7 +44,6 @@ function push() {
     if [ "$OS_TAGS" == "1" ]; then
         docker push fabiocicerchia/nginx-lua:$MINOR-$OS
         docker push fabiocicerchia/nginx-lua:$PATCH-$OS
-        docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
     fi
 }
 
