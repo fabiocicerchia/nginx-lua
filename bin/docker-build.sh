@@ -91,3 +91,5 @@ for (( I=0; I<$NLEN; I++ )); do
     done
 
 done
+
+docker images
