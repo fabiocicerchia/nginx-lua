@@ -1,6 +1,6 @@
-ARG DOCKER_IMAGE={{DOCKER_IMAGE}}
-ARG DOCKER_IMAGE_OS={{DOCKER_IMAGE_OS}}
-ARG DOCKER_IMAGE_TAG={{DOCKER_IMAGE_TAG}}
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ARG DOCKER_IMAGE_OS=amazonlinux
+ARG DOCKER_IMAGE_TAG=2.0.20200304.0
 
 ####################################
 # Build Nginx with support for LUA #
@@ -32,7 +32,7 @@ ARG VER_LUA_RESTY_LRUCACHE=0.09
 ARG VER_NGX_DEVEL_KIT=0.3.1
 
 # https://github.com/nginx/nginx
-ARG VER_NGINX={{VER_NGINX}}
+ARG VER_NGINX=1.19.0
 ARG NGINX_BUILD_CONFIG="\
          --prefix=/etc/nginx \
          --sbin-path=/usr/sbin/nginx \
@@ -96,7 +96,6 @@ ARG BUILD_DEPS="\
 
 RUN set -x \
    && yum makecache \
-   && yum install -y epel-release \
    && yum install -y \
       $BUILD_DEPS
 
@@ -190,9 +189,9 @@ COPY --from=builder /var/cache/nginx /var/cache/nginx
 
 RUN set -eux \
     && yum makecache \
-    && yum install -y epel-release \
     && yum install -y \
        $PKG_DEPS \
+       shadow-utils \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \
@@ -211,6 +210,8 @@ RUN set -eux \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 32548 nginx \
 # Cleanup
 # ##############################################################################
+    && yum remove -y \
+       shadow-utils \
     && yum clean all \
     && rm -rf /var/cache/yum
 

@@ -1,114 +1,39 @@
-FROM ubuntu:20.10
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ARG DOCKER_IMAGE_OS=ubuntu
+ARG DOCKER_IMAGE_TAG=20.10
 
-LABEL maintainer="info@fabiocicerchia.it"
+####################################
+# Build Nginx with support for LUA #
+####################################
+FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
 ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG VCS_REF
 
-LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.build-date=$BUILD_DATE
-LABEL org.label-schema.name="fabiocicerchia/nginx-lua"
-LABEL org.label-schema.description="Nginx 1.19.0 with LUA support based on ubuntu 20.10."
-LABEL org.label-schema.url="https://github.com/fabiocicerchia/nginx-lua"
-LABEL org.label-schema.vcs-url="https://github.com/fabiocicerchia/nginx-lua"
-LABEL org.label-schema.vcs-ref=$VCS_REF
-LABEL org.label-schema.version=$BUILD_VERSION
-LABEL org.label-schema.docker.cmd="docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.19.0-ubuntu20.10"
-
 # https://github.com/openresty/luajit2
-ENV VER_LUAJIT 2.1-20200102
+ARG VER_LUAJIT=2.1-20200102
 
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ENV VER_LUA_NGINX_MODULE 0.10.15
+ARG VER_LUA_NGINX_MODULE=0.10.15
 
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ENV VER_LUA_RESTY_CORE 0.1.17
-ENV LUA_LIB_DIR /usr/local/share/lua/5.1
+ARG VER_LUA_RESTY_CORE=0.1.17
+ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
-ENV VER_LUA_RESTY_LRUCACHE 0.09
-
-# https://github.com/nginx/nginx
-ENV VER_NGINX 1.19.0
+ARG VER_LUA_RESTY_LRUCACHE=0.09
 
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
-ENV VER_NGX_DEVEL_KIT 0.3.1
+ARG VER_NGX_DEVEL_KIT=0.3.1
 
-# https://github.com/Yelp/dumb-init
-ENV VER_DUMBINIT 1.2.2
-
-ENV LUAJIT_LIB /usr/local/lib
-ENV LUAJIT_INC /usr/local/include/luajit-2.1
-ENV LD_LIBRARY_PATH /usr/local/lib/:$LD_LIBRARY_PATH
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN set -x \
-   && apt-get update \
-   && apt-get install -y --no-install-recommends --no-install-suggests \
-      zlib1g-dev \
-      libpcre3-dev \
-      libssl-dev \
-      libgeoip-dev \
-      ca-certificates \
-   && apt-get install -y --no-install-recommends --no-install-suggests \
-      curl \
-      g++ \
-      gzip \
-      make \
-      tar \
-# OpenResty LUAJIT2
-# ##############################################################################
-   && curl -Lo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz \
-      && tar xvzf /luajit.tar.gz && rm /luajit.tar.gz \
-      && cd /luajit2-${VER_LUAJIT} \
-      && make -j "$(nproc)" \
-      && make install \
-      && cd / \
-# LUA Resty Core
-# ##############################################################################
-   && curl -Lo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz \
-      && tar xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
-      && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-      && make -j "$(nproc)" \
-      && make install \
-      && cd / \
-# LUA Resty LRUCache
-# ##############################################################################
-   && curl -Lo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz \
-      && tar xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
-      && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-      && make -j "$(nproc)" \
-      && make install \
-      && cd / \
-# NGX Devel Kit
-# ##############################################################################
-   && curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz \
-      && tar xvzf /ngx_devel_kit.tar.gz && rm /ngx_devel_kit.tar.gz \
-# Lua Nginx Module
-# ##############################################################################
-   && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
-      && tar xvzf /lua-nginx.tar.gz && rm /lua-nginx.tar.gz \
-# NGINX
-# ##############################################################################
-# create nginx user/group first, to be consistent throughout docker variants
-   && addgroup --system --gid 32548 nginx \
-   && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 32548 nginx \
-# we're on an architecture upstream doesn't officially build for
-# let's build binaries from the published packaging sources
-      && curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz \
-      && tar xvzf /nginx.tar.gz && rm /nginx.tar.gz \
-      && cd /nginx-${VER_NGINX} \
-      && mkdir -p /var/cache/nginx/client_temp \
-         /var/cache/nginx/proxy_temp \
-         /var/cache/nginx/fastcgi_temp \
-         /var/cache/nginx/uwsgi_temp \
-         /var/cache/nginx/scgi_temp \
-      && ./configure \
+# https://github.com/nginx/nginx
+ARG VER_NGINX=1.19.0
+ARG NGINX_BUILD_CONFIG="\
          --prefix=/etc/nginx \
          --sbin-path=/usr/sbin/nginx \
          --modules-path=/usr/lib/nginx/modules \
@@ -118,19 +43,22 @@ RUN set -x \
          --pid-path=/var/run/nginx.pid \
          --lock-path=/var/run/nginx.lock \
          --http-client-body-temp-path=/var/cache/nginx/client_temp \
-         --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
          --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-         --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+         --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
          --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+         --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
          --user=nginx \
          --group=nginx \
+         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
          --with-compat \
          --with-file-aio \
-         --with-threads \
          --with-http_addition_module \
          --with-http_auth_request_module \
          --with-http_dav_module \
+         --with-http_dav_module \
          --with-http_flv_module \
+         --with-http_geoip_module \
          --with-http_gunzip_module \
          --with-http_gzip_static_module \
          --with-http_mp4_module \
@@ -148,39 +76,146 @@ RUN set -x \
          --with-stream_realip_module \
          --with-stream_ssl_module \
          --with-stream_ssl_preread_module \
-         --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
-         --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' \
-         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-         --with-http_dav_module \
-         --with-http_geoip_module \
-      && make -j "$(nproc)" build \
-      && make install \
-# Bring in tzdata so users could set the timezones through the environment
-# variables
-   && apt-get install -y --no-install-recommends --no-install-suggests tzdata \
-# Bring in curl and ca-certificates to make registering on DNS SD easier
-   && apt-get install -y --no-install-recommends --no-install-suggests curl ca-certificates \
-# forward request and error logs to docker log collector
-   && ln -sf /dev/stdout /var/log/nginx/access.log \
-   && ln -sf /dev/stderr /var/log/nginx/error.log \
-# dumb-init
-# ##############################################################################
-   && apt-get install -y --no-install-recommends --no-install-suggests dumb-init \
-# Cleanup
-# ##############################################################################
-   && rm -rf /lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-   && rm -rf /lua-resty-core-${VER_LUA_RESTY_CORE} \
-   && rm -rf /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-   && rm -rf /luajit2-${VER_LUAJIT} \
-   && rm -rf /nginx-${VER_NGINX} \
-   && rm -rf /ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-   && apt-get autoremove -y \
-   && apt-get remove -y \
+         --with-threads \
+    "
+
+ARG LUAJIT_LIB=/usr/local/lib
+ARG LUAJIT_INC=/usr/local/include/luajit-2.1
+ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
+
+ENV DEBIAN_FRONTEND noninteractive
+
+ARG BUILD_DEPS="\
+      ca-certificates \
       curl \
       g++ \
+      libgeoip-dev \
+      libpcre3-dev \
+      libssl-dev \
       make \
-   && rm -rf /var/lib/apt/lists/*
+      zlib1g-dev"
+
+RUN set -x \
+   && apt-get update \
+   && apt-get install -y --no-install-recommends --no-install-suggests \
+      apt-utils \
+   && apt-get install -y --no-install-recommends --no-install-suggests \
+      $BUILD_DEPS
+
+RUN set -eux \
+# OpenResty LUAJIT2
+# ##############################################################################
+    && curl -Lo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz \
+    && tar -C / -xvzf /luajit.tar.gz && rm /luajit.tar.gz \
+    && cd /luajit2-${VER_LUAJIT} \
+    && make -j "$(nproc)" \
+    && make install \
+    \
+# LUA Resty Core
+# ##############################################################################
+    && curl -Lo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz \
+    && tar -C / -xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
+    && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
+    && make -j "$(nproc)" \
+    && make install \
+    \
+# LUA Resty LRUCache
+# ##############################################################################
+    && curl -Lo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz \
+    && tar -C / -xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
+    && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
+    && make -j "$(nproc)" \
+    && make install \
+    \
+# NGX Devel Kit
+# ##############################################################################
+    && curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz \
+    && tar -C / -xvzf /ngx_devel_kit.tar.gz && rm /ngx_devel_kit.tar.gz \
+    \
+# Lua Nginx Module
+# ##############################################################################
+    && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
+    && tar -C / -xvzf /lua-nginx.tar.gz && rm /lua-nginx.tar.gz
+
+RUN set -eux \
+# NGINX
+# ##############################################################################
+# we're on an architecture upstream doesn't officially build for
+# let's build binaries from the published packaging sources
+    && curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz \
+    && tar -C / -xvzf /nginx.tar.gz && rm /nginx.tar.gz \
+    && cd /nginx-${VER_NGINX} \
+    && mkdir -p /var/cache/nginx/client_temp \
+       /var/cache/nginx/proxy_temp \
+       /var/cache/nginx/fastcgi_temp \
+       /var/cache/nginx/uwsgi_temp \
+       /var/cache/nginx/scgi_temp \
+    && ./configure \
+       ${NGINX_BUILD_CONFIG} \
+       --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
+       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' \
+    && make -j "$(nproc)" build \
+    && make install
+
+##########################################
+# Combine everything with minimal layers #
+##########################################
+FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
+
+# http://label-schema.org/rc1/
+LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
+      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.description="Nginx $VER_NGINX with LUA support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
+      org.label-schema.docker.cmd="docker run -p 80:80 -d $DOCKER_IMAGE:$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
+      org.label-schema.name="$DOCKER_IMAGE" \
+      org.label-schema.schema-version="1.0" \
+      org.label-schema.url="https://github.com/$DOCKER_IMAGE" \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
+      org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG"
+
+# https://github.com/Yelp/dumb-init
+ARG VER_DUMBINIT=1.2.2
+
+ENV DEBIAN_FRONTEND noninteractive
+
+ARG PKG_DEPS="\
+      zlib1g-dev \
+      libpcre3-dev \
+      libssl-dev \
+      libgeoip-dev \
+      ca-certificates"
+
+COPY --from=builder /etc/nginx /etc/nginx
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/share/lua /usr/local/share/lua
+COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder /var/cache/nginx /var/cache/nginx
+
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+       $PKG_DEPS \
+# Bring in tzdata so users could set the timezones through the environment
+# variables
+    && apt-get install -y --no-install-recommends --no-install-suggests tzdata \
+# Bring in curl and ca-certificates to make registering on DNS SD easier
+    && apt-get install -y --no-install-recommends --no-install-suggests curl ca-certificates \
+# forward request and error logs to docker log collector
+    && mkdir -p /var/log/nginx \
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# dumb-init
+# ##############################################################################
+    && curl -Lo /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v${VER_DUMBINIT}/dumb-init_${VER_DUMBINIT}_x86_64 \
+    && chmod +x /usr/bin/dumb-init \
+# create nginx user/group first, to be consistent throughout docker variants
+    && addgroup --system --gid 32548 nginx \
+    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 32548 nginx \
+# Cleanup
+# ##############################################################################
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
