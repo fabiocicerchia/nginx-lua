@@ -1,0 +1,1 @@
+nginx/1.19.0/alpine/3.12.0/Dockerfile

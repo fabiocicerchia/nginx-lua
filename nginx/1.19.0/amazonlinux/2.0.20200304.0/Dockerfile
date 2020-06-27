@@ -7,10 +7,6 @@ ARG DOCKER_IMAGE_TAG=2.0.20200304.0
 ####################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
-ARG BUILD_DATE
-ARG BUILD_VERSION
-ARG VCS_REF
-
 # https://github.com/openresty/luajit2
 ARG VER_LUAJIT=2.1-20200102
 
@@ -94,10 +90,13 @@ ARG BUILD_DEPS="\
       tar \
       zlib-devel"
 
+ARG NGINX_BUILD_DEPS=""
+
 RUN set -x \
    && yum makecache \
    && yum install -y \
-      $BUILD_DEPS
+      $BUILD_DEPS \
+      $NGINX_BUILD_DEPS
 
 RUN set -eux \
 # OpenResty LUAJIT2
@@ -158,6 +157,13 @@ RUN set -eux \
 # Combine everything with minimal layers #
 ##########################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
+
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ARG DOCKER_IMAGE_OS=amazonlinux
+ARG DOCKER_IMAGE_TAG=2.0.20200304.0
+ARG VER_NGINX=1.19.0
+ARG BUILD_DATE
+ARG VCS_REF
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \

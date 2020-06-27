@@ -4,6 +4,7 @@ source supported_versions
 
 function docker_tag_exists() {
     curl --silent -f -lSL https://index.docker.io/v1/repositories/$1/tags/$2 > /dev/null
+    echo $?
 }
 
 function push() {
@@ -21,9 +22,9 @@ function push() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    #if docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER; then
-    #    return
-    #fi
+    if [ "$FORCE" == "0" -a $(docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER) == 0 ]; then
+        return
+    fi
 
     docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
     docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
@@ -50,6 +51,10 @@ function push() {
 set -x
 
 OS=$1
+FORCE=0
+if [ "$2" == "1" ]; then
+    FORCE=1
+fi
 VERSIONS=()
 if [ "$OS" == "alpine" ]; then VERSIONS=$ALPINE
 elif [ "$OS" == "amazonlinux" ]; then VERSIONS=$AMAZONLINUX
