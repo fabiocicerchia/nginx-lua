@@ -7,10 +7,6 @@ ARG DOCKER_IMAGE_TAG=3.12.0
 ####################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
-ARG BUILD_DATE
-ARG BUILD_VERSION
-ARG VCS_REF
-
 # https://github.com/openresty/luajit2
 ARG VER_LUAJIT=2.1-20200102
 
@@ -177,6 +173,13 @@ RUN set -eux \
 # Combine everything with minimal layers #
 ##########################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
+
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ARG DOCKER_IMAGE_OS=alpine
+ARG DOCKER_IMAGE_TAG=3.12.0
+ARG VER_NGINX=1.19.0
+ARG BUILD_DATE
+ARG VCS_REF
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \

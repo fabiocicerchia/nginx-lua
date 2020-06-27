@@ -7,10 +7,6 @@ ARG DOCKER_IMAGE_TAG=10.4-slim
 ####################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
-ARG BUILD_DATE
-ARG BUILD_VERSION
-ARG VCS_REF
-
 # https://github.com/openresty/luajit2
 ARG VER_LUAJIT=2.1-20200102
 
@@ -95,12 +91,15 @@ ARG BUILD_DEPS="\
       make \
       zlib1g-dev"
 
+ARG NGINX_BUILD_DEPS=""
+
 RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
        apt-utils \
     && apt-get install -y --no-install-recommends --no-install-suggests \
-      $BUILD_DEPS
+      $BUILD_DEPS \
+      $NGINX_BUILD_DEPS
 
 RUN set -eux \
 # OpenResty LUAJIT2
@@ -161,6 +160,13 @@ RUN set -eux \
 # Combine everything with minimal layers #
 ##########################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
+
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ARG DOCKER_IMAGE_OS=debian
+ARG DOCKER_IMAGE_TAG=10.4-slim
+ARG VER_NGINX=1.19.0
+ARG BUILD_DATE
+ARG VCS_REF
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
