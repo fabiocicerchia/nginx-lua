@@ -7,25 +7,35 @@ ARG DOCKER_IMAGE_TAG={{DOCKER_IMAGE_TAG}}
 ####################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
+# ngx_devel_kit
+# https://github.com/vision5/ngx_devel_kit
+# The NDK is now considered to be stable.
+ARG VER_NGX_DEVEL_KIT=0.3.1
+
+# luajit2
 # https://github.com/openresty/luajit2
 ARG VER_LUAJIT=2.1-20200102
+ARG LUAJIT_LIB=/usr/local/lib
+ARG LUAJIT_INC=/usr/local/include/luajit-2.1
+ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
+# lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
 ARG VER_LUA_NGINX_MODULE=0.10.15
 
+# lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
 ARG VER_LUA_RESTY_CORE=0.1.17
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 
+# lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
 ARG VER_LUA_RESTY_LRUCACHE=0.09
 
-# https://github.com/vision5/ngx_devel_kit
-# The NDK is now considered to be stable.
-ARG VER_NGX_DEVEL_KIT=0.3.1
+FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
 # https://github.com/nginx/nginx
 ARG VER_NGINX={{VER_NGINX}}
@@ -75,10 +85,6 @@ ARG NGINX_BUILD_CONFIG="\
          --with-threads \
     "
 
-ARG LUAJIT_LIB=/usr/local/lib
-ARG LUAJIT_INC=/usr/local/include/luajit-2.1
-ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
-
 ENV DEBIAN_FRONTEND noninteractive
 
 ARG BUILD_DEPS="\
@@ -105,7 +111,7 @@ RUN set -eux \
 # OpenResty LUAJIT2
 # ##############################################################################
     && curl -Lo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz \
-    && tar -C / -xvzf /luajit.tar.gz && rm /luajit.tar.gz \
+    && tar -C / -xvzf /luajit.tar.gz \
     && cd /luajit2-${VER_LUAJIT} \
     && make -j "$(nproc)" \
     && make install \
@@ -113,7 +119,7 @@ RUN set -eux \
 # LUA Resty Core
 # ##############################################################################
     && curl -Lo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz \
-    && tar -C / -xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
+    && tar -C / -xvzf /lua-resty-core.tar.gz \
     && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
     && make -j "$(nproc)" \
     && make install \
@@ -121,7 +127,7 @@ RUN set -eux \
 # LUA Resty LRUCache
 # ##############################################################################
     && curl -Lo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz \
-    && tar -C / -xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
+    && tar -C / -xvzf /lua-resty-lrucache.tar.gz \
     && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
     && make -j "$(nproc)" \
     && make install \
@@ -129,12 +135,12 @@ RUN set -eux \
 # NGX Devel Kit
 # ##############################################################################
     && curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz \
-    && tar -C / -xvzf /ngx_devel_kit.tar.gz && rm /ngx_devel_kit.tar.gz \
+    && tar -C / -xvzf /ngx_devel_kit.tar.gz \
     \
 # Lua Nginx Module
 # ##############################################################################
     && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
-    && tar -C / -xvzf /lua-nginx.tar.gz && rm /lua-nginx.tar.gz
+    && tar -C / -xvzf /lua-nginx.tar.gz
 
 RUN set -eux \
 # NGINX
@@ -142,7 +148,7 @@ RUN set -eux \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
     && curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz \
-    && tar -C / -xvzf /nginx.tar.gz && rm /nginx.tar.gz \
+    && tar -C / -xvzf /nginx.tar.gz \
     && cd /nginx-${VER_NGINX} \
     && mkdir -p /var/cache/nginx/client_temp \
        /var/cache/nginx/proxy_temp \
@@ -171,7 +177,7 @@ ARG VCS_REF
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.description="Nginx $VER_NGINX with LUA support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
+      org.label-schema.description="Nginx $VER_NGINX with Lua support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
       org.label-schema.docker.cmd="docker run -p 80:80 -d $DOCKER_IMAGE:$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
       org.label-schema.name="$DOCKER_IMAGE" \
       org.label-schema.schema-version="1.0" \
@@ -180,6 +186,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
       org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG"
 
+# dumb-init
 # https://github.com/Yelp/dumb-init
 ARG VER_DUMBINIT=1.2.2
 
@@ -221,14 +228,18 @@ RUN set -eux \
 # Cleanup
 # ##############################################################################
     && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+# smoke test
+# ##############################################################################
+    && nginx -V \
+    && nginx -t
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 80 443
 
-STOPSIGNAL SIGTERM
+# Override stop signal to stop process gracefully
+STOPSIGNAL SIGQUIT
 
 ENTRYPOINT ["dumb-init"]
 

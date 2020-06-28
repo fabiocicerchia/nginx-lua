@@ -1,4 +1,4 @@
-# Nginx & LUA
+# Nginx & Lua
 
 ![nginx logo](docs/logo-nginx.png)
 ![lua logo](docs/logo-lua.png)
@@ -11,7 +11,7 @@
 ![Known Vulnerabilities](https://img.shields.io/badge/vulnerabilities-snyk-4b45a9)
 
 
-Nginx 1.19+ with LUA support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
+Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
 
 ## Quick reference
 
@@ -49,7 +49,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ## Features
 
- - Support for LUA.
+ - Support for Lua.
  - Minimal size only, minimal layers.
  - Same build configure of official nginx image.
  - Security checks: Docker Bench Security, Snyk.
@@ -110,17 +110,17 @@ The following are the available build-time options. They can be set using the `-
 | DOCKER_IMAGE | fabiocicerchia/nginx-lua | |
 | DOCKER_IMAGE_OS | alpine | The Docker image base to build `FROM`. |
 | DOCKER_IMAGE_TAG | 3.12.0 | The Docker image tag to build `FROM`. |
+| VER_NGX_DEVEL_KIT | 0.3.1 | The version of Nginx Development Kit to use. |
 | VER_LUAJIT | 2.1-20200102 | The version of LuaJIT to use. |
+| LUAJIT_LIB | /usr/local/lib | Tell nginx's build system where to find LuaJIT 2.0 |
+| LUAJIT_INC | /usr/local/include/luajit-2.1 | Tell nginx's build system where to find LuaJIT 2.0 |
+| LD_LIBRARY_PATH | /usr/local/lib/:$LD_LIBRARY_PATH | Search path environment variable for the linux shared library. |
 | VER_LUA_NGINX_MODULE | 0.10.15 | The version of ngx_http_lua_module to use. |
 | VER_LUA_RESTY_CORE | 0.1.17 | The version of lua-resty-core to use. |
 | LUA_LIB_DIR | /usr/local/share/lua/5.1 | Path to Lua library directory. |
 | VER_LUA_RESTY_LRUCACHE | 0.09 | The version of lua-resty-lrucache to use. |
-| VER_NGX_DEVEL_KIT | 0.3.1 | The version of Nginx Development Kit to use. |
 | VER_NGINX | 1.19.0 | The version of nginx to use. |
 | NGINX_BUILD_CONFIG | --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads | Options to pass to nginx's `./configure` script. |
-| LUAJIT_LIB | /usr/local/lib | Tell nginx's build system where to find LuaJIT 2.0 |
-| LUAJIT_INC | /usr/local/include/luajit-2.1 | Tell nginx's build system where to find LuaJIT 2.0 |
-| LD_LIBRARY_PATH | /usr/local/lib/:$LD_LIBRARY_PATH | Search path environment variable for the linux shared library. |
 | BUILD_DEPS | Differs based on the distro | List of needed packages to build properly the software. |
 | NGINX_BUILD_DEPS | Differs based on the distro | List of needed packages to build properly nginx. |
 | BUILD_DATE | This label contains the Date/Time the image was built. |
@@ -156,6 +156,10 @@ These built-from-source flavors include the following modules by default, but on
  - stream_ssl_preread_module
  - thread
 
+## Notes
+
+ - The `SIGQUIT` signal will be sent to nginx to stop this container, to give it an opportunity to stop gracefully (i.e, finish processing active connections). The Docker default is `SIGTERM`, which immediately terminates active connections. Note that if your configuration listens on UNIX domain sockets, this means that you'll need to manually remove the socket file upon shutdown, due to [nginx bug #753](https://trac.nginx.org/nginx/ticket/753).
+
 ## Run Container
 
 ```bash
@@ -169,15 +173,15 @@ docker run -it --rm -p 80:80 \
 ## Image Variants
 
 ### `fabiocicerchia/nginx-lua:<version>`
-The default Nginx + LUA image. Uses Alpine for base image.
+The default Nginx + Lua image. Uses Alpine for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>`
-Provides Nginx + LUA. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>`
-Provides Nginx + LUA. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
 
-## Image Labels
+## Image Labels
 
 The image builds are labeled with various information. Here's an example of printing the labels using jq:
 
@@ -187,7 +191,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 {
   "maintainer": "Fabio Cicerchia <info@fabiocicerchia.it>",
   "org.label-schema.build-date": "2020-06-27T20:53:15Z",
-  "org.label-schema.description": "Nginx 1.19.0 with LUA support based on alpine 3.12.0.",
+  "org.label-schema.description": "Nginx 1.19.0 with Lua support based on alpine 3.12.0.",
   "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.19.0-alpine3.12.0",
   "org.label-schema.name": "fabiocicerchia/nginx-lua",
   "org.label-schema.schema-version": "1.0",
