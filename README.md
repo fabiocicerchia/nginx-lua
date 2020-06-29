@@ -1,7 +1,7 @@
 # Nginx & Lua
 
-![nginx logo](docs/logo-nginx.png)
-![lua logo](docs/logo-lua.png)
+![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-nginx.png)
+![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-lua.png)
 
 ---
 
