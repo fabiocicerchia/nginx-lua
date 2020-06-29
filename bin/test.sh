@@ -20,6 +20,7 @@ function test() {
         docker rm -f nginx_lua_test
      else
         echo "Image not found: fabiocicerchia/nginx-lua:$DOCKER_TAG"
+        exit 1
      fi
 }
 
@@ -67,6 +68,8 @@ elif [ "$OS" == "debian" ]; then VERSIONS=$DEBIAN
 elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
 elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
 fi
+
+docker images
 
 NLEN=${#NGINX[@]}
 for (( I=0; I<$NLEN; I++ )); do

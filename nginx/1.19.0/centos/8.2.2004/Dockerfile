@@ -7,6 +7,8 @@ ARG DOCKER_IMAGE_TAG=8.2.2004
 ####################################
 FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
 
+ARG EXTENDED_IMAGE=1
+
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
@@ -19,10 +21,22 @@ ARG LUAJIT_LIB=/usr/local/lib
 ARG LUAJIT_INC=/usr/local/include/luajit-2.1
 ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 
+# headers-more-nginx-module
+# https://github.com/openresty/headers-more-nginx-module
+ARG VER_OPENRESTY_HEADERS=743a4bb1a253325d17a4f4ce8ee61ea0d8e0cc19
+
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
 ARG VER_LUA_NGINX_MODULE=0.10.15
+
+# lua-resty-cookie
+# https://github.com/cloudflare/lua-resty-cookie
+ARG VER_CLOUDFLARE_COOKIE=c54865bdcfc3c42cbd6dbbceb654ba73871d07f6
+
+# lua-resty-dns
+# https://github.com/openresty/lua-resty-dns
+ARG VER_OPENRESTY_DNS=0.21
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
@@ -35,7 +49,33 @@ ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 # This library is considered production ready.
 ARG VER_LUA_RESTY_LRUCACHE=0.09
 
-FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
+# lua-resty-memcached
+# https://github.com/openresty/lua-resty-memcached
+ARG VER_OPENRESTY_MEMCACHED=0.15
+
+# lua-resty-mysql
+# https://github.com/openresty/lua-resty-mysql
+ARG VER_OPENRESTY_MYSQL=0.22
+
+# lua-resty-redis
+# https://github.com/openresty/lua-resty-redis
+ARG VER_OPENRESTY_REDIS=0.27
+
+# lua-resty-shell
+# https://github.com/openresty/lua-resty-shell
+ARG VER_OPENRESTY_SHELL=0.02
+
+# lua-resty-websocket
+# https://github.com/openresty/lua-resty-websocket
+ARG VER_OPENRESTY_WEBSOCKET=0.07
+
+# nginx-lua-prometheus
+# https://github.com/knyar/nginx-lua-prometheus
+ARG VER_PROMETHEUS=0.20200523
+
+# stream-lua-nginx-module
+# https://github.com/openresty/stream-lua-nginx-module
+ARG VER_OPENRESTY_STREAMLUA=0.0.8rc3
 
 # https://github.com/nginx/nginx
 ARG VER_NGINX=1.19.0
@@ -138,7 +178,78 @@ RUN set -eux \
 # Lua Nginx Module
 # ##############################################################################
     && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
-    && tar -C / -xvzf /lua-nginx.tar.gz
+    && tar -C / -xvzf /lua-nginx.tar.gz \
+# OpenResty Redis
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-redis.tar.gz https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-redis.tar.gz \
+    && cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Mysql
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-mysql.tar.gz https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-mysql.tar.gz \
+    && cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Websocket
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-websocket.tar.gz https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-websocket.tar.gz \
+    && cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Dns
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-dns.tar.gz https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-dns.tar.gz \
+    && cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Memcached
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-memcached.tar.gz https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-memcached.tar.gz \
+    && cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Shell
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-shell.tar.gz https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-shell.tar.gz \
+    && cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Headers
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/${VER_OPENRESTY_HEADERS}.zip \
+    && unzip -d / /headers-more-nginx-module.zip) \
+# OpenResty Stream Lua
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
+    && unzip -d / /stream-lua-nginx-module.zip) \
+# Cloudflare Cookie
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz \
+    && tar -C / -xvzf /lua-resty-cookie.tar.gz \
+    && cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
+    && make -j "$(nproc)") \
+# Prometheus
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /nginx-lua-prometheus.tar.gz https://github.com/knyar/nginx-lua-prometheus/archive/${VER_PROMETHEUS}.tar.gz \
+    && tar -C / -xvzf /nginx-lua-prometheus.tar.gz \
+    && mv /nginx-lua-prometheus-${VER_PROMETHEUS}/*.lua ${LUA_LIB_DIR}/)
 
 RUN set -eux \
 # NGINX
@@ -153,10 +264,17 @@ RUN set -eux \
        /var/cache/nginx/fastcgi_temp \
        /var/cache/nginx/uwsgi_temp \
        /var/cache/nginx/scgi_temp \
-    && ./configure \
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    ./configure \
+       ${NGINX_BUILD_CONFIG} \
+       --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+       --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+       --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
+       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
+    || (./configure \
        ${NGINX_BUILD_CONFIG} \
        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
-       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' \
+       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     && make -j "$(nproc)" build \
     && make install
 
@@ -168,6 +286,7 @@ FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ARG DOCKER_IMAGE_OS=centos
 ARG DOCKER_IMAGE_TAG=8.2.2004
+ARG EXTENDED_IMAGE=1
 ARG VER_NGINX=1.19.0
 ARG BUILD_DATE
 ARG VCS_REF
@@ -182,7 +301,8 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       org.label-schema.url="https://github.com/$DOCKER_IMAGE" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
-      org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG"
+      org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
+      version.extended="$EXTENDED_IMAGE"
 
 # dumb-init
 # https://github.com/Yelp/dumb-init
