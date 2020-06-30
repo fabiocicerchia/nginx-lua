@@ -9,7 +9,7 @@ function test() {
 
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:$DOCKER_TAG | wc -l)
     if [ $FOUND -ne 0 ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG
+        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG
         COUNT=0
         until [ $COUNT -eq 20 -o "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
             echo -n '.'; sleep 0.5;
@@ -20,6 +20,7 @@ function test() {
         docker rm -f nginx_lua_test
      else
         echo "Image not found: fabiocicerchia/nginx-lua:$DOCKER_TAG"
+        exit 1
      fi
 }
 
@@ -29,29 +30,31 @@ function runtest() {
     OS_VER=$3
     VER_TAGS=$4
     OS_TAGS=$5
+    DEFAULT=$6
 
     MAJOR=$(echo $NGINX_VER | cut -d '.' -f 1)
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
     test $PATCH-$OS$OS_VER
+    test $MINOR-$OS$OS_VER
+    test $MAJOR-$OS$OS_VER
 
-    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+    if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
         test $MAJOR
-        test $MAJOR-$OS
-        test $MAJOR-$OS$OS_VER
         test $MINOR
         test $PATCH
+        test latest
+    fi
+
+    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+        test $MAJOR-$OS
+        test $MAJOR-$OS$OS_VER
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
         test $MINOR-$OS
         test $PATCH-$OS
-        test $MINOR-$OS$OS_VER
-    fi
-
-    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        test latest
     fi
 
 }
@@ -67,6 +70,8 @@ elif [ "$OS" == "debian" ]; then VERSIONS=$DEBIAN
 elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
 elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
 fi
+
+docker images
 
 NLEN=${#NGINX[@]}
 for (( I=0; I<$NLEN; I++ )); do
