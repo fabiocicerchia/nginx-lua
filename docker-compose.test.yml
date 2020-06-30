@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  nginx-lua:
+    image: fabiocicerchia/nginx-lua:latest
+    ports:
+     - 8080:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  nginx:
+    image: nginx:latest
+    ports:
+     - 8081:80
+    volumes:
+      - ./test/nginx-non-lua.conf:/etc/nginx/nginx.conf
+  openresty:
+    image: openresty/openresty:latest
+    ports:
+     - 8082:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf

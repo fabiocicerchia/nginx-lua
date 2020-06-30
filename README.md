@@ -1,7 +1,7 @@
-# Nginx & LUA
+# Nginx & Lua
 
-![nginx logo](docs/logo-nginx.png)
-![lua logo](docs/logo-lua.png)
+![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-nginx.png)
+![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-lua.png)
 
 ---
 
@@ -10,8 +10,7 @@
 ![Docker stars](https://img.shields.io/docker/stars/fabiocicerchia/nginx-lua.svg "Docker stars")
 ![Known Vulnerabilities](https://img.shields.io/badge/vulnerabilities-snyk-4b45a9)
 
-
-Nginx 1.19+ with LUA support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
+Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
 
 ## Quick reference
 
@@ -49,7 +48,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ## Features
 
- - Support for LUA.
+ - Support for Lua.
  - Minimal size only, minimal layers.
  - Same build configure of official nginx image.
  - Security checks: Docker Bench Security, Snyk.
@@ -95,6 +94,17 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
    - [ngx_stream_realip_module](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html)
    - [ngx_stream_ssl_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html)
    - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
+   - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
+   - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
+   - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
+   - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
+   - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
+   - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
+   - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
+   - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
+   - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
+   - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
+   - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
    </details>
 
 ### Compiled Version Details
@@ -108,24 +118,36 @@ The following are the available build-time options. They can be set using the `-
 | Key | Default | Description |
 :----- | :-----: |:----------- |
 | DOCKER_IMAGE | fabiocicerchia/nginx-lua | |
-| DOCKER_IMAGE_OS | alpine | The Docker image base to build `FROM`. |
+| DOCKER_IMAGE_OS | alpine | The Docker base image to build `FROM`. |
 | DOCKER_IMAGE_TAG | 3.12.0 | The Docker image tag to build `FROM`. |
-| VER_LUAJIT | 2.1-20200102 | The version of LuaJIT to use. |
-| VER_LUA_NGINX_MODULE | 0.10.15 | The version of ngx_http_lua_module to use. |
-| VER_LUA_RESTY_CORE | 0.1.17 | The version of lua-resty-core to use. |
-| LUA_LIB_DIR | /usr/local/share/lua/5.1 | Path to Lua library directory. |
-| VER_LUA_RESTY_LRUCACHE | 0.09 | The version of lua-resty-lrucache to use. |
-| VER_NGX_DEVEL_KIT | 0.3.1 | The version of Nginx Development Kit to use. |
-| VER_NGINX | 1.19.0 | The version of nginx to use. |
-| NGINX_BUILD_CONFIG | --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads | Options to pass to nginx's `./configure` script. |
+| BUILD_DATE | This label contains the Date/Time the image was built. |
+| VCS_REF | Identifier for the version of the source code from which this image was built. |
+| EXTENDED_IMAGE | 1 | Flag to identify if extended image (which contains extra modules). |
+| VER_NGX_DEVEL_KIT | 0.3.1 | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
+| VER_LUAJIT | 2.1-20200102 | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | LUAJIT_LIB | /usr/local/lib | Tell nginx's build system where to find LuaJIT 2.0 |
 | LUAJIT_INC | /usr/local/include/luajit-2.1 | Tell nginx's build system where to find LuaJIT 2.0 |
 | LD_LIBRARY_PATH | /usr/local/lib/:$LD_LIBRARY_PATH | Search path environment variable for the linux shared library. |
+| VER_LUA_NGINX_MODULE | 0.10.15 | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) to use. |
+| VER_LUA_RESTY_CORE | 0.1.17 | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) to use. |
+| LUA_LIB_DIR | /usr/local/share/lua/5.1 | Path to Lua library directory. |
+| VER_LUA_RESTY_LRUCACHE | 0.09 | The version of [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache) to use. |
+| VER_OPENRESTY_HEADERS | 743a4bb1a253325d17a4f4ce8ee61ea0d8e0cc19 | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) to use. |
+| VER_CLOUDFLARE_COOKIE | c54865bdcfc3c42cbd6dbbceb654ba73871d07f6 | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) to use. |
+| VER_OPENRESTY_DNS | 0.21 | The version of [lua-resty-dns](https://github.com/openresty/lua-resty-dns) to use. |
+| VER_OPENRESTY_MEMCACHED | 0.15 | The version of [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached) to use. |
+| VER_OPENRESTY_MYSQL | 0.22 | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) to use. |
+| VER_OPENRESTY_REDIS | 0.27 | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) to use. |
+| VER_OPENRESTY_SHELL | 0.02 | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
+| VER_OPENRESTY_HALTHCHECK | 0.06 | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) to use. |
+| VER_OPENRESTY_WEBSOCKET | 0.07 | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) to use. |
+| VER_PROMETHEUS | 0.20200523 | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) to use. |
+| VER_OPENRESTY_STREAMLUA | 0.0.8rc3 | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
+| VER_NGINX | 1.19.0 | The version of nginx to use. |
+| NGINX_BUILD_CONFIG | --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads | Options to pass to nginx's `./configure` script. |
 | BUILD_DEPS | Differs based on the distro | List of needed packages to build properly the software. |
 | NGINX_BUILD_DEPS | Differs based on the distro | List of needed packages to build properly nginx. |
-| BUILD_DATE | This label contains the Date/Time the image was built. |
-| VCS_REF | Identifier for the version of the source code from which this image was built. |
-| VER_DUMBINIT | 1.2.2 | The version of dumb-init to use. |
+| VER_DUMBINIT | 1.2.2 | The version of [dumb-init](https://github.com/Yelp/dumb-init) to use. |
 | PKG_DEPS | Differs based on the distro | List of needed packages to run properly the software. |
 
 These built-from-source flavors include the following modules by default, but one can easily increase or decrease that with the custom build options above:
@@ -156,6 +178,10 @@ These built-from-source flavors include the following modules by default, but on
  - stream_ssl_preread_module
  - thread
 
+## Notes
+
+ - The `SIGQUIT` signal will be sent to nginx to stop this container, to give it an opportunity to stop gracefully (i.e, finish processing active connections). The Docker default is `SIGTERM`, which immediately terminates active connections. Note that if your configuration listens on UNIX domain sockets, this means that you'll need to manually remove the socket file upon shutdown, due to [nginx bug #753](https://trac.nginx.org/nginx/ticket/753).
+
 ## Run Container
 
 ```bash
@@ -169,15 +195,15 @@ docker run -it --rm -p 80:80 \
 ## Image Variants
 
 ### `fabiocicerchia/nginx-lua:<version>`
-The default Nginx + LUA image. Uses Alpine for base image.
+The default Nginx + Lua image. Uses Alpine for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>`
-Provides Nginx + LUA. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>`
-Provides Nginx + LUA. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
 
-## Image Labels
+## Image Labels
 
 The image builds are labeled with various information. Here's an example of printing the labels using jq:
 
@@ -186,30 +212,227 @@ $ docker pull fabiocicerchia/nginx-lua:1-alpine
 $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 {
   "maintainer": "Fabio Cicerchia <info@fabiocicerchia.it>",
-  "org.label-schema.build-date": "2020-06-27T20:53:15Z",
-  "org.label-schema.description": "Nginx 1.19.0 with LUA support based on alpine 3.12.0.",
+  "org.label-schema.build-date": "1970-01-01T00:00:00Z",
+  "org.label-schema.description": "Nginx 1.19.0 with Lua support based on alpine 3.12.0.",
   "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.19.0-alpine3.12.0",
   "org.label-schema.name": "fabiocicerchia/nginx-lua",
   "org.label-schema.schema-version": "1.0",
   "org.label-schema.url": "https://github.com/fabiocicerchia/nginx-lua",
   "org.label-schema.vcs-ref": "5b8a255",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
-  "org.label-schema.version": "1.19.0-alpine3.12.0"
+  "org.label-schema.version": "1.19.0-alpine3.12.0",
+  "versions.extended": "1",
+  "versions.dumb-init": "1.2.2",
+  "versions.headers-more-nginx-module": "743a4bb1a253325d17a4f4ce8ee61ea0d8e0cc19",
+  "versions.lua-nginx-module": "0.10.15",
+  "versions.lua-resty-cookie": "c54865bdcfc3c42cbd6dbbceb654ba73871d07f6",
+  "versions.lua-resty-core": "0.1.17",
+  "versions.lua-resty-dns": "0.21",
+  "versions.lua-resty-lrucache": "0.09",
+  "versions.lua-resty-memcached": "0.15",
+  "versions.lua-resty-mysql": "0.22",
+  "versions.lua-resty-redis": "0.27",
+  "versions.lua-resty-shell": "0.02",
+  "versions.lua-resty-upstream-healthcheck": "0.06",
+  "versions.lua-resty-websocket": "0.07",
+  "versions.luajit2": "2.1-20200102",
+  "versions.nginx": "1.19.0",
+  "versions.nginx-lua-prometheus": "0.20200523",
+  "versions.ngx_devel_kit": "0.3.1",
+  "versions.os": "3.12.0",
+  "versions.stream-lua-nginx-module": "0.0.8rc3"
 }
 ```
 
-| Label Name                         | Description             |
-:----------------------------------- |:----------------------- |
-| `maintainer`                       | Maintainer of the image |
-| `org.label-schema.build-date`      | This label contains the Date/Time the image was built. The value SHOULD be formatted according to RFC 3339. buildarg `BUILD_DATE` |
-| `org.label-schema.description`     | Text description of the image. May contain up to 300 characters. |
-| `org.label-schema.docker.cmd`      | How to run a container based on the image under the Docker runtime. |
-| `org.label-schema.name`            | buildarg `DOCKER_IMAGE` |
-| `org.label-schema.schema-version`  | This label SHOULD be present to indicate the version of Label Schema in use. |
-| `org.label-schema.url`             | URL of website with more information about the product or service provided by the container. |
-| `org.label-schema.vcs-ref`         | buildarg `VCS_REF` |
-| `org.label-schema.vcs-url`         | URL for the source code under version control from which this container image was built. |
-| `org.label-schema.version`         | Release identifier for the contents of the image. |
+| Label Name                                | Description             |
+:------------------------------------------ |:----------------------- |
+| `maintainer`                              | Maintainer of the image |
+| `org.label-schema.build-date`             | This label contains the Date/Time the image was built. The value SHOULD be formatted according to RFC 3339. buildarg `BUILD_DATE` |
+| `org.label-schema.description`            | Text description of the image. May contain up to 300 characters. |
+| `org.label-schema.docker.cmd`             | How to run a container based on the image under the Docker runtime. |
+| `org.label-schema.name`                   | buildarg `DOCKER_IMAGE` |
+| `org.label-schema.schema-version`         | This label SHOULD be present to indicate the version of Label Schema in use. |
+| `org.label-schema.url`                    | URL of website with more information about the product or service provided by the container. |
+| `org.label-schema.vcs-ref`                | buildarg `VCS_REF` |
+| `org.label-schema.vcs-url`                | URL for the source code under version control from which this container image was built. |
+| `org.label-schema.version`                | Release identifier for the contents of the image. |
+| `versions.extended`                       | Flag to identify if extended image (which contains extra modules). |
+| `versions.dumb-init`                      | The version of [dumb-init](https://github.com/Yelp/dumb-init) used. |
+| `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
+| `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
+| `versions.lua-resty-cookie`               | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) used. |
+| `versions.lua-resty-core`                 | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) used. |
+| `versions.lua-resty-dns`                  | The version of [lua-resty-dns](https://github.com/openresty/lua-resty-dns) used. |
+| `versions.lua-resty-lrucache`             | The version of [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache) used. |
+| `versions.lua-resty-memcached`            | The version of [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached) used. |
+| `versions.lua-resty-mysql`                | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) used. |
+| `versions.lua-resty-redis`                | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) used. |
+| `versions.lua-resty-shell`                | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) used. |
+| `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
+| `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
+| `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
+| `versions.nginx`                          | The version of nginx used. |
+| `versions.nginx-lua-prometheus`           | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) used. |
+| `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
+| `versions.os`                             | The Docker base image. |
+| `versions.stream-lua-nginx-module`        | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) used. |
+
+## Benchmarks
+
+![Benchmark Requests per second](http://chart.googleapis.com/chart?chco=00B140,000080,4D8D89&chd=t:95.42|95.42|95.33&chdl=nginx|nginx-lua|openresty&chdlp=b&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Requests+per+second&chxl=0:|reqs/sec&chxt=x,y)
+![Benchmark Median Response Time](http://chart.googleapis.com/chart?&chco=00B140,000080,4D8D89&chd=t:3.3|3.4|3.2&chdl=nginx|nginx-lua|openresty&chdlp=b&chds=0,5&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Median+Response+Time&chxl=0:|msec&chxr=1,0,5,1&chxt=x,y)
+
+<details><summary>1k requests benchmark</summary>
+
+```console
+ARTILLERY - NGINX
+Started phase 0, duration: 10s @ 00:00:00(+0200) 1970-01-01
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 10 seconds
+  Scenarios launched:  998
+  Scenarios completed: 998
+  Requests completed:  998
+  Mean response/sec: 100.3
+  Response time (msec):
+    min: 2.3
+    max: 54.7
+    median: 3.3
+    p95: 7.8
+    p99: 18.9
+  Codes:
+    200: 998
+
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 11 seconds
+  Scenarios launched:  2
+  Scenarios completed: 2
+  Requests completed:  2
+  Mean response/sec: 4
+  Response time (msec):
+    min: 6.2
+    max: 6.4
+    median: 6.3
+    p95: 6.4
+    p99: 6.4
+  Codes:
+    200: 2
+
+All virtual users finished
+Summary report @ 00:00:00(+0200) 1970-01-01
+  Scenarios launched:  1000
+  Scenarios completed: 1000
+  Requests completed:  1000
+  Mean response/sec: 95.42
+  Response time (msec):
+    min: 2.3
+    max: 54.7
+    median: 3.3
+    p95: 7.8
+    p99: 18.9
+  Scenario counts:
+    0: 1000 (100%)
+  Codes:
+    200: 1000
+
+ARTILLERY - NGINX-LUA
+Started phase 0, duration: 10s @ 00:00:00(+0200) 1970-01-01
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 10 seconds
+  Scenarios launched:  999
+  Scenarios completed: 998
+  Requests completed:  998
+  Mean response/sec: 100.3
+  Response time (msec):
+    min: 2.4
+    max: 24.7
+    median: 3.4
+    p95: 5.8
+    p99: 12.8
+  Codes:
+    200: 998
+
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 10 seconds
+  Scenarios launched:  1
+  Scenarios completed: 2
+  Requests completed:  2
+  Mean response/sec: 2
+  Response time (msec):
+    min: 3.8
+    max: 16.2
+    median: 10
+    p95: 16.2
+    p99: 16.2
+  Codes:
+    200: 2
+
+All virtual users finished
+Summary report @ 00:00:00(+0200) 1970-01-01
+  Scenarios launched:  1000
+  Scenarios completed: 1000
+  Requests completed:  1000
+  Mean response/sec: 95.42
+  Response time (msec):
+    min: 2.4
+    max: 24.7
+    median: 3.4
+    p95: 5.9
+    p99: 13.5
+  Scenario counts:
+    0: 1000 (100%)
+  Codes:
+    200: 1000
+
+ARTILLERY - OPENRESTY
+Started phase 0, duration: 10s @ 00:00:00(+0200) 1970-01-01
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 10 seconds
+  Scenarios launched:  999
+  Scenarios completed: 999
+  Requests completed:  999
+  Mean response/sec: 100.2
+  Response time (msec):
+    min: 2.5
+    max: 27.4
+    median: 3.2
+    p95: 4.4
+    p99: 11.4
+  Codes:
+    200: 999
+
+Report @ 00:00:00(+0200) 1970-01-01
+Elapsed time: 10 seconds
+  Scenarios launched:  1
+  Scenarios completed: 1
+  Requests completed:  1
+  Mean response/sec: 2
+  Response time (msec):
+    min: 3.5
+    max: 3.5
+    median: 3.5
+    p95: 3.5
+    p99: 3.5
+  Codes:
+    200: 1
+
+All virtual users finished
+Summary report @ 00:00:00(+0200) 1970-01-01
+  Scenarios launched:  1000
+  Scenarios completed: 1000
+  Requests completed:  1000
+  Mean response/sec: 95.33
+  Response time (msec):
+    min: 2.5
+    max: 27.4
+    median: 3.2
+    p95: 4.4
+    p99: 11.4
+  Scenario counts:
+    0: 1000 (100%)
+  Codes:
+    200: 1000
+```
+</details>
 
 ## Examples
 

@@ -1,34 +1,118 @@
+#############################
+# Settings Common Variables #
+#############################
+FROM alpine:3.11.6 AS base
+
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=alpine
+ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
 ARG DOCKER_IMAGE_TAG=3.11.6
+ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
-####################################
-# Build Nginx with support for LUA #
-####################################
-FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG AS builder
+ARG BUILD_DATE
+ENV BUILD_DATE=$BUILD_DATE
+ARG VCS_REF
+ENV VCS_REF=$VCS_REF
 
-# https://github.com/openresty/luajit2
-ARG VER_LUAJIT=2.1-20200102
+ARG EXTENDED_IMAGE=1
+ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
-# https://github.com/openresty/lua-nginx-module
-# Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.15
-
-# https://github.com/openresty/lua-resty-core
-# This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.17
-ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
-
-# https://github.com/openresty/lua-resty-lrucache
-# This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.09
-
+# ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
 ARG VER_NGX_DEVEL_KIT=0.3.1
+ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
+
+# luajit2
+# https://github.com/openresty/luajit2
+ARG VER_LUAJIT=2.1-20200102
+ENV VER_LUAJIT=$VER_LUAJIT
+ARG LUAJIT_LIB=/usr/local/lib
+ENV LUAJIT_LIB=$LUAJIT_LIB
+ARG LUAJIT_INC=/usr/local/include/luajit-2.1
+ENV LUAJIT_INC=$LUAJIT_INC
+ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+
+# lua-nginx-module
+# https://github.com/openresty/lua-nginx-module
+# Production ready.
+ARG VER_LUA_NGINX_MODULE=0.10.15
+ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
+
+# lua-resty-core
+# https://github.com/openresty/lua-resty-core
+# This library is production ready.
+ARG VER_LUA_RESTY_CORE=0.1.17
+ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
+ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
+ENV LUA_LIB_DIR=$LUA_LIB_DIR
+
+# lua-resty-lrucache
+# https://github.com/openresty/lua-resty-lrucache
+# This library is considered production ready.
+ARG VER_LUA_RESTY_LRUCACHE=0.09
+ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
+
+# headers-more-nginx-module
+# https://github.com/openresty/headers-more-nginx-module
+ARG VER_OPENRESTY_HEADERS=743a4bb1a253325d17a4f4ce8ee61ea0d8e0cc19
+ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
+
+# lua-resty-cookie
+# https://github.com/cloudflare/lua-resty-cookie
+ARG VER_CLOUDFLARE_COOKIE=c54865bdcfc3c42cbd6dbbceb654ba73871d07f6
+ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
+
+# lua-resty-dns
+# https://github.com/openresty/lua-resty-dns
+ARG VER_OPENRESTY_DNS=0.21
+ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
+
+# lua-resty-memcached
+# https://github.com/openresty/lua-resty-memcached
+ARG VER_OPENRESTY_MEMCACHED=0.15
+ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
+
+# lua-resty-mysql
+# https://github.com/openresty/lua-resty-mysql
+ARG VER_OPENRESTY_MYSQL=0.22
+ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
+
+# lua-resty-redis
+# https://github.com/openresty/lua-resty-redis
+ARG VER_OPENRESTY_REDIS=0.27
+ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
+
+# lua-resty-shell
+# https://github.com/openresty/lua-resty-shell
+ARG VER_OPENRESTY_SHELL=0.02
+ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
+
+# lua-resty-upstream-healthcheck
+# https://github.com/openresty/lua-resty-upstream-healthcheck
+ARG VER_OPENRESTY_HEALTHCHECK=0.06
+ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
+
+# lua-resty-websocket
+# https://github.com/openresty/lua-resty-websocket
+ARG VER_OPENRESTY_WEBSOCKET=0.07
+ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
+
+# nginx-lua-prometheus
+# https://github.com/knyar/nginx-lua-prometheus
+ARG VER_PROMETHEUS=0.20200523
+ENV VER_PROMETHEUS=$VER_PROMETHEUS
+
+# stream-lua-nginx-module
+# https://github.com/openresty/stream-lua-nginx-module
+ARG VER_OPENRESTY_STREAMLUA=0.0.8rc3
+ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx
 ARG VER_NGINX=1.19.0
+ENV VER_NGINX=$VER_NGINX
 ARG NGINX_BUILD_CONFIG="\
          --prefix=/etc/nginx \
          --sbin-path=/usr/sbin/nginx \
@@ -74,10 +158,7 @@ ARG NGINX_BUILD_CONFIG="\
          --with-stream_ssl_preread_module \
          --with-threads \
     "
-
-ARG LUAJIT_LIB=/usr/local/lib
-ARG LUAJIT_INC=/usr/local/include/luajit-2.1
-ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
+ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
       curl \
@@ -89,8 +170,10 @@ ARG BUILD_DEPS="\
       pcre-dev \
       tar \
       zlib-dev"
+ENV BUILD_DEPS=$BUILD_DEPS
 
 ARG NGINX_BUILD_DEPS="\
+# NGINX
       alpine-sdk \
       bash \
       findutils \
@@ -107,6 +190,17 @@ ARG NGINX_BUILD_DEPS="\
       pcre-dev \
       perl-dev \
       zlib-dev"
+ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
+
+# dumb-init
+# https://github.com/Yelp/dumb-init
+ARG VER_DUMBINIT=1.2.2
+ENV VER_DUMBINIT=$VER_DUMBINIT
+
+####################################
+# Build Nginx with support for LUA #
+####################################
+FROM base AS builder
 
 RUN set -eux \
    && apk update \
@@ -115,18 +209,27 @@ RUN set -eux \
       $NGINX_BUILD_DEPS
 
 RUN set -eux \
+# NGX Devel Kit
+# ##############################################################################
+    && curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz \
+    && tar -C / -xvzf /ngx_devel_kit.tar.gz \
+    \
 # OpenResty LUAJIT2
 # ##############################################################################
     && curl -Lo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz \
-    && tar -C / -xvzf /luajit.tar.gz && rm /luajit.tar.gz \
+    && tar -C / -xvzf /luajit.tar.gz \
     && cd /luajit2-${VER_LUAJIT} \
     && make -j "$(nproc)" \
     && make install \
     \
+# Lua Nginx Module
+# ##############################################################################
+    && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
+    && tar -C / -xvzf /lua-nginx.tar.gz \
 # LUA Resty Core
 # ##############################################################################
     && curl -Lo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz \
-    && tar -C / -xvzf /lua-resty-core.tar.gz && rm /lua-resty-core.tar.gz \
+    && tar -C / -xvzf /lua-resty-core.tar.gz \
     && cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
     && make -j "$(nproc)" \
     && make install \
@@ -134,20 +237,90 @@ RUN set -eux \
 # LUA Resty LRUCache
 # ##############################################################################
     && curl -Lo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz \
-    && tar -C / -xvzf /lua-resty-lrucache.tar.gz && rm /lua-resty-lrucache.tar.gz \
+    && tar -C / -xvzf /lua-resty-lrucache.tar.gz \
     && cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
     && make -j "$(nproc)" \
     && make install \
     \
-# NGX Devel Kit
+# OpenResty Headers
 # ##############################################################################
-    && curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz \
-    && tar -C / -xvzf /ngx_devel_kit.tar.gz && rm /ngx_devel_kit.tar.gz \
-    \
-# Lua Nginx Module
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/${VER_OPENRESTY_HEADERS}.zip \
+    && unzip -d / /headers-more-nginx-module.zip) \
+# Cloudflare Cookie
 # ##############################################################################
-    && curl -Lo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz \
-    && tar -C / -xvzf /lua-nginx.tar.gz && rm /lua-nginx.tar.gz
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz \
+    && tar -C / -xvzf /lua-resty-cookie.tar.gz \
+    && cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
+    && make -j "$(nproc)") \
+# OpenResty Dns
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-dns.tar.gz https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-dns.tar.gz \
+    && cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Memcached
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-memcached.tar.gz https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-memcached.tar.gz \
+    && cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Mysql
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-mysql.tar.gz https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-mysql.tar.gz \
+    && cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Redis
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-redis.tar.gz https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-redis.tar.gz \
+    && cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Shell
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-shell.tar.gz https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-shell.tar.gz \
+    && cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Upstream Healthcheck
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-resty-upstream-healthcheck.tar.gz https://github.com/openresty/lua-resty-upstream-healthcheck/archive/v${VER_OPENRESTY_HEALTHCHECK}.tar.gz \
+    && tar -C / -xvzf /lua-resty-upstream-healthcheck.tar.gz \
+    && cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
+    && make -j "$(nproc)" \
+    && make install) \
+# OpenResty Websocket
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-openresty-websocket.tar.gz https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz \
+    && tar -C / -xvzf /lua-openresty-websocket.tar.gz \
+    && cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+    && make -j "$(nproc)" \
+    && make install) \
+# Prometheus
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /nginx-lua-prometheus.tar.gz https://github.com/knyar/nginx-lua-prometheus/archive/${VER_PROMETHEUS}.tar.gz \
+    && tar -C / -xvzf /nginx-lua-prometheus.tar.gz \
+    && mv /nginx-lua-prometheus-${VER_PROMETHEUS}/*.lua ${LUA_LIB_DIR}/) \
+# OpenResty Stream Lua
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
+    && unzip -d / /stream-lua-nginx-module.zip)
 
 RUN set -eux \
 # NGINX
@@ -155,52 +328,70 @@ RUN set -eux \
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
     && curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz \
-    && tar -C / -xvzf /nginx.tar.gz && rm /nginx.tar.gz \
+    && tar -C / -xvzf /nginx.tar.gz \
     && cd /nginx-${VER_NGINX} \
     && mkdir -p /var/cache/nginx/client_temp \
        /var/cache/nginx/proxy_temp \
        /var/cache/nginx/fastcgi_temp \
        /var/cache/nginx/uwsgi_temp \
        /var/cache/nginx/scgi_temp \
-    && ./configure \
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    ./configure \
+       ${NGINX_BUILD_CONFIG} \
+       --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+       --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+       --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
+       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
+    || (./configure \
        ${NGINX_BUILD_CONFIG} \
        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
-       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie' \
+       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     && make -j "$(nproc)" build \
     && make install
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM $DOCKER_IMAGE_OS:$DOCKER_IMAGE_TAG
-
-ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
-ARG DOCKER_IMAGE_OS=alpine
-ARG DOCKER_IMAGE_TAG=3.11.6
-ARG VER_NGINX=1.19.0
-ARG BUILD_DATE
-ARG VCS_REF
+FROM base
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       org.label-schema.build-date=$BUILD_DATE \
-      org.label-schema.description="Nginx $VER_NGINX with LUA support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
+      org.label-schema.description="Nginx $VER_NGINX with Lua support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
       org.label-schema.docker.cmd="docker run -p 80:80 -d $DOCKER_IMAGE:$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
       org.label-schema.name="$DOCKER_IMAGE" \
       org.label-schema.schema-version="1.0" \
       org.label-schema.url="https://github.com/$DOCKER_IMAGE" \
       org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
-      org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG"
-
-# https://github.com/Yelp/dumb-init
-ARG VER_DUMBINIT=1.2.2
+      org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
+      versions.extended=${EXTENDED_IMAGE} \
+      versions.dumb-init=${VER_DUMBINIT} \
+      versions.headers-more-nginx-module=${VER_OPENRESTY_HEADERS} \
+      versions.lua-nginx-module=${VER_LUA_NGINX_MODULE} \
+      versions.lua-resty-cookie=${VER_CLOUDFLARE_COOKIE} \
+      versions.lua-resty-core=${VER_LUA_RESTY_CORE} \
+      versions.lua-resty-dns=${VER_OPENRESTY_DNS} \
+      versions.lua-resty-lrucache=${VER_LUA_RESTY_LRUCACHE} \
+      versions.lua-resty-memcached=${VER_OPENRESTY_MEMCACHED} \
+      versions.lua-resty-mysql=${VER_OPENRESTY_MYSQL} \
+      versions.lua-resty-redis=${VER_OPENRESTY_REDIS} \
+      versions.lua-resty-shell=${VER_OPENRESTY_SHELL} \
+      versions.lua-resty-upstream-healthcheck=${VER_OPENRESTY_HEALTHCHECK} \
+      versions.lua-resty-websocket=${VER_OPENRESTY_WEBSOCKET} \
+      versions.luajit2=${VER_LUAJIT} \
+      versions.nginx-lua-prometheus=${VER_PROMETHEUS} \
+      versions.nginx=${VER_NGINX} \
+      versions.ngx_devel_kit=${VER_NGX_DEVEL_KIT} \
+      versions.os=${DOCKER_IMAGE_TAG} \
+      versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
       geoip-dev \
       openssl-dev \
       pcre-dev \
       zlib-dev"
+ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder /etc/nginx /etc/nginx
 COPY --from=builder /usr/local/lib /usr/local/lib
@@ -227,14 +418,18 @@ RUN set -eux \
     && chmod +x /usr/bin/dumb-init \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup -g 32548 -S nginx \
-    && adduser -S -D -H -u 32548 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+    && adduser -S -D -H -u 32548 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+# smoke test
+# ##############################################################################
+    && nginx -V \
+    && nginx -t
 
 HEALTHCHECK --interval=30s --timeout=3s CMD curl --fail http://localhost/ || exit 1
 
-EXPOSE 80
-EXPOSE 443
+EXPOSE 80 443
 
-STOPSIGNAL SIGTERM
+# Override stop signal to stop process gracefully
+STOPSIGNAL SIGQUIT
 
 ENTRYPOINT ["dumb-init"]
 
