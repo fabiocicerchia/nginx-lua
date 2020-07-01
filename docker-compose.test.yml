@@ -18,3 +18,34 @@ services:
      - 8082:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+
+  alpine:
+    image: fabiocicerchia/nginx-lua:1-alpine
+    ports:
+     - 8090:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  ubuntu:
+    image: fabiocicerchia/nginx-lua:1-ubuntu
+    ports:
+     - 8091:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  debian:
+    image: fabiocicerchia/nginx-lua:1-debian
+    ports:
+     - 8092:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  fedora:
+    image: fabiocicerchia/nginx-lua:1-fedora
+    ports:
+     - 8093:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  centos:
+    image: fabiocicerchia/nginx-lua:1-centos
+    ports:
+     - 8094:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf

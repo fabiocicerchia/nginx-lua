@@ -1,0 +1,93 @@
+Started phase 0, duration: 10s @ 00:00:00(+0200) 2020-07-01
+Report @ 00:00:00(+0200) 2020-07-01
+Elapsed time: 10 seconds
+  Scenarios launched:  2127
+  Scenarios completed: 2122
+  Requests completed:  2122
+  Mean response/sec: 214
+  Response time (msec):
+    min: 7
+    max: 76.8
+    median: 11
+    p95: 20.9
+    p99: 32.5
+  Codes:
+    200: 2122
+
+Report @ 00:00:00(+0200) 2020-07-01
+Elapsed time: 20 seconds
+  Scenarios launched:  2190
+  Scenarios completed: 2190
+  Requests completed:  2190
+  Mean response/sec: 219.88
+  Response time (msec):
+    min: 6.7
+    max: 70.2
+    median: 10.1
+    p95: 27.4
+    p99: 43.4
+  Codes:
+    200: 2190
+
+Report @ 00:00:00(+0200) 2020-07-01
+Elapsed time: 30 seconds
+  Scenarios launched:  2080
+  Scenarios completed: 2080
+  Requests completed:  2080
+  Mean response/sec: 208
+  Response time (msec):
+    min: 6.5
+    max: 89.6
+    median: 10.3
+    p95: 32.5
+    p99: 55.2
+  Codes:
+    200: 2080
+
+Report @ 00:00:00(+0200) 2020-07-01
+Elapsed time: 40 seconds
+  Scenarios launched:  2747
+  Scenarios completed: 2747
+  Requests completed:  2747
+  Mean response/sec: 274.97
+  Response time (msec):
+    min: 6.3
+    max: 67
+    median: 8.5
+    p95: 15.6
+    p99: 30.4
+  Codes:
+    200: 2747
+
+Report @ 00:00:00(+0200) 2020-07-01
+Elapsed time: 43 seconds
+  Scenarios launched:  856
+  Scenarios completed: 861
+  Requests completed:  861
+  Mean response/sec: 240.34
+  Response time (msec):
+    min: 1.8
+    max: 66.9
+    median: 8.5
+    p95: 14.7
+    p99: 35.5
+  Codes:
+    200: 861
+
+All virtual users finished
+Summary report @ 00:00:00(+0200) 2020-07-01
+  Scenarios launched:  10000
+  Scenarios completed: 10000
+  Requests completed:  10000
+  Mean response/sec: 229.41
+  Response time (msec):
+    min: 1.8
+    max: 89.6
+    median: 9.8
+    p95: 24.5
+    p99: 43.5
+  Scenario counts:
+    0: 10000 (100%)
+  Codes:
+    200: 10000
+
