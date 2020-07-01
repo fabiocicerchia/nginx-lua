@@ -1,18 +1,19 @@
 #!/bin/bash
+# shellcheck disable=SC2086,SC2178,SC1091,SC2004,SC2207,SC2206
 
-VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | egrep "\d+\.\d+\.\d+" | egrep -v "alpine|perl" | sort -Vr | head -n1)
+VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E "\d+\.\d+\.\d+" | grep -E -v "alpine|perl" | sort -Vr | head -n1)
 NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=($VER)
 done
 
-VER_ALPINE=$(DISTRO=alpine; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | egrep "\d+\.\d+\.\d+" | sort -Vr | head -n 2)
+VER_ALPINE=$(DISTRO=alpine; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E "\d+\.\d+\.\d+" | sort -Vr | head -n 2)
 ALPINE=()
 for VER in $VER_ALPINE; do
     ALPINE+=($VER)
 done
 
-VER_AMAZONLINUX=$(DISTRO=amazonlinux; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | egrep -v "with-|^201" | egrep "\d+\." | sort -Vr | head -n 2)
+VER_AMAZONLINUX=$(DISTRO=amazonlinux; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E -v "with-|^201" | grep -E "\d+\." | sort -Vr | head -n 2)
 AMAZONLINUX=()
 for VER in $VER_AMAZONLINUX; do
     AMAZONLINUX+=($VER)

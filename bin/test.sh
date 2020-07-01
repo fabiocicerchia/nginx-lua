@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086,SC2178,SC1091,SC2004
 
 source supported_versions
 
@@ -11,7 +12,7 @@ function test() {
     if [ $FOUND -ne 0 ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG
         COUNT=0
-        until [ $COUNT -eq 20 -o "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
+        until [ $COUNT -eq 20 ] || [ "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
             echo -n '.'; sleep 0.5;
             COUNT=$((COUNT+1))
         done

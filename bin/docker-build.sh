@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086,SC2178,SC1091,SC2004,SC2046
 
 source supported_versions
 
@@ -22,7 +23,7 @@ function build() {
     MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
     PATCH=$NGINX_VER
 
-    if [ "$FORCE" == "0" -a $(docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER) == 0 ]; then
+    if [ "$FORCE" == "0" ] && [ $(docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER) == 0 ]; then
         return
     fi
 

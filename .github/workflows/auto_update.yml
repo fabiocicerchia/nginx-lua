@@ -1,0 +1,17 @@
+name: Auto Update
+
+on:
+  schedule:
+    - cron:  '0 0 * * *'
+
+env:
+  IMAGE_NAME: fabiocicerchia/nginx-lua
+
+jobs:
+  auto_update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generate Supported Versions
+        run: ./bin/auto_update.sh

@@ -1,0 +1,14 @@
+config:
+  target: "http://localhost:8090"
+  tls:
+    rejectUnauthorized: false
+  http:
+    timeout: 10
+  phases:
+    - duration: 10
+      arrivalRate: 1000
+
+scenarios:
+  - flow:
+      - get:
+          url: "/"
