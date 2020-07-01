@@ -39,11 +39,12 @@ for tag in tags:
     dockerfiles[dockerfile].append(tag)
     dockerfiles[dockerfile] = sorted(dockerfiles[dockerfile], key = operator.itemgetter(0))
 
-print('# Supported Tags\n')
+print('# Tags\n')
+print('## Supported Tags\n')
 for file in supported:
-    print(' - [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
+    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
 
-print('\n# Unsupported Tags\n')
+print('\n## Unsupported Tags\n')
 reversed = list(set(files) - set(supported))[::-1]
 for file in reversed:
-    print(' - [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
+    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')

@@ -14,8 +14,8 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 
 ## Quick reference
 
- - **Maintained by**: [Fabio Cicerchia](https://github.com/fabiocicerchia)
- - **Where to get help**: [the Docker Community Forums](https://forums.docker.com/), [the Docker Community Slack](https://dockr.ly/slack), or [Stack Overflow](https://stackoverflow.com/search?tab=newest&q=docker)
+- **Maintained by**: [Fabio Cicerchia](https://github.com/fabiocicerchia)
+- **Where to get help**: [the Docker Community Forums](https://forums.docker.com/), [the Docker Community Slack](https://dockr.ly/slack), or [Stack Overflow](https://stackoverflow.com/search?tab=newest&q=docker)
 
 ## Supported tags and respective `Dockerfile` links
 
@@ -48,66 +48,66 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ## Features
 
- - Support for Lua.
- - Minimal size only, minimal layers.
- - Same build configure of official nginx image.
- - Security checks: Docker Bench Security, Snyk.
- - Docker Healthchecks.
- - Exposes default ports (`80` and `443`), easy to extend.
- - Runs as non-root UID/GID `32548` (selected randomly to avoid mapping to an existing user) and uses [dumb-init](https://github.com/Yelp/dumb-init) to reap zombie processes.
- - Support for multiple linux distros: Alpine, Amazon, CentOS, Debian, Fedora, Ubuntu.
- - Extra Lua Modules.
- - Performance Benchmarks.
+- Support for Lua.
+- Minimal size only, minimal layers.
+- Same build configure of official nginx image.
+- Security checks: Docker Bench Security, Snyk.
+- Docker Healthchecks.
+- Exposes default ports (`80` and `443`), easy to extend.
+- Runs as non-root UID/GID `32548` (selected randomly to avoid mapping to an existing user) and uses [dumb-init](https://github.com/Yelp/dumb-init) to reap zombie processes.
+- Support for multiple linux distros: Alpine, Amazon, CentOS, Debian, Fedora, Ubuntu.
+- Extra Lua Modules.
+- Performance Benchmarks.
 
 ## Specs
 
- - [nginx](https://nginx.org/en/download.html)
- - Supported OS
-   - [Alpine Linux](https://hub.docker.com/_/alpine) (~30MB)
-   - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~200MB)
-   - [CentOS](https://hub.docker.com/_/centos) (~250MB)
-   - [Debian](https://hub.docker.com/_/debian) (~150MB)
-   - [Fedora](https://hub.docker.com/_/fedora) (~250MB)
-   - [Ubuntu](https://hub.docker.com/_/ubuntu) (~200MB)
- - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
- - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
- - [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
- - [Lua-land LRU Cache based on LuaJIT FFI](https://github.com/openresty/lua-resty-lrucache)
- - [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit)
- - <details><summary>Additional Modules</summary>
+- [nginx](https://nginx.org/en/download.html)
+- Supported OS
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~30MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~200MB)
+  - [CentOS](https://hub.docker.com/_/centos) (~250MB)
+  - [Debian](https://hub.docker.com/_/debian) (~150MB)
+  - [Fedora](https://hub.docker.com/_/fedora) (~250MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~200MB)
+- [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
+- [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
+- [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
+- [Lua-land LRU Cache based on LuaJIT FFI](https://github.com/openresty/lua-resty-lrucache)
+- [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit)
+- <details><summary>Additional Modules</summary>
 
-   - [ngx_http_addition_module](http://nginx.org/en/docs/http/ngx_http_addition_module.html)
-   - [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html)
-   - [ngx_http_dav_module](http://nginx.org/en/docs/http/ngx_http_dav_module.html)
-   - [ngx_http_flv_module](http://nginx.org/en/docs/http/ngx_http_flv_module.html)
-   - [ngx_http_geoip_module](http://nginx.org/en/docs/http/ngx_http_geoip_module.html)
-   - [ngx_http_gunzip_module](http://nginx.org/en/docs/http/ngx_http_gunzip_module.html)
-   - [ngx_http_gzip_static_module](http://nginx.org/en/docs/http/ngx_http_gzip_static_module.html)
-   - [ngx_http_mp4_module](http://nginx.org/en/docs/http/ngx_http_mp4_module.html)
-   - [ngx_http_random_index_module](http://nginx.org/en/docs/http/ngx_http_random_index_module.html)
-   - [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
-   - [ngx_http_secure_link_module](http://nginx.org/en/docs/http/ngx_http_secure_link_module.html)
-   - [ngx_http_slice_module](http://nginx.org/en/docs/http/ngx_http_slice_module.html)
-   - [ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
-   - [ngx_http_stub_status_module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
-   - [ngx_http_sub_module](http://nginx.org/en/docs/http/ngx_http_sub_module.html)
-   - [ngx_http_v2_module](http://nginx.org/en/docs/http/ngx_http_v2_module.html)
-   - [ngx_mail_ssl_module](http://nginx.org/en/docs/mail/ngx_mail_ssl_module.html)
-   - [ngx_stream_realip_module](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html)
-   - [ngx_stream_ssl_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html)
-   - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
-   - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
-   - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
-   - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
-   - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
-   - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
-   - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
-   - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
-   - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
-   - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
-   - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
-   - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
-   </details>
+  - [ngx_http_addition_module](http://nginx.org/en/docs/http/ngx_http_addition_module.html)
+  - [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html)
+  - [ngx_http_dav_module](http://nginx.org/en/docs/http/ngx_http_dav_module.html)
+  - [ngx_http_flv_module](http://nginx.org/en/docs/http/ngx_http_flv_module.html)
+  - [ngx_http_geoip_module](http://nginx.org/en/docs/http/ngx_http_geoip_module.html)
+  - [ngx_http_gunzip_module](http://nginx.org/en/docs/http/ngx_http_gunzip_module.html)
+  - [ngx_http_gzip_static_module](http://nginx.org/en/docs/http/ngx_http_gzip_static_module.html)
+  - [ngx_http_mp4_module](http://nginx.org/en/docs/http/ngx_http_mp4_module.html)
+  - [ngx_http_random_index_module](http://nginx.org/en/docs/http/ngx_http_random_index_module.html)
+  - [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
+  - [ngx_http_secure_link_module](http://nginx.org/en/docs/http/ngx_http_secure_link_module.html)
+  - [ngx_http_slice_module](http://nginx.org/en/docs/http/ngx_http_slice_module.html)
+  - [ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
+  - [ngx_http_stub_status_module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
+  - [ngx_http_sub_module](http://nginx.org/en/docs/http/ngx_http_sub_module.html)
+  - [ngx_http_v2_module](http://nginx.org/en/docs/http/ngx_http_v2_module.html)
+  - [ngx_mail_ssl_module](http://nginx.org/en/docs/mail/ngx_mail_ssl_module.html)
+  - [ngx_stream_realip_module](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html)
+  - [ngx_stream_ssl_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html)
+  - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
+  - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
+  - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
+  - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
+  - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
+  - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
+  - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
+  - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
+  - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
+  - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
+  - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
+  - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
+  </details>
 
 ### Compiled Version Details
 
@@ -122,8 +122,8 @@ The following are the available build-time options. They can be set using the `-
 | DOCKER_IMAGE             | `fabiocicerchia/nginx-lua`                 | The image name. |
 | DOCKER_IMAGE_OS          | `alpine`                                   | The Docker base image to build `FROM`. |
 | DOCKER_IMAGE_TAG         | `3.12.0`                                   | The Docker image tag to build `FROM`. |
-| BUILD_DATE               | ``                                         | This label contains the Date/Time the image was built. |
-| VCS_REF                  | ``                                         | Identifier for the version of the source code from which this image was built. |
+| BUILD_DATE               |                                            | This label contains the Date/Time the image was built. |
+| VCS_REF                  |                                            | Identifier for the version of the source code from which this image was built. |
 | EXTENDED_IMAGE           | `1`                                        | Flag to identify if extended image (which contains extra modules). |
 | VER_NGX_DEVEL_KIT        | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | VER_LUAJIT               | `2.1-20200102`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
@@ -146,7 +146,7 @@ The following are the available build-time options. They can be set using the `-
 | VER_PROMETHEUS           | `0.20200523`                               | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) to use. |
 | VER_OPENRESTY_STREAMLUA  | `0.0.8rc3`                                 | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
 | VER_NGINX                | `1.19.0`                                   | The version of nginx to use. |
-| NGINX_BUILD_CONFIG       | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads | Options to pass to nginx's `./configure` script. |
+| NGINX_BUILD_CONFIG       | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads` | Options to pass to nginx's `./configure` script. |
 | BUILD_DEPS               | Differs based on the distro                | List of needed packages to build properly the software. |
 | NGINX_BUILD_DEPS         | Differs based on the distro                | List of needed packages to build properly nginx. |
 | VER_DUMBINIT             | `1.2.2`                                    | The version of [dumb-init](https://github.com/Yelp/dumb-init) to use. |
@@ -154,35 +154,35 @@ The following are the available build-time options. They can be set using the `-
 
 These built-from-source flavors include the following modules by default, but one can easily increase or decrease that with the custom build options above:
 
- - file-aio
- - http_addition_module
- - http_auth_request_module
- - http_dav_module
- - http_dav_module
- - http_flv_module
- - http_geoip_module
- - http_gunzip_module
- - http_gzip_static_module
- - http_mp4_module
- - http_random_index_module
- - http_realip_module
- - http_secure_link_module
- - http_slice_module
- - http_ssl_module
- - http_stub_status_module
- - http_sub_module
- - http_v2_module
- - mail
- - mail_ssl_module
- - stream
- - stream_realip_module
- - stream_ssl_module
- - stream_ssl_preread_module
- - thread
+- file-aio
+- http_addition_module
+- http_auth_request_module
+- http_dav_module
+- http_dav_module
+- http_flv_module
+- http_geoip_module
+- http_gunzip_module
+- http_gzip_static_module
+- http_mp4_module
+- http_random_index_module
+- http_realip_module
+- http_secure_link_module
+- http_slice_module
+- http_ssl_module
+- http_stub_status_module
+- http_sub_module
+- http_v2_module
+- mail
+- mail_ssl_module
+- stream
+- stream_realip_module
+- stream_ssl_module
+- stream_ssl_preread_module
+- thread
 
 ## Notes
 
- - The `SIGQUIT` signal will be sent to nginx to stop this container, to give it an opportunity to stop gracefully (i.e, finish processing active connections). The Docker default is `SIGTERM`, which immediately terminates active connections. Note that if your configuration listens on UNIX domain sockets, this means that you'll need to manually remove the socket file upon shutdown, due to [nginx bug #753](https://trac.nginx.org/nginx/ticket/753).
+- The `SIGQUIT` signal will be sent to nginx to stop this container, to give it an opportunity to stop gracefully (i.e, finish processing active connections). The Docker default is `SIGTERM`, which immediately terminates active connections. Note that if your configuration listens on UNIX domain sockets, this means that you'll need to manually remove the socket file upon shutdown, due to [nginx bug #753](https://trac.nginx.org/nginx/ticket/753).
 
 ## Run Container
 
@@ -334,17 +334,17 @@ services:
       retries: 3
 ```
 
-# License
+## License
 
 As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
 
 As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.
 
- - [Nginx License](https://nginx.org/LICENSE)
- - [Lua License](https://www.lua.org/license.html)
- - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
+- [Nginx License](https://nginx.org/LICENSE)
+- [Lua License](https://www.lua.org/license.html)
+- [OpenResty License](https://github.com/openresty/openresty#copyright--license)
 
-## `fabiocicerchia/nginx-lua`
+### `fabiocicerchia/nginx-lua`
 
 MIT License
 

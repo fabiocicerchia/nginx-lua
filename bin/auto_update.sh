@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086,SC2178,SC1091,SC2004
 
 ./bin/generate_supported_versions.sh | tee supported_versions
 ./bin/dockerfile-generate.sh

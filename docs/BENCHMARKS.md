@@ -1,4 +1,4 @@
-## Benchmarks
+# Benchmarks
 
 VM on DigitalOcean with 1vCPU and 2GB RAM.
 
