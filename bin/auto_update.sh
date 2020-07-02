@@ -1,7 +1,9 @@
 #!/bin/bash
 # shellcheck disable=SC2086,SC2178,SC1091,SC2004
 
-./bin/generate_supported_versions.sh | tee supported_versions
+set -x
+
+./bin/generate_supported_versions.sh
 ./bin/dockerfile-generate.sh
 ./bin/generate_tags.py | tee docs/TAGS.md
 git config --global user.name "fabiocicerchia"
