@@ -22,11 +22,13 @@ for file in files:
     if os == 'alpine':
         tags[nginxVerMajor + '.' + nginxVerMinor + '-' + nginxVerPatch] = file
     tags[nginxVerMajor + '.' + nginxVerMinor + '-' + os + osVer] = file
-    tags[nginxVerMajor + '.' + nginxVerMinor + '-' + os] = file
+    if not(os == 'amazonlinux' and osVer.startswith('2018')):
+        tags[nginxVerMajor + '.' + nginxVerMinor + '-' + os] = file
     if os == 'alpine':
         tags[nginxVerMajor + '.' + nginxVerMinor] = file
     tags[nginxVerMajor + '-' + os + osVer] = file
-    tags[nginxVerMajor + '-' + os] = file
+    if not(os == 'amazonlinux' and osVer.startswith('2018')):
+        tags[nginxVerMajor + '-' + os] = file
     if os == 'alpine':
         tags[nginxVerMajor] = file
         tags['latest'] = file

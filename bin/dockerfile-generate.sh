@@ -10,10 +10,10 @@ function init_dockerfile() {
     mkdir -p $DOCKERFILE_PATH 2> /dev/null
     cp tpl/Dockerfile.$OS $DOCKERFILE
 
-    sed -i "" "s/{{DOCKER_IMAGE}}/fabiocicerchia\/nginx-lua/" $DOCKERFILE
-    sed -i "" "s/{{DOCKER_IMAGE_OS}}/$OS/"                    $DOCKERFILE
-    sed -i "" "s/{{DOCKER_IMAGE_TAG}}/$OS_VER/"               $DOCKERFILE
-    sed -i "" "s/{{VER_NGINX}}/$NGINX_VER/"                   $DOCKERFILE
+    sed -i "s/{{DOCKER_IMAGE}}/fabiocicerchia\/nginx-lua/" $DOCKERFILE
+    sed -i "s/{{DOCKER_IMAGE_OS}}/$OS/"                    $DOCKERFILE
+    sed -i "s/{{DOCKER_IMAGE_TAG}}/$OS_VER/"               $DOCKERFILE
+    sed -i "s/{{VER_NGINX}}/$NGINX_VER/"                   $DOCKERFILE
 }
 
 set -x

@@ -8,7 +8,7 @@ NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=($VER)
 done
-if [ "$#NGINX[@]" != "1" ]; then
+if [ "${#NGINX[@]}" != "1" ]; then
     echo "Wrong version count in NGINX."
     exit 1
 fi
@@ -18,7 +18,7 @@ ALPINE=()
 for VER in $VER_ALPINE; do
     ALPINE+=($VER)
 done
-if [ "$#ALPINE[@]" != "2" ]; then
+if [ "${#ALPINE[@]}" != "2" ]; then
     echo "Wrong version count in ALPINE."
     exit 1
 fi
@@ -28,7 +28,7 @@ AMAZONLINUX=()
 for VER in $VER_AMAZONLINUX; do
     AMAZONLINUX+=($VER)
 done
-if [ "$#AMAZONLINUX[@]" != "2" ]; then
+if [ "${#AMAZONLINUX[@]}" != "2" ]; then
     echo "Wrong version count in AMAZONLINUX."
     exit 1
 fi
@@ -38,7 +38,7 @@ CENTOS=()
 for VER in $VER_CENTOS; do
     CENTOS+=($VER)
 done
-if [ "$#CENTOS[@]" != "2" ]; then
+if [ "${#CENTOS[@]}" != "2" ]; then
     echo "Wrong version count in CENTOS."
     exit 1
 fi
@@ -48,7 +48,7 @@ DEBIAN=()
 for VER in $VER_DEBIAN; do
     DEBIAN+=($VER)
 done
-if [ "$#DEBIAN[@]" != "2" ]; then
+if [ "${#DEBIAN[@]}" != "2" ]; then
     echo "Wrong version count in DEBIAN."
     exit 1
 fi
@@ -58,7 +58,7 @@ FEDORA=()
 for VER in $VER_FEDORA; do
     FEDORA+=($VER)
 done
-if [ "$#FEDORA[@]" != "2" ]; then
+if [ "${#FEDORA[@]}" != "2" ]; then
     echo "Wrong version count in FEDORA."
     exit 1
 fi
@@ -68,7 +68,7 @@ UBUNTU=()
 for VER in $VER_UBUNTU; do
     UBUNTU+=($VER)
 done
-if [ "$#UBUNTU[@]" != "2" ]; then
+if [ "${#UBUNTU[@]}" != "2" ]; then
     echo "Wrong version count in UBUNTU."
     exit 1
 fi
