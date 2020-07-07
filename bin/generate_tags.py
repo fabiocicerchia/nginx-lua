@@ -34,6 +34,7 @@ for file in files:
         tags['latest'] = file
 
 dockerfiles = {}
+reversed = files
 for tag in tags:
     dockerfile = tags[tag]
     if dockerfile not in dockerfiles:
@@ -44,9 +45,10 @@ for tag in tags:
 print('# Tags\n')
 print('## Supported Tags\n')
 for file in supported:
+    reversed.remove(file)
     print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
 
 print('\n## Unsupported Tags\n')
-reversed = list(set(files) - set(supported))[::-1]
+reversed = list(reversed)[::-1]
 for file in reversed:
     print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
