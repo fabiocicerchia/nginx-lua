@@ -3,7 +3,7 @@
 
 set -x
 
-VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E "\d+\.\d+\.\d+" | grep -E -v "alpine|perl" | sort -Vr | head -n1)
+VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | egrep "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n1)
 NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=($VER)
@@ -13,7 +13,7 @@ if [ "${#NGINX[@]}" != "1" ]; then
     exit 1
 fi
 
-VER_ALPINE=$(DISTRO=alpine; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E "\d+\.\d+\.\d+" | sort -Vr | head -n 2)
+VER_ALPINE=$(DISTRO=alpine; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | egrep "[0-9]+\.[0-9]+\.[0-9]+" | sort -Vr | head -n 2)
 ALPINE=()
 for VER in $VER_ALPINE; do
     ALPINE+=($VER)
@@ -23,7 +23,7 @@ if [ "${#ALPINE[@]}" != "2" ]; then
     exit 1
 fi
 
-VER_AMAZONLINUX=$(DISTRO=amazonlinux; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep -E -v "with-|^201" | grep -E "\d+\." | sort -Vr | head -n 2)
+VER_AMAZONLINUX=$(DISTRO=amazonlinux; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | egrep -v "with-|^201" | grep -E "[0-9]+\." | sort -Vr | head -n 2)
 AMAZONLINUX=()
 for VER in $VER_AMAZONLINUX; do
     AMAZONLINUX+=($VER)
@@ -33,7 +33,7 @@ if [ "${#AMAZONLINUX[@]}" != "2" ]; then
     exit 1
 fi
 
-VER_CENTOS=$(DISTRO=centos; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep "\." | grep -v centos | sort -Vr | head -n 2)
+VER_CENTOS=$(DISTRO=centos; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | grep -v centos | sort -Vr | head -n 2)
 CENTOS=()
 for VER in $VER_CENTOS; do
     CENTOS+=($VER)
@@ -43,7 +43,7 @@ if [ "${#CENTOS[@]}" != "2" ]; then
     exit 1
 fi
 
-VER_DEBIAN=$(DISTRO=debian; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep "\." | grep slim | sort -Vr | head -n 2)
+VER_DEBIAN=$(DISTRO=debian; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | grep slim | sort -Vr | head -n 2)
 DEBIAN=()
 for VER in $VER_DEBIAN; do
     DEBIAN+=($VER)
@@ -53,7 +53,7 @@ if [ "${#DEBIAN[@]}" != "2" ]; then
     exit 1
 fi
 
-VER_FEDORA=$(DISTRO=fedora; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | sort -nr | head -n 2)
+VER_FEDORA=$(DISTRO=fedora; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | sort -nr | head -n 2)
 FEDORA=()
 for VER in $VER_FEDORA; do
     FEDORA+=($VER)
@@ -63,7 +63,7 @@ if [ "${#FEDORA[@]}" != "2" ]; then
     exit 1
 fi
 
-VER_UBUNTU=$(DISTRO=ubuntu; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | awk -F: '{print $3}' | grep "\." | sort -nr | head -n 2)
+VER_UBUNTU=$(DISTRO=ubuntu; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | sort -nr | head -n 2)
 UBUNTU=()
 for VER in $VER_UBUNTU; do
     UBUNTU+=($VER)
