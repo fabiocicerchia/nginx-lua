@@ -49,3 +49,6 @@ services:
      - 8094:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+  sut:
+    build: .
+    command: echo pass
