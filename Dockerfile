@@ -1,1 +1,1 @@
-nginx/1.19.0/alpine/3.12.0/Dockerfile
+nginx/1.19.1/alpine/3.12.0/Dockerfile
