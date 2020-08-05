@@ -8,8 +8,8 @@
 - [`1-amazonlinux`, `1.19-amazonlinux`, `1.19.1-amazonlinux`, `1.19.1-amazonlinux2.0.20200722.0`, `1.19-amazonlinux2.0.20200722.0`, `1-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/amazonlinux/2.0.20200722.0/Dockerfile)
 - [`1-centos8.1.1911`, `1.19-centos8.1.1911`, `1.19.1-centos8.1.1911`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/centos/8.1.1911/Dockerfile)
 - [`1-centos`, `1-centos8.2.2004`, `1.19-centos`, `1.19-centos8.2.2004`, `1.19.1-centos`, `1.19.1-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/centos/8.2.2004/Dockerfile)
-- [`1-debian10.3-slim`, `1.19-debian10.3-slim`, `1.19.1-debian10.3-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/debian/10.3-slim/Dockerfile)
-- [`1-debian`, `1-debian10.4-slim`, `1.19-debian`, `1.19-debian10.4-slim`, `1.19.1-debian`, `1.19.1-debian10.4-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/debian/10.4-slim/Dockerfile)
+- [`1-debian10.4-slim`, `1.19-debian10.4-slim`, `1.19.1-debian10.4-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/debian/10.4-slim/Dockerfile)
+- [`1-debian`, `1.19-debian`, `1.19.1-debian`, `1.19.1-debian10.5-slim`, `1.19-debian10.5-slim`, `1-debian10.5-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/debian/10.5-slim/Dockerfile)
 - [`1-fedora32`, `1.19-fedora32`, `1.19.1-fedora32`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/fedora/32/Dockerfile)
 - [`1-fedora`, `1-fedora33`, `1.19-fedora`, `1.19-fedora33`, `1.19.1-fedora`, `1.19.1-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/fedora/33/Dockerfile)
 - [`1-ubuntu20.04`, `1.19-ubuntu20.04`, `1.19.1-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/ubuntu/20.04/Dockerfile)
@@ -17,6 +17,7 @@
 
 ## Unsupported Tags
 
+- [`1-debian10.3-slim`, `1.19-debian10.3-slim`, `1.19.1-debian10.3-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/debian/10.3-slim/Dockerfile)
 - [`1-amazonlinux2.0.20200406.0`, `1.19-amazonlinux2.0.20200406.0`, `1.19.1-amazonlinux2.0.20200406.0`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/amazonlinux/2.0.20200406.0/Dockerfile)
 - [`1.19.0-ubuntu`, `1.19.0-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.0/ubuntu/20.10/Dockerfile)
 - [`1.19.0-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.0/ubuntu/20.04/Dockerfile)
