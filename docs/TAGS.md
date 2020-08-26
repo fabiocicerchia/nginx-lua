@@ -10,13 +10,14 @@
 - [`1-centos`, `1-centos8.2.2004`, `1.19-centos`, `1.19-centos8.2.2004`, `1.19.2-centos`, `1.19.2-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/centos/8.2.2004/Dockerfile)
 - [`1-debian10.4-slim`, `1.19-debian10.4-slim`, `1.19.2-debian10.4-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/debian/10.4-slim/Dockerfile)
 - [`1-debian`, `1.19-debian`, `1.19-debian10.5-slim`, `1-debian10.5-slim`, `1.19.2-debian`, `1.19.2-debian10.5-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/debian/10.5-slim/Dockerfile)
-- [`1-fedora32`, `1.19-fedora32`, `1.19.2-fedora32`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/fedora/32/Dockerfile)
-- [`1-fedora`, `1-fedora33`, `1.19-fedora`, `1.19-fedora33`, `1.19.2-fedora`, `1.19.2-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/fedora/33/Dockerfile)
+- [`1-fedora33`, `1.19-fedora33`, `1.19.2-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/fedora/33/Dockerfile)
+- [`1-fedora`, `1.19-fedora`, `1.19.2-fedora`, `1.19.2-fedora34`, `1.19-fedora34`, `1-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/fedora/34/Dockerfile)
 - [`1-ubuntu20.04`, `1.19-ubuntu20.04`, `1.19.2-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/ubuntu/20.04/Dockerfile)
 - [`1-ubuntu`, `1-ubuntu20.10`, `1.19-ubuntu`, `1.19-ubuntu20.10`, `1.19.2-ubuntu`, `1.19.2-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/ubuntu/20.10/Dockerfile)
 
 ## Unsupported Tags
 
+- [`1-fedora32`, `1.19-fedora32`, `1.19.2-fedora32`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.2/fedora/32/Dockerfile)
 - [`1.19.1-ubuntu`, `1.19.1-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/ubuntu/20.10/Dockerfile)
 - [`1.19.1-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/ubuntu/20.04/Dockerfile)
 - [`1.19.1-fedora`, `1.19.1-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/masternginx/1.19.1/fedora/33/Dockerfile)
