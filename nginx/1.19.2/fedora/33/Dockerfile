@@ -26,7 +26,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
 # https://github.com/openresty/luajit2
-ARG VER_LUAJIT=2.1-20200102
+ARG VER_LUAJIT=2.1-20201002
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -38,13 +38,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.15
+ARG VER_LUA_NGINX_MODULE=0.10.17
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.17
+ARG VER_LUA_RESTY_CORE=0.1.19
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -52,17 +52,17 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 # lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.09
+ARG VER_LUA_RESTY_LRUCACHE=0.10
 ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS=743a4bb1a253325d17a4f4ce8ee61ea0d8e0cc19
+ARG VER_OPENRESTY_HEADERS=d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
 # https://github.com/cloudflare/lua-resty-cookie
-ARG VER_CLOUDFLARE_COOKIE=c54865bdcfc3c42cbd6dbbceb654ba73871d07f6
+ARG VER_CLOUDFLARE_COOKIE=303e32e512defced053a6484bc0745cf9dc0d39e
 ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 
 # lua-resty-dns
@@ -82,12 +82,12 @@ ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
 # https://github.com/openresty/lua-resty-redis
-ARG VER_OPENRESTY_REDIS=0.27
+ARG VER_OPENRESTY_REDIS=0.28
 ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
 
 # lua-resty-shell
 # https://github.com/openresty/lua-resty-shell
-ARG VER_OPENRESTY_SHELL=0.02
+ARG VER_OPENRESTY_SHELL=0.03
 ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
 # lua-resty-upstream-healthcheck
@@ -100,6 +100,11 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 ARG VER_OPENRESTY_WEBSOCKET=0.07
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
+# lua-upstream-nginx-module
+# https://github.com/openresty/lua-upstream-nginx-module
+ARG VER_LUA_UPSTREAM=0.07
+ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
+
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus
 ARG VER_PROMETHEUS=0.20200523
@@ -107,7 +112,7 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=0.0.8rc3
+ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx
@@ -131,6 +136,7 @@ ARG NGINX_BUILD_CONFIG="\
          --group=nginx \
          --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
          --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
          --with-compat \
          --with-file-aio \
          --with-http_addition_module \
@@ -294,6 +300,12 @@ RUN set -eux \
     && cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
     && make -j "$(nproc)" \
     && make install) \
+# LUA Upstream
+# ##############################################################################
+    && [ $EXTENDED_IMAGE -eq 1 ] && ( \
+    curl -Lo /lua-upstream-nginx-module.tar.gz https://github.com/openresty/lua-upstream-nginx-module/archive/v${VER_LUA_UPSTREAM}.tar.gz \
+    && tar -C / -xvzf /lua-upstream-nginx-module.tar.gz \
+    && cd /lua-upstream-nginx-module-${VER_LUA_UPSTREAM}) \
 # Prometheus
 # ##############################################################################
     && [ $EXTENDED_IMAGE -eq 1 ] && ( \
@@ -363,6 +375,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       versions.lua-resty-shell=${VER_OPENRESTY_SHELL} \
       versions.lua-resty-upstream-healthcheck=${VER_OPENRESTY_HEALTHCHECK} \
       versions.lua-resty-websocket=${VER_OPENRESTY_WEBSOCKET} \
+      versions.lua-upstream=${VER_LUA_UPSTREAM} \
       versions.luajit2=${VER_LUAJIT} \
       versions.nginx-lua-prometheus=${VER_PROMETHEUS} \
       versions.nginx=${VER_NGINX} \
