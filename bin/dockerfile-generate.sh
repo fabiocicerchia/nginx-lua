@@ -22,6 +22,7 @@ for NGINX_VER in "${NGINX[@]}"; do
 
     OS=alpine
     for OS_VER in "${ALPINE[@]}"; do init_dockerfile; done
+    ln -s nginx/$NGINX_VER/alpine/$OS_VER/Dockerfile ./Dockerfile
 
     OS=amazonlinux
     for OS_VER in "${AMAZONLINUX[@]}"; do init_dockerfile; done
