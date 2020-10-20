@@ -1,0 +1,5 @@
+ignored:
+  - DL3003 # Use WORKDIR to switch to a directory
+  - DL3008 # Pin versions in apt get install. Instead of `apt-get install <package>` use `apt-get install <package>=<version>`
+  - DL3018 # Pin versions in apk add. Instead of `apk add <package>` use `apk add <package>=<version>`
+  - SC2086 # Double quote to prevent globbing and word splitting.
