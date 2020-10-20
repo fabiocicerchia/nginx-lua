@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh alpine 1
+        run: ./bin/docker-build.sh alpine 0
 
       - name: Test images
         run: ./bin/test.sh alpine
@@ -32,7 +32,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh alpine 1
+        run: ./bin/docker-push.sh alpine 0
         if: github.ref == 'refs/heads/master'
 
   docker_amazonlinux:
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh amazonlinux 1
+        run: ./bin/docker-build.sh amazonlinux 0
 
       - name: Test images
         run: ./bin/test.sh amazonlinux
@@ -51,7 +51,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh amazonlinux 1
+        run: ./bin/docker-push.sh amazonlinux 0
         if: github.ref == 'refs/heads/master'
 
   docker_centos:
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh centos 1
+        run: ./bin/docker-build.sh centos 0
 
       - name: Test images
         run: ./bin/test.sh centos
@@ -70,7 +70,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh centos 1
+        run: ./bin/docker-push.sh centos 0
         if: github.ref == 'refs/heads/master'
 
   docker_debian:
@@ -79,7 +79,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh debian 1
+        run: ./bin/docker-build.sh debian 0
 
       - name: Test images
         run: ./bin/test.sh debian
@@ -89,7 +89,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh debian 1
+        run: ./bin/docker-push.sh debian 0
         if: github.ref == 'refs/heads/master'
 
   docker_fedora:
@@ -98,7 +98,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh fedora 1
+        run: ./bin/docker-build.sh fedora 0
 
       - name: Test images
         run: ./bin/test.sh fedora
@@ -108,7 +108,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh fedora 1
+        run: ./bin/docker-push.sh fedora 0
         if: github.ref == 'refs/heads/master'
 
   docker_ubuntu:
@@ -117,7 +117,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh ubuntu 1
+        run: ./bin/docker-build.sh ubuntu 0
 
       - name: Test images
         run: ./bin/test.sh ubuntu
@@ -127,5 +127,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh ubuntu 1
+        run: ./bin/docker-push.sh ubuntu 0
         if: github.ref == 'refs/heads/master'
