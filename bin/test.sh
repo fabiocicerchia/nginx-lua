@@ -19,9 +19,6 @@ function test() {
         curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1
         curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1
         docker rm -f nginx_lua_test
-     else
-        echo "Image not found: fabiocicerchia/nginx-lua:$DOCKER_TAG"
-        exit 1
      fi
 }
 
