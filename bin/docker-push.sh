@@ -54,12 +54,12 @@ if [ "$2" == "1" ]; then
     FORCE=1
 fi
 VERSIONS=()
-if [ "$OS" == "alpine" ]; then VERSIONS=$ALPINE
-elif [ "$OS" == "amazonlinux" ]; then VERSIONS=$AMAZONLINUX
-elif [ "$OS" == "centos" ]; then VERSIONS=$CENTOS
-elif [ "$OS" == "debian" ]; then VERSIONS=$DEBIAN
-elif [ "$OS" == "fedora" ]; then VERSIONS=$FEDORA
-elif [ "$OS" == "ubuntu" ]; then VERSIONS=$UBUNTU
+if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
+elif [ "$OS" == "amazonlinux" ]; then VERSIONS=("${AMAZONLINUX[@]}")
+elif [ "$OS" == "centos" ]; then VERSIONS=("${CENTOS[@]}")
+elif [ "$OS" == "debian" ]; then VERSIONS=("${DEBIAN[@]}")
+elif [ "$OS" == "fedora" ]; then VERSIONS=("${FEDORA[@]}")
+elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
 fi
 
 NLEN=${#NGINX[@]}
