@@ -36,6 +36,7 @@ function build() {
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$OS"
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS"
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
     fi

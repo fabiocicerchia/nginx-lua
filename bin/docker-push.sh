@@ -24,25 +24,26 @@ function push() {
         return
     fi
 
-    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
-    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
-    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER
+    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER
+    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER
+    [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER
 
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MAJOR
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MINOR
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$PATCH
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:latest | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:latest
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MAJOR
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MINOR
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$PATCH
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:latest | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:latest
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MAJOR-$OS
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS$OSVER | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OSVER
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$OS | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$OS
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MAJOR-$OS
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MAJOR-$OS$OSVER | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MAJOR-$OS$OSVER
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR-$OS | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$MINOR-$OS
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS | wc -l) -ne 0 ]] || docker push fabiocicerchia/nginx-lua:$PATCH-$OS
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$MINOR-$OS | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$MINOR-$OS
+        [[ $(docker image ls -q fabiocicerchia/nginx-lua:$PATCH-$OS | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:$PATCH-$OS
     fi
 }
 

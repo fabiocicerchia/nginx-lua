@@ -27,6 +27,7 @@ for file in files:
     if os == 'alpine':
         tags[nginxVerMajor + '.' + nginxVerMinor] = file
     tags[nginxVerMajor + '-' + os + osVer] = file
+    tags[os] = file
     if not(os == 'amazonlinux' and osVer.startswith('2018')):
         tags[nginxVerMajor + '-' + os] = file
     if os == 'alpine':

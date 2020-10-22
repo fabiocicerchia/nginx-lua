@@ -27,6 +27,7 @@ function tag() {
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+        STR="$STR \`$OS\`"
         STR="$STR \`$MAJOR-$OS\`"
         STR="$STR \`$MAJOR-$OS$OS_VER\`"
     fi
