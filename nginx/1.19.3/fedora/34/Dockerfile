@@ -386,6 +386,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
       GeoIP-devel \
       ca-certificates \
+      gcc-c++ \
       openssl-devel \
       pcre-devel \
       zlib-devel"
