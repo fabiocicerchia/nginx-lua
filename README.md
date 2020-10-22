@@ -19,8 +19,8 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`1-alpine3.11.6`,`1.19-alpine3.11.6`,`1.19.3-alpine3.11.6`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.11.6/Dockerfile)
-- [`1`,`1.19`,`1.19.3`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.0`,`1-alpine3.12.0`,`1.19-alpine3.12.0`,`1.19.3-alpine3.12.0`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.0/Dockerfile)
+- [`1-alpine3.12.0`,`1.19-alpine3.12.0`,`1.19.3-alpine3.12.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.0/Dockerfile)
+- [`1`,`1.19`,`1.19.3`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
 - [`1-amazonlinux2.0.20200602.0`,`1.19-amazonlinux2.0.20200602.0`,`1.19.3-amazonlinux2.0.20200602.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200602.0/Dockerfile)
 - [`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
 - [`1-centos8.1.1911`,`1.19-centos8.1.1911`,`1.19.3-centos8.1.1911`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8.1.1911/Dockerfile)
