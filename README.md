@@ -19,6 +19,7 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 
 ## Supported tags and respective `Dockerfile` links
 
+<!-- START_SUPPORTED_TAGS -->
 - [`1-alpine3.12.0`,`1.19-alpine3.12.0`,`1.19.3-alpine3.12.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.0/Dockerfile)
 - [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
 - [`1-amazonlinux2.0.20200602.0`,`1.19-amazonlinux2.0.20200602.0`,`1.19.3-amazonlinux2.0.20200602.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200602.0/Dockerfile)
@@ -31,6 +32,7 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 - [`fedora`,`1-fedora`,`1-fedora34`,`1-fedora34`,`1.19-fedora`,`1.19-fedora34`,`1.19.3-fedora`,`1.19.3-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/34/Dockerfile)
 - [`1-ubuntu20.04`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.04/Dockerfile)
 - [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.10`,`1-ubuntu20.10`,`1.19.3-ubuntu`,`1.19-ubuntu20.10`,`1.19.3-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.10/Dockerfile)
+<!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [docs/TAGS.md](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).
 
