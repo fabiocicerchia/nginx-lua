@@ -348,6 +348,13 @@ RUN set -eux \
     && make -j "$(nproc)" build \
     && make install
 
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+        gettext-base
+
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
@@ -399,6 +406,7 @@ COPY --from=builder /usr/local/lib /usr/local/lib
 COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /var/cache/nginx /var/cache/nginx
+COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
 RUN set -eux \
     && apt-get update \
@@ -426,6 +434,7 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/* \
 # smoke test
 # ##############################################################################
+    && envsubst -V \
     && nginx -V \
     && nginx -t
 

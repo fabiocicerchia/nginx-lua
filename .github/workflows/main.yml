@@ -19,17 +19,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh alpine 1
+        run: make build-alpine
 
       - name: Test images
-        run: ./bin/test.sh alpine
+        run: make test-alpine
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh alpine 1
+        run: make push-alpine
         if: github.ref == 'refs/heads/master'
 
   docker_amazonlinux:
@@ -38,17 +38,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh amazonlinux 1
+        run: make build-amazonlinux
 
       - name: Test images
-        run: ./bin/test.sh amazonlinux
+        run: make test-amazonlinux
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh amazonlinux 1
+        run: make push-amazonlinux
         if: github.ref == 'refs/heads/master'
 
   docker_centos:
@@ -57,17 +57,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh centos 1
+        run: make build-centos
 
       - name: Test images
-        run: ./bin/test.sh centos
+        run: make test-centos
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh centos 1
+        run: make push-centos
         if: github.ref == 'refs/heads/master'
 
   docker_debian:
@@ -76,17 +76,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh debian 1
+        run: make build-debian
 
       - name: Test images
-        run: ./bin/test.sh debian
+        run: make test-debian
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh debian 1
+        run: make push-debian
         if: github.ref == 'refs/heads/master'
 
   docker_fedora:
@@ -95,17 +95,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh fedora 1
+        run: make build-fedora
 
       - name: Test images
-        run: ./bin/test.sh fedora
+        run: make test-fedora
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh fedora 1
+        run: make push-fedora
         if: github.ref == 'refs/heads/master'
 
   docker_ubuntu:
@@ -114,15 +114,15 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build images
-        run: ./bin/docker-build.sh ubuntu 1
+        run: make build-ubuntu
 
       - name: Test images
-        run: ./bin/test.sh ubuntu
+        run: make test-ubuntu
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
         if: github.ref == 'refs/heads/master'
 
       - name: Push images
-        run: ./bin/docker-push.sh ubuntu 1
+        run: make push-ubuntu
         if: github.ref == 'refs/heads/master'
