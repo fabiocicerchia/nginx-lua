@@ -56,7 +56,6 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 - Security checks: Docker Bench Security, Snyk.
 - Docker Healthchecks.
 - Exposes default ports (`80` and `443`), easy to extend.
-- Runs as non-root UID/GID `32548` (selected randomly to avoid mapping to an existing user) and uses [dumb-init](https://github.com/Yelp/dumb-init) to reap zombie processes.
 - Support for multiple linux distros: Alpine, Amazon, CentOS, Debian, Fedora, Ubuntu.
 - Extra Lua Modules.
 - Performance Benchmarks.
@@ -169,26 +168,41 @@ $ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $
 ```
 If you have a more advanced configuration that requires nginx to write to other locations, simply add more volume mounts to those locations.
 
-### Running nginx in debug mode
-
-Images since version 1.9.8 come with `nginx-debug` binary that produces verbose output when using higher log levels. It can be used with simple CMD substitution:
-```console
-$ docker run --name my-nginx -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx nginx-debug -g 'daemon off;'
-```
-Similar configuration in docker-compose.yml may look like this:
-```yaml
-web:
-  image: nginx
-  volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf:ro
-  command: [nginx-debug, '-g', 'daemon off;']
-```
-
 ### Entrypoint quiet logs
 
 Since version 1.19.0, a verbose entrypoint was added. It provides information on what's happening during container startup. You can silence this output by setting environment variable `NGINX_ENTRYPOINT_QUIET_LOGS`:
 ```console
 $ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 nginx
+```
+
+### User and group id
+
+Since 1.17.0, both alpine- and debian-based images variants use the same user and group ids to drop the privileges for worker processes:
+```console
+$ id
+uid=101(nginx) gid=101(nginx) groups=101(nginx)
+```
+
+### Running nginx as a non-root user
+
+It is possible to run the image as a less privileged arbitrary UID/GID. This, however, requires modification of nginx configuration to use directories writeable by that specific UID/GID pair:
+```console
+$ docker run -d -v $PWD/nginx.conf:/etc/nginx/nginx.conf nginx
+```
+where nginx.conf in the current directory should have the following directives re-defined:
+```nginx
+pid        /tmp/nginx.pid;
+```
+And in the http context:
+```nginx
+http {
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
+...
+}
 ```
 
 ## Specs
@@ -282,7 +296,6 @@ The following are the available build-time options. They can be set using the `-
 | NGINX_BUILD_CONFIG       | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads` | Options to pass to nginx's `./configure` script. |
 | BUILD_DEPS               | Differs based on the distro                | List of needed packages to build properly the software. |
 | NGINX_BUILD_DEPS         | Differs based on the distro                | List of needed packages to build properly nginx. |
-| VER_DUMBINIT             | `1.2.2`                                    | The version of [dumb-init](https://github.com/Yelp/dumb-init) to use. |
 | PKG_DEPS                 | Differs based on the distro                | List of needed packages to run properly the software. |
 
 These built-from-source flavors include the following modules by default, but one can easily increase or decrease that with the custom build options above:
@@ -380,7 +393,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "org.label-schema.vcs-ref": "5b8a255",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
   "org.label-schema.version": "1.19.2-alpine3.12.0",
-  "versions.dumb-init": "1.2.2",
   "versions.extended": "1",
   "versions.headers-more-nginx-module": "d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17",
   "versions.lua-nginx-module": "0.10.17",
@@ -417,7 +429,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `org.label-schema.vcs-url`                | URL for the source code under version control from which this container image was built. |
 | `org.label-schema.version`                | Release identifier for the contents of the image. |
 | `versions.extended`                       | Flag to identify if extended image (which contains extra modules). |
-| `versions.dumb-init`                      | The version of [dumb-init](https://github.com/Yelp/dumb-init) used. |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
 | `versions.lua-resty-cookie`               | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) used. |

@@ -198,11 +198,6 @@ ARG NGINX_BUILD_DEPS="\
       zlib-dev"
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
-# dumb-init
-# https://github.com/Yelp/dumb-init
-ARG VER_DUMBINIT=1.2.2
-ENV VER_DUMBINIT=$VER_DUMBINIT
-
 ####################################
 # Build Nginx with support for LUA #
 ####################################
@@ -378,7 +373,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
       org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
       org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
       versions.extended=${EXTENDED_IMAGE} \
-      versions.dumb-init=${VER_DUMBINIT} \
       versions.headers-more-nginx-module=${VER_OPENRESTY_HEADERS} \
       versions.lua-nginx-module=${VER_LUA_NGINX_MODULE} \
       versions.lua-resty-cookie=${VER_CLOUDFLARE_COOKIE} \
@@ -442,16 +436,18 @@ RUN set -eux \
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
-# dumb-init
-# ##############################################################################
-    && curl -Lo /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v${VER_DUMBINIT}/dumb-init_${VER_DUMBINIT}_x86_64 \
-    && chmod +x /usr/bin/dumb-init \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 32548 -S nginx \
-    && adduser -S -D -H -u 32548 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+
+COPY docker-entrypoint.sh /
+COPY 10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
+COPY 20-envsubst-on-templates.sh /docker-entrypoint.d
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
 # smoke test
 # ##############################################################################
-    && envsubst -V \
+RUN envsubst -V \
     && nginx -V \
     && nginx -t
 
@@ -461,7 +457,5 @@ EXPOSE 80 443
 
 # Override stop signal to stop process gracefully
 STOPSIGNAL SIGQUIT
-
-ENTRYPOINT ["dumb-init"]
 
 CMD ["nginx", "-g", "daemon off;"]
