@@ -61,6 +61,136 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 - Extra Lua Modules.
 - Performance Benchmarks.
 
+## Typical Uses
+
+Just to name a few:
+
+* Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
+* doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
+* manipulating response headers in an arbitrary way (by Lua)
+* fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
+* coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other storage,
+* doing very complex URL dispatch in Lua at rewrite phase,
+* using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
+
+The possibilities are unlimited as the module allows bringing together various
+elements within Nginx as well as exposing the power of the Lua language to the
+user. The module provides the full flexibility of scripting while offering
+performance levels comparable with native C language programs both in terms of
+CPU time as well as memory footprint thanks to LuaJIT 2.x.
+
+Other scripting language implementations typically struggle to match this
+performance level.
+
+## How to use this image
+
+### Hosting some simple static content
+
+```console
+$ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d nginx
+```
+Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary content (which is a much cleaner solution than the bind mount above):
+```dockerfile
+FROM nginx
+COPY static-html-directory /usr/share/nginx/html
+```
+Place this file in the same directory as your directory of content ("static-html-directory"), run `docker build -t some-content-nginx .`, then start your container:
+```console
+$ docker run --name some-nginx -d some-content-nginx
+```
+
+### Exposing external port
+
+```console
+$ docker run --name some-nginx -d -p 8080:80 some-content-nginx
+```
+Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
+
+### Complex configuration
+
+```console
+$ docker run --name my-custom-nginx-container -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx
+```
+For information on the syntax of the nginx configuration files, see [the official documentation](http://nginx.org/en/docs/) (specifically the [Beginner's Guide](http://nginx.org/en/docs/beginners_guide.html#conf_structure)).
+If you wish to adapt the default configuration, use something like the following to copy it from a running nginx container:
+```console
+$ docker run --name tmp-nginx-container -d nginx
+$ docker cp tmp-nginx-container:/etc/nginx/nginx.conf /host/path/nginx.conf
+$ docker rm -f tmp-nginx-container
+```
+This can also be accomplished more cleanly using a simple `Dockerfile` (in `/host/path/`):
+```dockerfile
+FROM nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+```
+If you add a custom `CMD` in the Dockerfile, be sure to include `-g daemon off;` in the `CMD` in order for nginx to stay in the foreground, so that Docker can track the process properly (otherwise your container will stop immediately after starting)!
+Then build the image with `docker build -t custom-nginx .` and run it as follows:
+```console
+$ docker run --name my-custom-nginx-container -d custom-nginx
+```
+#### Using environment variables in nginx configuration (new in 1.19)
+
+Out-of-the-box, nginx doesn't support environment variables inside most configuration blocks. But this image has a function, which will extract environment variables before nginx starts.
+Here is an example using docker-compose.yml:
+```yaml
+web:
+  image: nginx
+  volumes:
+   - ./templates:/etc/nginx/templates
+  ports:
+   - "8080:80"
+  environment:
+   - NGINX_HOST=foobar.com
+   - NGINX_PORT=80
+```
+By default, this function reads template files in `/etc/nginx/templates/*.template` and outputs the result of executing `envsubst` to `/etc/nginx/conf.d`.
+So if you place `templates/default.conf.template` file, which contains variable references like this:
+	listen       ${NGINX_PORT};
+outputs to `/etc/nginx/conf.d/default.conf` like this:
+	listen       80;
+This behavior can be changed via the following environment variables:
+-	`NGINX_ENVSUBST_TEMPLATE_DIR`
+	-	A directory which contains template files (default: `/etc/nginx/templates`)
+	-	When this directory doesn't exist, this function will do nothing about template processing.
+-	`NGINX_ENVSUBST_TEMPLATE_SUFFIX`
+	-	A suffix of template files (default: `.template`)
+	-	This function only processes the files whose name ends with this suffix.
+-	`NGINX_ENVSUBST_OUTPUT_DIR`
+	-	A directory where the result of executing envsubst is output (default: `/etc/nginx/conf.d`)
+	-	The output filename is the template filename with the suffix removed.
+		-	ex.) `/etc/nginx/templates/default.conf.template` will be output with the filename `/etc/nginx/conf.d/default.conf`.
+	-	This directory must be writable by the user running a container.
+
+### Running nginx in read-only mode
+
+To run nginx in read-only mode, you will need to mount a Docker volume to every location where nginx writes information. The default nginx configuration requires write access to `/var/cache` and `/var/run`. This can be easily accomplished by running nginx as follows:
+```console
+$ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $(pwd)/nginx-pid:/var/run nginx
+```
+If you have a more advanced configuration that requires nginx to write to other locations, simply add more volume mounts to those locations.
+
+### Running nginx in debug mode
+
+Images since version 1.9.8 come with `nginx-debug` binary that produces verbose output when using higher log levels. It can be used with simple CMD substitution:
+```console
+$ docker run --name my-nginx -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx nginx-debug -g 'daemon off;'
+```
+Similar configuration in docker-compose.yml may look like this:
+```yaml
+web:
+  image: nginx
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  command: [nginx-debug, '-g', 'daemon off;']
+```
+
+### Entrypoint quiet logs
+
+Since version 1.19.0, a verbose entrypoint was added. It provides information on what's happening during container startup. You can silence this output by setting environment variable `NGINX_ENTRYPOINT_QUIET_LOGS`:
+```console
+$ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 nginx
+```
+
 ## Specs
 
 - [nginx](https://nginx.org/en/download.html)
@@ -299,6 +429,16 @@ More details about the benchark can be found in [docs/benchmarks/different_image
 ![Benchmark Median Response Time](http://chart.googleapis.com/chart?&chco=0D597F,9CCE28,CD2B4A,3D6EB4,DD4915&chd=t:9.86|9.93|10.4|10.06|10.3&chdl=alpine|centos|debian|fedora|ubuntu&chdlp=bvr&chds=9.5,10&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Median+Response+Time&chxl=0:|msec&chxr=1,9.5,10,0.1&chxt=x,y)
 
 More details about the benchark can be found in [docs/benchmarks/distros](docs/benchmarks/distros).
+
+## Extras
+
+Extract of [openresty/lua-nginx-module](https://github.com/openresty/lua-nginx-module) under [BSD license](https://github.com/openresty/lua-nginx-module#copyright-and-license).
+
+ - [LUA Nginx Module - Known Issues](docs/lua-nginx-module/known-issues.md)
+ - [LUA Nginx Module - Directives](docs/lua-nginx-module/directives.md)
+ - [Nginx API for Lua](docs/lua-nginx-module/nginx-api-for-lua.md)
+
+![Lua Nginx Modules Directives](docs/lua-nginx-module/lua_nginx_modules_directives.png)
 
 ## Examples
 
