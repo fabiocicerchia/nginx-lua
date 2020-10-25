@@ -18,6 +18,26 @@ build-debian:
 build-ubuntu:
 	./bin/docker-build.sh ubuntu 1
 
+build-all-minimal: build-alpine-minimal build-centos-minimal build-amazonlinux-minimal build-fedora-minimal build-debian-minimal build-ubuntu-minimal
+
+build-alpine-minimal:
+	./bin/docker-build.sh alpine 1 0
+
+build-centos-minimal:
+	./bin/docker-build.sh centos 1 0
+
+build-amazonlinux-minimal:
+	./bin/docker-build.sh amazonlinux 1 0
+
+build-fedora-minimal:
+	./bin/docker-build.sh fedora 1 0
+
+build-debian-minimal:
+	./bin/docker-build.sh debian 1 0
+
+build-ubuntu-minimal:
+	./bin/docker-build.sh ubuntu 1 0
+
 push-all: push-alpine push-centos push-amazonlinux push-fedora push-debian push-ubuntu
 
 push-alpine:

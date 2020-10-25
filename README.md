@@ -243,7 +243,7 @@ $ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 nginx
 
 ### Compiled Version Details
 
-```bash
+```console
 configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --user=nginx --group=nginx --add-module=/lua-nginx-module-0.10.15 --add-module=/ngx_devel_kit-0.3.1 --with-compat --with-file-aio --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_dav_module --with-http_flv_module --with-http_geoip_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-threads --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
@@ -256,7 +256,7 @@ The following are the available build-time options. They can be set using the `-
 | DOCKER_IMAGE_TAG         | `3.12.0`                                   | The Docker image tag to build `FROM`. |
 | BUILD_DATE               |                                            | This label contains the Date/Time the image was built. |
 | VCS_REF                  |                                            | Identifier for the version of the source code from which this image was built. |
-| EXTENDED_IMAGE           | `1`                                        | Flag to identify if extended image (which contains extra modules). |
+| EXTENDED_IMAGE           | `1`                                        | Flag to identify if extended image (which contains extra modules). See [Minimal Image](#minimal-image). |
 | VER_NGX_DEVEL_KIT        | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | VER_LUAJIT               | `2.1-20201002`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | LUAJIT_LIB               | `/usr/local/lib`                           | Tell nginx's build system where to find LuaJIT 2.0 |
@@ -319,8 +319,8 @@ These built-from-source flavors include the following modules by default, but on
 
 ## Run Container
 
-```bash
-docker run -it --rm -p 80:80 \
+```console
+$ docker run -it --rm -p 80:80 \
   --health-cmd='curl --fail http://example.com || exit 1' \
   --health-interval=30s \
   --health-timeout=3s \
@@ -330,19 +330,43 @@ docker run -it --rm -p 80:80 \
 ## Image Variants
 
 ### `fabiocicerchia/nginx-lua:<version>`
-The default Nginx + Lua image. Uses Alpine for base image.
+The default Nginx + Lua + extra lua modules image. Uses Alpine for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>`
-Provides Nginx + Lua. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>`
-Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+
+### `fabiocicerchia/nginx-lua:<version>-minimal`
+Provides Nginx + Lua image. Uses Alpine for base image.  
+**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
+
+### `fabiocicerchia/nginx-lua:<version>-<distro>-minimal`
+Provides Nginx + Lua. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.  
+**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
+
+### `fabiocicerchia/nginx-lua:<version>-<distro><version>-minimal`
+Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.  
+**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
+
+## Minimal Image
+
+The extended image (default one) contains a set of extra packages for enhanced functionality.
+If you need a smaller version, like the official distros (containing only nginx and openresty's lua module),
+you could build specifying the build argument set to 0:
+
+```console
+$ docker build \
+  --build-arg EXTENDED=0 \
+  -f $DOCKERFILE .
+```
 
 ## Image Labels
 
 The image builds are labeled with various information. Here's an example of printing the labels using jq:
 
-```bash
+```console
 $ docker pull fabiocicerchia/nginx-lua:1-alpine
 $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 {

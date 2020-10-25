@@ -15,6 +15,7 @@ function build() {
     VER_TAGS=$4
     OS_TAGS=$5
     DEFAULT=$6
+    EXTENDED=$7
 
     DOCKERFILE_PATH=nginx/$NGINX_VER/$OS/$OS_VER
     DOCKERFILE=$DOCKERFILE_PATH/Dockerfile
@@ -27,32 +28,38 @@ function build() {
         return
     fi
 
+    SUFFIX=""
+    if [ $EXTENDED -eq 0 ]; then
+        SUFFIX="-minimal"
+    fi
+
     TAGS=""
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:latest"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:latest$SUFFIX"
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$OS"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$OS$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$SUFFIX"
+        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$SUFFIX"
     fi
 
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER"
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER"
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER$SUFFIX"
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER$SUFFIX"
+    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
 
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
     time docker build \
+        --build-arg EXTENDED=$EXTENDED \
         --build-arg BUILD_DATE=$BUILD_DATE \
         --build-arg VCS_REF=$VCS_REF \
         $TAGS \
@@ -65,6 +72,10 @@ OS=$1
 FORCE=0
 if [ "$2" == "1" ]; then
     FORCE=1
+fi
+EXTENDED=1
+if [ "$2" == "0" ]; then
+    EXTENDED=0
 fi
 VERSIONS=()
 if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
@@ -95,7 +106,7 @@ for (( I=0; I<$NLEN; I++ )); do
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
+        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT $EXTENDED
     done
 
 done
