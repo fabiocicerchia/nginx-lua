@@ -48,6 +48,19 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 > [wikipedia.org/wiki/Lua](https://en.wikipedia.org/wiki/Lua_(programming_language))
 
+## Why this repo and not OpenResty?
+
+| | nginx-lua | OpenResty |
+|--|--|--|
+| nginx latest version | `1.19.3` | `1.17.x` (last tested: `1.17.8`) |
+| Alpine supported | ✅ | ✅ |
+| Amazon supported | ✅ | ✅ |
+| CentOS supported | ✅ | ✅ |
+| Debian supported | ✅ | ✅ |
+| Fedora supported | ✅ | ❌ |
+| Ubuntu supported | ✅ | ✅ |
+| Windows supported | ❌ | ✅ |
+
 ## Features
 
 - Support for Lua.
@@ -62,35 +75,37 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ## Typical Uses
 
-Just to name a few:
-
-* Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
-* doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
-* manipulating response headers in an arbitrary way (by Lua)
-* fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
-* coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other storage,
-* doing very complex URL dispatch in Lua at rewrite phase,
-* using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
-
-The possibilities are unlimited as the module allows bringing together various
-elements within Nginx as well as exposing the power of the Lua language to the
-user. The module provides the full flexibility of scripting while offering
-performance levels comparable with native C language programs both in terms of
-CPU time as well as memory footprint thanks to LuaJIT 2.x.
-
-Other scripting language implementations typically struggle to match this
-performance level.
+> Just to name a few:
+> 
+> * Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
+> * doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
+> * manipulating response headers in an arbitrary way (by Lua)
+> * fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
+> * coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
+> * doing very complex URL dispatch in Lua at rewrite phase,
+> * using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
+> 
+> The possibilities are unlimited as the module allows bringing together various
+> elements within Nginx as well as exposing the power of the Lua language to the
+> user. The module provides the full flexibility of scripting while offering
+> performance levels comparable with native C language programs both in terms of
+> CPU time as well as memory footprint thanks to LuaJIT 2.x.
+> 
+> Other scripting language implementations typically struggle to match this
+> performance level.
+>
+> - https://github.com/openresty/lua-nginx-module#typical-uses
 
 ## How to use this image
 
 ### Hosting some simple static content
 
 ```console
-$ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d nginx
+$ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d fabiocicerchia/nginx-lua
 ```
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary content (which is a much cleaner solution than the bind mount above):
 ```dockerfile
-FROM nginx
+FROM fabiocicerchia/nginx-lua
 COPY static-html-directory /usr/share/nginx/html
 ```
 Place this file in the same directory as your directory of content ("static-html-directory"), run `docker build -t some-content-nginx .`, then start your container:
@@ -108,18 +123,18 @@ Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browse
 ### Complex configuration
 
 ```console
-$ docker run --name my-custom-nginx-container -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d nginx
+$ docker run --name my-custom-nginx-container -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d fabiocicerchia/nginx-lua
 ```
 For information on the syntax of the nginx configuration files, see [the official documentation](http://nginx.org/en/docs/) (specifically the [Beginner's Guide](http://nginx.org/en/docs/beginners_guide.html#conf_structure)).
 If you wish to adapt the default configuration, use something like the following to copy it from a running nginx container:
 ```console
-$ docker run --name tmp-nginx-container -d nginx
+$ docker run --name tmp-nginx-container -d fabiocicerchia/nginx-lua
 $ docker cp tmp-nginx-container:/etc/nginx/nginx.conf /host/path/nginx.conf
 $ docker rm -f tmp-nginx-container
 ```
 This can also be accomplished more cleanly using a simple `Dockerfile` (in `/host/path/`):
 ```dockerfile
-FROM nginx
+FROM fabiocicerchia/nginx-lua
 COPY nginx.conf /etc/nginx/nginx.conf
 ```
 If you add a custom `CMD` in the Dockerfile, be sure to include `-g daemon off;` in the `CMD` in order for nginx to stay in the foreground, so that Docker can track the process properly (otherwise your container will stop immediately after starting)!
@@ -133,7 +148,7 @@ Out-of-the-box, nginx doesn't support environment variables inside most configur
 Here is an example using docker-compose.yml:
 ```yaml
 web:
-  image: nginx
+  image: fabiocicerchia/nginx-lua
   volumes:
    - ./templates:/etc/nginx/templates
   ports:
@@ -164,7 +179,7 @@ This behavior can be changed via the following environment variables:
 
 To run nginx in read-only mode, you will need to mount a Docker volume to every location where nginx writes information. The default nginx configuration requires write access to `/var/cache` and `/var/run`. This can be easily accomplished by running nginx as follows:
 ```console
-$ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $(pwd)/nginx-pid:/var/run nginx
+$ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $(pwd)/nginx-pid:/var/run fabiocicerchia/nginx-lua
 ```
 If you have a more advanced configuration that requires nginx to write to other locations, simply add more volume mounts to those locations.
 
@@ -172,7 +187,7 @@ If you have a more advanced configuration that requires nginx to write to other 
 
 Since version 1.19.0, a verbose entrypoint was added. It provides information on what's happening during container startup. You can silence this output by setting environment variable `NGINX_ENTRYPOINT_QUIET_LOGS`:
 ```console
-$ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 nginx
+$ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 fabiocicerchia/nginx-lua
 ```
 
 ### User and group id
@@ -372,6 +387,20 @@ you could build specifying the build argument set to 0:
 ```console
 $ docker build \
   --build-arg EXTENDED=0 \
+  -f $DOCKERFILE .
+```
+
+## Custom Builds
+
+If you need to extend the functionality of the existing image, you could build your own version using the following command.
+For the list of values do refer to the [relative section](#compiled-version-details).
+
+```console
+$ docker build
+  --build-arg NGINX_BUILD_CONFIG=... \ # nginx build flags
+  --build-arg BUILD_DEPS=... \ # packages needed for building phase
+  --build-arg NGINX_BUILD_DEPS=... \ # packages needed for building phase by nginx
+  --build-arg PKG_DEPS=... \ # packages available in final image
   -f $DOCKERFILE .
 ```
 
