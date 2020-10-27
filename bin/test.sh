@@ -1,16 +1,16 @@
 #!/bin/bash
-# shellcheck disable=SC2086,SC2178,SC1091,SC2004
+# shellcheck disable=SC1091
 
 source supported_versions
 
 function test() {
     DOCKER_TAG=$1
 
-    docker rm -f nginx_lua_test 2> /dev/null
+    docker rm -f nginx_lua_test 2> /dev/null || true
 
-    FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:$DOCKER_TAG | wc -l)
-    if [ $FOUND -ne 0 ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v $PWD/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:$DOCKER_TAG
+    FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
+    if [ "$FOUND" -ne "0" ]; then
+        docker run -d --name nginx_lua_test -p 8080:80 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
         COUNT=0
         until [ $COUNT -eq 20 ] || [ "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
             echo -n '.'; sleep 0.5;
@@ -30,34 +30,34 @@ function runtest() {
     OS_TAGS=$5
     DEFAULT=$6
 
-    MAJOR=$(echo $NGINX_VER | cut -d '.' -f 1)
-    MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
-    PATCH=$NGINX_VER
+    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
+    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
+    PATCH="$NGINX_VER"
 
-    test $PATCH-$OS$OS_VER
-    test $MINOR-$OS$OS_VER
-    test $MAJOR-$OS$OS_VER
+    test "$PATCH-$OS$OS_VER"
+    test "$MINOR-$OS$OS_VER"
+    test "$MAJOR-$OS$OS_VER"
 
     if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
-        test $MAJOR
-        test $MINOR
-        test $PATCH
+        test "$MAJOR"
+        test "$MINOR"
+        test "$PATCH"
         test latest
     fi
 
     if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
-        test $MAJOR-$OS
-        test $MAJOR-$OS$OS_VER
+        test "$MAJOR-$OS"
+        test "$MAJOR-$OS$OS_VER"
     fi
 
     if [ "$OS_TAGS" == "1" ]; then
-        test $MINOR-$OS
-        test $PATCH-$OS
+        test "$MINOR-$OS"
+        test "$PATCH-$OS"
     fi
 
 }
 
-set -x
+set -eux
 
 OS=$1
 VERSIONS=()
@@ -72,7 +72,7 @@ fi
 docker images
 
 NLEN=${#NGINX[@]}
-for (( I=0; I<$NLEN; I++ )); do
+for (( I=0; I<NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"
 
     VER_TAGS=0
@@ -85,13 +85,13 @@ for (( I=0; I<$NLEN; I++ )); do
     if [ "$OS" == "alpine" ]; then DEFAULT=1; fi
 
     DLEN=${#VERSIONS[@]}
-    for (( J=0; J<$DLEN; J++ )); do
+    for (( J=0; J<DLEN; J++ )); do
         OS_VER="${VERSIONS[$J]}"
         OS_TAGS=0
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        runtest $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT
+        runtest "$NGINX_VER" "$OS" "$OS_VER" $VER_TAGS $OS_TAGS $DEFAULT
     done
 
 done

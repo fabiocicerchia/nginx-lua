@@ -1,79 +1,161 @@
-build-all: build-alpine build-centos build-amazonlinux build-fedora build-debian build-ubuntu
+FORCE=1
+BUILD_CMD=./bin/docker-build.sh
+PUSH_CMD=./bin/docker-push.sh
+TEST_CMD=./bin/test.sh
+SEC_CMD=./bin/test-security.sh
+
+################################################################################
+# UTILITIES
+################################################################################
+auto-update: generate-supported-versions generate-dockerfiles update-tags
+
+auto-update-and-commit: auto-update
+	set -eux
+	git config --global user.name "fabiocicerchia"
+	git config --global user.email "fabiocicerchia@users.noreply.github.com"
+	git add -A
+	git commit -m "Automated updates"
+	set +x
+	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
+	set -x
+	git push origin HEAD:master
+
+generate-supported-versions:
+	./bin/generate-supported-versions.sh
+
+generate-dockerfiles:
+	./bin/generate-dockerfiles.sh
+
+update-tags:
+	./bin/generate_tags.py | tee docs/TAGS.md
+
+update-readme:
+	./bin/update-readme.sh
+
+benchmark:
+	./bin/benchmark.sh
+
+################################################################################
+# GENERIC
+################################################################################
+
+all: build-all test-all push-all
+
+################################################################################
+# BUILD
+################################################################################
+
+build-all: build-alpine build-amazonlinux build-centos build-debian build-fedora build-ubuntu
 
 build-alpine:
-	./bin/docker-build.sh alpine 1
-
-build-centos:
-	./bin/docker-build.sh centos 1
+	$(BUILD_CMD) alpine $(FORCE)
 
 build-amazonlinux:
-	./bin/docker-build.sh amazonlinux 1
+	$(BUILD_CMD) amazonlinux $(FORCE)
 
-build-fedora:
-	./bin/docker-build.sh fedora 1
+build-centos:
+	$(BUILD_CMD) centos $(FORCE)
 
 build-debian:
-	./bin/docker-build.sh debian 1
+	$(BUILD_CMD) debian $(FORCE)
+
+build-fedora:
+	$(BUILD_CMD) fedora $(FORCE)
 
 build-ubuntu:
-	./bin/docker-build.sh ubuntu 1
+	$(BUILD_CMD) ubuntu $(FORCE)
 
-build-all-minimal: build-alpine-minimal build-centos-minimal build-amazonlinux-minimal build-fedora-minimal build-debian-minimal build-ubuntu-minimal
+################################################################################
+# BUILD MINIMAL
+################################################################################
+
+build-all-minimal: build-alpine-minimal build-amazonlinux-minimal build-centos-minimal build-debian-minimal build-fedora-minimal build-ubuntu-minimal
 
 build-alpine-minimal:
-	./bin/docker-build.sh alpine 1 0
-
-build-centos-minimal:
-	./bin/docker-build.sh centos 1 0
+	$(BUILD_CMD) alpine $(FORCE) 0
 
 build-amazonlinux-minimal:
-	./bin/docker-build.sh amazonlinux 1 0
+	$(BUILD_CMD) amazonlinux $(FORCE) 0
 
-build-fedora-minimal:
-	./bin/docker-build.sh fedora 1 0
+build-centos-minimal:
+	$(BUILD_CMD) centos $(FORCE) 0
 
 build-debian-minimal:
-	./bin/docker-build.sh debian 1 0
+	$(BUILD_CMD) debian $(FORCE) 0
+
+build-fedora-minimal:
+	$(BUILD_CMD) fedora $(FORCE) 0
 
 build-ubuntu-minimal:
-	./bin/docker-build.sh ubuntu 1 0
+	$(BUILD_CMD) ubuntu $(FORCE) 0
 
-push-all: push-alpine push-centos push-amazonlinux push-fedora push-debian push-ubuntu
+################################################################################
+# TESTING
+################################################################################
 
-push-alpine:
-	./bin/docker-push.sh alpine 1
-
-push-centos:
-	./bin/docker-push.sh centos 1
-
-push-amazonlinux:
-	./bin/docker-push.sh amazonlinux 1
-
-push-fedora:
-	./bin/docker-push.sh fedora 1
-
-push-debian:
-	./bin/docker-push.sh debian 1
-
-push-ubuntu:
-	./bin/docker-push.sh ubuntu 1
-
-test-all: test-alpine test-centos test-amazonlinux test-fedora test-debian test-ubuntu
+test-all: test-alpine test-amazonlinux test-centos test-debian test-fedora test-ubuntu test-lint test-security
 
 test-alpine:
-	./bin/test.sh alpine 1
-
-test-centos:
-	./bin/test.sh centos 1
+	$(TEST_CMD) alpine
 
 test-amazonlinux:
-	./bin/test.sh amazonlinux 1
+	$(TEST_CMD) amazonlinux
 
-test-fedora:
-	./bin/test.sh fedora 1
+test-centos:
+	$(TEST_CMD) centos
 
 test-debian:
-	./bin/test.sh debian 1
+	$(TEST_CMD) debian
+
+test-fedora:
+	$(TEST_CMD) fedora
 
 test-ubuntu:
-	./bin/test.sh ubuntu 1
+	$(TEST_CMD) ubuntu
+
+test-lint:
+	./bin/test-lint.sh
+
+test-security: test-security-alpine test-security-amazonlinux test-security-centos test-security-debian test-security-fedora test-security-ubuntu
+
+test-security-alpine:
+	$(SEC_CMD) alpine
+
+test-security-amazonlinux:
+	$(SEC_CMD) amazonlinux
+
+test-security-centos:
+	$(SEC_CMD) centos
+
+test-security-debian:
+	$(SEC_CMD) debian
+
+test-security-fedora:
+	$(SEC_CMD) fedora
+
+test-security-ubuntu:
+	$(SEC_CMD) ubuntu
+
+################################################################################
+# PUSH
+################################################################################
+
+push-all: push-alpine push-amazonlinux push-centos push-debian push-fedora push-ubuntu
+
+push-alpine:
+	$(PUSH_CMD) alpine $(FORCE)
+
+push-amazonlinux:
+	$(PUSH_CMD) amazonlinux $(FORCE)
+
+push-centos:
+	$(PUSH_CMD) centos $(FORCE)
+
+push-debian:
+	$(PUSH_CMD) debian $(FORCE)
+
+push-fedora:
+	$(PUSH_CMD) fedora $(FORCE)
+
+push-ubuntu:
+	$(PUSH_CMD) ubuntu $(FORCE)

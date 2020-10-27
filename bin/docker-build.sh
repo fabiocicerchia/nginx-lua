@@ -1,10 +1,10 @@
 #!/bin/bash
-# shellcheck disable=SC2086,SC2178,SC1091,SC2004,SC2046
+# shellcheck disable=SC1091,SC2086
 
 source supported_versions
 
 function docker_tag_exists() {
-    curl --silent -f -lSL https://index.docker.io/v1/repositories/$1/tags/$2 > /dev/null
+    curl --silent -f -lSL "https://index.docker.io/v1/repositories/$1/tags/$2" > /dev/null
     echo $?
 }
 
@@ -17,19 +17,19 @@ function build() {
     DEFAULT=$6
     EXTENDED=$7
 
-    DOCKERFILE_PATH=nginx/$NGINX_VER/$OS/$OS_VER
-    DOCKERFILE=$DOCKERFILE_PATH/Dockerfile
+    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
+    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile"
 
-    MAJOR=$(echo $NGINX_VER | cut -d '.' -f 1)
-    MINOR=$MAJOR.$(echo $NGINX_VER | cut -d '.' -f 2)
-    PATCH=$NGINX_VER
+    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
+    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
+    PATCH="$NGINX_VER"
 
-    if [ "$FORCE" == "0" ] && [ $(docker_tag_exists fabiocicerchia/nginx-lua $PATCH-$OS$OS_VER) == 0 ]; then
+    if [ "$FORCE" == "0" ] && [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
         return
     fi
 
     SUFFIX=""
-    if [ $EXTENDED -eq 0 ]; then
+    if [ "$EXTENDED" -eq "0" ]; then
         SUFFIX="-minimal"
     fi
 
@@ -59,23 +59,23 @@ function build() {
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
     time docker build \
-        --build-arg EXTENDED=$EXTENDED \
-        --build-arg BUILD_DATE=$BUILD_DATE \
-        --build-arg VCS_REF=$VCS_REF \
+        --build-arg EXTENDED_IMAGE="$EXTENDED_IMAGE" \
+        --build-arg BUILD_DATE="$BUILD_DATE" \
+        --build-arg VCS_REF="$VCS_REF" \
         $TAGS \
-        -f $DOCKERFILE .
+        -f "$DOCKERFILE" .
 }
 
-set -x
+set -eux
 
 OS=$1
 FORCE=0
 if [ "$2" == "1" ]; then
     FORCE=1
 fi
-EXTENDED=1
+EXTENDED_IMAGE=1
 if [ "$2" == "0" ]; then
-    EXTENDED=0
+    EXTENDED_IMAGE=0
 fi
 VERSIONS=()
 if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
@@ -87,7 +87,7 @@ elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
 fi
 
 NLEN=${#NGINX[@]}
-for (( I=0; I<$NLEN; I++ )); do
+for (( I=0; I<NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"
 
     VER_TAGS=0
@@ -100,13 +100,13 @@ for (( I=0; I<$NLEN; I++ )); do
     if [ "$OS" == "alpine" ]; then DEFAULT=1; fi
 
     DLEN=${#VERSIONS[@]}
-    for (( J=0; J<$DLEN; J++ )); do
+    for (( J=0; J<DLEN; J++ )); do
         OS_VER="${VERSIONS[$J]}"
         OS_TAGS=0
         if [ "$((J+1))" == "$DLEN" ]; then
             OS_TAGS=1
         fi
-        build $NGINX_VER $OS $OS_VER $VER_TAGS $OS_TAGS $DEFAULT $EXTENDED
+        build "$NGINX_VER" "$OS" "$OS_VER" $VER_TAGS $OS_TAGS $DEFAULT $EXTENDED_IMAGE
     done
 
 done

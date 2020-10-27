@@ -20,18 +20,12 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`1-alpine3.12.0`,`1.19-alpine3.12.0`,`1.19.3-alpine3.12.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.0/Dockerfile)
-- [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
-- [`1-amazonlinux2.0.20200602.0`,`1.19-amazonlinux2.0.20200602.0`,`1.19.3-amazonlinux2.0.20200602.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200602.0/Dockerfile)
-- [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
-- [`1-centos8.1.1911`,`1.19-centos8.1.1911`,`1.19.3-centos8.1.1911`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8.1.1911/Dockerfile)
-- [`centos`,`1-centos`,`1.19-centos`,`1.19.3-centos`,`1-centos8.2.2004`,`1-centos8.2.2004`,`1.19-centos8.2.2004`,`1.19.3-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8.2.2004/Dockerfile)
-- [`1-debian10.5-slim`,`1.19-debian10.5-slim`,`1.19.3-debian10.5-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.5-slim/Dockerfile)
-- [`debian`,`1-debian`,`1.19-debian`,`1.19.3-debian`,`1-debian10.6-slim`,`1-debian10.6-slim`,`1.19-debian10.6-slim`,`1.19.3-debian10.6-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.6-slim/Dockerfile)
-- [`1-fedora33`,`1.19-fedora33`,`1.19.3-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/33/Dockerfile)
-- [`fedora`,`1-fedora`,`1-fedora34`,`1-fedora34`,`1.19-fedora`,`1.19-fedora34`,`1.19.3-fedora`,`1.19.3-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/34/Dockerfile)
-- [`1-ubuntu20.04`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.04/Dockerfile)
-- [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.10`,`1-ubuntu20.10`,`1.19.3-ubuntu`,`1.19-ubuntu20.10`,`1.19.3-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.10/Dockerfile)
+ - [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
+ - [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
+ - [`centos`,`1-centos`,`1.19-centos`,`1.19.3-centos`,`1-centos8.2.2004`,`1-centos8.2.2004`,`1.19-centos8.2.2004`,`1.19.3-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8.2.2004/Dockerfile)
+ - [`debian`,`1-debian`,`1.19-debian`,`1.19.3-debian`,`1-debian10.6-slim`,`1-debian10.6-slim`,`1.19-debian10.6-slim`,`1.19.3-debian10.6-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.6-slim/Dockerfile)
+ - [`fedora`,`1-fedora`,`1-fedora34`,`1-fedora34`,`1.19-fedora`,`1.19-fedora34`,`1.19.3-fedora`,`1.19.3-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/34/Dockerfile)
+ - [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.10`,`1-ubuntu20.10`,`1.19.3-ubuntu`,`1.19-ubuntu20.10`,`1.19.3-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.10/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [docs/TAGS.md](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).
@@ -182,6 +176,24 @@ To run nginx in read-only mode, you will need to mount a Docker volume to every 
 $ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $(pwd)/nginx-pid:/var/run fabiocicerchia/nginx-lua
 ```
 If you have a more advanced configuration that requires nginx to write to other locations, simply add more volume mounts to those locations.
+
+### Running nginx in debug mode
+
+Images since version 1.19.3 come with `nginx-debug` binary that produces verbose output when using higher log levels. It can be used with simple CMD substitution:
+
+```console
+$ docker run --name my-nginx -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d fabiocicerchia/nginx-lua nginx-debug -g 'daemon off;'
+```
+
+Similar configuration in docker-compose.yml may look like this:
+
+```yaml
+web:
+  image: fabiocicerchia/nginx-lua
+  volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  command: [nginx-debug, '-g', 'daemon off;']
+```
 
 ### Entrypoint quiet logs
 

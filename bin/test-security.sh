@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2086,SC2178,SC1091,SC2004
+# shellcheck disable=SC1091
 
 source supported_versions
 
@@ -9,21 +9,21 @@ function runtest() {
     OS_VER=$3
 
     snyk test \
-        --project-name=fabiocicerchia/nginx-lua:$NGINX_VER-$OS$OS_VER \
+        --project-name=fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
         --severity-threshold=medium \
         --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:$NGINX_VER-$OS$OS_VER \
-        --file=nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile || true
+        --docker fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
+        --file="nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile" || true
 
     snyk monitor \
-        --project-name=fabiocicerchia/nginx-lua:$NGINX_VER-$OS$OS_VER \
+        --project-name=fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
         --severity-threshold=medium \
         --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:$NGINX_VER-$OS$OS_VER \
-        --file=nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile
+        --docker fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
+        --file="nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile"
 }
 
-set -x
+set -eux
 
 OS=$1
 VERSIONS=()
@@ -36,7 +36,6 @@ elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
 fi
 
 docker run -it --net host --pid host --userns host --cap-add audit_control \
-    -e DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST \
     -v /etc:/etc \
     -v /var/lib:/var/lib:ro \
     -v /var/run/docker.sock:/var/run/docker.sock:ro \
@@ -44,13 +43,13 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
     docker/docker-bench-security
 
 NLEN=${#NGINX[@]}
-for (( I=0; I<$NLEN; I++ )); do
+for (( I=0; I<NLEN; I++ )); do
     NGINX_VER="${NGINX[$I]}"
 
     DLEN=${#VERSIONS[@]}
-    for (( J=0; J<$DLEN; J++ )); do
+    for (( J=0; J<DLEN; J++ )); do
         OS_VER="${VERSIONS[$J]}"
-        runtest $NGINX_VER $OS $OS_VER
+        runtest "$NGINX_VER" "$OS" "$OS_VER"
     done
 
 done

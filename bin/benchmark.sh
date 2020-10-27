@@ -1,5 +1,4 @@
 #!/bin/bash
-# shellcheck disable=SC2086,SC2178,SC1091,SC2004
 
 # VM: ubuntu-s-1vcpu-2gb-fra1-01
 
