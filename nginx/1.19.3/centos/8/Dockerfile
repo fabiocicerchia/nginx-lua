@@ -1,13 +1,13 @@
 #############################
 # Settings Common Variables #
 #############################
-FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}} AS base
+FROM centos:8 AS base
 
-ARG DOCKER_IMAGE={{DOCKER_IMAGE}}
+ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS={{DOCKER_IMAGE_OS}}
+ARG DOCKER_IMAGE_OS=centos
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG={{DOCKER_IMAGE_TAG}}
+ARG DOCKER_IMAGE_TAG=8
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -116,7 +116,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX={{VER_NGINX}}
+ARG VER_NGINX=1.19.3
 ENV VER_NGINX=$VER_NGINX
 ARG NGINX_BUILD_CONFIG="\
         --prefix=/etc/nginx \
@@ -162,7 +162,7 @@ ARG NGINX_BUILD_CONFIG="\
         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-    "
+"
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
@@ -192,9 +192,9 @@ COPY tpl/Makefile Makefile
 # hadolint ignore=SC2086
 # TODO: NGINX_BUILD_CONFIG not updated
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
-    && dnf makecache \
-    && dnf install -y \
+    && yum makecache \
+    && yum install -y epel-release \
+    && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [[ "$EXTENDED_IMAGE" -eq "1" ]] && \
@@ -208,8 +208,8 @@ RUN set -eux \
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && dnf makecache \
-    && dnf install -y \
+    && yum makecache \
+    && yum install -y \
         gettext
 
 ##########################################
@@ -252,7 +252,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
     GeoIP-devel \
     ca-certificates \
-    gcc-c++ \
     openssl-devel \
     pcre-devel \
     zlib-devel \
@@ -274,15 +273,15 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
-    && dnf makecache \
-    && dnf install -y \
+    && yum makecache \
+    && yum install -y epel-release \
+    && yum install -y \
         $PKG_DEPS \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && dnf install -y tzdata \
+    && yum install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && dnf install -y curl ca-certificates \
+    && yum install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -292,8 +291,8 @@ RUN set -eux \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Cleanup
 # ##############################################################################
-    && dnf clean all \
-    && rm -rf /var/cache/dnf
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # smoke test
 # ##############################################################################

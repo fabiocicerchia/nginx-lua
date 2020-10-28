@@ -22,10 +22,10 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 <!-- START_SUPPORTED_TAGS -->
  - [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
  - [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
- - [`centos`,`1-centos`,`1.19-centos`,`1.19.3-centos`,`1-centos8.2.2004`,`1-centos8.2.2004`,`1.19-centos8.2.2004`,`1.19.3-centos8.2.2004`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8.2.2004/Dockerfile)
- - [`debian`,`1-debian`,`1.19-debian`,`1.19.3-debian`,`1-debian10.6-slim`,`1-debian10.6-slim`,`1.19-debian10.6-slim`,`1.19.3-debian10.6-slim`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.6-slim/Dockerfile)
- - [`fedora`,`1-fedora`,`1-fedora34`,`1-fedora34`,`1.19-fedora`,`1.19-fedora34`,`1.19.3-fedora`,`1.19.3-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/34/Dockerfile)
- - [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.10`,`1-ubuntu20.10`,`1.19.3-ubuntu`,`1.19-ubuntu20.10`,`1.19.3-ubuntu20.10`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.10/Dockerfile)
+ - [`centos`,`1-centos`,`1.19-centos`,`1.19.3-centos`,`1-centoscentos8`,`1-centoscentos8`,`1.19-centoscentos8`,`1.19.3-centoscentos8`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/centos8/Dockerfile)
+ - [`debian`,`1-debian`,`1.19-debian`,`1-debian10.6`,`1-debian10.6`,`1.19.3-debian`,`1.19-debian10.6`,`1.19.3-debian10.6`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.6/Dockerfile)
+ - [`fedora`,`1-fedora`,`1-fedora33`,`1-fedora33`,`1.19-fedora`,`1.19-fedora33`,`1.19.3-fedora`,`1.19.3-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/33/Dockerfile)
+ - [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.19.3-ubuntu`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [docs/TAGS.md](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).

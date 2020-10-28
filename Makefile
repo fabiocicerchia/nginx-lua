@@ -11,6 +11,7 @@ auto-update: generate-supported-versions generate-dockerfiles update-tags
 
 auto-update-and-commit: auto-update
 	set -eux
+	export TAG_VER="v1.$(date +%Y%m%d)"
 	git config --global user.name "fabiocicerchia"
 	git config --global user.email "fabiocicerchia@users.noreply.github.com"
 	git add -A
@@ -19,6 +20,8 @@ auto-update-and-commit: auto-update
 	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
 	set -x
 	git push origin HEAD:master
+	git tag $(TAG_VER) -a -m "Auto tag $(TAG_VER)"
+	git push origin --tags
 
 generate-supported-versions:
 	./bin/generate-supported-versions.sh

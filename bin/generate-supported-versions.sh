@@ -1,9 +1,27 @@
 #!/bin/bash
 # shellcheck disable=SC2207,SC2129
 
+fetch_latest() {
+    DISTRO=$1
+    FILTER=${2-}
+    if [ "$FILTER" == "" ]; then
+        FILTER=".+"
+    fi
+    DIGEST=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
+    VER=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+
+    PAGE=2
+    while [ "$VER" = "" -a $PAGE -lt 100 ]; do
+        VER=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+        ((PAGE+=1))
+    done
+
+    echo $VER
+}
+
 set -eux
 
-VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
+VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/ß[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
 NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=("$VER")
@@ -13,62 +31,44 @@ if [ "${#NGINX[@]}" != "1" ]; then
     exit 1
 fi
 
-VER_ALPINE=$(DISTRO=alpine; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | sort -Vr | head -n 1)
-ALPINE=()
-for VER in $VER_ALPINE; do
-    ALPINE+=("$VER")
-done
-if [ "${#ALPINE[@]}" != "1" ]; then
+VER_ALPINE=$(fetch_latest "alpine")
+ALPINE=("$VER_ALPINE")
+if [ "$VER_ALPINE" = "" ]; then
     echo "Wrong version count in ALPINE."
     exit 1
 fi
 
-VER_AMAZONLINUX=$(DISTRO=amazonlinux; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E -v "with-|^201" | grep -E "[0-9]+\." | sort -Vr | head -n 1)
-AMAZONLINUX=()
-for VER in $VER_AMAZONLINUX; do
-    AMAZONLINUX+=("$VER")
-done
-if [ "${#AMAZONLINUX[@]}" != "1" ]; then
+VER_AMAZONLINUX=$(fetch_latest "amazonlinux")
+AMAZONLINUX=("$VER_AMAZONLINUX")
+if [ "$VER_AMAZONLINUX" = "" ]; then
     echo "Wrong version count in AMAZONLINUX."
     exit 1
 fi
 
-VER_CENTOS=$(DISTRO=centos; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | grep -E -v centos | sort -Vr | head -n 1)
-CENTOS=()
-for VER in $VER_CENTOS; do
-    CENTOS+=("$VER")
-done
-if [ "${#CENTOS[@]}" != "1" ]; then
+VER_CENTOS=$(fetch_latest "centos" "^\d$")
+CENTOS=("$VER_CENTOS")
+if [ "$VER_CENTOS" = "" ]; then
     echo "Wrong version count in CENTOS."
     exit 1
 fi
 
-VER_DEBIAN=$(DISTRO=debian; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | grep -E slim | sort -Vr | head -n 1)
-DEBIAN=()
-for VER in $VER_DEBIAN; do
-    DEBIAN+=("$VER")
-done
-if [ "${#DEBIAN[@]}" != "1" ]; then
+VER_DEBIAN=$(fetch_latest "debian" "^\d{2}\.\d{1,2}")
+DEBIAN=("$VER_DEBIAN")
+if [ "$VER_DEBIAN" = "" ]; then
     echo "Wrong version count in DEBIAN."
     exit 1
 fi
 
-VER_FEDORA=$(DISTRO=fedora; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | sort -nr | head -n 1)
-FEDORA=()
-for VER in $VER_FEDORA; do
-    FEDORA+=("$VER")
-done
-if [ "${#FEDORA[@]}" != "1" ]; then
+VER_FEDORA=$(fetch_latest "fedora")
+FEDORA=("$VER_FEDORA")
+if [ "$VER_FEDORA" = "" ]; then
     echo "Wrong version count in FEDORA."
     exit 1
 fi
 
-VER_UBUNTU=$(DISTRO=ubuntu; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep "\." | sort -nr | head -n 1)
-UBUNTU=()
-for VER in $VER_UBUNTU; do
-    UBUNTU+=("$VER")
-done
-if [ "${#UBUNTU[@]}" != "1" ]; then
+VER_UBUNTU=$(fetch_latest "ubuntu" "^\d{2}\.\d{2}")
+UBUNTU=("$VER_UBUNTU")
+if [ "$VER_UBUNTU" = "" ]; then
     echo "Wrong version count in UBUNTU."
     exit 1
 fi
