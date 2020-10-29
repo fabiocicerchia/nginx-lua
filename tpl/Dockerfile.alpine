@@ -271,9 +271,6 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY tpl/docker-entrypoint.sh /
-COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d
-COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
@@ -309,7 +306,12 @@ RUN set -eux \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && mkdir /docker-entrypoint.d
+
+COPY tpl/docker-entrypoint.sh /
+COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
+COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
 
 # smoke test
 # ##############################################################################

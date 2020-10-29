@@ -83,7 +83,8 @@ FEDORA=($(sort -Vu <<<"${FEDORA[*]}"))
 UBUNTU=($(sort -Vu <<<"${UBUNTU[*]}"))
 unset IFS
 
-echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' > supported_versions
+echo -n "" > supported_versions
+echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' >> supported_versions
 echo "ALPINE=(\"${ALPINE[*]}\")" | sed 's/ /" "/g' >> supported_versions
 echo "AMAZONLINUX=(\"${AMAZONLINUX[*]}\")" | sed 's/ /" "/g' >> supported_versions
 echo "CENTOS=(\"${CENTOS[*]}\")" | sed 's/ /" "/g' >> supported_versions

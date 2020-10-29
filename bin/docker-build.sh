@@ -30,7 +30,7 @@ function build() {
 
     SUFFIX=""
     if [ "$EXTENDED" -eq "0" ]; then
-        SUFFIX="-minimal"
+        SUFFIX="${SUFFIX}-minimal"
     fi
 
     TAGS=""
