@@ -16,13 +16,11 @@ core:
 	   /var/cache/nginx/fastcgi_temp \
 	   /var/cache/nginx/uwsgi_temp \
 	   /var/cache/nginx/scgi_temp
-	CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
-	LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 	cd /nginx-${VER_NGINX} \
-	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(CFLAGS)" --with-ld-opt="$(LDOPT)" --with-debug \
+	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& make -j $(NPROC) build \
 	&& mv objs/nginx objs/nginx-debug \
-	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(CFLAGS)" --with-ld-opt="$(LDOPT)" \
+	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" \
 	&& make -j $(NPROC) build \
 	&& make -j $(NPROC) modules \
 	&& install -m755 objs/nginx-debug /usr/sbin/nginx-debug \

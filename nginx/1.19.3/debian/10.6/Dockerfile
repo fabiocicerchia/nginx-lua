@@ -118,6 +118,10 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 # https://github.com/nginx/nginx/releases
 ARG VER_NGINX=1.19.3
 ENV VER_NGINX=$VER_NGINX
+ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
+ENV NGX_CFLAGS=$NGX_CFLAGS
+ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
+ENV NGX_LDOPT=$NGX_LDOPT
 ARG NGINX_BUILD_CONFIG="\
         --prefix=/etc/nginx \
         --sbin-path=/usr/sbin/nginx \
