@@ -5,10 +5,18 @@
 
 ---
 
-![Docker](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker/badge.svg)
+[![MIT License](https://img.shields.io/badge/License-MIT-lightgrey.svg?longCache=true)](LICENSE)
+[![Pull Requests](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?longCache=true)](https://github.com/fabiocicerchia/nginx-lua/pulls)
+![Last Commit](https://img.shields.io/github/last-commit/fabiocicerchia/nginx-lua)
+![Release Date](https://img.shields.io/github/release-date/fabiocicerchia/nginx-lua)
+
 ![Docker pulls](https://img.shields.io/docker/pulls/fabiocicerchia/nginx-lua.svg "Docker pulls")
 ![Docker stars](https://img.shields.io/docker/stars/fabiocicerchia/nginx-lua.svg "Docker stars")
 ![Known Vulnerabilities](https://img.shields.io/badge/vulnerabilities-snyk-4b45a9)
+
+![Docker](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker/badge.svg)
+![Docker Builds](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker%20Builds/badge.svg)
+![Auto Update](https://github.com/fabiocicerchia/nginx-lua/workflows/Auto%20Update/badge.svg)
 
 Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
 
@@ -28,7 +36,13 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
  - [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.19.3-ubuntu`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
-**Note:** The full list of supported/unsupported tags can be found on [docs/TAGS.md](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).
+**Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).
+
+## Quick reference (cont.)
+
+ - **Where to file issues:** [https://github.com/fabiocicerchia/nginx-lua/issues](https://github.com/fabiocicerchia/nginx-lua/issues)
+ - **Supported architectures:** amd64
+ - **Published image artifact details:** [repo-info repo's docs/metadata/ directory](https://github.com/fabiocicerchia/nginx-lua/tree/master/docs/examples) ([history](https://github.com/fabiocicerchia/nginx-lua/commits/master/docs/metadata)) (image metadata, transfer size, etc)
 
 ## What is nginx?
 
@@ -236,12 +250,12 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [Alpine Linux](https://hub.docker.com/_/alpine) (~30MB)
-  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~200MB)
-  - [CentOS](https://hub.docker.com/_/centos) (~250MB)
-  - [Debian](https://hub.docker.com/_/debian) (~150MB)
-  - [Fedora](https://hub.docker.com/_/fedora) (~200MB)
-  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~200MB)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~50MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~225MB)
+  - [CentOS](https://hub.docker.com/_/centos) (~280MB)
+  - [Debian](https://hub.docker.com/_/debian) (~200MB)
+  - [Fedora](https://hub.docker.com/_/fedora) (~375MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~215MB)
 - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
 - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
 - [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
@@ -554,6 +568,8 @@ services:
       timeout: 3s
       retries: 3
 ```
+
+More examples are available in the directory [`docs/examples`](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/examples)
 
 ## License
 

@@ -8,10 +8,12 @@ fetch_latest() {
         FILTER=".+"
     fi
     DIGEST=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
-    VER=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+    curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" > /tmp/latest.$DISTRO
+    VER=$(cat /tmp/latest.$DISTRO | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
 
     PAGE=2
     while [ "$VER" = "" -a $PAGE -lt 100 ]; do
+        cat /tmp/latest.$DISTRO
         VER=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
         ((PAGE+=1))
     done

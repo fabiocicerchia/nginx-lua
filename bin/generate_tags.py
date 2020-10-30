@@ -47,9 +47,9 @@ print('# Tags\n')
 print('## Supported Tags\n')
 for file in supported:
     reversed.remove(file)
-    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
+    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master/' + file + ')')
 
 print('\n## Unsupported Tags\n')
 reversed = list(reversed)[::-1]
 for file in reversed:
-    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master' + file + ')')
+    print('- [`' + '`, `'.join(dockerfiles[file]) + '`](https://github.com/fabiocicerchia/nginx-lua/blob/master/' + file + ')')

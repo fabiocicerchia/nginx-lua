@@ -3,6 +3,9 @@ BUILD_CMD=./bin/docker-build.sh
 PUSH_CMD=./bin/docker-push.sh
 TEST_CMD=./bin/test.sh
 SEC_CMD=./bin/test-security.sh
+META_CMD=./bin/docker-metadata.sh
+DATE=$(shell date +%Y%m%d)
+TAG_VER="v1.$(DATE)"
 
 ################################################################################
 # UTILITIES
@@ -16,10 +19,23 @@ auto-update-and-commit: auto-update
 	git config --global user.email "fabiocicerchia@users.noreply.github.com"
 	git add -A
 	git commit -m "Automated updates"
-	set +x
 	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
-	set -x
 	git push origin HEAD:master
+
+auto-commit-metadata: generate-metadata
+	set -eux
+	git config --global user.name "fabiocicerchia"
+	git config --global user.email "fabiocicerchia@users.noreply.github.com"
+	git add -A
+	git commit -m "Automated metadata"
+	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
+	git push origin HEAD:master
+
+auto-tag:
+	set -eux
+	git config --global user.name "fabiocicerchia"
+	git config --global user.email "fabiocicerchia@users.noreply.github.com"
+	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
 	git tag $(TAG_VER) -a -m "Auto tag $(TAG_VER)"
 	git push origin --tags
 
@@ -28,6 +44,14 @@ generate-supported-versions:
 
 generate-dockerfiles:
 	./bin/generate-dockerfiles.sh
+
+generate-metadata:
+	$(META_CMD) alpine
+	$(META_CMD) amazonlinux
+	$(META_CMD) centos
+	$(META_CMD) debian
+	$(META_CMD) fedora
+	$(META_CMD) ubuntu
 
 update-tags:
 	./bin/generate_tags.py | tee docs/TAGS.md
@@ -52,21 +76,27 @@ build-all: build-alpine build-amazonlinux build-centos build-debian build-fedora
 
 build-alpine:
 	$(BUILD_CMD) alpine $(FORCE)
+	$(META_CMD) alpine
 
 build-amazonlinux:
 	$(BUILD_CMD) amazonlinux $(FORCE)
+	$(META_CMD) amazonlinux
 
 build-centos:
 	$(BUILD_CMD) centos $(FORCE)
+	$(META_CMD) centos
 
 build-debian:
 	$(BUILD_CMD) debian $(FORCE)
+	$(META_CMD) debian
 
 build-fedora:
 	$(BUILD_CMD) fedora $(FORCE)
+	$(META_CMD) fedora
 
 build-ubuntu:
 	$(BUILD_CMD) ubuntu $(FORCE)
+	$(META_CMD) ubuntu
 
 ################################################################################
 # BUILD MINIMAL
