@@ -9,33 +9,15 @@ on:
       - opened
       - synchronize
 
-env:
-  IMAGE_NAME: fabiocicerchia/nginx-lua
-
 jobs:
-  artifacts:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Archive metadata artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: metadata
-          path: docs/metadata
-          retention-days: 1
-
   docker_alpine:
+    name: Build Docker Alpine
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-alpine
-          path: docs/metadata/*alpine*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-alpine
@@ -55,20 +37,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-alpine
-          path: docs/metadata/*alpine*
+          path: docs/metadata
           retention-days: 1
 
   docker_amazonlinux:
+    name: Build Docker Amazon Linux
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-amazonlinux
-          path: docs/metadata/*amazonlinux*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-amazonlinux
@@ -88,20 +67,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-amazonlinux
-          path: docs/metadata/*amazonlinux*
+          path: docs/metadata
           retention-days: 1
 
   docker_centos:
+    name: Build Docker CentOS
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-centos
-          path: docs/metadata/*centos*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-centos
@@ -121,20 +97,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-centos
-          path: docs/metadata/*centos*
+          path: docs/metadata
           retention-days: 1
 
   docker_debian:
+    name: Build Docker Debian
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-debian
-          path: docs/metadata/*debian*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-debian
@@ -154,20 +127,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-debian
-          path: docs/metadata/*debian*
+          path: docs/metadata
           retention-days: 1
 
   docker_fedora:
+    name: Build Docker Fedora
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-fedora
-          path: docs/metadata/*fedora*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-fedora
@@ -187,20 +157,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-fedora
-          path: docs/metadata/*fedora*
+          path: docs/metadata
           retention-days: 1
 
   docker_ubuntu:
+    name: Build Docker Ubuntu
     runs-on: ubuntu-latest
-    needs: artifacts
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-ubuntu
-          path: docs/metadata/*ubuntu*
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/*
 
       - name: Build images
         run: make build-ubuntu
@@ -220,61 +187,73 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: metadata-ubuntu
-          path: docs/metadata/*ubuntu*
+          path: docs/metadata
           retention-days: 1
 
   metadata:
+    name: Generates Metadata
     runs-on: ubuntu-latest
     needs: [docker_alpine, docker_amazonlinux, docker_centos, docker_debian, docker_fedora, docker_ubuntu]
     steps:
       - uses: actions/checkout@v2
 
-      - name: Restore alpine metadata artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: metadata-alpine
-          path: docs/metadata/*alpine*
-
       - name: Restore amazonlinux metadata artifacts
         uses: actions/download-artifact@v2
         with:
           name: metadata-amazonlinux
-          path: docs/metadata/*amazonlinux*
+          path: docs/metadata
 
       - name: Restore centos metadata artifacts
         uses: actions/download-artifact@v2
         with:
           name: metadata-centos
-          path: docs/metadata/*centos*
+          path: docs/metadata
 
       - name: Restore debian metadata artifacts
         uses: actions/download-artifact@v2
         with:
           name: metadata-debian
-          path: docs/metadata/*debian*
+          path: docs/metadata
 
       - name: Restore fedora metadata artifacts
         uses: actions/download-artifact@v2
         with:
           name: metadata-fedora
-          path: docs/metadata/*fedora*
+          path: docs/metadata
 
       - name: Restore ubuntu metadata artifacts
         uses: actions/download-artifact@v2
         with:
           name: metadata-ubuntu
-          path: docs/metadata/*ubuntu*
+          path: docs/metadata
 
       - name: Push metadata
         run: make auto-commit-metadata
         if: github.ref == 'refs/heads/master'
 
   auto_tag:
+    name: Create Release
     runs-on: ubuntu-latest
     needs: metadata
     steps:
       - uses: actions/checkout@v2
 
-      - name: Create tag
-        run: make auto-tag
-        if: github.ref == 'refs/heads/master'
+      - name: Get version
+        id: version
+        run: echo "::set-output name=version::$(date +'v1.%Y%m%d.%H%M%S')"
+
+      - name: Test with environment variables
+        run: echo $TAG_NAME
+        env:
+          TAG_NAME: ${{ steps.version.outputs.version }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: $TAG_NAME
+          release_name: Release $TAG_NAME
+          draft: false
+          prerelease: false

@@ -4,8 +4,6 @@ PUSH_CMD=./bin/docker-push.sh
 TEST_CMD=./bin/test.sh
 SEC_CMD=./bin/test-security.sh
 META_CMD=./bin/docker-metadata.sh
-DATE=$(shell date +%Y%m%d)
-TAG_VER="v1.$(DATE)"
 
 ################################################################################
 # UTILITIES
@@ -30,14 +28,6 @@ auto-commit-metadata: generate-metadata
 	git commit -m "Automated metadata"
 	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
 	git push origin HEAD:master
-
-auto-tag:
-	set -eux
-	git config --global user.name "fabiocicerchia"
-	git config --global user.email "fabiocicerchia@users.noreply.github.com"
-	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
-	git tag $(TAG_VER) -a -m "Auto tag $(TAG_VER)"
-	git push origin --tags
 
 generate-supported-versions:
 	./bin/generate-supported-versions.sh

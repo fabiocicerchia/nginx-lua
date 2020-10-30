@@ -9,7 +9,7 @@ function lint() {
 
     PWD=$(pwd)
 
-    docker run --rm -i -v "$PWD"/"$DOCKERFILE":/tmp/Dockerfile -v "$PWD"/.hadolint.yaml:/tmp/.hadolint.yaml hadolint/hadolint hadolint -c /tmp/.hadolint.yaml /tmp/Dockerfile || true
+    docker run --rm -i -v "$PWD"/"$DOCKERFILE":/tmp/Dockerfile -v "$PWD"/.hadolint.yml:/tmp/.hadolint.yml hadolint/hadolint hadolint -c /tmp/.hadolint.yml /tmp/Dockerfile || true
 }
 
 set -eux
