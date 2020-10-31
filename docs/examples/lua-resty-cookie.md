@@ -1,3 +1,5 @@
+# Example - lua-resty-cookie
+
 ```lua
     lua_package_path "/path/to/lua-resty-cookie/lib/?.lua;;";
 

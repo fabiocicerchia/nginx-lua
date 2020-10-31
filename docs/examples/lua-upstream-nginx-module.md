@@ -1,3 +1,5 @@
+# Example - lua-upstream-nginx-module
+
 ```nginx
 http {
     upstream foo.com {

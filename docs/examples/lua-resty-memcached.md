@@ -1,3 +1,5 @@
+# Example - lua-resty-memcached
+
 ```nginx
     lua_package_path "/path/to/lua-resty-memcached/lib/?.lua;;";
 

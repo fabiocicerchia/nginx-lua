@@ -1,3 +1,5 @@
+# Example - lua-resty-websocket
+
 ```lua
     local server = require "resty.websocket.server"
 

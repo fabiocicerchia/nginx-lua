@@ -1,3 +1,5 @@
+# Example - lua-resty-dns
+
 ```nginx
 lua_package_path "/path/to/lua-resty-dns/lib/?.lua;;";
 

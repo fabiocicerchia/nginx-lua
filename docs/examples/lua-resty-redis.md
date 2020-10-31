@@ -1,3 +1,5 @@
+# Example - lua-resty-redis
+
 ```nginx
     # you do not need the following line if you are using
     # the OpenResty bundle:

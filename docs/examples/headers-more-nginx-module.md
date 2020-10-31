@@ -1,3 +1,5 @@
+# Example - headers-more-nginx-module
+
 ```lua
 # set the Server output header
 more_set_headers 'Server: my-server';

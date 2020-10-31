@@ -1,3 +1,5 @@
+# Example - lua-resty-upstream-healthcheck
+
 ```nginx
 http {
     lua_package_path "/path/to/lua-resty-upstream-healthcheck/lib/?.lua;;";

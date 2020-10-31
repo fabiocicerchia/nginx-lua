@@ -1,8 +1,6 @@
-Known Issues
-============
+# Known Issues
 
-TCP socket connect operation issues
------------------------------------
+## TCP socket connect operation issues
 
 The [tcpsock:connect](#tcpsockconnect) method may indicate `success` despite connection failures such as with `Connection Refused` errors.
 
@@ -10,13 +8,11 @@ However, later attempts to manipulate the cosocket object will fail and return t
 
 This issue is due to limitations in the Nginx event model and only appears to affect Mac OS X.
 
-Lua Coroutine Yielding/Resuming
--------------------------------
+## Lua Coroutine Yielding/Resuming
 
-* Because Lua's `dofile` and `require` builtins are currently implemented as C functions in LuaJIT 2.0/2.1, if the Lua file being loaded by `dofile` or `require` invokes [ngx.location.capture*](#ngxlocationcapture), [ngx.exec](#ngxexec), [ngx.exit](#ngxexit), or other API functions requiring yielding in the *top-level* scope of the Lua file, then the Lua error "attempt to yield across C-call boundary" will be raised. To avoid this, put these calls requiring yielding into your own Lua functions in the Lua file instead of the top-level scope of the file.
+- Because Lua's `dofile` and `require` builtins are currently implemented as C functions in LuaJIT 2.0/2.1, if the Lua file being loaded by `dofile` or `require` invokes [ngx.location.capture\*](#ngxlocationcapture), [ngx.exec](#ngxexec), [ngx.exit](#ngxexit), or other API functions requiring yielding in the _top-level_ scope of the Lua file, then the Lua error "attempt to yield across C-call boundary" will be raised. To avoid this, put these calls requiring yielding into your own Lua functions in the Lua file instead of the top-level scope of the file.
 
-Lua Variable Scope
-------------------
+## Lua Variable Scope
 
 Care must be taken when importing modules, and this form should be used:
 
@@ -32,7 +28,7 @@ instead of the old deprecated form:
  require('xxx')
 ```
 
-Here is the reason: by design, the global environment has exactly the same lifetime as the Nginx request handler associated with it. Each request handler has its own set of Lua global variables and that is the idea of request isolation. The Lua module is actually loaded by the first Nginx request handler and is cached by the `require()` built-in in the `package.loaded` table for later reference, and the `module()` builtin used by some Lua modules has the side effect of setting a global variable to the loaded module table. But this global variable will be cleared at the end of the request handler,  and every subsequent request handler all has its own (clean) global environment. So one will get Lua exception for accessing the `nil` value.
+Here is the reason: by design, the global environment has exactly the same lifetime as the Nginx request handler associated with it. Each request handler has its own set of Lua global variables and that is the idea of request isolation. The Lua module is actually loaded by the first Nginx request handler and is cached by the `require()` built-in in the `package.loaded` table for later reference, and the `module()` builtin used by some Lua modules has the side effect of setting a global variable to the loaded module table. But this global variable will be cleared at the end of the request handler, and every subsequent request handler all has its own (clean) global environment. So one will get Lua exception for accessing the `nil` value.
 
 The use of Lua global variables is a generally inadvisable in the ngx_lua context as:
 
@@ -40,7 +36,7 @@ The use of Lua global variables is a generally inadvisable in the ngx_lua contex
 1. Lua global variables require Lua table look-ups in the global environment which is computationally expensive, and
 1. some Lua global variable references may include typing errors which make such difficult to debug.
 
-It is therefore *highly* recommended to always declare such within an appropriate local scope instead.
+It is therefore _highly_ recommended to always declare such within an appropriate local scope instead.
 
 ```lua
 
@@ -67,8 +63,7 @@ The output says that the line 1489 of file `lib/foo/bar.lua` writes to a global 
 
 This tool will guarantee that local variables in the Lua module functions are all declared with the `local` keyword, otherwise a runtime exception will be thrown. It prevents undesirable race conditions while accessing such variables. See [Data Sharing within an Nginx Worker](#data-sharing-within-an-nginx-worker) for the reasons behind this.
 
-Locations Configured by Subrequest Directives of Other Modules
---------------------------------------------------------------
+## Locations Configured by Subrequest Directives of Other Modules
 
 The [ngx.location.capture](#ngxlocationcapture) and [ngx.location.capture_multi](#ngxlocationcapture_multi) directives cannot capture locations that include the [add_before_body](http://nginx.org/en/docs/http/ngx_http_addition_module.html#add_before_body), [add_after_body](http://nginx.org/en/docs/http/ngx_http_addition_module.html#add_after_body), [auth_request](https://nginx.org/en/docs/http/ngx_http_auth_request_module.html#auth_request), [echo_location](http://github.com/openresty/echo-nginx-module#echo_location), [echo_location_async](http://github.com/openresty/echo-nginx-module#echo_location_async), [echo_subrequest](http://github.com/openresty/echo-nginx-module#echo_subrequest), or [echo_subrequest_async](http://github.com/openresty/echo-nginx-module#echo_subrequest_async) directives.
 
@@ -94,17 +89,15 @@ The [ngx.location.capture](#ngxlocationcapture) and [ngx.location.capture_multi]
 
 will not work as expected.
 
-Cosockets Not Available Everywhere
-----------------------------------
+## Cosockets Not Available Everywhere
 
-Due to internal limitations in the Nginx core, the cosocket API is disabled in the following contexts: [set_by_lua*](#set_by_lua), [log_by_lua*](#log_by_lua), [header_filter_by_lua*](#header_filter_by_lua), and [body_filter_by_lua](#body_filter_by_lua).
+Due to internal limitations in the Nginx core, the cosocket API is disabled in the following contexts: [set_by_lua\*](#set_by_lua), [log_by_lua\*](#log_by_lua), [header_filter_by_lua\*](#header_filter_by_lua), and [body_filter_by_lua](#body_filter_by_lua).
 
-The cosockets are currently also disabled in the [init_by_lua*](#init_by_lua) and [init_worker_by_lua*](#init_worker_by_lua) directive contexts but we may add support for these contexts in the future because there is no limitation in the Nginx core (or the limitation might be worked around).
+The cosockets are currently also disabled in the [init_by_lua\*](#init_by_lua) and [init_worker_by_lua\*](#init_worker_by_lua) directive contexts but we may add support for these contexts in the future because there is no limitation in the Nginx core (or the limitation might be worked around).
 
-There exists a workaround, however, when the original context does *not* need to wait for the cosocket results. That is, creating a zero-delay timer via the [ngx.timer.at](#ngxtimerat) API and do the cosocket results in the timer handler, which runs asynchronously as to the original context creating the timer.
+There exists a workaround, however, when the original context does _not_ need to wait for the cosocket results. That is, creating a zero-delay timer via the [ngx.timer.at](#ngxtimerat) API and do the cosocket results in the timer handler, which runs asynchronously as to the original context creating the timer.
 
-Special Escaping Sequences
---------------------------
+## Special Escaping Sequences
 
 **NOTE** Following the `v0.9.17` release, this pitfall can be avoided by using the `*_by_lua_block {}` configuration directives.
 
@@ -123,7 +116,7 @@ PCRE sequences such as `\d`, `\s`, or `\w`, require special attention because in
  # evaluates to "not matched!"
 ```
 
-To avoid this, *double* escape the backslash:
+To avoid this, _double_ escape the backslash:
 
 ```nginx
 
@@ -211,30 +204,27 @@ As noted earlier, PCRE sequences presented within `*_by_lua_block {}` directives
  # evaluates to "1234"
 ```
 
-Mixing with SSI Not Supported
------------------------------
+## Mixing with SSI Not Supported
 
 Mixing SSI with ngx_lua in the same Nginx request is not supported at all. Just use ngx_lua exclusively. Everything you can do with SSI can be done atop ngx_lua anyway and it can be more efficient when using ngx_lua.
 
-SPDY Mode Not Fully Supported
------------------------------
+## SPDY Mode Not Fully Supported
 
 Certain Lua APIs provided by ngx_lua do not work in Nginx's SPDY mode yet: [ngx.location.capture](#ngxlocationcapture), [ngx.location.capture_multi](#ngxlocationcapture_multi), and [ngx.req.socket](#ngxreqsocket).
 
-Missing data on short circuited requests
-----------------------------------------
+## Missing data on short circuited requests
 
 Nginx may terminate a request early with (at least):
 
-* 400 (Bad Request)
-* 405 (Not Allowed)
-* 408 (Request Timeout)
-* 413 (Request Entity Too Large)
-* 414 (Request URI Too Large)
-* 494 (Request Headers Too Large)
-* 499 (Client Closed Request)
-* 500 (Internal Server Error)
-* 501 (Not Implemented)
+- 400 (Bad Request)
+- 405 (Not Allowed)
+- 408 (Request Timeout)
+- 413 (Request Entity Too Large)
+- 414 (Request URI Too Large)
+- 494 (Request Headers Too Large)
+- 499 (Client Closed Request)
+- 500 (Internal Server Error)
+- 501 (Not Implemented)
 
 This means that phases that normally run are skipped, such as the rewrite or
 access phase. This also means that later phases that are run regardless, e.g.

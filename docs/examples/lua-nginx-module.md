@@ -1,3 +1,5 @@
+# Example - lua-nginx-module
+
 ```nginx
  # set search paths for pure Lua external libraries (';;' is the default path):
  lua_package_path '/foo/bar/?.lua;/blah/?.lua;;';

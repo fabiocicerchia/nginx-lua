@@ -1,3 +1,5 @@
+# Example - lua-resty-mysql
+
 ```nginx
     # you do not need the following line if you are using
     # the ngx_openresty bundle:

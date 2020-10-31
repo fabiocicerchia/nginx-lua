@@ -1,3 +1,5 @@
+# Example - nginx-lua-prometheus
+
 ```lua
 lua_shared_dict prometheus_metrics 10M;
 lua_package_path "/path/to/nginx-lua-prometheus/?.lua;;";

@@ -1,3 +1,5 @@
+# Example - stream-lua-nginx-module
+
 ```nginx
 events {
     worker_connections 1024;
