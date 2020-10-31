@@ -24,8 +24,10 @@ function build() {
     MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
     PATCH="$NGINX_VER"
 
-    if [ "$FORCE" == "0" ] && [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
-        return
+    if [ "$FORCE" == "0" ]; then
+        if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
+            return
+        fi
     fi
 
     SUFFIX=""

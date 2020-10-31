@@ -242,18 +242,22 @@ jobs:
         id: version
         run: echo "::set-output name=version::$(date +'v1.%Y%m%d.%H%M%S')"
 
-      - name: Test with environment variables
-        run: echo $TAG_NAME
+      - name: Changelog
+        uses: scottbrenner/generate-changelog-action@master
+        id: Changelog
         env:
-          TAG_NAME: ${{ steps.version.outputs.version }}
+          REPO: ${{ github.repository }}
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
+          TAG_NAME: ${{ steps.version.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
           tag_name: $TAG_NAME
           release_name: Release $TAG_NAME
+          body: |
+            ${{ steps.Changelog.outputs.changelog }}
           draft: false
           prerelease: false
