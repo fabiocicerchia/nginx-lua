@@ -4,6 +4,8 @@ PUSH_CMD=./bin/docker-push.sh
 TEST_CMD=./bin/test.sh
 SEC_CMD=./bin/test-security.sh
 META_CMD=./bin/docker-metadata.sh
+TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
+BODY_SUP_VERS=$(shell cat supported_version)
 
 ################################################################################
 # UTILITIES
@@ -12,7 +14,6 @@ auto-update: generate-supported-versions generate-dockerfiles update-tags
 
 auto-update-and-commit: auto-update
 	set -eux
-	export TAG_VER="v1.$(date +%Y%m%d)"
 	git config --global user.name "fabiocicerchia"
 	git config --global user.email "fabiocicerchia@users.noreply.github.com"
 	git add -A
@@ -28,6 +29,19 @@ auto-commit-metadata: generate-metadata
 	git commit -m "Automated metadata"
 	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
 	git push origin HEAD:master
+
+tag:
+	set -eux
+	git config --global user.name "fabiocicerchia"
+	git config --global user.email "fabiocicerchia@users.noreply.github.com"
+	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
+	git tag $(TAG_VER) -a -m "$(TAG_VER)"
+	git push origin --tags
+
+release:
+	set -eux
+	curl --data '{"tag_name": "$(TAG_VER)", "target_commitish": "master", "name": "$(TAG_VER)", "body": "$(BODY_SUP_VERS)", "draft": false, "prerelease": false}' \
+		https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=$(GH_TOKEN)
 
 generate-supported-versions:
 	./bin/generate-supported-versions.sh

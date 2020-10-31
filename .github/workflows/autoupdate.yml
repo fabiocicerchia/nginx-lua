@@ -263,6 +263,10 @@ jobs:
         id: version
         run: echo "::set-output name=version::$(date +'v1.%Y%m%d.%H%M%S')"
 
+      - name: Get supported versions
+        id: supported_version
+        run: echo "::set-output name=supported_versions::$(cat supported_versions)"
+
       - name: Changelog
         uses: scottbrenner/generate-changelog-action@master
         id: Changelog
@@ -279,5 +283,6 @@ jobs:
           release_name: Release ${{ steps.version.outputs.version }}
           body: |
             ${{ steps.Changelog.outputs.changelog }}
+            ${{ steps.supported_versions.outputs.supported_versions }}
           draft: false
           prerelease: false
