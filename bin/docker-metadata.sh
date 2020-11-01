@@ -15,6 +15,12 @@ function metadata() {
     MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
     PATCH="$NGINX_VER"
 
+    if [ "$FORCE" == "0" ]; then
+        if [ -f "docs/metadata/$PATCH-$OS$OS_VER.md" ]; then
+            return
+        fi
+    fi
+
     if [ $(docker image ls -q fabiocicerchia/nginx-lua:"$PATCH-$OS$OS_VER" | wc -l) -ne 0 ]; then
         echo -e "# fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER\n" > "docs/metadata/$PATCH-$OS$OS_VER.md"
         echo '```json' >> "docs/metadata/$PATCH-$OS$OS_VER.md"
@@ -26,6 +32,10 @@ function metadata() {
 set -eux
 
 OS=$1
+FORCE=0
+if [ "$2" == "1" ]; then
+    FORCE=1
+fi
 VERSIONS=()
 if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
 elif [ "$OS" == "amazonlinux" ]; then VERSIONS=("${AMAZONLINUX[@]}")

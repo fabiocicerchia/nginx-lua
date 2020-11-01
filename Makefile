@@ -50,12 +50,20 @@ generate-dockerfiles:
 	./bin/generate-dockerfiles.sh
 
 generate-metadata:
-	$(META_CMD) alpine
-	$(META_CMD) amazonlinux
-	$(META_CMD) centos
-	$(META_CMD) debian
-	$(META_CMD) fedora
-	$(META_CMD) ubuntu
+	$(META_CMD) alpine 0
+	$(META_CMD) amazonlinux 0
+	$(META_CMD) centos 0
+	$(META_CMD) debian 0
+	$(META_CMD) fedora 0
+	$(META_CMD) ubuntu 0
+
+generate-metadata-force:
+	$(META_CMD) alpine $(FORCE)
+	$(META_CMD) amazonlinux $(FORCE)
+	$(META_CMD) centos $(FORCE)
+	$(META_CMD) debian $(FORCE)
+	$(META_CMD) fedora $(FORCE)
+	$(META_CMD) ubuntu $(FORCE)
 
 update-tags:
 	./bin/generate_tags.py | tee docs/TAGS.md
@@ -80,27 +88,27 @@ build-all: build-alpine build-amazonlinux build-centos build-debian build-fedora
 
 build-alpine:
 	$(BUILD_CMD) alpine $(FORCE)
-	$(META_CMD) alpine
+	$(META_CMD) alpine 0
 
 build-amazonlinux:
 	$(BUILD_CMD) amazonlinux $(FORCE)
-	$(META_CMD) amazonlinux
+	$(META_CMD) amazonlinux 0
 
 build-centos:
 	$(BUILD_CMD) centos $(FORCE)
-	$(META_CMD) centos
+	$(META_CMD) centos 0
 
 build-debian:
 	$(BUILD_CMD) debian $(FORCE)
-	$(META_CMD) debian
+	$(META_CMD) debian 0
 
 build-fedora:
 	$(BUILD_CMD) fedora $(FORCE)
-	$(META_CMD) fedora
+	$(META_CMD) fedora 0
 
 build-ubuntu:
 	$(BUILD_CMD) ubuntu $(FORCE)
-	$(META_CMD) ubuntu
+	$(META_CMD) ubuntu 0
 
 ################################################################################
 # BUILD MINIMAL
