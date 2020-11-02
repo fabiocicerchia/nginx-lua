@@ -18,9 +18,7 @@ jobs:
 
       - name: cancelling
         uses: andymckay/cancel-action@0.2
-        if: ${{ env.VER_UPDATED == '0' }}
-        env:
-          VER_UPDATED=${{ steps.auto-update-and-commit.outputs.ver_updated }}
+        if: ${{ steps.auto-update-and-commit.outputs.ver_updated == '0' }}
 
       - name: cancelling
         uses: andymckay/cancel-action@0.2
