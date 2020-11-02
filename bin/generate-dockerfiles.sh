@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 
+source ./bin/_common.sh
 source supported_versions
 
 function init_dockerfile() {
@@ -25,26 +26,8 @@ function init_dockerfile() {
 
 set -eux
 
-for NGINX_VER in "${NGINX[@]}"; do
+loop_over_nginx "init_dockerfile"
 
-    OS=alpine
-    for OS_VER in "${ALPINE[@]}"; do init_dockerfile; done
-    rm ./Dockerfile
-    ln -s "nginx/$NGINX_VER/alpine/$OS_VER/Dockerfile" ./Dockerfile
-
-    OS=amazonlinux
-    for OS_VER in "${AMAZONLINUX[@]}"; do init_dockerfile; done
-
-    OS=centos
-    for OS_VER in "${CENTOS[@]}"; do init_dockerfile; done
-
-    OS=debian
-    for OS_VER in "${DEBIAN[@]}"; do init_dockerfile; done
-
-    OS=fedora
-    for OS_VER in "${FEDORA[@]}"; do init_dockerfile; done
-
-    OS=ubuntu
-    for OS_VER in "${UBUNTU[@]}"; do init_dockerfile; done
-
-done
+rm ./Dockerfile
+DOCKEFILE=$(find nginx/*/alpine/*/Dockerfile -type f | sort -r | head -n1)
+ln -s $DOCKEFILE ./Dockerfile

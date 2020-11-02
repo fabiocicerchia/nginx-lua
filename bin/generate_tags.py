@@ -17,18 +17,20 @@ for file in files:
     nginxVerMajor, nginxVerMinor, nginxVerPatch = nginxVerPieces
 
     # tags[os] = file # currently missing
-    tags[nginxVerMajor + "." + nginxVerMinor + "." + nginxVerPatch + "-" + os + osVer] = file
+    tags[
+        nginxVerMajor + "." + nginxVerMinor + "." + nginxVerPatch + "-" + os + osVer
+    ] = file
     tags[nginxVerMajor + "." + nginxVerMinor + "." + nginxVerPatch + "-" + os] = file
     if os == "alpine":
         tags[nginxVerMajor + "." + nginxVerMinor + "-" + nginxVerPatch] = file
     tags[nginxVerMajor + "." + nginxVerMinor + "-" + os + osVer] = file
-    if not(os == "amazonlinux" and osVer.startswith("2018")):
+    if not (os == "amazonlinux" and osVer.startswith("2018")):
         tags[nginxVerMajor + "." + nginxVerMinor + "-" + os] = file
     if os == "alpine":
         tags[nginxVerMajor + "." + nginxVerMinor] = file
     tags[nginxVerMajor + "-" + os + osVer] = file
     tags[os] = file
-    if not(os == "amazonlinux" and osVer.startswith("2018")):
+    if not (os == "amazonlinux" and osVer.startswith("2018")):
         tags[nginxVerMajor + "-" + os] = file
     if os == "alpine":
         tags[nginxVerMajor] = file

@@ -7,19 +7,14 @@ fetch_latest() {
     if [ "$FILTER" == "" ]; then
         FILTER=".+"
     fi
-    DIGEST=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
-    curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" > /tmp/latest.$DISTRO
+    DIGEST=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" -O - | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
+    wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" -O - > /tmp/latest.$DISTRO.p1
     VER=$(cat /tmp/latest.$DISTRO | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
-
-    if [ "$VER" = "" ]; then
-        ls -lah /tmp/latest.$DISTRO
-        cat /tmp/latest.$DISTRO
-        curl -v "https://hub.docker.com/v2/repositories/library/$DISTRO/tags"
-    fi
 
     PAGE=2
     while [ "$VER" = "" -a $PAGE -lt 100 ]; do
-        VER=$(curl "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+        wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - > /tmp/latest.$DISTRO.p$PAGE
+        VER=$(cat /tmp/latest.$DISTRO | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
         ((PAGE+=1))
     done
 

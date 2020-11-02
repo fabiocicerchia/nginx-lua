@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 
+source ./bin/_common.sh
 source supported_versions
 
 function test() {
@@ -23,13 +24,6 @@ function test() {
 }
 
 function runtest() {
-    NGINX_VER=$1
-    OS=$2
-    OS_VER=$3
-    VER_TAGS=$4
-    OS_TAGS=$5
-    DEFAULT=$6
-
     MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
     MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
     PATCH="$NGINX_VER"
@@ -38,19 +32,19 @@ function runtest() {
     test "$MINOR-$OS$OS_VER"
     test "$MAJOR-$OS$OS_VER"
 
-    if [ "$VER_TAGS$OS_TAGS$DEFAULT" == "111" ]; then
+    if [ "$LAST_VER_NGINX$LAST_VER_OS$DEFAULT_IMAGE" == "111" ]; then
         test "$MAJOR"
         test "$MINOR"
         test "$PATCH"
         test latest
     fi
 
-    if [ "$VER_TAGS$OS_TAGS" == "11" ]; then
+    if [ "$LAST_VER_NGINX$LAST_VER_OS" == "11" ]; then
         test "$MAJOR-$OS"
         test "$MAJOR-$OS$OS_VER"
     fi
 
-    if [ "$OS_TAGS" == "1" ]; then
+    if [ "$LAST_VER_OS" == "1" ]; then
         test "$MINOR-$OS"
         test "$PATCH-$OS"
     fi
@@ -60,38 +54,8 @@ function runtest() {
 set -eux
 
 OS=$1
-VERSIONS=()
-if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
-elif [ "$OS" == "amazonlinux" ]; then VERSIONS=("${AMAZONLINUX[@]}")
-elif [ "$OS" == "centos" ]; then VERSIONS=("${CENTOS[@]}")
-elif [ "$OS" == "debian" ]; then VERSIONS=("${DEBIAN[@]}")
-elif [ "$OS" == "fedora" ]; then VERSIONS=("${FEDORA[@]}")
-elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
-fi
+VERSIONS=($(get_versions "$OS"))
 
 docker images
 
-NLEN=${#NGINX[@]}
-for (( I=0; I<NLEN; I++ )); do
-    NGINX_VER="${NGINX[$I]}"
-
-    VER_TAGS=0
-    if [ "$((I+1))" == "$NLEN" ]; then
-        VER_TAGS=1
-    fi
-
-    # Default image is Alpine
-    DEFAULT=0
-    if [ "$OS" == "alpine" ]; then DEFAULT=1; fi
-
-    DLEN=${#VERSIONS[@]}
-    for (( J=0; J<DLEN; J++ )); do
-        OS_VER="${VERSIONS[$J]}"
-        OS_TAGS=0
-        if [ "$((J+1))" == "$DLEN" ]; then
-            OS_TAGS=1
-        fi
-        runtest "$NGINX_VER" "$OS" "$OS_VER" $VER_TAGS $OS_TAGS $DEFAULT
-    done
-
-done
+loop_over_nginx_with_os "$OS" "runtest"

@@ -1,6 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC1091
 
+source ./bin/_common.sh
 source supported_versions
 
 function runtest() {
@@ -26,14 +27,7 @@ function runtest() {
 set -eux
 
 OS=$1
-VERSIONS=()
-if [ "$OS" == "alpine" ]; then VERSIONS=("${ALPINE[@]}")
-elif [ "$OS" == "amazonlinux" ]; then VERSIONS=("${AMAZONLINUX[@]}")
-elif [ "$OS" == "centos" ]; then VERSIONS=("${CENTOS[@]}")
-elif [ "$OS" == "debian" ]; then VERSIONS=("${DEBIAN[@]}")
-elif [ "$OS" == "fedora" ]; then VERSIONS=("${FEDORA[@]}")
-elif [ "$OS" == "ubuntu" ]; then VERSIONS=("${UBUNTU[@]}")
-fi
+VERSIONS=($(get_versions "$OS"))
 
 docker run -it --net host --pid host --userns host --cap-add audit_control \
     -v /etc:/etc \
@@ -42,14 +36,4 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
     --label docker_bench_security \
     docker/docker-bench-security
 
-NLEN=${#NGINX[@]}
-for (( I=0; I<NLEN; I++ )); do
-    NGINX_VER="${NGINX[$I]}"
-
-    DLEN=${#VERSIONS[@]}
-    for (( J=0; J<DLEN; J++ )); do
-        OS_VER="${VERSIONS[$J]}"
-        runtest "$NGINX_VER" "$OS" "$OS_VER"
-    done
-
-done
+loop_over_nginx_with_os "$OS" "runtest"

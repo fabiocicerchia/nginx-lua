@@ -23,3 +23,4 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: true
           DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yml
+          FILTER_REGEX_EXCLUDE: nginx/(1.17.10|1.18.0|1.19.0|1.19.1|1.19.2)
