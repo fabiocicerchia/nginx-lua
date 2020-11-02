@@ -1,0 +1,34 @@
+site_name: fabiocicerchia/nginx-lua
+repo_url: https://github.com/fabiocicerchia/nginx-lua/
+site_author: Fabio Cicerchia <info@fabiocicerchia.it>
+copyright: Copyright (c) 2020 Fabio Cicerchia info@fabiocicerchia.it
+theme:
+  name: readthedocs
+  highlightjs: true
+nav:
+  - Home: README.md
+  - BENCHMARKS.md
+  - lua-nginx-module:
+    - 'directives': 'lua-nginx-module/directives.md'
+    - 'known-issues': 'lua-nginx-module/known-issues.md'
+    - 'nginx-api-for-lua': 'lua-nginx-module/nginx-api-for-lua.md'
+  - Examples:
+    - 'docker-compose': 'examples/docker-compose.md'
+    - 'headers-more-nginx-module': 'examples/headers-more-nginx-module.md'
+    - 'lua-nginx-module': 'examples/lua-nginx-module.md'
+    - 'lua-resty-cookie': 'examples/lua-resty-cookie.md'
+    - 'lua-resty-dns': 'examples/lua-resty-dns.md'
+    - 'lua-resty-lrucache': 'examples/lua-resty-lrucache.md'
+    - 'lua-resty-memcached': 'examples/lua-resty-memcached.md'
+    - 'lua-resty-mysql': 'examples/lua-resty-mysql.md'
+    - 'lua-resty-redis': 'examples/lua-resty-redis.md'
+    - 'lua-resty-shell': 'examples/lua-resty-shell.md'
+    - 'lua-resty-upstream-healthcheck': 'examples/lua-resty-upstream-healthcheck.md'
+    - 'lua-resty-websocket': 'examples/lua-resty-websocket.md'
+    - 'lua-upstream-nginx-module': 'examples/lua-upstream-nginx-module.md'
+    - 'nginx-lua-prometheus': 'examples/nginx-lua-prometheus.md'
+    - 'stream-lua-nginx-module': 'examples/stream-lua-nginx-module.md'
+  - About:
+    - LICENSE.md
+    - CONTRIBUTING.md
+    - CODE_OF_CONDUCT.md
