@@ -48,6 +48,7 @@ jobs:
   metadata:
     name: Generates Metadata
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: docker_build
     steps:
       - uses: actions/checkout@v2
