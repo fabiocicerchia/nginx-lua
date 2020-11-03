@@ -8,17 +8,17 @@ fetch_latest() {
         FILTER=".+"
     fi
     DIGEST=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" -O - | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
-    wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" -O - > /tmp/latest.$DISTRO.p1
-    VER=$(cat /tmp/latest.$DISTRO.p1 | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+    wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags" -O - > "/tmp/latest.$DISTRO.p1"
+    VER=$(cat "/tmp/latest.$DISTRO.p1" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
 
     PAGE=2
-    while [ "$VER" = "" -a $PAGE -lt 100 ]; do
-        wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - > /tmp/latest.$DISTRO.p$PAGE
-        VER=$(cat /tmp/latest.$DISTRO.p$PAGE | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
+    while [ "$VER" = "" ] && [ $PAGE -lt 100 ]; do
+        wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - > "/tmp/latest.$DISTRO.p$PAGE"
+        VER=$(cat "/tmp/latest.$DISTRO.p$PAGE" | jq -rc '.results[] | select( .images[].digest == "'$DIGEST'" and .name != "latest" ) | .name' | grep -E "$FILTER" | sort -Vr | head -n 1)
         ((PAGE+=1))
     done
 
-    echo $VER
+    echo "$VER"
 }
 
 set -eux
@@ -110,4 +110,4 @@ echo "UBUNTU=(\"${UBUNTU[*]}\")" | sed 's/ /" "/g' >> supported_versions
 
 DIFF=$(diff supported_versions supported_versions.bak; echo $?)
 rm supported_versions.bak
-exit $DIFF
+exit "$DIFF"

@@ -1,3 +1,5 @@
+# CONTRIBUTING
+
 Please take a moment to review this document in order to make the contribution
 process easy and effective for everyone involved.
 
@@ -8,14 +10,12 @@ changes, and helping you finalize your pull requests.
 
 ## Using the issue tracker
 
-The issue tracker is the preferred channel for [bug reports](#bugs),
-[features requests](#features) and [submitting pull
+The issue tracker is the preferred channel for [bug reports](#bug-reports),
+[features requests](#features-requests) and [submitting pull
 requests](#pull-requests), but please respect the following restrictions:
 
 - Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others.
-
-<a name="bugs"></a>
 
 ## Bug reports
 
@@ -57,16 +57,12 @@ Example:
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-<a name="features"></a>
-
 ## Feature requests
 
 Feature requests are welcome. But take a moment to find out whether your idea
 fits with the scope and aims of the project. It's up to _you_ to make a strong
 case to convince the project's developers of the merits of this feature. Please
 provide as much detail and context as possible.
-
-<a name="pull-requests"></a>
 
 ## Pull requests
 
@@ -143,8 +139,6 @@ included in the project:
 
 **IMPORTANT**: By submitting a patch, you agree to license your work under the
 same license as that used by the project.
-
-<a name="maintainers"></a>
 
 ## Maintainers
 

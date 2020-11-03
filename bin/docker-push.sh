@@ -6,9 +6,9 @@ source supported_versions
 
 function docker_push() {
     TAG=$1
-    docker push fabiocicerchia/nginx-lua:$TAG
-    if [ $? -ne 0 ]; then
-        docker push fabiocicerchia/nginx-lua:$TAG
+    EXITCODE=$(docker push fabiocicerchia/nginx-lua:"$TAG"; echo $?)
+    if [ $EXITCODE -ne 0 ]; then
+        docker push fabiocicerchia/nginx-lua:"$TAG"
     fi
 }
 
@@ -53,6 +53,6 @@ FORCE=0
 if [ "$2" == "1" ]; then
     FORCE=1
 fi
-VERSIONS=($(get_versions "$OS"))
+mapfile -t VERSIONS < <(get_versions "$OS")
 
 loop_over_nginx_with_os "$OS" "push"

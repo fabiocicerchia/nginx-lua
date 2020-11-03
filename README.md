@@ -86,20 +86,20 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 > Just to name a few:
 > 
-> * Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
-> * doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
-> * manipulating response headers in an arbitrary way (by Lua)
-> * fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
-> * coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
-> * doing very complex URL dispatch in Lua at rewrite phase,
-> * using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
-> 
+> - Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
+> - doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
+> - manipulating response headers in an arbitrary way (by Lua)
+> - fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
+> - coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
+> - doing very complex URL dispatch in Lua at rewrite phase,
+> - using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
+>
 > The possibilities are unlimited as the module allows bringing together various
 > elements within Nginx as well as exposing the power of the Lua language to the
 > user. The module provides the full flexibility of scripting while offering
 > performance levels comparable with native C language programs both in terms of
 > CPU time as well as memory footprint thanks to LuaJIT 2.x.
-> 
+>
 > Other scripting language implementations typically struggle to match this
 > performance level.
 >
@@ -183,17 +183,18 @@ web:
 By default, this function reads template files in `/etc/nginx/templates/*.template` and outputs the result of executing `envsubst` to `/etc/nginx/conf.d`.
 So if you place `templates/default.conf.template` file, which contains variable references like this:
 
-```
+```nginx
 listen       ${NGINX_PORT};
 ```
 
 outputs to `/etc/nginx/conf.d/default.conf` like this:
 
-```
+```nginx
 listen       80;
 ```
 
 This behavior can be changed via the following environment variables:
+
 - `NGINX_ENVSUBST_TEMPLATE_DIR`
   - A directory which contains template files (default: `/etc/nginx/templates`)
   - When this directory doesn't exist, this function will do nothing about template processing.
