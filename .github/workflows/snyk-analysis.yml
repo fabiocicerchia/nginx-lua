@@ -13,9 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Check docker changes
+      id: docker_changes
+      run: git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' '
+
     - name: Build a Docker image
+      if: steps.docker_changes.output != '0'
       run: docker build -t fabiocicerchia/nginx-lua .
+
     - name: Run Snyk to check Docker image for vulnerabilities
+      if: steps.docker_changes.output != '0'
       # Snyk can be used to break the build when it detects vulnerabilities.
       # In this case we want to upload the issues to GitHub Code Scanning
       continue-on-error: true
@@ -28,7 +36,9 @@ jobs:
       with:
         image: fabiocicerchia/nginx-lua
         args: --file=Dockerfile
+
     - name: Upload result to GitHub Code Scanning
+      if: steps.docker_changes.output != '0'
       uses: github/codeql-action/upload-sarif@v1
       with:
         sarif_file: snyk.sarif

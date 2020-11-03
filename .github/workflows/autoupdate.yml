@@ -14,11 +14,11 @@ jobs:
 
       - name: Generate Supported Versions
         id: auto-update-and-commit
-        run: echo "::set-output name=ver_updated::$(make auto-update-and-commit)"
+        run: make auto-update-and-commit
 
       - name: cancelling
         uses: andymckay/cancel-action@0.2
-        if: ${{ steps.auto-update-and-commit.outputs.ver_updated == '0' }}
+        if: steps.auto-update-and-commit.outputs == '0'
 
       - name: cancelling
         uses: andymckay/cancel-action@0.2
@@ -35,63 +35,76 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Check docker changes
+        id: docker_changes
+        run: git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' '
+
       - name: Cleanup metadata artifacts
         run: rm -rf docs/metadata/*
+        if: steps.docker_changes.output != '0'
 
       - name: Build images
         run: make build-${{ matrix.distro }}
+        if: steps.docker_changes.output != '0'
 
       - name: Test images
         run: make test-${{ matrix.distro }}
+        if: steps.docker_changes.output != '0'
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && steps.docker_changes.output != '0'
 
       - name: Push images
         run: make push-${{ matrix.distro }}
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master' && steps.docker_changes.output != '0'
 
       - name: Archive metadata artifacts
         uses: actions/upload-artifact@v2
+        if: steps.docker_changes.output != '0'
         with:
           name: metadata-${{ matrix.distro }}
           path: docs/metadata
           retention-days: 1
+          if-no-files-found: ignore
 
   metadata:
     name: Generates Metadata
     runs-on: ubuntu-latest
-    continue-on-error: true
     needs: docker_build
     steps:
       - uses: actions/checkout@v2
 
       - name: Restore amazonlinux metadata artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: metadata-amazonlinux
           path: docs/metadata
 
       - name: Restore centos metadata artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: metadata-centos
           path: docs/metadata
 
       - name: Restore debian metadata artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: metadata-debian
           path: docs/metadata
 
       - name: Restore fedora metadata artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: metadata-fedora
           path: docs/metadata
 
       - name: Restore ubuntu metadata artifacts
+        continue-on-error: true
         uses: actions/download-artifact@v2
         with:
           name: metadata-ubuntu

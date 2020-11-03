@@ -1,6 +1,6 @@
 PAGER=
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
-DOCKERFILE_CHANGES=$(shell git diff-tree --no-commit-id --name-only -r HEAD | grep -E "^\/nginx" | wc -l | tr -d ' ')
+DOCKERFILE_CHANGES=$(shell git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
 	SKIP=1
 else
@@ -112,7 +112,7 @@ auto-update-and-commit: .setup_gitrepo auto-update
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add -A
-	git commit -m "Automated metadata"
+	git commit -m "Automated metadata" || true
 	git push origin HEAD:master
 
 tag: .setup_gitrepo
@@ -144,6 +144,7 @@ benchmark:
 	./bin/benchmark.sh
 
 changelog:
+	git fetch --all --tags
 	echo "Changes:"
 	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
 	sed -i "" 's/^*/-/' CHANGELOG
