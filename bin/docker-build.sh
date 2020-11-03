@@ -67,7 +67,7 @@ EXTENDED_IMAGE=1
 if [ "$2" == "0" ]; then
     EXTENDED_IMAGE=0
 fi
-VERSIONS=($(get_versions "$OS"))
+mapfile -t VERSIONS < <(get_versions "$OS")
 
 loop_over_nginx_with_os "$OS" "build"
 

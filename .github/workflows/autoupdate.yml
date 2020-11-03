@@ -16,6 +16,15 @@ jobs:
         id: auto-update-and-commit
         run: make auto-update-and-commit
 
+      - name: Archive metadata artifacts
+        uses: actions/upload-artifact@v2
+        if: steps.auto-update-and-commit.outputs == '0'
+        with:
+          name: broken-docker-update
+          path: /tmp/generate-supported-versions
+          retention-days: 5
+          if-no-files-found: ignore
+
       - name: cancelling
         uses: andymckay/cancel-action@0.2
         if: steps.auto-update-and-commit.outputs == '0'
@@ -37,7 +46,9 @@ jobs:
 
       - name: Check docker changes
         id: docker_changes
-        run: git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' '
+        run: git diff-tree --no-commit-id --name-only -r ${SHA:-HEAD} nginx tpl | wc -l | tr -d ' '
+        env:
+          SHA: ${{ github.sha }}
 
       - name: Cleanup metadata artifacts
         run: rm -rf docs/metadata/*
@@ -53,11 +64,11 @@ jobs:
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
-        if: github.ref == 'refs/heads/master' && steps.docker_changes.output != '0'
+        if: github.ref == 'refs/heads/main' && steps.docker_changes.output != '0'
 
       - name: Push images
         run: make push-${{ matrix.distro }}
-        if: github.ref == 'refs/heads/master' && steps.docker_changes.output != '0'
+        if: github.ref == 'refs/heads/main' && steps.docker_changes.output != '0'
 
       - name: Archive metadata artifacts
         uses: actions/upload-artifact@v2
@@ -112,7 +123,7 @@ jobs:
 
       - name: Push metadata
         run: make auto-commit-metadata
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
 
   auto_tag:
     name: Create Release

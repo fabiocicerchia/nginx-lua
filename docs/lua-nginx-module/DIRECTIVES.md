@@ -253,7 +253,9 @@ The regular expressions used in [ngx.re.match](#ngxrematch), [ngx.re.gmatch](#ng
 
 The default number of entries allowed is 1024 and when this limit is reached, new regular expressions will not be cached (as if the `o` option was not specified) and there will be one, and only one, warning in the `error.log` file:
 
-    2011/08/27 23:18:26 [warn] 31997#0: *1 lua exceeding regex cache max entries (1024), ...
+```console
+2011/08/27 23:18:26 [warn] 31997#0: *1 lua exceeding regex cache max entries (1024), ...
+```
 
 If you are using the `ngx.re.*` implementation of [lua-resty-core](https://github.com/openresty/lua-resty-core) by loading the `resty.core.regex` module (or just the `resty.core` module), then an LRU cache is used for the regex cache being used here.
 
@@ -1137,7 +1139,9 @@ Likewise, new "eof" flag can also be specified by setting a boolean value to [ng
 
 Then `GET /t` will just return the output
 
-    hello world
+```console
+hello world
+```
 
 That is, when the body filter sees a chunk containing the word "hello", then it will set the "eof" flag to true immediately, resulting in truncated but still valid responses.
 
@@ -1471,7 +1475,9 @@ directives even though you will not use this static certificate and private key 
 because the NGINX core requires their appearance otherwise you are seeing the following error
 while starting NGINX:
 
-    nginx: [emerg] no ssl configured for the server
+```console
+nginx: [emerg] no ssl configured for the server
+```
 
 This directive requires OpenSSL 1.0.2e or greater.
 
@@ -1550,7 +1556,9 @@ hook, for obvious reasons.
 To easily test this hook locally with a modern web browser, you can temporarily put the following line
 in your https server block to disable the TLS session ticket support:
 
-    ssl_session_tickets off;
+```nginx
+ssl_session_tickets off;
+```
 
 But do not forget to comment this line out before publishing your site to the world.
 
@@ -1618,7 +1626,9 @@ library.
 To easily test this hook locally with a modern web browser, you can temporarily put the following line
 in your https server block to disable the TLS session ticket support:
 
-    ssl_session_tickets off;
+```nginx
+ssl_session_tickets off;
+```
 
 But do not forget to comment this line out before publishing your site to the world.
 
@@ -1934,8 +1944,10 @@ For example, on Linux, you can configure the standard [listen](http://nginx.org/
 
 On FreeBSD, you can only tune the system-wide configuration for TCP keepalive, for example:
 
-    # sysctl net.inet.tcp.keepintvl=2000
-    # sysctl net.inet.tcp.keepidle=2000
+```console
+# sysctl net.inet.tcp.keepintvl=2000
+# sysctl net.inet.tcp.keepidle=2000
+```
 
 This directive was first introduced in the `v0.7.4` release.
 

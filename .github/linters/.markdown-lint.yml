@@ -1,1 +1,8 @@
 line-length: false
+MD033:
+  allowed_elements:
+    - details
+    - summary
+MD026:
+  punctuation: ".,;:!。，；：！？"
+MD038: false

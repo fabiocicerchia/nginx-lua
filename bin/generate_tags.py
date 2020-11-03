@@ -13,7 +13,7 @@ for file in files:
     pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile", file)
 
     nginxVer, os, osVer = pieces.group(1, 2, 3)
-    nginxVerPieces = re.split("\.", nginxVer)
+    nginxVerPieces = re.split(r"\.", nginxVer)
     nginxVerMajor, nginxVerMinor, nginxVerPatch = nginxVerPieces
 
     # tags[os] = file # currently missing
@@ -54,7 +54,7 @@ for file in supported:
     print(
         "- [`"
         + "`, `".join(dockerfiles[file])
-        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/master/"
+        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/main/"
         + file
         + ")"
     )
@@ -65,7 +65,7 @@ for file in reversed:
     print(
         "- [`"
         + "`, `".join(dockerfiles[file])
-        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/master/"
+        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/main/"
         + file
         + ")"
     )

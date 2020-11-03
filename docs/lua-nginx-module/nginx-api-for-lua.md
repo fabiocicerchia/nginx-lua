@@ -307,21 +307,23 @@ The `ngx.DECLINED` constant was first introduced in the `v0.5.0rc19` release.
 
 **context:** _init_by_lua\*, set_by_lua\*, rewrite_by_lua\*, access_by_lua\*, content_by_lua\*, header_filter_by_lua\*, body_filter_by_lua\*, log_by_lua\*, ngx.timer.\*, balancer_by_lua\*, ssl_certificate_by_lua\*, ssl_session_fetch_by_lua\*, ssl_session_store_by_lua\*_
 
-      ngx.HTTP_GET
-      ngx.HTTP_HEAD
-      ngx.HTTP_PUT
-      ngx.HTTP_POST
-      ngx.HTTP_DELETE
-      ngx.HTTP_OPTIONS   (added in the v0.5.0rc24 release)
-      ngx.HTTP_MKCOL     (added in the v0.8.2 release)
-      ngx.HTTP_COPY      (added in the v0.8.2 release)
-      ngx.HTTP_MOVE      (added in the v0.8.2 release)
-      ngx.HTTP_PROPFIND  (added in the v0.8.2 release)
-      ngx.HTTP_PROPPATCH (added in the v0.8.2 release)
-      ngx.HTTP_LOCK      (added in the v0.8.2 release)
-      ngx.HTTP_UNLOCK    (added in the v0.8.2 release)
-      ngx.HTTP_PATCH     (added in the v0.8.2 release)
-      ngx.HTTP_TRACE     (added in the v0.8.2 release)
+```default
+ngx.HTTP_GET
+ngx.HTTP_HEAD
+ngx.HTTP_PUT
+ngx.HTTP_POST
+ngx.HTTP_DELETE
+ngx.HTTP_OPTIONS   (added in the v0.5.0rc24 release)
+ngx.HTTP_MKCOL     (added in the v0.8.2 release)
+ngx.HTTP_COPY      (added in the v0.8.2 release)
+ngx.HTTP_MOVE      (added in the v0.8.2 release)
+ngx.HTTP_PROPFIND  (added in the v0.8.2 release)
+ngx.HTTP_PROPPATCH (added in the v0.8.2 release)
+ngx.HTTP_LOCK      (added in the v0.8.2 release)
+ngx.HTTP_UNLOCK    (added in the v0.8.2 release)
+ngx.HTTP_PATCH     (added in the v0.8.2 release)
+ngx.HTTP_TRACE     (added in the v0.8.2 release)
+```
 
 These constants are usually used in [ngx.location.capture](#ngxlocationcapture) and [ngx.location.capture_multi](#ngxlocationcapture_multi) method calls.
 
@@ -707,8 +709,10 @@ This option is set to `false` by default
 
 Accessing location `/lua` gives
 
-    /other dog: hello world
-    /lua: hello world
+```default
+/other dog: hello world
+/lua: hello world
+```
 
 The `copy_all_vars` option provides a copy of the parent request's Nginx variables to subrequests when such subrequests are issued. Changes made to these variables by such subrequests will not affect the parent request or any other subrequests sharing the parent request's variables.
 
@@ -733,8 +737,10 @@ The `copy_all_vars` option provides a copy of the parent request's Nginx variabl
 
 Request `GET /lua` will give the output
 
-    /other dog: hello world
-    /lua: hello
+```default
+/other dog: hello world
+/lua: hello
+```
 
 Note that if both `share_all_vars` and `copy_all_vars` are set to true, then `share_all_vars` takes precedence.
 
@@ -768,8 +774,10 @@ unescaping them in the Nginx config file.
 
 Accessing `/lua` will yield the output
 
-    dog = hello
-    cat = 32
+```default
+dog = hello
+cat = 32
+```
 
 The `ctx` option can be used to specify a custom Lua table to serve as the [ngx.ctx](#ngxctx) table for the subrequest.
 
@@ -793,8 +801,10 @@ The `ctx` option can be used to specify a custom Lua table to serve as the [ngx.
 
 Then request `GET /lua` gives
 
-    bar
-    nil
+```default
+bar
+nil
+```
 
 It is also possible to use this `ctx` option to share the same [ngx.ctx](#ngxctx) table between the current (parent) request and the subrequest:
 
@@ -815,7 +825,9 @@ It is also possible to use this `ctx` option to share the same [ngx.ctx](#ngxctx
 
 Request `GET /lua` yields the output
 
-    bar
+```default
+bar
+```
 
 Note that subrequests issued by [ngx.location.capture](#ngxlocationcapture) inherit all the
 request headers of the current request by default and that this may have unexpected side effects on the
@@ -828,7 +840,9 @@ When the `body` option is not specified and the `always_forward_body` option is 
 
 There is a hard-coded upper limit on the number of subrequests possible for every main request. In older versions of Nginx, the limit was `50` concurrent subrequests and in more recent versions, Nginx `1.9.5` onwards, the same limit is changed to limit the depth of recursive subrequests. When this limit is exceeded, the following error message is added to the `error.log` file:
 
-    [error] 13983#0: *1 subrequests cycle while processing "/uri"
+```default
+[error] 13983#0: *1 subrequests cycle while processing "/uri"
+```
 
 The limit can be manually modified if required by editing the definition of the `NGX_HTTP_MAX_SUBREQUESTS` macro in the `nginx/src/http/ngx_http_request.h` file in the Nginx source tree.
 
@@ -912,7 +926,9 @@ before sending out the response headers.
 
 Setting `ngx.status` after the response header is sent out has no effect but leaving an error message in your Nginx's error log file:
 
-    attempt to set ngx.status after sending out response headers
+```default
+attempt to set ngx.status after sending out response headers
+```
 
 ## ngx.header.HEADER
 
@@ -1008,8 +1024,10 @@ This is particularly useful in the context of [header_filter_by_lua\*](#header_f
 
 For multi-value headers, all of the values of header will be collected in order and returned as a Lua table. For example, response headers
 
-    Foo: bar
-    Foo: baz
+```default
+Foo: bar
+Foo: baz
+```
 
 will result in
 
@@ -1115,10 +1133,12 @@ By default, the request line and trailing `CR LF` terminator will also be includ
 
 gives something like this:
 
-    GET /t HTTP/1.1
-    Host: localhost
-    Connection: close
-    Foo: bar
+```default
+GET /t HTTP/1.1
+Host: localhost
+Connection: close
+Foo: bar
+```
 
 You can specify the optional
 `no_request_line` argument as a `true` value to exclude the request line from the result. For example,
@@ -1130,9 +1150,11 @@ You can specify the optional
 
 outputs something like this:
 
-    Host: localhost
-    Connection: close
-    Foo: bar
+```default
+Host: localhost
+Connection: close
+Foo: bar
+```
 
 This method was first introduced in the `v0.7.17` release.
 
@@ -1270,9 +1292,11 @@ data. By default, this `binary` argument is false and this function
 will throw out a Lua error such as the one below when the `uri`
 argument contains any control characters (ASCII Code 0 ~ 0x08, 0x0A ~ 0x1F and 0x7F).
 
-    [error] 23430#23430: *1 lua entry thread aborted: runtime error:
-    content_by_lua(nginx.conf:44):3: ngx.req.set_uri unsafe byte "0x00"
-    in "\x00foo" (maybe you want to set the 'binary' argument?)
+```default
+[error] 23430#23430: *1 lua entry thread aborted: runtime error:
+content_by_lua(nginx.conf:44):3: ngx.req.set_uri unsafe byte "0x00"
+in "\x00foo" (maybe you want to set the 'binary' argument?)
+```
 
 This interface was first introduced in the `v0.3.1rc14` release.
 
@@ -2275,7 +2299,9 @@ For example,
 
 gives the output
 
-    b r56 7
+```default
+b r56 7
+```
 
 ## ngx.encode_args
 
@@ -2294,7 +2320,9 @@ For example,
 
 yields
 
-    foo=3&b%20r=hello%20world
+```default
+foo=3&b%20r=hello%20world
+```
 
 The table keys must be Lua strings.
 
@@ -2307,7 +2335,9 @@ Multi-value query args are also supported. Just use a Lua table for the argument
 
 gives
 
-    baz=32&baz=hello
+```default
+baz=32&baz=hello
+```
 
 If the value table is empty and the effect is equivalent to the `nil` value.
 
@@ -2320,7 +2350,9 @@ Boolean argument values are also supported, for instance,
 
 yields
 
-    a&b=1
+```default
+a&b=1
+```
 
 If the argument value is `false`, then the effect is equivalent to the `nil` value.
 
@@ -2415,7 +2447,9 @@ For example,
 
 yields the output
 
-    R/pvxzHC4NLtj7S+kXFg/NePTmk=
+```default
+R/pvxzHC4NLtj7S+kXFg/NePTmk=
+```
 
 This API requires the OpenSSL library enabled in the Nginx build (usually by passing the `--with-http_ssl_module` option to the `./configure` script).
 
@@ -2440,7 +2474,9 @@ For example,
 
 yields the output
 
-    5d41402abc4b2a76b9719d911017c592
+```default
+5d41402abc4b2a76b9719d911017c592
+```
 
 See [ngx.md5_bin](#ngxmd5_bin) if the raw binary MD5 digest is required.
 
@@ -2649,47 +2685,49 @@ Unmatched subpatterns will have `false` values in their `captures` table fields.
 
 Specify `options` to control how the match operation will be performed. The following option characters are supported:
 
-    a             anchored mode (only match from the beginning)
+```default
+a             anchored mode (only match from the beginning)
 
-    d             enable the DFA mode (or the longest token match semantics).
-                  this requires PCRE 6.0+ or else a Lua exception will be thrown.
-                  first introduced in ngx_lua v0.3.1rc30.
+d             enable the DFA mode (or the longest token match semantics).
+              this requires PCRE 6.0+ or else a Lua exception will be thrown.
+              first introduced in ngx_lua v0.3.1rc30.
 
-    D             enable duplicate named pattern support. This allows named
-                  subpattern names to be repeated, returning the captures in
-                  an array-like Lua table. for example,
-                    local m = ngx.re.match("hello, world",
-                                           "(?<named>\w+), (?<named>\w+)",
-                                           "D")
-                    -- m["named"] == {"hello", "world"}
-                  this option was first introduced in the v0.7.14 release.
-                  this option requires at least PCRE 8.12.
+D             enable duplicate named pattern support. This allows named
+              subpattern names to be repeated, returning the captures in
+              an array-like Lua table. for example,
+                local m = ngx.re.match("hello, world",
+                                       "(?<named>\w+), (?<named>\w+)",
+                                       "D")
+                -- m["named"] == {"hello", "world"}
+              this option was first introduced in the v0.7.14 release.
+              this option requires at least PCRE 8.12.
 
-    i             case insensitive mode (similar to Perl's /i modifier)
+i             case insensitive mode (similar to Perl's /i modifier)
 
-    j             enable PCRE JIT compilation, this requires PCRE 8.21+ which
-                  must be built with the --enable-jit option. for optimum performance,
-                  this option should always be used together with the 'o' option.
-                  first introduced in ngx_lua v0.3.1rc30.
+j             enable PCRE JIT compilation, this requires PCRE 8.21+ which
+              must be built with the --enable-jit option. for optimum performance,
+              this option should always be used together with the 'o' option.
+              first introduced in ngx_lua v0.3.1rc30.
 
-    J             enable the PCRE Javascript compatible mode. this option was
-                  first introduced in the v0.7.14 release. this option requires
-                  at least PCRE 8.12.
+J             enable the PCRE Javascript compatible mode. this option was
+              first introduced in the v0.7.14 release. this option requires
+              at least PCRE 8.12.
 
-    m             multi-line mode (similar to Perl's /m modifier)
+m             multi-line mode (similar to Perl's /m modifier)
 
-    o             compile-once mode (similar to Perl's /o modifier),
-                  to enable the worker-process-level compiled-regex cache
+o             compile-once mode (similar to Perl's /o modifier),
+              to enable the worker-process-level compiled-regex cache
 
-    s             single-line mode (similar to Perl's /s modifier)
+s             single-line mode (similar to Perl's /s modifier)
 
-    u             UTF-8 mode. this requires PCRE to be built with
-                  the --enable-utf8 option or else a Lua exception will be thrown.
+u             UTF-8 mode. this requires PCRE to be built with
+              the --enable-utf8 option or else a Lua exception will be thrown.
 
-    U             similar to "u" but disables PCRE's UTF-8 validity check on
-                  the subject string. first introduced in ngx_lua v0.8.1.
+U             similar to "u" but disables PCRE's UTF-8 validity check on
+              the subject string. first introduced in ngx_lua v0.8.1.
 
-    x             extended mode (similar to Perl's /x modifier)
+x             extended mode (similar to Perl's /x modifier)
+```
 
 These options can be combined:
 
@@ -2734,7 +2772,9 @@ This method requires the PCRE library enabled in Nginx ([Known Issue With Specia
 
 To confirm that PCRE JIT is enabled, activate the Nginx debug log by adding the `--with-debug` option to Nginx or OpenResty's `./configure` script. Then, enable the "debug" error log level in `error_log` directive. The following message will be generated if PCRE JIT is enabled:
 
-    pcre JIT compiling result: 1
+```default
+pcre JIT compiling result: 1
+```
 
 Starting from the `0.9.4` release, this function also accepts a 5th argument, `res_table`, for letting the caller supply the Lua table used to hold all the capturing results. Starting from `0.9.6`, it is the caller's responsibility to ensure this table is empty. This is very useful for recycling Lua tables and saving GC and table allocation overhead.
 
@@ -2773,9 +2813,11 @@ Below is an example:
 
 This example produces the output
 
-    from: 8
-    to: 11
-    matched: 1234
+```default
+from: 8
+to: 11
+matched: 1234
+```
 
 Because this API function does not create new Lua strings nor new Lua tables, it is much faster than [ngx.re.match](#ngxrematch). It should be used wherever possible.
 
@@ -4041,13 +4083,15 @@ The iterator function behaves differently (i.e., like a real iterator) when it i
 
 Then for the incoming data stream `'hello, world! -agentzh\r\n--abcedhb blah blah'`, we shall get the following output from the sample code above:
 
-    read chunk: [hell]
-    read chunk: [o, w]
-    read chunk: [orld]
-    read chunk: [! -a]
-    read chunk: [gent]
-    read chunk: [zh]
-    read done
+```default
+read chunk: [hell]
+read chunk: [o, w]
+read chunk: [orld]
+read chunk: [! -a]
+read chunk: [gent]
+read chunk: [zh]
+read done
+```
 
 Note that, the actual data returned _might_ be a little longer than the size limit specified by the `size` argument when the boundary pattern has ambiguity for streaming parsing. Near the boundary of the data stream, the data string actually returned could also be shorter than the size limit.
 
@@ -4437,14 +4481,16 @@ to do manual time-slicing:
 
 Then it will generate the output
 
-    0
-    1
-    f 1
-    2
-    f 2
-    3
-    f 3
-    4
+```default
+0
+1
+f 1
+2
+f 2
+3
+f 3
+4
+```
 
 "Light threads" are mostly useful for making concurrent upstream requests in a single Nginx request handler, much like a generalized version of [ngx.location.capture_multi](#ngxlocationcapture_multi) that can work with all the [Nginx API for Lua](#nginx-api-for-lua). The following example demonstrates parallel requests to MySQL, Memcached, and upstream HTTP services in a single Lua handler, and outputting the results in the order that they actually return (similar to Facebook's BigPipe model):
 
@@ -4583,10 +4629,12 @@ And below is an example demonstrating the "wait any" model:
 
 And it will generate the following output:
 
-    f thread created: running
-    g thread created: running
-    g: hello
-    res: g done
+```default
+f thread created: running
+g thread created: running
+g: hello
+res: g done
+```
 
 This API was first enabled in the `v0.7.0` release.
 

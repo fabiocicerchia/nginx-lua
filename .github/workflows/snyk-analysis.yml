@@ -7,7 +7,12 @@
 # fail PR checks for new vulnerabilities, see https://github.com/snyk/actions/
 
 name: Snyk Container
-on: push
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   snyk:
     runs-on: ubuntu-latest
@@ -16,7 +21,9 @@ jobs:
 
     - name: Check docker changes
       id: docker_changes
-      run: git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' '
+      run: git diff-tree --no-commit-id --name-only -r ${SHA:-HEAD} nginx tpl | wc -l | tr -d ' '
+      env:
+        SHA: ${{ github.sha }}
 
     - name: Build a Docker image
       if: steps.docker_changes.output != '0'

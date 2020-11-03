@@ -30,4 +30,4 @@ loop_over_nginx "init_dockerfile"
 
 rm ./Dockerfile
 DOCKEFILE=$(find nginx/*/alpine/*/Dockerfile -type f | sort -r | head -n1)
-ln -s $DOCKEFILE ./Dockerfile
+ln -s "$DOCKEFILE" ./Dockerfile

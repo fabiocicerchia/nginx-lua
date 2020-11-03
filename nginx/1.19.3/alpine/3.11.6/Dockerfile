@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM alpine:3.11.6 AS base
-
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=alpine
@@ -206,14 +213,16 @@ ENV VER_DUMBINIT=$VER_DUMBINIT
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM alpine:3.11.6 AS builder
 
+# hadolint ignore=SC2086
 RUN set -eux \
    && apk update \
    && apk add --no-cache \
       $BUILD_DEPS \
       $NGINX_BUILD_DEPS
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGX Devel Kit
 # ##############################################################################
@@ -334,6 +343,7 @@ RUN set -eux \
     curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
     && unzip -d / /stream-lua-nginx-module.zip)
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGINX
 # ##############################################################################
@@ -364,7 +374,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM alpine:3.11.6
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -412,6 +422,7 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 
+# hadolint ignore=SC2086
 RUN set -eux \
     && apk update \
     && apk add --no-cache \

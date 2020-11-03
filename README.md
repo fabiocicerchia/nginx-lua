@@ -1,7 +1,7 @@
 # Nginx & Lua
 
-![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-nginx.png)
-![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/master/docs/logo-lua.png)
+![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-nginx.png)
+![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-lua.png)
 
 ---
 
@@ -29,21 +29,21 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/alpine/3.12.1/Dockerfile)
-- [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
-- [`centos`,`1-centos`,`1-centos8`,`1-centos8`,`1.19-centos`,`1.19-centos8`,`1.19.3-centos`,`1.19.3-centos8`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/centos/8/Dockerfile)
-- [`debian`,`1-debian`,`1.19-debian`,`1-debian10.6`,`1-debian10.6`,`1.19.3-debian`,`1.19-debian10.6`,`1.19.3-debian10.6`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/debian/10.6/Dockerfile)
-- [`fedora`,`1-fedora`,`1-fedora33`,`1-fedora33`,`1.19-fedora`,`1.19-fedora33`,`1.19.3-fedora`,`1.19.3-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/fedora/33/Dockerfile)
-- [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.19.3-ubuntu`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/master/nginx/1.19.3/ubuntu/20.04/Dockerfile)
+- [`1`,`1.19`,`1.19.3`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.3-alpine`,`1-alpine3.12.1`,`1-alpine3.12.1`,`1.19-alpine3.12.1`,`1.19.3-alpine3.12.1`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/alpine/3.12.1/Dockerfile)
+- [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.3-amazonlinux`,`1-amazonlinux2.0.20200722.0`,`1-amazonlinux2.0.20200722.0`,`1.19-amazonlinux2.0.20200722.0`,`1.19.3-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/amazonlinux/2.0.20200722.0/Dockerfile)
+- [`centos`,`1-centos`,`1-centos8`,`1-centos8`,`1.19-centos`,`1.19-centos8`,`1.19.3-centos`,`1.19.3-centos8`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/centos/8/Dockerfile)
+- [`debian`,`1-debian`,`1.19-debian`,`1-debian10.6`,`1-debian10.6`,`1.19.3-debian`,`1.19-debian10.6`,`1.19.3-debian10.6`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/debian/10.6/Dockerfile)
+- [`fedora`,`1-fedora`,`1-fedora33`,`1-fedora33`,`1.19-fedora`,`1.19-fedora33`,`1.19.3-fedora`,`1.19.3-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/fedora/33/Dockerfile)
+- [`ubuntu`,`1-ubuntu`,`1.19-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.19.3-ubuntu`,`1.19-ubuntu20.04`,`1.19.3-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.3/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
-**Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/TAGS.md).
+**Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
 
 ## Quick reference (cont.)
 
 - **Where to file issues:** [https://github.com/fabiocicerchia/nginx-lua/issues](https://github.com/fabiocicerchia/nginx-lua/issues)
 - **Supported architectures:** amd64
-- **Published image artifact details:** [repo-info repo's docs/metadata/ directory](https://github.com/fabiocicerchia/nginx-lua/tree/master/docs/examples) ([history](https://github.com/fabiocicerchia/nginx-lua/commits/master/docs/metadata)) (image metadata, transfer size, etc)
+- **Published image artifact details:** [repo-info repo's docs/metadata/ directory](https://github.com/fabiocicerchia/nginx-lua/tree/main/docs/examples) ([history](https://github.com/fabiocicerchia/nginx-lua/commits/main/docs/metadata)) (image metadata, transfer size, etc)
 
 ## What is nginx?
 
@@ -85,25 +85,25 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 ## Typical Uses
 
 > Just to name a few:
-> 
-> * Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
-> * doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
-> * manipulating response headers in an arbitrary way (by Lua)
-> * fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
-> * coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
-> * doing very complex URL dispatch in Lua at rewrite phase,
-> * using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
-> 
+>
+> - Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
+> - doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
+> - manipulating response headers in an arbitrary way (by Lua)
+> - fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
+> - coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
+> - doing very complex URL dispatch in Lua at rewrite phase,
+> - using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
+>
 > The possibilities are unlimited as the module allows bringing together various
 > elements within Nginx as well as exposing the power of the Lua language to the
 > user. The module provides the full flexibility of scripting while offering
 > performance levels comparable with native C language programs both in terms of
 > CPU time as well as memory footprint thanks to LuaJIT 2.x.
-> 
+>
 > Other scripting language implementations typically struggle to match this
 > performance level.
 >
-> - https://github.com/openresty/lua-nginx-module#typical-uses
+> - <https://github.com/openresty/lua-nginx-module#typical-uses>
 
 ## How to use this image
 
@@ -111,6 +111,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ```console
 $ docker run --name some-nginx -v /some/content:/usr/share/nginx/html:ro -d fabiocicerchia/nginx-lua
+[...OMITTED...]
 ```
 
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary content (which is a much cleaner solution than the bind mount above):
@@ -124,12 +125,14 @@ Place this file in the same directory as your directory of content ("static-html
 
 ```console
 $ docker run --name some-nginx -d some-content-nginx
+[...OMITTED...]
 ```
 
 ### Exposing external port
 
 ```console
 $ docker run --name some-nginx -d -p 8080:80 some-content-nginx
+[...OMITTED...]
 ```
 
 Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
@@ -138,6 +141,7 @@ Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browse
 
 ```console
 $ docker run --name my-custom-nginx-container -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d fabiocicerchia/nginx-lua
+[...OMITTED...]
 ```
 
 For information on the syntax of the nginx configuration files, see [the official documentation](http://nginx.org/en/docs/) (specifically the [Beginner's Guide](http://nginx.org/en/docs/beginners_guide.html#conf_structure)).
@@ -145,8 +149,11 @@ If you wish to adapt the default configuration, use something like the following
 
 ```console
 $ docker run --name tmp-nginx-container -d fabiocicerchia/nginx-lua
+[...OMITTED...]
 $ docker cp tmp-nginx-container:/etc/nginx/nginx.conf /host/path/nginx.conf
+[...OMITTED...]
 $ docker rm -f tmp-nginx-container
+[...OMITTED...]
 ```
 
 This can also be accomplished more cleanly using a simple `Dockerfile` (in `/host/path/`):
@@ -161,6 +168,7 @@ Then build the image with `docker build -t custom-nginx .` and run it as follows
 
 ```console
 $ docker run --name my-custom-nginx-container -d custom-nginx
+[...OMITTED...]
 ```
 
 #### Using environment variables in nginx configuration (new in 1.19)
@@ -183,17 +191,18 @@ web:
 By default, this function reads template files in `/etc/nginx/templates/*.template` and outputs the result of executing `envsubst` to `/etc/nginx/conf.d`.
 So if you place `templates/default.conf.template` file, which contains variable references like this:
 
-```
+```nginx
 listen       ${NGINX_PORT};
 ```
 
 outputs to `/etc/nginx/conf.d/default.conf` like this:
 
-```
+```nginx
 listen       80;
 ```
 
 This behavior can be changed via the following environment variables:
+
 - `NGINX_ENVSUBST_TEMPLATE_DIR`
   - A directory which contains template files (default: `/etc/nginx/templates`)
   - When this directory doesn't exist, this function will do nothing about template processing.
@@ -212,6 +221,7 @@ To run nginx in read-only mode, you will need to mount a Docker volume to every 
 
 ```console
 $ docker run -d -p 80:80 --read-only -v $(pwd)/nginx-cache:/var/cache/nginx -v $(pwd)/nginx-pid:/var/run fabiocicerchia/nginx-lua
+[...OMITTED...]
 ```
 
 If you have a more advanced configuration that requires nginx to write to other locations, simply add more volume mounts to those locations.
@@ -222,6 +232,7 @@ Images since version 1.19.3 come with `nginx-debug` binary that produces verbose
 
 ```console
 $ docker run --name my-nginx -v /host/path/nginx.conf:/etc/nginx/nginx.conf:ro -d fabiocicerchia/nginx-lua nginx-debug -g 'daemon off;'
+[...OMITTED...]
 ```
 
 Similar configuration in docker-compose.yml may look like this:
@@ -240,6 +251,7 @@ Since version 1.19.0, a verbose entrypoint was added. It provides information on
 
 ```console
 $ docker run -d -e NGINX_ENTRYPOINT_QUIET_LOGS=1 fabiocicerchia/nginx-lua
+[...OMITTED...]
 ```
 
 ### User and group id
@@ -257,6 +269,7 @@ It is possible to run the image as a less privileged arbitrary UID/GID. This, ho
 
 ```console
 $ docker run -d -v $PWD/nginx.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua
+[...OMITTED...]
 ```
 
 where nginx.conf in the current directory should have the following directives re-defined:
@@ -607,7 +620,7 @@ services:
       retries: 3
 ```
 
-More examples are available in the directory [`docs/examples`](https://github.com/fabiocicerchia/nginx-lua/blob/master/docs/examples)
+More examples are available in the directory [`docs/examples`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/examples)
 
 ## License
 

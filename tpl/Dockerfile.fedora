@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}} AS base
-
 ARG DOCKER_IMAGE={{DOCKER_IMAGE}}
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS={{DOCKER_IMAGE_OS}}
@@ -189,19 +196,19 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}} AS builder
 
 COPY tpl/Makefile Makefile
 
-# hadolint ignore=SC2086
 # TODO: NGINX_BUILD_CONFIG not updated
+# hadolint ignore=SC2086
 RUN set -eux \
     && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
-    && [[ "$EXTENDED_IMAGE" -eq "1" ]] && \
+    && [ $EXTENDED_IMAGE -eq 1 ] && \
 	NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
 		--add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
 		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
@@ -219,7 +226,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}}
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \

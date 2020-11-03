@@ -49,48 +49,48 @@ function loop_over_nginx() {
 
     LEN_VER_NGINX=${#NGINX[@]}
     for (( I=0; I<LEN_VER_NGINX; I++ )); do
-        NGINX_VER="${NGINX[$I]}"
+        export NGINX_VER="${NGINX[$I]}"
 
-        LAST_VER_NGINX=0
+        export LAST_VER_NGINX=0
         if [ "$((I+1))" == "$LEN_VER_NGINX" ]; then
-            LAST_VER_NGINX=1
+            export LAST_VER_NGINX=1
         fi
 
         # Default image is Alpine
-        DEFAULT_IMAGE=1
-        OS=alpine
+        export DEFAULT_IMAGE=1
+        export OS=alpine
         loop_over_os "$OS" "$FUNC"
-        DEFAULT_IMAGE=0
+        export DEFAULT_IMAGE=0
 
-        OS=amazonlinux
-        loop_over_os "$OS" "$FUNC"
-
-        OS=centos
+        export OS=amazonlinux
         loop_over_os "$OS" "$FUNC"
 
-        OS=debian
+        export OS=centos
         loop_over_os "$OS" "$FUNC"
 
-        OS=fedora
+        export OS=debian
         loop_over_os "$OS" "$FUNC"
 
-        OS=ubuntu
+        export OS=fedora
+        loop_over_os "$OS" "$FUNC"
+
+        export OS=ubuntu
         loop_over_os "$OS" "$FUNC"
 
     done
 }
 
 function loop_over_os() {
-    VERSIONS=($(get_versions "$OS"))
+    mapfile -t VERSIONS < <(get_versions "$OS")
     FUNC=$2
 
     LEN_VER_OS=${#VERSIONS[@]}
     for (( J=0; J<LEN_VER_OS; J++ )); do
-        OS_VER="${VERSIONS[$J]}";
+        export OS_VER="${VERSIONS[$J]}";
 
-        LAST_VER_OS=0
+        export LAST_VER_OS=0
         if [ "$((J+1))" == "$LEN_VER_OS" ]; then
-            LAST_VER_OS=1
+            export LAST_VER_OS=1
         fi
 
         ${FUNC};

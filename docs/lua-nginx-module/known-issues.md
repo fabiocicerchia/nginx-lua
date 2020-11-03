@@ -53,11 +53,13 @@ It is therefore _highly_ recommended to always declare such within an appropriat
 
 To find all instances of Lua global variables in your Lua code, run the [lua-releng tool](https://github.com/openresty/nginx-devel-utils/blob/master/lua-releng) across all `.lua` source files:
 
-    $ lua-releng
-    Checking use of Lua global variables in file lib/foo/bar.lua ...
-            1       [1489]  SETGLOBAL       7 -1    ; contains
-            55      [1506]  GETGLOBAL       7 -3    ; setvar
-            3       [1545]  GETGLOBAL       3 -4    ; varexpand
+```console
+$ lua-releng
+Checking use of Lua global variables in file lib/foo/bar.lua ...
+        1       [1489]  SETGLOBAL       7 -1    ; contains
+        55      [1506]  GETGLOBAL       7 -3    ; setvar
+        3       [1545]  GETGLOBAL       3 -4    ; varexpand
+```
 
 The output says that the line 1489 of file `lib/foo/bar.lua` writes to a global variable named `contains`, the line 1506 reads from the global variable `setvar`, and line 1545 reads the global `varexpand`.
 
@@ -82,9 +84,9 @@ The [ngx.location.capture](#ngxlocationcapture) and [ngx.location.capture_multi]
  }
 ```
 
-```nginx
-
- $ curl -i http://example.com/foo
+```console
+$ curl -i http://example.com/foo
+[...OMITTED...]
 ```
 
 will not work as expected.

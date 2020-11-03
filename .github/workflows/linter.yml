@@ -1,13 +1,6 @@
 name: Lint Code Base
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    type:
-      - opened
-      - synchronize
+on: push
 
 jobs:
   build:
@@ -24,4 +17,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           DOCKERFILE_HADOLINT_FILE_NAME: .hadolint.yml
-          FILTER_REGEX_EXCLUDE: "nginx/(1.17.10|1.18.0|1.19.0|1.19.1|1.19.2)"
+          FILTER_REGEX_EXCLUDE: "nginx/(1.17.10|1.18.0|1.19.0|1.19.1|1.19.2)|tpl/.+.sh"

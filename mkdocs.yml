@@ -7,6 +7,7 @@ theme:
   highlightjs: true
 nav:
   - Home: README.md
+  - DEV.md
   - BENCHMARKS.md
   - lua-nginx-module:
     - 'directives': 'lua-nginx-module/directives.md'
