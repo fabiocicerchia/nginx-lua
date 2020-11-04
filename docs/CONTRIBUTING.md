@@ -28,7 +28,7 @@ Guidelines for bug reports:
    reported.
 
 2. **Check if the issue has been fixed** &mdash; try to reproduce it using the
-   latest `master` or development branch in the repository.
+   latest `main` or development branch in the repository.
 
 3. **Isolate the problem** &mdash; ideally create a [reduced test
    case](http://css-tricks.com/6263-reduced-test-cases/).
@@ -96,8 +96,8 @@ included in the project:
 2. If you cloned a while ago, get the latest changes from upstream:
 
    ```bash
-   git checkout master
-   git pull upstream master
+   git checkout main
+   git pull upstream main
    ```
 
 3. Create a new topic branch (off the main project development branch) to
@@ -120,7 +120,7 @@ included in the project:
 6. Locally merge (or rebase) the upstream development branch into your topic branch:
 
    ```bash
-   git pull [--rebase] upstream master
+   git pull [--rebase] upstream main
    ```
 
 7. Push your topic branch up to your fork:
@@ -150,8 +150,8 @@ If you have commit access, please follow this process for merging patches and cu
 2. Check that a change has any necessary tests and a proper, descriptive commit message.
 3. Checkout the change and test it locally.
 4. If the change is good, and authored by someone who cannot commit to
-   `master`, please try to avoid using GitHub's merge button. Apply the change
-   to `master` locally (feel free to amend any minor problems in the author's
+   `main`, please try to avoid using GitHub's merge button. Apply the change
+   to `main` locally (feel free to amend any minor problems in the author's
    original commit if necessary).
 5. If the change is good, and authored by another maintainer/collaborator, give
    them a "Ship it!" comment and let them handle the merge.
@@ -160,11 +160,11 @@ If you have commit access, please follow this process for merging patches and cu
 
 1. All non-trivial changes should be put up for review using GitHub Pull
    Requests.
-2. Your change should not be merged into `master` (or another feature branch),
+2. Your change should not be merged into `main` (or another feature branch),
    without at least one "Ship it!" comment from another maintainer/collaborator
    on the project. "Looks good to me" is not the same as "Ship it!".
 3. Try to avoid using GitHub's merge button. Locally rebase your change onto
-   `master` and then push to GitHub.
+   `main` and then push to GitHub.
 4. Once a feature branch has been merged into its target branch, please delete
    the feature branch from the remote repository.
 
@@ -175,5 +175,5 @@ If you have commit access, please follow this process for merging patches and cu
    added to the `CHANGELOG.md` (inc. date) and the `package.json`.
 3. The commit message must be of `v0.0.0` format.
 4. Create an annotated tag for the version: `git tag -m "v0.0.0" v0.0.0`.
-5. Push the changes and tags to GitHub: `git push --tags origin master`.
+5. Push the changes and tags to GitHub: `git push --tags origin main`.
 6. Publish the new version to npm: `npm publish`.

@@ -1,3 +1,12 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 FROM amazonlinux:2.0.20180622.1
 
 LABEL maintainer="info@fabiocicerchia.it"

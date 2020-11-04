@@ -1,6 +1,14 @@
-PAGER=
-PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
-DOCKERFILE_CHANGES=$(shell git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' ')
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+#
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
+PAGER:=
+DOCKERFILE_CHANGES=$(shell git diff-tree --no-commit-id --name-only -r $${SHA:-HEAD} nginx tpl | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
 	SKIP=1
 else
@@ -9,14 +17,16 @@ endif
 ifeq ($(FORCE), 1)
 	SKIP=0
 endif
-BUILD_CMD=./bin/docker-build.sh
-PUSH_CMD=./bin/docker-push.sh
-TEST_CMD=./bin/test.sh
-SEC_CMD=./bin/test-security.sh
-META_CMD=./bin/docker-metadata.sh
+BUILD_CMD:=./bin/docker-build.sh
+PUSH_CMD:=./bin/docker-push.sh
+TEST_CMD:=./bin/test.sh
+SEC_CMD:=./bin/test-security.sh
+META_CMD:=./bin/docker-metadata.sh
+DISTROS=alpine amazonlinux centos debian fedora ubuntu
+
+PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell make changelog)
-DISTROS=alpine amazonlinux centos debian fedora ubuntu
 
 build_targets=$(addprefix build-, $(DISTROS))
 test_targets=$(addprefix test-, $(DISTROS))
@@ -26,79 +36,125 @@ minimal_targets=$(addprefix build-minimal-, $(DISTROS))
 
 .PHONY: changelog
 .SILENT: help changelog
+default: help
+
+################################################################################
+##@ GENERIC
+################################################################################
+
+all: build-all test-all push-all ## build, test and push everything
 
 ################################################################################
 # HELP
 ################################################################################
-default: help
 
-help:
-	echo "UTILITIES"
-	echo " - tag"
-	echo " - release"
-	echo " - auto-update"
-	echo "   - generate-supported-versions"
-	echo "   - generate-dockerfiles"
-	echo "   - update-tags"
-	echo " - generate-metadata"
-	echo " - update-readme"
-	echo " - benchmark"
-	echo " - changelog"
-
-	echo "ALL: build-all test-all push-all"
-
-	echo "BUILD"
-	echo " - build-all"
-	echo "   - build-alpine"
-	echo "   - build-amazonlinux"
-	echo "   - build-centos"
-	echo "   - build-debian"
-	echo "   - build-fedora"
-	echo "   - build-ubuntu"
-
-	echo "BUILD MINIMAL"
-	echo " - build-minimal-all"
-	echo "   - build-minimal-alpine"
-	echo "   - build-minimal-amazonlinux"
-	echo "   - build-minimal-centos"
-	echo "   - build-minimal-debian"
-	echo "   - build-minimal-fedora"
-	echo "   - build-minimal-ubuntu"
-
-	echo "TESTING"
-	echo " - test-all"
-	echo "   - test-alpine"
-	echo "   - test-amazonlinux"
-	echo "   - test-centos"
-	echo "   - test-debian"
-	echo "   - test-fedora"
-	echo "   - test-ubuntu"
-
-	echo "LINTING"
-	echo " - test-lint"
-
-	echo "SECURITY"
-	echo " - test-security"
-	echo "   - test-security-alpine"
-	echo "   - test-security-amazonlinux"
-	echo "   - test-security-centos"
-	echo "   - test-security-debian"
-	echo "   - test-security-fedora"
-	echo "   - test-security-ubuntu"
-
-	echo "PUSHING"
-	echo "  - push-all"
-	echo "    - push-alpine"
-	echo "    - push-amazonlinux"
-	echo "    - push-centos"
-	echo "    - push-debian"
-	echo "    - push-fedora"
-	echo "    - push-ubuntu"
+help: ## prints this help
+	echo "              __                     __ "
+	echo ".-----.-----.|__|.-----.--.--.______|  |.--.--.---.-."
+	echo "|     |  _  ||  ||     |_   _|______|  ||  |  |  _  |"
+	echo "|__|__|___  ||__||__|__|__.__|      |__||_____|___._|"
+	echo "      |_____|"
+	echo ""
+	echo "Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License"
+	echo "Repo: https://github.com/fabiocicerchia/nginx-lua"
+	echo ""
+	@gawk 'function fix_value(value, str) { \
+		padding=sprintf("%30s",""); \
+		ret=gensub("([^ ]+)", "\\1"padding"\n ", "g", "  "value); \
+		ret=gensub("(^|\n)(.{33}) *", "\\1\\2\033[0m"str"  \033[36m", "g", ret); \
+		ret=substr(ret, 3, length(ret)-16-length(str)); \
+		return ret; \
+	} \
+	BEGIN { \
+		FS = ":.*##"; \
+		printf "Use: make \033[36m<target>\033[0m\n"; \
+	} /^\$$?\(?[a-zA-Z_-]+\)?:.*?##/ { \
+		gsub("\\$$\\(build_targets\\)",    fix_value("$(build_targets)", $$2),    $$1); \
+		gsub("\\$$\\(minimal_targets\\)",  fix_value("$(minimal_targets)", $$2),  $$1); \
+		gsub("\\$$\\(test_targets\\)",     fix_value("$(test_targets)", $$2),     $$1); \
+		gsub("\\$$\\(security_targets\\)", fix_value("$(security_targets)", $$2), $$1); \
+		gsub("\\$$\\(push_targets\\)",     fix_value("$(push_targets)", $$2),     $$1); \
+		printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2 \
+	} /^##@/ { \
+		printf "\n\033[1m%s\033[0m\n", substr($$0, 5) \
+	}' $(MAKEFILE_LIST)
 
 ################################################################################
-# UTILITIES
+##@ BUILD
 ################################################################################
-auto-update: generate-supported-versions generate-dockerfiles update-tags
+
+build-all: $(build_targets) ## build all dockerfiles
+
+$(build_targets): ## build one distro
+ifeq ($(SKIP), 1)
+	echo SKIPPING $@
+else
+	DISTRO=$(subst build-,,$(@)); \
+	echo BUILDING $$DISTRO; \
+	$(BUILD_CMD) $$DISTRO 1; \
+	$(META_CMD) $$DISTRO 1
+endif
+
+################################################################################
+##@ BUILD MINIMAL
+################################################################################
+
+build-minimal-all: $(minimal_targets) ## build all dockerfiles (minimal)
+
+$(minimal_targets): ## build one distro (minimal)
+ifeq ($(SKIP), 1)
+	echo SKIPPING $@
+else
+	DISTRO=$(subst build-minimal-,,$(@)); \
+	echo BUILDING $$DISTRO; \
+	$(BUILD_CMD) $$DISTRO 1 0
+endif
+
+################################################################################
+##@ TESTING
+################################################################################
+
+test-all: $(test_targets) ## test all docker images
+
+$(test_targets): ## test one docker image
+ifeq ($(SKIP), 1)
+	echo SKIPPING $@
+else
+	DISTRO=$(subst test-,,$(@)); \
+	echo TESTING $$DISTRO; \
+	$(TEST_CMD) $$DISTRO 1
+endif
+
+test-security: $(security_targets) ## test security all docker images
+
+$(security_targets): ## test security one docker images
+ifeq ($(SKIP), 1)
+	echo SKIPPING $@
+else
+	DISTRO=$(subst test-security-,,$(@)); \
+	echo SECURITY $$DISTRO; \
+	$(SEC_CMD) $$DISTRO
+endif
+
+################################################################################
+##@ PUSH
+################################################################################
+
+push-all: $(push_targets) ## push all docker images to docker hub
+
+$(push_targets): ## push one docker images to docker hub
+ifeq ($(SKIP), 1)
+	echo SKIPPING $@
+else
+	DISTRO=$(subst push-,,$(@)); \
+	echo PUSHING $$DISTRO; \
+	$(TEST_CMD) $$DISTRO 1
+endif
+
+################################################################################
+##@ UTILITIES
+################################################################################
+auto-update: generate-supported-versions generate-dockerfiles update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
 	git config --global user.name "fabiocicerchia"
@@ -108,42 +164,42 @@ auto-update: generate-supported-versions generate-dockerfiles update-tags
 auto-update-and-commit: .setup_gitrepo auto-update
 	git add -A
 	git commit -m "Automated updates"
-	git push origin HEAD:master
+	git push origin HEAD:main
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add -A
 	git commit -m "Automated metadata" || true
-	git push origin HEAD:master
+	git push origin HEAD:main
 
-tag: .setup_gitrepo
+tag: .setup_gitrepo ## create a git tag
 	git tag $(TAG_VER) -a -m "$(TAG_VER)"
 	git push origin --tags
 
-release:
-	curl --data '{"tag_name": "$(TAG_VER)", "target_commitish": "master", "name": "$(TAG_VER)", "body": "$(CHANGELOG)", "draft": false, "prerelease": false}' \
+release: ## create a github release
+	curl --data '{"tag_name": "$(TAG_VER)", "target_commitish": "main", "name": "$(TAG_VER)", "body": "$(CHANGELOG)", "draft": false, "prerelease": false}' \
 		https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=$(GH_TOKEN)
 
-generate-supported-versions:
+generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
 
-generate-dockerfiles:
+generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.sh
 
-generate-metadata:
+generate-metadata: ## generate all metadata for docker images
 	for DISTRO in $(DISTROS); do \
 		$(META_CMD) $$DISTRO 0; \
 	done
 
-update-tags:
+update-tags: ## update docker tags file
 	./bin/generate_tags.py | tee docs/TAGS.md
 
-update-readme:
+update-readme: ## update supported docker tags in readme
 	./bin/update-readme.sh
 
-benchmark:
+benchmark: ## benchmark (wip)
 	./bin/benchmark.sh
 
-changelog:
+changelog: ## generate a changelog since previous tag
 	git fetch --all --tags
 	echo "Changes:"
 	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
@@ -156,81 +212,3 @@ changelog:
 	echo ""
 	echo "Supported Versions:"
 	cat supported_versions | sed 's/[()"]//g' | tr 'A-Z' 'a-z' | sed 's/^/ - /'
-
-################################################################################
-# GENERIC
-################################################################################
-
-all: build-all test-all push-all
-
-################################################################################
-# BUILD
-################################################################################
-
-build-all: $(build_targets)
-
-$(build_targets):
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
-else
-	DISTRO=$(subst build-,,$(@)); \
-	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1; \
-	$(META_CMD) $$DISTRO 1
-endif
-
-################################################################################
-# BUILD MINIMAL
-################################################################################
-
-build-minimal-all: $(minimal_targets)
-
-$(minimal_targets):
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
-else
-	DISTRO=$(subst build-minimal-,,$(@)); \
-	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1 0
-endif
-
-################################################################################
-# TESTING
-################################################################################
-
-test-all: $(test_targets)
-
-$(test_targets):
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
-else
-	DISTRO=$(subst test-,,$(@)); \
-	echo TESTING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO 1
-endif
-
-test-security: $(security_targets)
-
-$(security_targets):
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
-else
-	DISTRO=$(subst test-security-,,$(@)); \
-	echo SECURITY $$DISTRO; \
-	$(SEC_CMD) $$DISTRO
-endif
-
-################################################################################
-# PUSH
-################################################################################
-
-push-all: $(push_targets)
-
-$(push_targets):
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
-else
-	DISTRO=$(subst push-,,$(@)); \
-	echo PUSHING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO 1
-endif

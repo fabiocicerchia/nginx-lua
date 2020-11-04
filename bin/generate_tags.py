@@ -54,7 +54,7 @@ for file in supported:
     print(
         "- [`"
         + "`, `".join(dockerfiles[file])
-        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/master/"
+        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/main/"
         + file
         + ")"
     )
@@ -65,7 +65,7 @@ for file in reversed:
     print(
         "- [`"
         + "`, `".join(dockerfiles[file])
-        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/master/"
+        + "`](https://github.com/fabiocicerchia/nginx-lua/blob/main/"
         + file
         + ")"
     )

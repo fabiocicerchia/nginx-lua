@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM debian:10.4-slim AS base
-
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=debian
@@ -191,16 +198,19 @@ ENV VER_DUMBINIT=$VER_DUMBINIT
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM debian:10.4-slim AS builder
 
+# hadolint ignore=SC2086
 RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
        apt-utils \
     && apt-get install -y --no-install-recommends --no-install-suggests \
       $BUILD_DEPS \
-      $NGINX_BUILD_DEPS
+      $NGINX_BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGX Devel Kit
 # ##############################################################################
@@ -321,6 +331,7 @@ RUN set -eux \
     curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
     && unzip -d / /stream-lua-nginx-module.zip)
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGINX
 # ##############################################################################
@@ -346,12 +357,13 @@ RUN set -eux \
        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
        --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     && make -j "$(nproc)" build \
-    && make install
+    && make install \
+    && rm -rf /var/lib/apt/lists/*
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM debian:10.4-slim
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -400,6 +412,7 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 
+# hadolint ignore=SC2086
 RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \

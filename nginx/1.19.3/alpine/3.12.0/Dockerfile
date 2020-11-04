@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM alpine:3.12.0 AS base
-
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=alpine
@@ -201,14 +208,16 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM alpine:3.12.0 AS builder
 
+# hadolint ignore=SC2086
 RUN set -eux \
    && apk update \
    && apk add --no-cache \
       $BUILD_DEPS \
       $NGINX_BUILD_DEPS
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGX Devel Kit
 # ##############################################################################
@@ -329,6 +338,7 @@ RUN set -eux \
     curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
     && unzip -d / /stream-lua-nginx-module.zip)
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGINX
 # ##############################################################################
@@ -359,7 +369,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM alpine:3.12.0
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -406,9 +416,10 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 
+# hadolint ignore=SC2086,DL4006
 RUN set -eux \
     && apk update \
-    && apk add --no-cache \
+    && apk add --no-cache --virtual .pkg_deps \
        $PKG_DEPS \
 # Bring in gettext so we can get `envsubst`, then throw
 # the rest away. To do this, we need to install `gettext`
@@ -424,14 +435,14 @@ RUN set -eux \
             | xargs -r apk info --installed \
             | sort -u \
     )" \
-    && apk add --no-cache $runDeps \
+    && apk add --no-cache --virtual .run_deps $runDeps \
     && apk del .gettext \
     && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache tzdata \
+    && apk add --no-cache --virtual pkg_tz tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache curl ca-certificates \
+    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \

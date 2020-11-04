@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM centos:8.1.1911 AS base
-
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=centos
@@ -185,15 +192,19 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM centos:8.1.1911 AS builder
 
+# hadolint ignore=SC2086
 RUN set -x \
    && yum makecache \
    && yum install -y epel-release \
    && yum install -y \
       $BUILD_DEPS \
-      $NGINX_BUILD_DEPS
+      $NGINX_BUILD_DEPS \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGX Devel Kit
 # ##############################################################################
@@ -314,6 +325,7 @@ RUN set -eux \
     curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip \
     && unzip -d / /stream-lua-nginx-module.zip)
 
+# hadolint ignore=SC2086,DL3003
 RUN set -eux \
 # NGINX
 # ##############################################################################
@@ -339,19 +351,23 @@ RUN set -eux \
        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
        --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     && make -j "$(nproc)" build \
-    && make install
+    && make install \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 RUN set -eux \
 # envsubst
 # ##############################################################################
     && yum makecache \
     && yum install -y \
-        gettext
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM centos:8.1.1911
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \

@@ -41,7 +41,7 @@ function tag() {
         STR="$STR,\`latest\`"
     fi
 
-    STR="- [$STR](https://github.com/fabiocicerchia/nginx-lua/blob/master/$DOCKERFILE)"
+    STR="- [$STR](https://github.com/fabiocicerchia/nginx-lua/blob/main/$DOCKERFILE)"
     echo "$STR"
 }
 

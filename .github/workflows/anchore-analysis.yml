@@ -5,7 +5,12 @@
 # information on Anchore's container image scanning tool Grype, see
 # https://github.com/anchore/grype
 name: Anchore Container Scan
-on: push
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   Anchore-Build-Scan:
     runs-on: ubuntu-latest
@@ -15,7 +20,9 @@ jobs:
 
     - name: Check docker changes
       id: docker_changes
-      run: git diff-tree --no-commit-id --name-only -r HEAD nginx tpl | wc -l | tr -d ' '
+      run: git diff-tree --no-commit-id --name-only -r ${SHA:-HEAD} nginx tpl | wc -l | tr -d ' '
+      env:
+        SHA: ${{ github.sha }}
 
     - name: Build the Docker image
       if: steps.docker_changes.output != '0'

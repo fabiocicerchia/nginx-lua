@@ -1,8 +1,15 @@
+#               __                     __
+# .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
+# |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
+# |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
+#       |_____|
+# 
+# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Repo: https://github.com/fabiocicerchia/nginx-lua
+
 #############################
 # Settings Common Variables #
 #############################
-FROM centos:8 AS base
-
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=centos
@@ -189,37 +196,41 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
+FROM centos:8 AS builder
 
 COPY tpl/Makefile Makefile
 
-# hadolint ignore=SC2086
 # TODO: NGINX_BUILD_CONFIG not updated
+# hadolint ignore=SC2086
 RUN set -eux \
     && yum makecache \
     && yum install -y epel-release \
     && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
-    && [[ "$EXTENDED_IMAGE" -eq "1" ]] && \
+    && [ $EXTENDED_IMAGE -eq 1 ] && \
 	NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
 		--add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
 		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 	" \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core
+    && make -j "$(nproc)" core \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 RUN set -eux \
 # envsubst
 # ##############################################################################
     && yum makecache \
     && yum install -y \
-        gettext
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM base
+FROM centos:8
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \

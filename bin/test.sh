@@ -54,7 +54,7 @@ function runtest() {
 set -eux
 
 OS=$1
-VERSIONS=($(get_versions "$OS"))
+mapfile -t VERSIONS < <(get_versions "$OS")
 
 docker images
 
