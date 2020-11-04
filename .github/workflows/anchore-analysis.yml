@@ -18,11 +18,16 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
 
+    - name: Get file changes
+      id: get_file_changes
+      uses: dorner/file-changes-action@v1.2.0
+      with:
+        githubToken: ${{ secrets.GH_TOKEN }}
+        plaintext: true
+
     - name: Check docker changes
       id: docker_changes
-      run: git diff-tree --no-commit-id --name-only -r ${SHA:-HEAD} nginx tpl | wc -l | tr -d ' '
-      env:
-        SHA: ${{ github.sha }}
+      run: "echo ${{ steps.get_file_changes.outputs.files }} | grep -E 'nginx|tpl' | wc -l | tr -d ' '"
 
     - name: Build the Docker image
       if: steps.docker_changes.output != '0'
