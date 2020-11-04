@@ -86,6 +86,10 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 > Just to name a few:
 >
+
+
+
+
 > - Mashup'ing and processing outputs of various Nginx upstream outputs (proxy, drizzle, postgres, redis, memcached, and etc) in Lua,
 > - doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
 > - manipulating response headers in an arbitrary way (by Lua)
