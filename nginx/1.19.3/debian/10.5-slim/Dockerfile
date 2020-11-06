@@ -7,6 +7,8 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+FROM debian:10.5-slim AS base
+
 #############################
 # Settings Common Variables #
 #############################
@@ -193,7 +195,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM debian:10.5-slim AS builder
+FROM base AS builder
 
 # hadolint ignore=SC2086
 RUN set -x \

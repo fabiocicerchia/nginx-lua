@@ -7,6 +7,8 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+FROM centos:8.1.1911 AS base
+
 #############################
 # Settings Common Variables #
 #############################
@@ -192,7 +194,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM centos:8.1.1911 AS builder
+FROM base AS builder
 
 # hadolint ignore=SC2086
 RUN set -x \

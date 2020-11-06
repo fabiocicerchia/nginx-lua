@@ -208,7 +208,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM alpine:3.12.0 AS builder
+FROM base AS builder
 
 # hadolint ignore=SC2086
 RUN set -eux \

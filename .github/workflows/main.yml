@@ -8,6 +8,9 @@ on:
     type:
       - opened
       - synchronize
+  workflow_dispatch: ~
+  repository_dispatch:
+    types: [autoupdate]
 
 jobs:
 
@@ -17,44 +20,36 @@ jobs:
         distro: [alpine, amazonlinux, centos, debian, fedora, ubuntu]
 
     name: Build Docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
 
-      - name: Get file changes
-        id: get_file_changes
-        uses: dorner/file-changes-action@v1.2.0
-        with:
-          githubToken: ${{ secrets.GH_TOKEN }}
-          plaintext: true
-
-      - name: Check docker changes
-        id: docker_changes
-        run: "echo ${{ steps.get_file_changes.outputs.files }} | grep -E 'nginx|tpl' | wc -l | tr -d ' '"
-
       - name: Cleanup metadata artifacts
+        continue-on-error: true
         run: rm -rf docs/metadata/*
-        if: steps.docker_changes.output != '0'
 
       - name: Build images
         run: make build-${{ matrix.distro }}
-        if: steps.docker_changes.output != '0'
+        env:
+          FORCE: 1
 
       - name: Test images
         run: make test-${{ matrix.distro }}
-        if: steps.docker_changes.output != '0'
+        env:
+          FORCE: 1
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
-        if: github.ref == 'refs/heads/main' && steps.docker_changes.output != '0'
+        if: github.ref == 'refs/heads/main'
 
       - name: Push images
         run: make push-${{ matrix.distro }}
-        if: github.ref == 'refs/heads/main' && steps.docker_changes.output != '0'
+        if: github.ref == 'refs/heads/main'
+        env:
+          FORCE: 1
 
       - name: Archive metadata artifacts
         uses: actions/upload-artifact@v2
-        if: steps.docker_changes.output != '0'
         with:
           name: metadata-${{ matrix.distro }}
           path: docs/metadata
@@ -63,8 +58,7 @@ jobs:
 
   metadata:
     name: Generates Metadata
-    runs-on: ubuntu-latest
-    continue-on-error: true
+    runs-on: ubuntu-20.04
     needs: docker_build
     steps:
       - uses: actions/checkout@v2
@@ -107,3 +101,17 @@ jobs:
       - name: Push metadata
         run: make auto-commit-metadata
         if: github.ref == 'refs/heads/main'
+
+      - name: cancelling
+        uses: andymckay/cancel-action@0.2
+        if: job.status != 'success'
+
+  auto_tag:
+    name: Create Release
+    runs-on: ubuntu-20.04
+    needs: metadata
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create Release
+        run: make release

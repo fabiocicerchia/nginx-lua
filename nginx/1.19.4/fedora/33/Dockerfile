@@ -3,20 +3,20 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM centos:8 AS base
+FROM fedora:33 AS base
 
 #############################
 # Settings Common Variables #
 #############################
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=centos
+ARG DOCKER_IMAGE_OS=fedora
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=8
+ARG DOCKER_IMAGE_TAG=33
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -125,7 +125,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.19.3
+ARG VER_NGINX=1.19.4
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
@@ -175,7 +175,7 @@ ARG NGINX_BUILD_CONFIG="\
         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-"
+    "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
@@ -205,9 +205,9 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
+    && dnf makecache \
+    && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
@@ -216,23 +216,19 @@ RUN set -eux \
 		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 	" \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && make -j "$(nproc)" core
 
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && yum makecache \
-    && yum install -y \
-        gettext \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && dnf makecache \
+    && dnf install -y \
+        gettext
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM centos:8
+FROM fedora:33
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -269,6 +265,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
     GeoIP-devel \
     ca-certificates \
+    gcc-c++ \
     openssl-devel \
     pcre-devel \
     zlib-devel \
@@ -287,15 +284,15 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
+    && dnf makecache \
+    && dnf install -y \
         $PKG_DEPS \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && yum install -y tzdata \
+    && dnf install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && yum install -y curl ca-certificates \
+    && dnf install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -306,8 +303,8 @@ RUN set -eux \
     && mkdir /docker-entrypoint.d \
 # Cleanup
 # ##############################################################################
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/

@@ -7,6 +7,8 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+FROM debian:10.6 AS base
+
 #############################
 # Settings Common Variables #
 #############################
@@ -197,7 +199,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM debian:10.6 AS builder
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 

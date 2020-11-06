@@ -31,6 +31,6 @@ FORCE=0
 if [ "$2" == "1" ]; then
     FORCE=1
 fi
-mapfile -t VERSIONS < <(get_versions "$OS")
+VERSIONS=($(get_versions "$OS"))
 
 loop_over_nginx_with_os "$OS" "metadata"

@@ -7,6 +7,8 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+FROM alpine:3.12.1 AS base
+
 #############################
 # Settings Common Variables #
 #############################
@@ -212,7 +214,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM alpine:3.12.1 AS builder
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 

@@ -3,20 +3,20 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM centos:8 AS base
+FROM alpine:3.12.1 AS base
 
 #############################
 # Settings Common Variables #
 #############################
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=centos
+ARG DOCKER_IMAGE_OS=alpine
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=8
+ARG DOCKER_IMAGE_TAG=3.12.1
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -125,7 +125,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.19.3
+ARG VER_NGINX=1.19.4
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
@@ -179,20 +179,36 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
-    GeoIP-devel \
-    ca-certificates \
-    gcc-c++ \
+    curl \
+    g++ \
+    geoip-dev \
     gzip \
     make \
-    openssl-devel \
-    pcre-devel \
+    openssl-dev \
+    pcre-dev \
     tar \
-    unzip \
-    zlib-devel \
+    zlib-dev \
 "
 ENV BUILD_DEPS=$BUILD_DEPS
 
-ARG NGINX_BUILD_DEPS=""
+ARG NGINX_BUILD_DEPS="\
+# NGINX
+    alpine-sdk \
+    bash \
+    findutils \
+    gcc \
+    gd-dev \
+    geoip-dev \
+    libc-dev \
+    libedit-dev \
+    libxslt-dev \
+    linux-headers \
+    make \
+    openssl-dev \
+    pcre-dev \
+    perl-dev \
+    zlib-dev \
+"
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ####################################
@@ -205,9 +221,8 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && apk update \
+    && apk add --no-cache \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
@@ -216,23 +231,12 @@ RUN set -eux \
 		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 	" \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core \
-    && yum clean all \
-    && rm -rf /var/cache/yum
-
-RUN set -eux \
-# envsubst
-# ##############################################################################
-    && yum makecache \
-    && yum install -y \
-        gettext \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && make -j "$(nproc)" core
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM centos:8
+FROM alpine:3.12.1
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -267,11 +271,10 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
-    GeoIP-devel \
-    ca-certificates \
-    openssl-devel \
-    pcre-devel \
-    zlib-devel \
+    geoip-dev \
+    openssl-dev \
+    pcre-dev \
+    zlib-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -281,33 +284,43 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
-SHELL ["/bin/sh", "-o", "pipefail", "-c"]
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && apk update \
+    && apk add --no-cache --virtual .pkg_deps \
         $PKG_DEPS \
+# Bring in gettext so we can get `envsubst`, then throw
+# the rest away. To do this, we need to install `gettext`
+# then move `envsubst` out of the way so `gettext` can
+# be deleted completely, then move `envsubst` back.
+    && apk add --no-cache --virtual .gettext gettext \
+    && mv /usr/bin/envsubst /tmp/ \
+    && runDeps="$( \
+        scanelf --needed --nobanner /tmp/envsubst \
+            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+            | sort -u \
+            | xargs -r apk info --installed \
+            | sort -u \
+    )" \
+    && apk add --no-cache --virtual .run_deps $runDeps \
+    && apk del .gettext \
+    && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && yum install -y tzdata \
+    && apk add --no-cache --virtual pkg_tz tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && yum install -y curl ca-certificates \
+    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
-    && mkdir /docker-entrypoint.d \
-# Cleanup
-# ##############################################################################
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && mkdir /docker-entrypoint.d
 
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/

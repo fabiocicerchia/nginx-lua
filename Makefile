@@ -8,7 +8,7 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 PAGER:=
-DOCKERFILE_CHANGES=$(shell git diff-tree --no-commit-id --name-only -r $${SHA:-HEAD} nginx tpl | wc -l | tr -d ' ')
+DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|tpl)/" | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
 	SKIP=1
 else
@@ -148,13 +148,13 @@ ifeq ($(SKIP), 1)
 else
 	DISTRO=$(subst push-,,$(@)); \
 	echo PUSHING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO 1
+	$(PUSH_CMD) $$DISTRO 1
 endif
 
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions generate-dockerfiles update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
 	git config --global user.name "fabiocicerchia"
@@ -162,14 +162,26 @@ auto-update: generate-supported-versions generate-dockerfiles update-tags ## aut
 	git remote set-url --push origin "https://fabiocicerchia:${GH_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
 
 auto-update-and-commit: .setup_gitrepo auto-update
-	git add -A
-	git commit -m "Automated updates"
-	git push origin HEAD:main
+	git add -A || true; \
+	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
+	if [ "$$CHANGES" != "0" ]; then \
+		git commit -m "Automated updates"; \
+		git pull origin main || true; \
+		git push origin main; \
+	else \
+		exit 1; \
+	fi
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
-	git add -A
-	git commit -m "Automated metadata" || true
-	git push origin HEAD:main
+	git add -A || true; \
+	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
+	if [ "$$CHANGES" != "0" ]; then \
+		git commit -m "Automated metadata"; \
+		git pull origin main || true; \
+		git push origin main; \
+	else \
+		exit 1; \
+	fi
 
 tag: .setup_gitrepo ## create a git tag
 	git tag $(TAG_VER) -a -m "$(TAG_VER)"
@@ -177,7 +189,7 @@ tag: .setup_gitrepo ## create a git tag
 
 release: ## create a github release
 	curl --data '{"tag_name": "$(TAG_VER)", "target_commitish": "main", "name": "$(TAG_VER)", "body": "$(CHANGELOG)", "draft": false, "prerelease": false}' \
-		https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=$(GH_TOKEN)
+		"https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=${GH_TOKEN}"
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
@@ -200,14 +212,14 @@ benchmark: ## benchmark (wip)
 	./bin/benchmark.sh
 
 changelog: ## generate a changelog since previous tag
-	git fetch --all --tags
+	git fetch --all --tags > /dev/null
 	echo "Changes:"
 	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
-	sed -i "" 's/^*/-/' CHANGELOG
-	sed -i "" 's/^[ \t]*//' CHANGELOG
-	sed -i "" 's/^-[ \t]*//' CHANGELOG
-	sed -i "" 's/^-[ \t]*//' CHANGELOG
-	sed -i "" 's/^/ - /' CHANGELOG
+	sed -i 's/^*/-/' CHANGELOG
+	sed -i 's/^[ \t]*//' CHANGELOG
+	sed -i 's/^-[ \t]*//' CHANGELOG
+	sed -i 's/^-[ \t]*//' CHANGELOG
+	sed -i 's/^/ - /' CHANGELOG
 	cat CHANGELOG
 	echo ""
 	echo "Supported Versions:"

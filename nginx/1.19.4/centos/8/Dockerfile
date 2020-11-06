@@ -3,7 +3,7 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
@@ -125,7 +125,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.19.3
+ARG VER_NGINX=1.19.4
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS

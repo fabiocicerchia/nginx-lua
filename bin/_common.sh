@@ -81,7 +81,7 @@ function loop_over_nginx() {
 }
 
 function loop_over_os() {
-    mapfile -t VERSIONS < <(get_versions "$OS")
+    VERSIONS=($(get_versions "$OS"))
     FUNC=$2
 
     LEN_VER_OS=${#VERSIONS[@]}

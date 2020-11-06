@@ -3,20 +3,20 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM centos:8 AS base
+FROM debian:10.6 AS base
 
 #############################
 # Settings Common Variables #
 #############################
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=centos
+ARG DOCKER_IMAGE_OS=debian
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=8
+ARG DOCKER_IMAGE_TAG=10.6
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -125,7 +125,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.19.3
+ARG VER_NGINX=1.19.4
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
@@ -175,20 +175,21 @@ ARG NGINX_BUILD_CONFIG="\
         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-"
+    "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
+ENV DEBIAN_FRONTEND noninteractive
+
 ARG BUILD_DEPS="\
-    GeoIP-devel \
     ca-certificates \
-    gcc-c++ \
-    gzip \
+    curl \
+    g++ \
+    libgeoip-dev \
+    libpcre3-dev \
+    libssl-dev \
     make \
-    openssl-devel \
-    pcre-devel \
-    tar \
     unzip \
-    zlib-devel \
+    zlib1g-dev \
 "
 ENV BUILD_DEPS=$BUILD_DEPS
 
@@ -205,9 +206,10 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+    apt-utils \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
@@ -217,22 +219,20 @@ RUN set -eux \
 	" \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && yum makecache \
-    && yum install -y \
-        gettext \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+        gettext-base \
+    && rm -rf /var/lib/apt/lists/*
 
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM centos:8
+FROM debian:10.6
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -267,11 +267,11 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
-    GeoIP-devel \
     ca-certificates \
-    openssl-devel \
-    pcre-devel \
-    zlib-devel \
+    libgeoip-dev \
+    libpcre3-dev \
+    libssl-dev \
+    zlib1g-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -283,31 +283,30 @@ COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
-SHELL ["/bin/sh", "-o", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && yum makecache \
-    && yum install -y epel-release \
-    && yum install -y \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
         $PKG_DEPS \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && yum install -y tzdata \
+    && apt-get install -y --no-install-recommends --no-install-suggests tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && yum install -y curl ca-certificates \
+    && apt-get install -y --no-install-recommends --no-install-suggests curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+    && addgroup --system --gid 101 nginx \
+    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
     && mkdir /docker-entrypoint.d \
 # Cleanup
 # ##############################################################################
-    && yum clean all \
-    && rm -rf /var/cache/yum
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/

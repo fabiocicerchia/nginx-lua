@@ -213,7 +213,7 @@ ENV VER_DUMBINIT=$VER_DUMBINIT
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM alpine:3.11.6 AS builder
+FROM base AS builder
 
 # hadolint ignore=SC2086
 RUN set -eux \

@@ -11,7 +11,7 @@ function tag() {
     MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
     MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
     PATCH="$NGINX_VER"
-    
+
     STR=""
 
     if [ "$LAST_VER_NGINX$LAST_VER_OS$DEFAULT_IMAGE" == "111" ]; then

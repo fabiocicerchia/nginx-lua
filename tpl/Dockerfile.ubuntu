@@ -3,9 +3,11 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
+
+FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}} AS base
 
 #############################
 # Settings Common Variables #
@@ -176,8 +178,6 @@ ARG NGINX_BUILD_CONFIG="\
     "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
-ENV DEBIAN_FRONTEND noninteractive
-
 ARG BUILD_DEPS="\
     ca-certificates \
     curl \
@@ -194,10 +194,12 @@ ENV BUILD_DEPS=$BUILD_DEPS
 ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
+ENV DEBIAN_FRONTEND noninteractive
+
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM {{DOCKER_IMAGE_OS}}:{{DOCKER_IMAGE_TAG}} AS builder
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
@@ -282,6 +284,8 @@ COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # hadolint ignore=SC2086
 RUN set -eux \

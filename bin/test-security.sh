@@ -27,7 +27,7 @@ function runtest() {
 set -eux
 
 OS=$1
-mapfile -t VERSIONS < <(get_versions "$OS")
+VERSIONS=($(get_versions "$OS"))
 
 docker run -it --net host --pid host --userns host --cap-add audit_control \
     -v /etc:/etc \

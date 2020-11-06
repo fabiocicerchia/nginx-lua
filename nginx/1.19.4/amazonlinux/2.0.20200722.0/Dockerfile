@@ -3,20 +3,20 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM centos:8 AS base
+FROM amazonlinux:2.0.20200722.0 AS base
 
 #############################
 # Settings Common Variables #
 #############################
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=centos
+ARG DOCKER_IMAGE_OS=amazonlinux
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=8
+ARG DOCKER_IMAGE_TAG=2.0.20200722.0
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -125,7 +125,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.8
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.19.3
+ARG VER_NGINX=1.19.4
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
@@ -206,7 +206,6 @@ COPY tpl/Makefile Makefile
 # hadolint ignore=SC2086
 RUN set -eux \
     && yum makecache \
-    && yum install -y epel-release \
     && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
@@ -232,7 +231,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM centos:8
+FROM amazonlinux:2.0.20200722.0
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -288,9 +287,9 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 # hadolint ignore=SC2086
 RUN set -eux \
     && yum makecache \
-    && yum install -y epel-release \
     && yum install -y \
         $PKG_DEPS \
+        shadow-utils \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \
@@ -306,6 +305,8 @@ RUN set -eux \
     && mkdir /docker-entrypoint.d \
 # Cleanup
 # ##############################################################################
+    && yum remove -y \
+        shadow-utils \
     && yum clean all \
     && rm -rf /var/cache/yum
 

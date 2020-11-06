@@ -3,7 +3,7 @@
 # |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
-# 
+#
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
@@ -39,7 +39,7 @@ core:
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module 
+deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
 
 # NGX Devel Kit
 # ##############################################################################
@@ -55,7 +55,7 @@ dep-luajit:
 	cd /luajit2-${VER_LUAJIT} \
 	&& make \
 	&& make install
-   
+
 # Lua Nginx Module
 # ##############################################################################
 dep-lua-nginx:
@@ -70,7 +70,7 @@ dep-lua-resty-core:
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 	&& make \
 	&& make install
-   
+
 # LUA Resty LRUCache
 # ##############################################################################
 dep-lua-resty-lrucache:
@@ -79,7 +79,7 @@ dep-lua-resty-lrucache:
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 	&& make \
 	&& make install
-   
+
 # OpenResty Headers
 # ##############################################################################
 dep-headers-more-nginx-module:

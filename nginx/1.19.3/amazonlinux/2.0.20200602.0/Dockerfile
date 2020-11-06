@@ -7,6 +7,8 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+FROM amazonlinux:2.0.20200602.0 AS base
+
 #############################
 # Settings Common Variables #
 #############################
@@ -192,7 +194,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM amazonlinux:2.0.20200602.0 AS builder
+FROM base AS builder
 
 # hadolint ignore=SC2086
 RUN set -x \
