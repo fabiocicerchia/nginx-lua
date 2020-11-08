@@ -16,9 +16,9 @@ fetch_latest() {
     VER=""
     PAGE=1
     while [ "$VER" = "" ] && [ $PAGE -lt 100 ]; do
-        VER=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - \
-            | jq -rc '.results[] | select( .images[].digest == "'"$DIGEST"'" and .name != "latest" ) | .name' \
-            | egrep "$FILTER" | sort -Vr | head -n 1)
+        VER=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - |
+            jq -rc '.results[] | select( .images[].digest == "'"$DIGEST"'" and .name != "latest" ) | .name' |
+            egrep "$FILTER" | sort -Vr | head -n 1)
         ((PAGE+=1))
     done
 
@@ -27,7 +27,8 @@ fetch_latest() {
 
 set -eux
 
-VER_NGINX=$(DISTRO=nginx; wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
+DISTRO=nginx
+VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
 NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=("$VER")
@@ -91,13 +92,13 @@ unset IFS
 
 cp supported_versions supported_versions.bak
 
-echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' > supported_versions
-echo "ALPINE=(\"${ALPINE[*]}\")" | sed 's/ /" "/g' >> supported_versions
-echo "AMAZONLINUX=(\"${AMAZONLINUX[*]}\")" | sed 's/ /" "/g' >> supported_versions
-echo "CENTOS=(\"${CENTOS[*]}\")" | sed 's/ /" "/g' >> supported_versions
-echo "DEBIAN=(\"${DEBIAN[*]}\")" | sed 's/ /" "/g' >> supported_versions
-echo "FEDORA=(\"${FEDORA[*]}\")" | sed 's/ /" "/g' >> supported_versions
-echo "UBUNTU=(\"${UBUNTU[*]}\")" | sed 's/ /" "/g' >> supported_versions
+echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' >supported_versions
+echo "ALPINE=(\"${ALPINE[*]}\")" | sed 's/ /" "/g' >>supported_versions
+echo "AMAZONLINUX=(\"${AMAZONLINUX[*]}\")" | sed 's/ /" "/g' >>supported_versions
+echo "CENTOS=(\"${CENTOS[*]}\")" | sed 's/ /" "/g' >>supported_versions
+echo "DEBIAN=(\"${DEBIAN[*]}\")" | sed 's/ /" "/g' >>supported_versions
+echo "FEDORA=(\"${FEDORA[*]}\")" | sed 's/ /" "/g' >>supported_versions
+echo "UBUNTU=(\"${UBUNTU[*]}\")" | sed 's/ /" "/g' >>supported_versions
 
 DIFF=$(diff supported_versions supported_versions.bak | wc -l | tr -d ' ')
 rm supported_versions.bak

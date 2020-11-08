@@ -1,2 +1,3 @@
 rules:
   invalid_command: off
+  base_image_tag: off

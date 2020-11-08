@@ -97,7 +97,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 > - doing arbitrarily complex access control and security checks in Lua before requests actually reach the upstream backends,
 > - manipulating response headers in an arbitrary way (by Lua)
 > - fetching backend information from external storage backends (like redis, memcached, mysql, postgresql) and use that information to choose which upstream backend to access on-the-fly,
-> - coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other > storage,
+> - coding up arbitrarily complex web applications in a content handler using synchronous but still non-blocking access to the database backends and other storage,
 > - doing very complex URL dispatch in Lua at rewrite phase,
 > - using Lua to implement advanced caching mechanism for Nginx's subrequests and arbitrary locations.
 >

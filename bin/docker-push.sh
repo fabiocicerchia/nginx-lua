@@ -6,7 +6,10 @@ source supported_versions
 
 function docker_push() {
     TAG=$1
-    EXITCODE=$(docker push fabiocicerchia/nginx-lua:"$TAG"; echo $?)
+    EXITCODE=$(
+        docker push fabiocicerchia/nginx-lua:"$TAG";
+        echo $?
+    )
     if [ "$EXITCODE" -ne "0" ]; then
         docker push fabiocicerchia/nginx-lua:"$TAG"
     fi

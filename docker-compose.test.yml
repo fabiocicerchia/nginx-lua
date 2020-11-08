@@ -1,52 +1,52 @@
-version: '3.7'
+version: "3.7"
 services:
   nginx-lua:
     image: fabiocicerchia/nginx-lua:latest
     ports:
-     - 8080:80
+      - 8080:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   nginx:
     image: nginx:latest
     ports:
-     - 8081:80
+      - 8081:80
     volumes:
       - ./test/nginx-non-lua.conf:/etc/nginx/nginx.conf
   openresty:
     image: openresty/openresty:latest
     ports:
-     - 8082:80
+      - 8082:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
 
   alpine:
     image: fabiocicerchia/nginx-lua:1-alpine
     ports:
-     - 8090:80
+      - 8090:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   ubuntu:
     image: fabiocicerchia/nginx-lua:1-ubuntu
     ports:
-     - 8091:80
+      - 8091:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   debian:
     image: fabiocicerchia/nginx-lua:1-debian
     ports:
-     - 8092:80
+      - 8092:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   fedora:
     image: fabiocicerchia/nginx-lua:1-fedora
     ports:
-     - 8093:80
+      - 8093:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   centos:
     image: fabiocicerchia/nginx-lua:1-centos
     ports:
-     - 8094:80
+      - 8094:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
   sut:
