@@ -188,7 +188,11 @@ tag: .setup_gitrepo ## create a git tag
 	git push origin --tags
 
 release: ## create a github release
-	curl --data '{"tag_name": "$(TAG_VER)", "target_commitish": "main", "name": "$(TAG_VER)", "body": "$(CHANGELOG)", "draft": false, "prerelease": false}' \
+	echo '{"tag_name": "${TAG_VER}", "target_commitish": "main", "name": "${TAG_VER}", "body": "' > BODY.json
+	make changelog >> BODY.json
+	echo '", "draft": false, "prerelease": false}' >> BODY.json
+	sed -i -e ':a' -e 'N' -e '$$!ba' -e 's/\n/\\n/g' BODY.json
+	echo curl --data-binary @BODY.json \
 		"https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=${GH_TOKEN}"
 
 generate-supported-versions: ## generate supported_versions file
