@@ -61,7 +61,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 | | nginx-lua | OpenResty |
 |--|--|--|
-| nginx latest version | `1.19.5` | `1.19.x` (last tested: `1.19.3`) |
+| nginx latest version | `1.19.5` | `1.19.x` (last tested: `1.19.3`)* |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ✅ | ✅ |
@@ -69,6 +69,8 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 | Fedora supported | ✅ | ❌ |
 | Ubuntu supported | ✅ | ✅ |
 | Windows supported | ❌ | ✅ |
+
+* Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
 
 ## Features
 
