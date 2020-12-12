@@ -35,7 +35,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
 # https://github.com/openresty/luajit2/releases
-ARG VER_LUAJIT=2.1-20201012-2
+ARG VER_LUAJIT=2.1-20201027
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -47,13 +47,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module/releases
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.17
+ARG VER_LUA_NGINX_MODULE=0.10.19
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core/releases
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.19
+ARG VER_LUA_RESTY_CORE=0.1.21
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -86,7 +86,7 @@ ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql/releases
-ARG VER_OPENRESTY_MYSQL=0.22
+ARG VER_OPENRESTY_MYSQL=0.23
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
@@ -111,17 +111,17 @@ ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module/releases
-ARG VER_LUA_UPSTREAM=0.07
+ARG VER_LUA_UPSTREAM=0.08
 ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus/releases
-ARG VER_PROMETHEUS=0.20200523
+ARG VER_PROMETHEUS=0.20201118
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module/releases
-ARG VER_OPENRESTY_STREAMLUA=0.0.8
+ARG VER_OPENRESTY_STREAMLUA=0.0.9
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
