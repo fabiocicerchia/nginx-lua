@@ -111,7 +111,7 @@ ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module/releases
-ARG VER_LUA_UPSTREAM=0.08
+ARG VER_LUA_UPSTREAM=0.07
 ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
