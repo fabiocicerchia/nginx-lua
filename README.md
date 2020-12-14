@@ -2,6 +2,7 @@
 
 ![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-nginx.png)
 ![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-lua.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
 ---
 
@@ -633,6 +634,9 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [Nginx License](https://nginx.org/LICENSE)
 - [Lua License](https://www.lua.org/license.html)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
 ### `fabiocicerchia/nginx-lua`
 
