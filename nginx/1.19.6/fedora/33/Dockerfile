@@ -7,16 +7,16 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM alpine:3.12.2 AS base
+FROM fedora:33 AS base
 
 #############################
 # Settings Common Variables #
 #############################
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=alpine
+ARG DOCKER_IMAGE_OS=fedora
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=3.12.2
+ARG DOCKER_IMAGE_TAG=33
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -175,40 +175,24 @@ ARG NGINX_BUILD_CONFIG="\
         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-"
+    "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
-    curl \
-    g++ \
-    geoip-dev \
+    GeoIP-devel \
+    ca-certificates \
+    gcc-c++ \
     gzip \
     make \
-    openssl-dev \
-    pcre-dev \
+    openssl-devel \
+    pcre-devel \
     tar \
-    zlib-dev \
+    unzip \
+    zlib-devel \
 "
 ENV BUILD_DEPS=$BUILD_DEPS
 
-ARG NGINX_BUILD_DEPS="\
-# NGINX
-    alpine-sdk \
-    bash \
-    findutils \
-    gcc \
-    gd-dev \
-    geoip-dev \
-    libc-dev \
-    libedit-dev \
-    libxslt-dev \
-    linux-headers \
-    make \
-    openssl-dev \
-    pcre-dev \
-    perl-dev \
-    zlib-dev \
-"
+ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ####################################
@@ -221,8 +205,9 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
+    && dnf makecache \
+    && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
@@ -233,10 +218,17 @@ RUN set -eux \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core
 
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && dnf makecache \
+    && dnf install -y \
+        gettext
+
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM alpine:3.12.2
+FROM fedora:33
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -271,10 +263,12 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
-    geoip-dev \
-    openssl-dev \
-    pcre-dev \
-    zlib-dev \
+    GeoIP-devel \
+    ca-certificates \
+    gcc-c++ \
+    openssl-devel \
+    pcre-devel \
+    zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -284,43 +278,33 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
+COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache --virtual .pkg_deps \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
+    && dnf makecache \
+    && dnf install -y \
         $PKG_DEPS \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache --virtual .run_deps $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache --virtual pkg_tz tzdata \
+    && dnf install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
+    && dnf install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-    && mkdir /docker-entrypoint.d
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+    && mkdir /docker-entrypoint.d \
+# Cleanup
+# ##############################################################################
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
