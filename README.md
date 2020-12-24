@@ -30,7 +30,7 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 
 <!-- START_SUPPORTED_TAGS -->
 - [`1`,`1.19`,`1.19.6`,`alpine`,`1-alpine`,`1.19-alpine`,`1.19.6-alpine`,`1-alpine3.12.3`,`1-alpine3.12.3`,`1.19-alpine3.12.3`,`1.19.6-alpine3.12.3`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/alpine/3.12.3/Dockerfile)
-- [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.6-amazonlinux`,`1-amazonlinux2.0.20201111.0`,`1-amazonlinux2.0.20201111.0`,`1.19-amazonlinux2.0.20201111.0`,`1.19.6-amazonlinux2.0.20201111.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/amazonlinux/2.0.20201111.0/Dockerfile)
+- [`amazonlinux`,`1-amazonlinux`,`1.19-amazonlinux`,`1.19.6-amazonlinux`,`1-amazonlinux2.0.20201218.1`,`1-amazonlinux2.0.20201218.1`,`1.19-amazonlinux2.0.20201218.1`,`1.19.6-amazonlinux2.0.20201218.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/amazonlinux/2.0.20201218.1/Dockerfile)
 - [`centos`,`1-centos`,`1-centos8`,`1-centos8`,`1.19-centos`,`1.19-centos8`,`1.19.6-centos`,`1.19.6-centos8`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/centos/8/Dockerfile)
 - [`debian`,`1-debian`,`1.19-debian`,`1-debian10.7`,`1-debian10.7`,`1.19.6-debian`,`1.19-debian10.7`,`1.19.6-debian10.7`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/debian/10.7/Dockerfile)
 - [`fedora`,`1-fedora`,`1-fedora33`,`1-fedora33`,`1.19-fedora`,`1.19-fedora33`,`1.19.6-fedora`,`1.19.6-fedora33`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/fedora/33/Dockerfile)
