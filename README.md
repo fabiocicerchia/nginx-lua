@@ -2,7 +2,6 @@
 
 ![nginx logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-nginx.png)
 ![lua logo](https://github.com/fabiocicerchia/nginx-lua/raw/main/docs/logo-lua.png)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
 ---
 
@@ -19,6 +18,7 @@
 ![Docker Builds](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker%20Builds/badge.svg)
 ![Auto Update](https://github.com/fabiocicerchia/nginx-lua/workflows/Auto%20Update/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/nginx-lua/badge/?version=latest)](https://nginx-lua.readthedocs.io/en/latest/?badge=latest)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
 Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
 
