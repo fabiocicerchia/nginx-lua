@@ -7,7 +7,7 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM alpine:3.12.3 AS base
+FROM alpine:3.13.0 AS base
 
 #############################
 # Settings Common Variables #
@@ -236,7 +236,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM alpine:3.12.3
+FROM alpine:3.13.0
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
