@@ -2,7 +2,7 @@
 
 ## Supported Tags
 
-- [`1-alpine`, `1`, `1.19-alpine`, `1.19`, `1.19.6-alpine`, `1.19-6`, `1.19.6-alpine3.12.3`, `1.19-alpine3.12.3`, `1-alpine3.12.3`, `alpine`, `latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/alpine/3.12.3/Dockerfile)
+- [`1-alpine`, `1`, `1.19-alpine`, `1.19`, `1.19.6-alpine`, `1.19-6`, `1.19.6-alpine3.13.0`, `1.19-alpine3.13.0`, `1-alpine3.13.0`, `alpine`, `latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/alpine/3.13.0/Dockerfile)
 - [`1-amazonlinux`, `1.19-amazonlinux`, `1.19.6-amazonlinux`, `1.19.6-amazonlinux2.0.20201218.1`, `1.19-amazonlinux2.0.20201218.1`, `1-amazonlinux2.0.20201218.1`, `amazonlinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/amazonlinux/2.0.20201218.1/Dockerfile)
 - [`1-centos`, `1.19-centos`, `1.19-centos8`, `1-centos8`, `1.19.6-centos8`, `1.19.6-centos`, `centos`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/centos/8/Dockerfile)
 - [`1-debian`, `1.19-debian`, `1.19-debian10.7`, `1-debian10.7`, `1.19.6-debian10.7`, `1.19.6-debian`, `debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/debian/10.7/Dockerfile)
@@ -13,6 +13,7 @@
 
 - [`1.19.6-amazonlinux2.0.20201111.0`, `1.19-amazonlinux2.0.20201111.0`, `1-amazonlinux2.0.20201111.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/amazonlinux/2.0.20201111.0/Dockerfile)
 - [`1.19-amazonlinux2.0.20200722.0`, `1-amazonlinux2.0.20200722.0`, `1.19.6-amazonlinux2.0.20200722.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/amazonlinux/2.0.20200722.0/Dockerfile)
+- [`1.19.6-alpine3.12.3`, `1.19-alpine3.12.3`, `1-alpine3.12.3`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/alpine/3.12.3/Dockerfile)
 - [`1.19-alpine3.12.2`, `1-alpine3.12.2`, `1.19.6-alpine3.12.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.6/alpine/3.12.2/Dockerfile)
 - [`1.19.5-ubuntu20.04`, `1.19.5-ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.5/ubuntu/20.04/Dockerfile)
 - [`1.19.5-fedora33`, `1.19.5-fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.19.5/fedora/33/Dockerfile)
