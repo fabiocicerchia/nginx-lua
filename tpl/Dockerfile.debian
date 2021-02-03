@@ -35,7 +35,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
 # https://github.com/openresty/luajit2/releases
-ARG VER_LUAJIT=2.1-20201027
+ARG VER_LUAJIT=2.1-20201229
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -106,7 +106,7 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket/releases
-ARG VER_OPENRESTY_WEBSOCKET=0.07
+ARG VER_OPENRESTY_WEBSOCKET=0.08
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-upstream-nginx-module
@@ -175,7 +175,7 @@ ARG NGINX_BUILD_CONFIG="\
         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-    "
+"
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ENV DEBIAN_FRONTEND noninteractive
