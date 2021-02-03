@@ -199,3 +199,15 @@ ifeq ($(EXTENDED_IMAGE), 1)
 	curl -Lo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip
 	unzip -d / /stream-lua-nginx-module.zip
 endif
+
+# ##############################################################################
+# LUAROCKS
+# ##############################################################################
+
+luarocks:
+	curl -Lo luarocks.tar.gz https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz
+	tar -xzvf luarocks.tar.gz
+	cd luarocks-${VER_LUAROCKS}; \
+	./configure \
+	&& make \
+	&& make install

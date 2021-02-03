@@ -7,11 +7,11 @@
 # Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM centos:8 AS base
-
 #############################
 # Settings Common Variables #
 #############################
+FROM centos:8 AS base
+
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
 ARG DOCKER_IMAGE_OS=centos
@@ -26,6 +26,10 @@ ENV VCS_REF=$VCS_REF
 
 ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
+
+# lua
+ARG VER_LUA=5.3
+ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit/releases
@@ -109,6 +113,11 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 ARG VER_OPENRESTY_WEBSOCKET=0.08
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
+# lua-rocks
+# https://luarocks.github.io/luarocks/releases/
+ARG VER_LUAROCKS=3.5.0
+ENV VER_LUAROCKS=$VER_LUAROCKS
+
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module/releases
 ARG VER_LUA_UPSTREAM=0.07
@@ -183,6 +192,8 @@ ARG BUILD_DEPS="\
     ca-certificates \
     gcc-c++ \
     gzip \
+    lua \
+    lua-devel \
     make \
     openssl-devel \
     pcre-devel \
@@ -198,7 +209,6 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
-FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
@@ -207,6 +217,10 @@ COPY tpl/Makefile Makefile
 RUN set -eux \
     && yum makecache \
     && yum install -y epel-release \
+    && dnf -y install dnf-plugins-core \
+    && dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && dnf config-manager --set-enabled powertools \
+    && yum makecache \
     && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
@@ -217,6 +231,7 @@ RUN set -eux \
 	" \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
+    && make -j "$(nproc)" luarocks \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -232,7 +247,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM centos:8
+FROM base
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
@@ -247,6 +262,8 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
     versions.extended=${EXTENDED_IMAGE} \
     versions.headers-more-nginx-module=${VER_OPENRESTY_HEADERS} \
+    versions.lua=${VER_LUA} \
+    versions.luarocks=${VER_LUAROCKS} \
     versions.lua-nginx-module=${VER_LUA_NGINX_MODULE} \
     versions.lua-resty-cookie=${VER_CLOUDFLARE_COOKIE} \
     versions.lua-resty-core=${VER_LUA_RESTY_CORE} \
@@ -269,6 +286,8 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
     GeoIP-devel \
     ca-certificates \
+    lua \
+    lua-devel \
     openssl-devel \
     pcre-devel \
     zlib-devel \
@@ -282,6 +301,8 @@ COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
+COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
@@ -289,8 +310,14 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 RUN set -eux \
     && yum makecache \
     && yum install -y epel-release \
+    && dnf -y install dnf-plugins-core \
+    && dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && dnf config-manager --set-enabled powertools \
+    && yum makecache \
     && yum install -y \
         $PKG_DEPS \
+# Fix LUA alias
+    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \
