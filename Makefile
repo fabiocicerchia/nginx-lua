@@ -191,8 +191,8 @@ release: ## create a github release
 	echo '{"tag_name": "${TAG_VER}", "target_commitish": "main", "name": "${TAG_VER}", "body": "' > BODY.json
 	make changelog >> BODY.json
 	echo '", "draft": false, "prerelease": false}' >> BODY.json
-	sed -i -e ':a' -e 'N' -e '$$!ba' -e 's/\n/\\n/g' BODY.json
-	echo curl --data-binary @BODY.json \
+	cat BODY.json | sed -e ':a' -e 'N' -e '$$!ba' -e 's/\n/\\n/g' | tee BODY.json
+	curl --data-binary @BODY.json \
 		"https://api.github.com/repos/fabiocicerchia/nginx-lua/releases?access_token=${GH_TOKEN}"
 
 generate-supported-versions: ## generate supported_versions file
@@ -219,12 +219,7 @@ changelog: ## generate a changelog since previous tag
 	git fetch --all --tags > /dev/null
 	echo "Changes:"
 	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
-	sed -i 's/^*/-/' CHANGELOG
-	sed -i 's/^[ \t]*//' CHANGELOG
-	sed -i 's/^-[ \t]*//' CHANGELOG
-	sed -i 's/^-[ \t]*//' CHANGELOG
-	sed -i 's/^/ - /' CHANGELOG
-	cat CHANGELOG
+	cat CHANGELOG | egrep -v "Automated (metadata|updates)" | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | tee CHANGELOG
 	echo ""
 	echo "Supported Versions:"
 	cat supported_versions | sed 's/[()"]//g' | tr 'A-Z' 'a-z' | sed 's/^/ - /'
