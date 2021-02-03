@@ -344,7 +344,9 @@ COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
 # ##############################################################################
 RUN envsubst -V \
     && nginx -V \
-    && nginx -t
+    && nginx -t \
+    && lua -v \
+    && luarocks --version
 
 EXPOSE 80 443
 
