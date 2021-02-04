@@ -28,7 +28,7 @@ ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
-ARG VER_LUA=5.3
+ARG VER_LUA=5.4.2
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -192,8 +192,8 @@ ARG BUILD_DEPS="\
     ca-certificates \
     gcc-c++ \
     gzip \
-    lua${VER_LUA} \
-    lua${VER_LUA}-dev \
+    lua-${VER_LUA} \
+    lua-devel-${VER_LUA} \
     make \
     openssl-devel \
     pcre-devel \
@@ -209,13 +209,14 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-33-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-33-primary \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
@@ -279,8 +280,8 @@ ARG PKG_DEPS="\
     GeoIP-devel \
     ca-certificates \
     gcc-c++ \
-    lua${VER_LUA} \
-    lua${VER_LUA}-dev \
+    lua-${VER_LUA} \
+    lua-devel-${VER_LUA} \
     openssl-devel \
     pcre-devel \
     zlib-devel \
@@ -301,7 +302,7 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-33-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-33-primary \
     && dnf makecache \
     && dnf install -y \
         $PKG_DEPS \

@@ -28,7 +28,7 @@ ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
-ARG VER_LUA=5.3
+ARG VER_LUA=5.3.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -192,8 +192,8 @@ ARG BUILD_DEPS="\
     ca-certificates \
     gcc-c++ \
     gzip \
-    lua \
-    lua-devel \
+    lua-${VER_LUA} \
+    lua-devel-${VER_LUA} \
     make \
     openssl-devel \
     pcre-devel \
@@ -209,6 +209,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 

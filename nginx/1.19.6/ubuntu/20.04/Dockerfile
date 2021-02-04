@@ -210,6 +210,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ####################################
 # Build Nginx with support for LUA #
 ####################################
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 

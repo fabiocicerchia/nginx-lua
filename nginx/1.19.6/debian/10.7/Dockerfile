@@ -210,6 +210,7 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 # Build Nginx with support for LUA #
 ####################################
+FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
