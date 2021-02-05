@@ -71,8 +71,6 @@ echo "ARTILLERY - DEBIAN"
 ./node_modules/.bin/artillery run test/artillery-debian.yml >artillery.debian.1.txt
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.1.txt
-echo "ARTILLERY - CENTOS"
-./node_modules/.bin/artillery run test/artillery-centos.yml >artillery.centos.1.txt
 
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.2.txt
@@ -82,8 +80,6 @@ echo "ARTILLERY - DEBIAN"
 ./node_modules/.bin/artillery run test/artillery-debian.yml >artillery.debian.2.txt
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.2.txt
-echo "ARTILLERY - CENTOS"
-./node_modules/.bin/artillery run test/artillery-centos.yml >artillery.centos.2.txt
 
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.3.txt
@@ -93,8 +89,6 @@ echo "ARTILLERY - DEBIAN"
 ./node_modules/.bin/artillery run test/artillery-debian.yml >artillery.debian.3.txt
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.3.txt
-echo "ARTILLERY - CENTOS"
-./node_modules/.bin/artillery run test/artillery-centos.yml >artillery.centos.3.txt
 
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.4.txt
@@ -104,8 +98,6 @@ echo "ARTILLERY - DEBIAN"
 ./node_modules/.bin/artillery run test/artillery-debian.yml >artillery.debian.4.txt
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.4.txt
-echo "ARTILLERY - CENTOS"
-./node_modules/.bin/artillery run test/artillery-centos.yml >artillery.centos.4.txt
 
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.5.txt
@@ -115,8 +107,6 @@ echo "ARTILLERY - DEBIAN"
 ./node_modules/.bin/artillery run test/artillery-debian.yml >artillery.debian.5.txt
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.5.txt
-echo "ARTILLERY - CENTOS"
-./node_modules/.bin/artillery run test/artillery-centos.yml >artillery.centos.5.txt
 
 echo Nginx
 TESTS=$(grep -r virtual docs/benchmark/reports/different_images/*nginx.* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')

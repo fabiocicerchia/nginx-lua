@@ -15,8 +15,6 @@ function get_versions() {
         echo "${ALPINE[@]}"
     elif [ "$OS" == "amazonlinux" ]; then
         echo "${AMAZONLINUX[@]}"
-    elif [ "$OS" == "centos" ]; then
-        echo "${CENTOS[@]}"
     elif [ "$OS" == "debian" ]; then
         echo "${DEBIAN[@]}"
     elif [ "$OS" == "fedora" ]; then

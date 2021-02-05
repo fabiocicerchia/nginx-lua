@@ -52,13 +52,6 @@ if [ "$VER_AMAZONLINUX" = "" ]; then
     exit 1
 fi
 
-VER_CENTOS=$(fetch_latest "centos" "^[0-9]+$")
-CENTOS=("$VER_CENTOS")
-if [ "$VER_CENTOS" = "" ]; then
-    echo "Wrong version count in CENTOS."
-    exit 1
-fi
-
 VER_DEBIAN=$(fetch_latest "debian" "^[0-9]{2}\.[0-9]{1,2}")
 DEBIAN=("$VER_DEBIAN")
 if [ "$VER_DEBIAN" = "" ]; then
@@ -84,7 +77,6 @@ IFS=$'\n'
 NGINX=($(sort -Vu <<<"${NGINX[*]}"))
 ALPINE=($(sort -Vu <<<"${ALPINE[*]}"))
 AMAZONLINUX=($(sort -Vu <<<"${AMAZONLINUX[*]}"))
-CENTOS=($(sort -Vu <<<"${CENTOS[*]}"))
 DEBIAN=($(sort -Vu <<<"${DEBIAN[*]}"))
 FEDORA=($(sort -Vu <<<"${FEDORA[*]}"))
 UBUNTU=($(sort -Vu <<<"${UBUNTU[*]}"))
@@ -95,7 +87,6 @@ cp supported_versions supported_versions.bak
 echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' >supported_versions
 echo "ALPINE=(\"${ALPINE[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "AMAZONLINUX=(\"${AMAZONLINUX[*]}\")" | sed 's/ /" "/g' >>supported_versions
-echo "CENTOS=(\"${CENTOS[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "DEBIAN=(\"${DEBIAN[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "FEDORA=(\"${FEDORA[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "UBUNTU=(\"${UBUNTU[*]}\")" | sed 's/ /" "/g' >>supported_versions
