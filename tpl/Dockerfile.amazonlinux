@@ -28,7 +28,7 @@ ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
-ARG VER_LUA=5.3
+ARG VER_LUA=53
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -193,7 +193,7 @@ ARG BUILD_DEPS="\
     gcc-c++ \
     gzip \
     lua${VER_LUA} \
-    lua${VER_LUA}-dev \
+    lua${VER_LUA}-devel \
     make \
     openssl-devel \
     pcre-devel \
@@ -227,7 +227,7 @@ RUN set -eux \
 	" \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
-    && make -j "$(nproc)" luarocks \
+    && make luarocks \
     && yum clean all \
     && rm -rf /var/cache/yum
 
@@ -283,7 +283,7 @@ ARG PKG_DEPS="\
     GeoIP-devel \
     ca-certificates \
     lua${VER_LUA} \
-    lua${VER_LUA}-dev \
+    lua${VER_LUA}-devel \
     openssl-devel \
     pcre-devel \
     zlib-devel \

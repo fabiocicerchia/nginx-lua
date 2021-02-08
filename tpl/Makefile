@@ -205,9 +205,9 @@ endif
 # ##############################################################################
 
 luarocks:
-	curl -Lo luarocks.tar.gz https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz
-	tar -xzvf luarocks.tar.gz
-	cd luarocks-${VER_LUAROCKS}; \
+	curl -Lo /luarocks.tar.gz https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz
+	tar -C / -xzvf /luarocks.tar.gz
+	cd /luarocks-${VER_LUAROCKS}; \
 	./configure \
 	&& make \
 	&& make install
