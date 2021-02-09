@@ -227,8 +227,7 @@ RUN set -eux \
 		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 	" \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core \
-    && make -j "$(nproc)" luarocks
+    && make -j "$(nproc)" core
 
 RUN set -eux \
 # envsubst
@@ -282,6 +281,7 @@ ARG PKG_DEPS="\
     gcc-c++ \
     lua-${VER_LUA} \
     lua-devel-${VER_LUA} \
+    luarocks \
     openssl-devel \
     pcre-devel \
     zlib-devel \
@@ -295,8 +295,6 @@ COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
-COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
-COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
