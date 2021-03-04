@@ -18,6 +18,7 @@ jobs:
         run: make auto-update-and-commit
 
       - name: Repository Dispatch
+        if: ${{ success() }}
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
