@@ -10,13 +10,13 @@
 #############################
 # Settings Common Variables #
 #############################
-FROM alpine:3.13.3 AS base
+FROM amazonlinux:2.0.20210326.0 AS base
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=alpine
+ARG DOCKER_IMAGE_OS=amazonlinux
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=3.13.3
+ARG DOCKER_IMAGE_TAG=2.0.20210326.0
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -28,7 +28,7 @@ ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
-ARG VER_LUA=5.3
+ARG VER_LUA=53
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -188,38 +188,22 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
-    curl \
-    g++ \
-    geoip-dev \
+    GeoIP-devel \
+    ca-certificates \
+    gcc-c++ \
     gzip \
     lua${VER_LUA} \
-    lua${VER_LUA}-dev \
+    lua${VER_LUA}-devel \
     make \
-    openssl-dev \
-    pcre-dev \
+    openssl-devel \
+    pcre-devel \
     tar \
-    zlib-dev \
+    unzip \
+    zlib-devel \
 "
 ENV BUILD_DEPS=$BUILD_DEPS
 
-ARG NGINX_BUILD_DEPS="\
-# NGINX
-    alpine-sdk \
-    bash \
-    findutils \
-    gcc \
-    gd-dev \
-    geoip-dev \
-    libc-dev \
-    libedit-dev \
-    libxslt-dev \
-    linux-headers \
-    make \
-    openssl-dev \
-    pcre-dev \
-    perl-dev \
-    zlib-dev \
-"
+ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ####################################
@@ -232,8 +216,8 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache \
+    && yum makecache \
+    && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
@@ -243,7 +227,18 @@ RUN set -eux \
 	" \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
-    && make -j "$(nproc)" luarocks
+    && make luarocks \
+    && yum clean all \
+    && rm -rf /var/cache/yum
+
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && yum makecache \
+    && yum install -y \
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
@@ -285,13 +280,13 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
-    geoip-dev \
+    GeoIP-devel \
+    ca-certificates \
     lua${VER_LUA} \
-    lua${VER_LUA}-dev \
-    openssl-dev \
-    pcre-dev \
-    unzip \
-    zlib-dev \
+    lua${VER_LUA}-devel \
+    openssl-devel \
+    pcre-devel \
+    zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -301,47 +296,39 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
+COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
 COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache --virtual .pkg_deps \
+    && yum makecache \
+    && yum install -y \
         $PKG_DEPS \
+        shadow-utils \
 # Fix LUA alias
     && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache --virtual .run_deps $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache --virtual pkg_tz tzdata \
+    && yum install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
+    && yum install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-    && mkdir /docker-entrypoint.d
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+    && mkdir /docker-entrypoint.d \
+# Cleanup
+# ##############################################################################
+    && yum remove -y \
+        shadow-utils \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
