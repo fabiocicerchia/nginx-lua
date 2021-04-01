@@ -98,9 +98,9 @@ jobs:
           name: metadata-ubuntu
           path: docs/metadata
 
-      - name: Push metadata
-        run: make auto-commit-metadata
-        if: github.ref == 'refs/heads/main'
+      #- name: Push metadata
+      #  run: make auto-commit-metadata
+      #  if: github.ref == 'refs/heads/main'
 
       - name: cancelling
         uses: andymckay/cancel-action@0.2
