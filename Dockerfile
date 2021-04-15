@@ -10,7 +10,7 @@
 #############################
 # Settings Common Variables #
 #############################
-FROM alpine:3.13.4 AS base
+FROM alpine:3.13.5 AS base
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
