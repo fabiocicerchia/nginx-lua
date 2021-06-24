@@ -32,7 +32,7 @@ Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian
 <!-- START_SUPPORTED_TAGS -->
 - [`1`,`1.21`,`1.21.0`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.0-alpine`,`1-alpine3.14.0`,`1-alpine3.14.0`,`1.21-alpine3.14.0`,`1.21.0-alpine3.14.0`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/alpine/3.14.0/Dockerfile)
 - [`amazonlinux`,`1-amazonlinux`,`1.21-amazonlinux`,`1.21.0-amazonlinux`,`1-amazonlinux2.0.20210525.0`,`1-amazonlinux2.0.20210525.0`,`1.21-amazonlinux2.0.20210525.0`,`1.21.0-amazonlinux2.0.20210525.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/amazonlinux/2.0.20210525.0/Dockerfile)
-- [`debian`,`1-debian`,`1.21-debian`,`1-debian10.9`,`1-debian10.9`,`1.21.0-debian`,`1.21-debian10.9`,`1.21.0-debian10.9`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/debian/10.9/Dockerfile)
+- [`debian`,`1-debian`,`1.21-debian`,`1-debian10.10`,`1-debian10.10`,`1.21.0-debian`,`1.21-debian10.10`,`1.21.0-debian10.10`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/debian/10.10/Dockerfile)
 - [`fedora`,`1-fedora`,`1-fedora34`,`1-fedora34`,`1.21-fedora`,`1.21-fedora34`,`1.21.0-fedora`,`1.21.0-fedora34`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/fedora/34/Dockerfile)
 - [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21.0-ubuntu`,`1.21-ubuntu20.04`,`1.21.0-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.0/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
