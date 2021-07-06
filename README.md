@@ -61,7 +61,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 | | nginx-lua | OpenResty |
 |--|--|--|
-| nginx latest version | `1.21.0` | `1.19.x` (last tested: `1.19.9`)* |
+| nginx latest version | `1.21.0` | `1.19.x` (last tested: `1.19.9`)<sup>*</sup> |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -70,7 +70,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 | Ubuntu supported | ✅ | ✅ |
 | Windows supported | ❌ | ✅ |
 
-* Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
+<sup>*</sup> Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
 
 ## Features
 
@@ -183,12 +183,12 @@ Here is an example using docker-compose.yml:
 web:
   image: fabiocicerchia/nginx-lua
   volumes:
-   - ./templates:/etc/nginx/templates
+    - ./templates:/etc/nginx/templates
   ports:
-   - "8080:80"
+    - "8080:80"
   environment:
-   - NGINX_HOST=foobar.com
-   - NGINX_PORT=80
+    - NGINX_HOST=foobar.com
+    - NGINX_PORT=80
 ```
 
 By default, this function reads template files in `/etc/nginx/templates/*.template` and outputs the result of executing `envsubst` to `/etc/nginx/conf.d`.

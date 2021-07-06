@@ -18,8 +18,8 @@ fetch_latest() {
     while [ "$VER" = "" ] && [ $PAGE -lt 100 ]; do
         VER=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - |
             jq -rc '.results[] | select( .images[].digest == "'"$DIGEST"'" and .name != "latest" ) | .name' |
-            egrep "$FILTER" | sort -Vr | head -n 1)
-        ((PAGE+=1))
+            grep -E "$FILTER" | sort -Vr | head -n 1)
+        ((PAGE += 1))
     done
 
     echo "$VER"

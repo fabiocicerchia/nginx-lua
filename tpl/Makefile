@@ -21,10 +21,10 @@ core:
 	curl -Lo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
-	   /var/cache/nginx/proxy_temp \
-	   /var/cache/nginx/fastcgi_temp \
-	   /var/cache/nginx/uwsgi_temp \
-	   /var/cache/nginx/scgi_temp
+		/var/cache/nginx/proxy_temp \
+		/var/cache/nginx/fastcgi_temp \
+		/var/cache/nginx/uwsgi_temp \
+		/var/cache/nginx/scgi_temp
 	cd /nginx-${VER_NGINX} \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& make -j $(NPROC) build \

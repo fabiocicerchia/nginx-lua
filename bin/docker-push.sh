@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091,SC2207
 
 source ./bin/_common.sh
 source supported_versions
@@ -7,7 +7,7 @@ source supported_versions
 function docker_push() {
     TAG=$1
     EXITCODE=$(
-        docker push fabiocicerchia/nginx-lua:"$TAG" > /dev/null;
+        docker push fabiocicerchia/nginx-lua:"$TAG" >/dev/null
         echo $?
     )
     if [ "$EXITCODE" -ne "0" ]; then

@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091,SC2207
 
 source ./bin/_common.sh
 source supported_versions
@@ -20,7 +20,7 @@ function metadata() {
             echo '```json'
             docker image inspect "fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER"
             echo '```'
-         } >"docs/metadata/$PATCH-$OS$OS_VER.md"
+        } >"docs/metadata/$PATCH-$OS$OS_VER.md"
     fi
 }
 

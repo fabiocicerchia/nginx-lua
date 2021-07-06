@@ -128,50 +128,50 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 ARG VER_NGINX=1.19.2
 ENV VER_NGINX=$VER_NGINX
 ARG NGINX_BUILD_CONFIG="\
-         --prefix=/etc/nginx \
-         --sbin-path=/usr/sbin/nginx \
-         --modules-path=/usr/lib/nginx/modules \
-         --conf-path=/etc/nginx/nginx.conf \
-         --error-log-path=/var/log/nginx/error.log \
-         --http-log-path=/var/log/nginx/access.log \
-         --pid-path=/var/run/nginx.pid \
-         --lock-path=/var/run/nginx.lock \
-         --http-client-body-temp-path=/var/cache/nginx/client_temp \
-         --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-         --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-         --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-         --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-         --user=nginx \
-         --group=nginx \
-         --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-         --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-         --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
-         --with-compat \
-         --with-file-aio \
-         --with-http_addition_module \
-         --with-http_auth_request_module \
-         --with-http_dav_module \
-         --with-http_dav_module \
-         --with-http_flv_module \
-         --with-http_geoip_module \
-         --with-http_gunzip_module \
-         --with-http_gzip_static_module \
-         --with-http_mp4_module \
-         --with-http_random_index_module \
-         --with-http_realip_module \
-         --with-http_secure_link_module \
-         --with-http_slice_module \
-         --with-http_ssl_module \
-         --with-http_stub_status_module \
-         --with-http_sub_module \
-         --with-http_v2_module \
-         --with-mail \
-         --with-mail_ssl_module \
-         --with-stream \
-         --with-stream_realip_module \
-         --with-stream_ssl_module \
-         --with-stream_ssl_preread_module \
-         --with-threads \
+          --prefix=/etc/nginx \
+          --sbin-path=/usr/sbin/nginx \
+          --modules-path=/usr/lib/nginx/modules \
+          --conf-path=/etc/nginx/nginx.conf \
+          --error-log-path=/var/log/nginx/error.log \
+          --http-log-path=/var/log/nginx/access.log \
+          --pid-path=/var/run/nginx.pid \
+          --lock-path=/var/run/nginx.lock \
+          --http-client-body-temp-path=/var/cache/nginx/client_temp \
+          --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+          --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+          --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+          --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+          --user=nginx \
+          --group=nginx \
+          --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+          --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+          --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
+          --with-compat \
+          --with-file-aio \
+          --with-http_addition_module \
+          --with-http_auth_request_module \
+          --with-http_dav_module \
+          --with-http_dav_module \
+          --with-http_flv_module \
+          --with-http_geoip_module \
+          --with-http_gunzip_module \
+          --with-http_gzip_static_module \
+          --with-http_mp4_module \
+          --with-http_random_index_module \
+          --with-http_realip_module \
+          --with-http_secure_link_module \
+          --with-http_slice_module \
+          --with-http_ssl_module \
+          --with-http_stub_status_module \
+          --with-http_sub_module \
+          --with-http_v2_module \
+          --with-mail \
+          --with-mail_ssl_module \
+          --with-stream \
+          --with-stream_realip_module \
+          --with-stream_ssl_module \
+          --with-stream_ssl_preread_module \
+          --with-threads \
     "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
@@ -218,8 +218,8 @@ ENV VER_DUMBINIT=$VER_DUMBINIT
 FROM base AS builder
 
 RUN set -eux \
-   && apk update \
-   && apk add --no-cache \
+    && apk update \
+    && apk add --no-cache \
       $BUILD_DEPS \
       $NGINX_BUILD_DEPS
 
@@ -352,21 +352,21 @@ RUN set -eux \
     && tar -C / -xvzf /nginx.tar.gz \
     && cd /nginx-${VER_NGINX} \
     && mkdir -p /var/cache/nginx/client_temp \
-       /var/cache/nginx/proxy_temp \
-       /var/cache/nginx/fastcgi_temp \
-       /var/cache/nginx/uwsgi_temp \
-       /var/cache/nginx/scgi_temp \
+        /var/cache/nginx/proxy_temp \
+        /var/cache/nginx/fastcgi_temp \
+        /var/cache/nginx/uwsgi_temp \
+        /var/cache/nginx/scgi_temp \
     && [ $EXTENDED_IMAGE -eq 1 ] && ( \
     ./configure \
-       ${NGINX_BUILD_CONFIG} \
-       --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
-       --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
-       --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
-       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
+        ${NGINX_BUILD_CONFIG} \
+        --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+        --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
+        --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     || (./configure \
-       ${NGINX_BUILD_CONFIG} \
-       --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
-       --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
+        ${NGINX_BUILD_CONFIG} \
+        --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' \
+        --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie') \
     && make -j "$(nproc)" build \
     && make install
 
@@ -424,7 +424,7 @@ COPY --from=builder /var/cache/nginx /var/cache/nginx
 RUN set -eux \
     && apk update \
     && apk add --no-cache \
-       $PKG_DEPS \
+        $PKG_DEPS \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && apk add --no-cache tzdata \

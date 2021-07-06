@@ -52,8 +52,8 @@
 
                 res, err, errcode, sqlstate =
                     db:query("create table cats "
-                             .. "(id serial primary key, "
-                             .. "name varchar(5))")
+                              .. "(id serial primary key, "
+                              .. "name varchar(5))")
                 if not res then
                     ngx.say("bad result: ", err, ": ", errcode, ": ", sqlstate, ".")
                     return
@@ -63,7 +63,7 @@
 
                 res, err, errcode, sqlstate =
                     db:query("insert into cats (name) "
-                             .. "values (\'Bob\'),(\'\'),(null)")
+                              .. "values (\'Bob\'),(\'\'),(null)")
                 if not res then
                     ngx.say("bad result: ", err, ": ", errcode, ": ", sqlstate, ".")
                     return

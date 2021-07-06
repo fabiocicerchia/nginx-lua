@@ -222,10 +222,10 @@ RUN set -eux \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
-	NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
-		--add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
-		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
-	" \
+        NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
+            --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+        " \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core
 

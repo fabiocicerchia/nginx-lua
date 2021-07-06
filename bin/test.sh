@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1091
+# shellcheck disable=SC1091,SC2207
 
 source ./bin/_common.sh
 source supported_versions
@@ -14,11 +14,12 @@ function test() {
         docker run -d --name nginx_lua_test -p 8080:80 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
         COUNT=0
         until [ $COUNT -eq 20 ] || [ "$(
-            curl --output /dev/null --silent --head --fail http://localhost:8080;
+            curl --output /dev/null --silent --head --fail http://localhost:8080
             echo $?
         )" == "0" ]; do
-            echo -n '.'; sleep 0.5;
-            COUNT=$((COUNT+1))
+            echo -n '.'
+            sleep 0.5
+            COUNT=$((COUNT + 1))
         done
         curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1
         curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1

@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1091,SC2086
+# shellcheck disable=SC1091,SC2086,SC2207
 
 source supported_versions
 
@@ -29,7 +29,7 @@ function loop_over_nginx_with_os() {
     FUNC=$2
 
     LEN_VER_NGINX=${#NGINX[@]}
-    for ((I = 0; I < LEN_VER_NGINX; I++ )); do
+    for ((I = 0; I < LEN_VER_NGINX; I++)); do
         NGINX_VER="${NGINX[$I]}"
 
         LAST_VER_NGINX=0
@@ -52,7 +52,7 @@ function loop_over_nginx() {
     FUNC=$1
 
     LEN_VER_NGINX=${#NGINX[@]}
-    for ((I = 0; I < LEN_VER_NGINX; I++ )); do
+    for ((I = 0; I < LEN_VER_NGINX; I++)); do
         export NGINX_VER="${NGINX[$I]}"
 
         export LAST_VER_NGINX=0
@@ -89,8 +89,8 @@ function loop_over_os() {
     FUNC=$2
 
     LEN_VER_OS=${#VERSIONS[@]}
-    for ((J = 0; J < LEN_VER_OS; J++ )); do
-        export OS_VER="${VERSIONS[$J]}";
+    for ((J = 0; J < LEN_VER_OS; J++)); do
+        export OS_VER="${VERSIONS[$J]}"
 
         export LAST_VER_OS=0
         if [ "$((J + 1))" == "$LEN_VER_OS" ]; then

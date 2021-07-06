@@ -141,64 +141,64 @@ ENV NGX_CFLAGS=$NGX_CFLAGS
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
 ARG NGINX_BUILD_CONFIG="\
-        --prefix=/etc/nginx \
-        --sbin-path=/usr/sbin/nginx \
-        --modules-path=/usr/lib/nginx/modules \
-        --conf-path=/etc/nginx/nginx.conf \
-        --error-log-path=/var/log/nginx/error.log \
-        --http-log-path=/var/log/nginx/access.log \
-        --pid-path=/var/run/nginx.pid \
-        --lock-path=/var/run/nginx.lock \
-        --http-client-body-temp-path=/var/cache/nginx/client_temp \
-        --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-        --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-        --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-        --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-        --with-perl_modules_path=/usr/lib/perl5/vendor_perl \
-        --user=nginx \
-        --group=nginx \
-        --with-compat \
-        --with-file-aio \
-        --with-threads \
-        --with-http_addition_module \
-        --with-http_auth_request_module \
-        --with-http_dav_module \
-        --with-http_flv_module \
-        --with-http_gunzip_module \
-        --with-http_gzip_static_module \
-        --with-http_mp4_module \
-        --with-http_random_index_module \
-        --with-http_realip_module \
-        --with-http_secure_link_module \
-        --with-http_slice_module \
-        --with-http_ssl_module \
-        --with-http_stub_status_module \
-        --with-http_sub_module \
-        --with-http_v2_module \
-        --with-mail \
-        --with-mail_ssl_module \
-        --with-stream \
-        --with-stream_realip_module \
-        --with-stream_ssl_module \
-        --with-stream_ssl_preread_module \
-        --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-        --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-        --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
+            --prefix=/etc/nginx \
+            --sbin-path=/usr/sbin/nginx \
+            --modules-path=/usr/lib/nginx/modules \
+            --conf-path=/etc/nginx/nginx.conf \
+            --error-log-path=/var/log/nginx/error.log \
+            --http-log-path=/var/log/nginx/access.log \
+            --pid-path=/var/run/nginx.pid \
+            --lock-path=/var/run/nginx.lock \
+            --http-client-body-temp-path=/var/cache/nginx/client_temp \
+            --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+            --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+            --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+            --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+            --with-perl_modules_path=/usr/lib/perl5/vendor_perl \
+            --user=nginx \
+            --group=nginx \
+            --with-compat \
+            --with-file-aio \
+            --with-threads \
+            --with-http_addition_module \
+            --with-http_auth_request_module \
+            --with-http_dav_module \
+            --with-http_flv_module \
+            --with-http_gunzip_module \
+            --with-http_gzip_static_module \
+            --with-http_mp4_module \
+            --with-http_random_index_module \
+            --with-http_realip_module \
+            --with-http_secure_link_module \
+            --with-http_slice_module \
+            --with-http_ssl_module \
+            --with-http_stub_status_module \
+            --with-http_sub_module \
+            --with-http_v2_module \
+            --with-mail \
+            --with-mail_ssl_module \
+            --with-stream \
+            --with-stream_realip_module \
+            --with-stream_ssl_module \
+            --with-stream_ssl_preread_module \
+            --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+            --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+            --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS="\
-    ca-certificates \
-    curl \
-    g++ \
-    libgeoip-dev \
-    libpcre3-dev \
-    libssl-dev \
-    lua${VER_LUA} \
-    lua${VER_LUA}-dev \
-    make \
-    unzip \
-    zlib1g-dev \
+        ca-certificates \
+        curl \
+        g++ \
+        libgeoip-dev \
+        libpcre3-dev \
+        libssl-dev \
+        lua${VER_LUA} \
+        lua${VER_LUA}-dev \
+        make \
+        unzip \
+        zlib1g-dev \
 "
 ENV BUILD_DEPS=$BUILD_DEPS
 
@@ -224,10 +224,10 @@ RUN set -eux \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && [ $EXTENDED_IMAGE -eq 1 ] && \
-	NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
-		--add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
-		--add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
-	" \
+        NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
+            --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+        " \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
     && make -j "$(nproc)" luarocks \
@@ -281,13 +281,13 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
 
 ARG PKG_DEPS="\
-    ca-certificates \
-    libgeoip-dev \
-    libpcre3-dev \
-    libssl-dev \
-    lua${VER_LUA} \
-    lua${VER_LUA}-dev \
-    zlib1g-dev \
+        ca-certificates \
+        libgeoip-dev \
+        libpcre3-dev \
+        libssl-dev \
+        lua${VER_LUA} \
+        lua${VER_LUA}-dev \
+        zlib1g-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
