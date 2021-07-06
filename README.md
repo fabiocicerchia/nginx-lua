@@ -61,7 +61,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 | | nginx-lua | OpenResty |
 |--|--|--|
-| nginx latest version | `1.21.0` | `1.19.x` (last tested: `1.19.9`)<sup>*</sup> |
+| nginx latest version | `1.21.0` | `1.19.x` (last tested: `1.19.9`)¹ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -70,7 +70,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 | Ubuntu supported | ✅ | ✅ |
 | Windows supported | ❌ | ✅ |
 
-<sup>*</sup> Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
+¹ Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
 
 ## Features
 
@@ -641,7 +641,6 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [Nginx License](https://nginx.org/LICENSE)
 - [Lua License](https://www.lua.org/license.html)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
-
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 

@@ -1,5 +1,6 @@
 {
   "Exclude": [
+    "docs/lua-nginx-module/DIRECTIVES.md",
     "docs/lua-nginx-module/known-issues.md",
     "docs/lua-nginx-module/nginx-api-for-lua.md"
   ]

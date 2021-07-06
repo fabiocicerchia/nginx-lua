@@ -91,26 +91,49 @@ server {
     }
 
     location / {
-       client_max_body_size 100k;
-       client_body_buffer_size 100k;
+        client_max_body_size 100k;
+        client_body_buffer_size 100k;
 
-       access_by_lua_block {
-           -- check the client IP address is in our black list
-           if ngx.var.remote_addr == "132.5.72.3" then
-               ngx.exit(ngx.HTTP_FORBIDDEN)
-           end
+        access_by_lua_block {
+            -- check the client IP address is in our black list
+            if ngx.var.remote_addr == "132.5.72.3" then
+                ngx.exit(ngx.HTTP_FORBIDDEN)
+            end
 
-           -- check if the URI contains bad words
-           if ngx.var.uri and
-                  string.match(ngx.var.request_body, "evil")
-           then
-               return ngx.redirect("/terms_of_use.html")
-           end
+            -- body may get buffered in a temp file:
+            local file = ngx.req.get_body_file()
+            if file then
+                ngx.say("body is in file ", file)
+            else
+                ngx.say("no body found")
+            end
+        }
+    }
 
-           -- tests passed
-       }
+    # transparent non-blocking I/O in Lua via subrequests
+    # (well, a better way is to use cosockets)
+    location = /lua {
+        # MIME type determined by default_type:
+        default_type 'text/plain';
 
-       # proxy_pass/fastcgi_pass/etc settings
+        content_by_lua_block {
+            local res = ngx.location.capture("/some_other_location")
+            if res then
+                ngx.say("status: ", res.status)
+                ngx.say("body:")
+                ngx.print(res.body)
+            end
+        }
+    }
+
+    location = /foo {
+        rewrite_by_lua_block {
+            res = ngx.location.capture("/memc",
+                { args = { cmd = "incr", key = ngx.var.uri } }
+            )
+        }
+
+        # proxy_pass/fastcgi_pass/etc settings
     }
 }
 ```

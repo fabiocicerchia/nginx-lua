@@ -28,7 +28,7 @@ fetch_latest() {
 set -eux
 
 DISTRO=nginx
-VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n'  | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
+VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/$DISTRO/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n' | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
 NGINX=()
 for VER in $VER_NGINX; do
     NGINX+=("$VER")
