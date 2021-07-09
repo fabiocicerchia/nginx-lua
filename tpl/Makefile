@@ -39,13 +39,19 @@ core:
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
+deps: dep-ngx_devel_kit dep-ngx_misc dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
 
 # NGX Devel Kit
 # ##############################################################################
 dep-ngx_devel_kit:
-	curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
+	curl -Lo /ngx_devel_kit.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
 	tar -C / -xvzf /ngx_devel_kit.tar.gz
+
+# NGX Set Misc
+# ##############################################################################
+dep-ngx_misc:
+	curl -Lo /lua-misc.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${MISC_NGINX_MODULE_VERSION}.tar.gz
+	tar -C / -xvzf /lua-misc.tar.gz
 
 # OpenResty LUAJIT2
 # ##############################################################################

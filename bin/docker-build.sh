@@ -13,7 +13,7 @@ function build() {
     PATCH="$NGINX_VER"
 
     if [ "$FORCE" == "0" ]; then
-        if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
+        if [ "$(docker_tag_exists prakasa1904/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
             return
         fi
     fi
@@ -25,26 +25,26 @@ function build() {
 
     TAGS=""
     if [ "$LAST_VER_NGINX$LAST_VER_OS$DEFAULT_IMAGE" == "111" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:latest$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$MAJOR$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$MINOR$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$PATCH$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:latest$SUFFIX"
     fi
 
     if [ "$LAST_VER_NGINX$LAST_VER_OS" == "11" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$OS$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$OS$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$MAJOR-$OS$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
     fi
 
     if [ "$LAST_VER_OS" == "1" ]; then
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$SUFFIX"
-        TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$MINOR-$OS$SUFFIX"
+        TAGS="$TAGS -t prakasa1904/nginx-lua:$PATCH-$OS$SUFFIX"
     fi
 
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$PATCH-$OS$OS_VER$SUFFIX"
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER$SUFFIX"
-    TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
+    TAGS="$TAGS -t prakasa1904/nginx-lua:$PATCH-$OS$OS_VER$SUFFIX"
+    TAGS="$TAGS -t prakasa1904/nginx-lua:$MINOR-$OS$OS_VER$SUFFIX"
+    TAGS="$TAGS -t prakasa1904/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
 
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
