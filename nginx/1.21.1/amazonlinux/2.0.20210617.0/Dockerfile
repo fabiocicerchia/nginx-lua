@@ -286,6 +286,7 @@ ARG PKG_DEPS="\
         lua${VER_LUA}-devel \
         openssl-devel \
         pcre-devel \
+        unzip \
         zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS

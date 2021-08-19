@@ -287,6 +287,7 @@ ARG PKG_DEPS="\
         libssl-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
+        unzip \
         zlib1g-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
