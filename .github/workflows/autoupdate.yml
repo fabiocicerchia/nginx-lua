@@ -23,3 +23,6 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           event-type: autoupdate
+
+      - name: Create Release
+        run: make release

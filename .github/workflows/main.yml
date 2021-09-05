@@ -98,13 +98,3 @@ jobs:
       - name: cancelling
         uses: andymckay/cancel-action@0.2
         if: job.status != 'success'
-
-  auto_tag:
-    name: Create Release
-    runs-on: ubuntu-20.04
-    needs: metadata
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create Release
-        run: make release
