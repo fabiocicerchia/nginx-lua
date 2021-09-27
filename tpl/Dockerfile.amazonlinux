@@ -331,6 +331,7 @@ RUN set -eux \
     && yum clean all \
     && rm -rf /var/cache/yum
 
+COPY tpl/support.sh /
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
 COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/

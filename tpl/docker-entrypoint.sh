@@ -1,6 +1,8 @@
 #!/bin/sh
 # vim:sw=4:ts=4:et
 
+/support.sh
+
 set -e
 
 if [ -z "${NGINX_ENTRYPOINT_QUIET_LOGS:-}" ]; then

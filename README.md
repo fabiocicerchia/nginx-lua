@@ -20,7 +20,20 @@
 [![Documentation Status](https://readthedocs.org/projects/nginx-lua/badge/?version=latest)](https://nginx-lua.readthedocs.io/en/latest/?badge=latest)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
-Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, CentOS, Debian, Fedora and Ubuntu.
+Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, Fedora and Ubuntu.
+
+---
+
+## 💗 Support the Project 💗
+
+This project is only maintained by one person, [Fabio Cicerchia](https://github.com/fabiocicerchia).  
+It started as a simple docker image, now it updates automatically periodically and provides support for multiple disto 😎  
+Maintaining a project is a very time consuming activity, especially when done alone 💪  
+I really want to make this project better and become super cool 🚀
+
+If you'd like to support this open-source project I'll appreciate any kind of [contribution](https://github.com/sponsors/fabiocicerchia).
+
+---
 
 ## Quick reference
 
@@ -80,7 +93,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 - Security checks: Docker Bench Security, Snyk.
 - Docker Healthchecks.
 - Exposes default ports (`80` and `443`), easy to extend.
-- Support for multiple linux distros: Alpine, Amazon, CentOS, Debian, Fedora, Ubuntu.
+- Support for multiple linux distros: Alpine, Amazon, Debian, Fedora, Ubuntu.
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
@@ -300,7 +313,6 @@ http {
 - Supported OS
   - [Alpine Linux](https://hub.docker.com/_/alpine) (~50MB)
   - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~225MB)
-  - [CentOS](https://hub.docker.com/_/centos) (~280MB)
   - [Debian](https://hub.docker.com/_/debian) (~200MB)
   - [Fedora](https://hub.docker.com/_/fedora) (~375MB)
   - [Ubuntu](https://hub.docker.com/_/ubuntu) (~215MB)
@@ -440,11 +452,11 @@ The default Nginx + Lua + extra lua modules image. Uses Alpine for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>`
 
-Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>`
 
-Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-minimal`
 
@@ -453,12 +465,12 @@ Provides Nginx + Lua image. Uses Alpine for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>-minimal`
 
-Provides Nginx + Lua. Uses Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.  
+Provides Nginx + Lua. Uses Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.  
 **WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>-minimal`
 
-Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, CentOS, Debian, Fedora, Ubuntu for base image.  
+Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.  
 **WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
 
 ## Minimal Image

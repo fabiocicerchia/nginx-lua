@@ -343,6 +343,7 @@ RUN set -eux \
     && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
     && mkdir /docker-entrypoint.d
 
+COPY tpl/support.sh /
 COPY tpl/docker-entrypoint.sh /
 COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
 COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
