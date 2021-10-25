@@ -44,13 +44,13 @@ deps: dep-ngx_devel_kit dep-ngx_misc dep-luajit dep-lua-nginx dep-lua-resty-core
 # NGX Devel Kit
 # ##############################################################################
 dep-ngx_devel_kit:
-	curl -Lo /ngx_devel_kit.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
+	curl -Lo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
 	tar -C / -xvzf /ngx_devel_kit.tar.gz
 
-# NGX Set Misc
-# ##############################################################################
+# # NGX Set Misc
+# # ##############################################################################
 dep-ngx_misc:
-	curl -Lo /lua-misc.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${MISC_NGINX_MODULE_VERSION}.tar.gz
+	curl -Lo /lua-misc.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${MISC_NGINX_MODULE_VERSION}.tar.gz
 	tar -C / -xvzf /lua-misc.tar.gz
 
 # OpenResty LUAJIT2

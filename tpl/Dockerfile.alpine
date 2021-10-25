@@ -39,7 +39,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # misc_nginx
 # https://github.com/openresty/set-misc-nginx-module/releases
-ARG MISC_NGINX_MODULE_VERSION=0.32
+ARG MISC_NGINX_MODULE_VERSION=0.33
 ENV MISC_NGINX_MODULE_VERSION=$MISC_NGINX_MODULE_VERSION
 
 # luajit2

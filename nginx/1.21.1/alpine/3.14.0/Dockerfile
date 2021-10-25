@@ -37,6 +37,11 @@ ENV VER_LUA=$VER_LUA
 ARG VER_NGX_DEVEL_KIT=0.3.1
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
+# misc_nginx
+# https://github.com/openresty/set-misc-nginx-module/releases
+ARG MISC_NGINX_MODULE_VERSION=0.33
+ENV MISC_NGINX_MODULE_VERSION=$MISC_NGINX_MODULE_VERSION
+
 # luajit2
 # https://github.com/openresty/luajit2/releases
 ARG VER_LUAJIT=2.1-20210510
@@ -184,6 +189,7 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
+            --add-module=/set-misc-nginx-module-${MISC_NGINX_MODULE_VERSION} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
