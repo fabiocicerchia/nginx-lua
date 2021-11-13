@@ -43,7 +43,7 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`1`,`1.21`,`1.21.4`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.4-alpine`,`1-alpine3.14.2`,`1-alpine3.14.2`,`1.21-alpine3.14.2`,`1.21.4-alpine3.14.2`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.4/alpine/3.14.2/Dockerfile)
+- [`1`,`1.21`,`1.21.4`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.4-alpine`,`1-alpine3.14.3`,`1-alpine3.14.3`,`1.21-alpine3.14.3`,`1.21.4-alpine3.14.3`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.4/alpine/3.14.3/Dockerfile)
 - [`amazonlinux`,`1-amazonlinux`,`1.21-amazonlinux`,`1.21.4-amazonlinux`,`1-amazonlinux2.0.20211005.0`,`1-amazonlinux2.0.20211005.0`,`1.21-amazonlinux2.0.20211005.0`,`1.21.4-amazonlinux2.0.20211005.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.4/amazonlinux/2.0.20211005.0/Dockerfile)
 - [`debian`,`1-debian`,`1.21-debian`,`1-debian11.1`,`1-debian11.1`,`1.21.4-debian`,`1.21-debian11.1`,`1.21.4-debian11.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.4/debian/11.1/Dockerfile)
 - [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21-fedora35`,`1.21.4-fedora`,`1.21.4-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.4/fedora/35/Dockerfile)
