@@ -7,3 +7,8 @@ luarocks install lua-cjson
 
 docker run -it -v $PWD/test.cjson.conf:/etc/nginx/conf.d/test.cjson.conf fabiocicerchia/nginx-lua sh
 curl -H 'Host: test.local' http://127.0.0.1/test
+
+
+TODO: ADD DOCS
+Explain with -compat
+add extra env vars

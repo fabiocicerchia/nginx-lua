@@ -12,6 +12,8 @@ function test() {
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
     if [ "$FOUND" -ne "0" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
+        #docker exec -it nginx_lua_test "apk add gcc musl-dev && luarocks install lua-cjson"
+        docker exec -it nginx_lua_test "apk add gcc musl-dev coreutils && luarocks install lua-cjson"
         COUNT=0
         until [ $COUNT -eq 20 ] || [ "$(
             curl --output /dev/null --silent --head --fail http://localhost:8080
