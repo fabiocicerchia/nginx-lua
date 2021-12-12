@@ -311,8 +311,6 @@ RUN set -eux \
     && yum install -y \
         $PKG_DEPS \
         shadow-utils \
-# Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \

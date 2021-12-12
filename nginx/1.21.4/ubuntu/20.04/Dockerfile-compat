@@ -313,8 +313,6 @@ RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
         $PKG_DEPS \
-# Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && apt-get install -y --no-install-recommends --no-install-suggests tzdata \
