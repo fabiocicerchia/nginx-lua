@@ -30,7 +30,6 @@ ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 # lua
 ARG VER_LUA=5.4.3
 ENV VER_LUA=$VER_LUA
-ENV MYCFLAGS=" -DLUA_COMPAT_5_1"
 
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit/releases
@@ -216,7 +215,7 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-34-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-35-primary \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
@@ -228,7 +227,8 @@ RUN set -eux \
         " \
     && make -j "$(nproc)" lua-src \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core
+    && make -j "$(nproc)" core \
+    && make -j "$(nproc)" luarocks
 
 RUN set -eux \
 # envsubst
@@ -304,7 +304,7 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-34-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-35-primary \
     && dnf makecache \
     && dnf install -y \
         $PKG_DEPS \

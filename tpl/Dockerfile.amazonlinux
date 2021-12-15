@@ -115,7 +115,7 @@ ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.7.0
+ARG VER_LUAROCKS=3.8.0
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # lua-upstream-nginx-module
@@ -227,7 +227,7 @@ RUN set -eux \
         " \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
-    && make luarocks \
+    && make -j "$(nproc)" luarocks \
     && yum clean all \
     && rm -rf /var/cache/yum
 

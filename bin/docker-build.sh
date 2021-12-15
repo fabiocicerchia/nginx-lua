@@ -54,7 +54,11 @@ function build() {
 
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
-    time docker build \
+
+    # REF: https://pascalroeleven.nl/2021/09/09/ubuntu-21-10-and-fedora-35-in-docker/
+    #      https://github.com/docker/buildx/issues/99
+    time docker buildx build \
+        --progress=plain \
         --build-arg EXTENDED_IMAGE="$EXTENDED_IMAGE" \
         --build-arg BUILD_DATE="$BUILD_DATE" \
         --build-arg VCS_REF="$VCS_REF" \
@@ -85,7 +89,8 @@ function build_compat() {
 
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
-    time docker build \
+    time docker buildx build \
+        --progress=plain \
         --build-arg EXTENDED_IMAGE="$EXTENDED_IMAGE" \
         --build-arg BUILD_DATE="$BUILD_DATE" \
         --build-arg VCS_REF="$VCS_REF" \

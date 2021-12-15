@@ -219,7 +219,6 @@ luarocks:
 lua-src:
 	curl -Lo /luasrc.tar.gz http://www.lua.org/ftp/lua-${VER_LUA}.tar.gz
 	tar -C / -xzvf /luasrc.tar.gz
-# sed -i "s/MYCFLAGS=.*/MYCFLAGS=$MYCFLAGS/" src/Makefile
 	cd /lua-$${VER_LUA}; \
 	sed -i "s/DLUA_COMPAT_5_3/DLUA_COMPAT_5_1/" src/Makefile \
 	&& make all test \
