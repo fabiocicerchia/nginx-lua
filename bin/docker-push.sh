@@ -32,7 +32,7 @@ function push_images() {
         [[ $(docker image ls -q fabiocicerchia/nginx-lua:"$MAJOR$SUFFIX" | wc -l) -ne 0 ]] && docker_push "$MAJOR$SUFFIX"
         [[ $(docker image ls -q fabiocicerchia/nginx-lua:"$MINOR$SUFFIX" | wc -l) -ne 0 ]] && docker_push "$MINOR$SUFFIX"
         [[ $(docker image ls -q fabiocicerchia/nginx-lua:"$PATCH$SUFFIX" | wc -l) -ne 0 ]] && docker_push "$PATCH$SUFFIX"
-        [[ $(docker image ls -q fabiocicerchia/nginx-lua:latest$SUFFIX | wc -l) -ne 0 ]] && docker push fabiocicerchia/nginx-lua:latest$SUFFIX
+        [[ $(docker image ls -q "fabiocicerchia/nginx-lua:latest$SUFFIX" | wc -l) -ne 0 ]] && docker push "fabiocicerchia/nginx-lua:latest$SUFFIX"
     fi
 
     if [ "$LAST_VER_NGINX$LAST_VER_OS" == "11" ]; then
@@ -54,7 +54,7 @@ function push() {
 
     SUFFIX=""
 
-    push_images $SUFFIX
+    push_images "$SUFFIX"
 }
 
 function push_compat() {
@@ -64,7 +64,7 @@ function push_compat() {
 
     SUFFIX="-compat"
 
-    push_images $SUFFIX
+    push_images "$SUFFIX"
 }
 
 set -eux
