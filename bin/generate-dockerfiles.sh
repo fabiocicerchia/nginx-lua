@@ -27,7 +27,7 @@ function init_dockerfile() {
     mkdir -p "$DOCKERFILE_PATH" 2>/dev/null
     cp "tpl/Dockerfile.$OS" "$DOCKERFILE"
 
-    patch_dockerfile $DOCKERFILE
+    patch_dockerfile "$DOCKERFILE"
 }
 
 function init_dockerfile_compat() {
@@ -37,7 +37,7 @@ function init_dockerfile_compat() {
     mkdir -p "$DOCKERFILE_PATH" 2>/dev/null
     cp "tpl/Dockerfile.$OS-compat" "$DOCKERFILE"
 
-    patch_dockerfile $DOCKERFILE
+    patch_dockerfile "$DOCKERFILE"
 }
 
 set -eux

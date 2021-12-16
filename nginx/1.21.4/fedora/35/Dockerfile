@@ -297,6 +297,8 @@ COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
+COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 

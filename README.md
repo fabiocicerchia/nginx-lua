@@ -472,6 +472,7 @@ Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, Debian, Fed
 
 Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
 **WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
+
 ### `fabiocicerchia/nginx-lua:<version>-minimal`
 
 Provides Nginx + Lua image. Uses Alpine for base image.  
