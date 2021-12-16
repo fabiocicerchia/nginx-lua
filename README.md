@@ -391,6 +391,8 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_MYSQL`       | `0.24`                                     | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) to use. |
 | `VER_OPENRESTY_REDIS`       | `0.29`                                     | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) to use. |
 | `VER_OPENRESTY_SHELL`       | `0.03`                                     | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
+| `VER_OPENRESTY_SIGNAL`      | `0.03`                                     | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) to use. |
+| `VER_OPENRESTY_TABLEPOOL`   | `0.02`                                     | The version of [lua-tablepool](https://github.com/openresty/lua-tablepool) to use. |
 | `VER_OPENRESTY_HEALTHCHECK` | `0.06`                                     | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) to use. |
 | `VER_OPENRESTY_WEBSOCKET`   | `0.08`                                     | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) to use. |
 | `VER_LUA_UPSTREAM`          | `0.07`                                     | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) to use. |
@@ -544,6 +546,8 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.lua-resty-mysql": "0.24",
   "versions.lua-resty-redis": "0.29",
   "versions.lua-resty-shell": "0.03",
+  "versions.lua-resty-signal": "0.03",
+  "versions.lua-resty-tablepool": "0.02",
   "versions.lua-resty-upstream-healthcheck": "0.06",
   "versions.lua-resty-websocket": "0.08",
   "versions.lua-upstream": "0.07",

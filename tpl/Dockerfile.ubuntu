@@ -103,6 +103,16 @@ ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
 ARG VER_OPENRESTY_SHELL=0.03
 ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
+# lua-tablepool
+# https://github.com/openresty/lua-tablepool/releases
+ARG VER_OPENRESTY_TABLEPOOL=0.02
+ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
+
+# lua-resty-signal
+# https://github.com/openresty/lua-resty-signal/releases
+ARG VER_OPENRESTY_SIGNAL=0.03
+ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
+
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck/releases
 ARG VER_OPENRESTY_HEALTHCHECK=0.06
@@ -270,6 +280,8 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-mysql=${VER_OPENRESTY_MYSQL} \
     versions.lua-resty-redis=${VER_OPENRESTY_REDIS} \
     versions.lua-resty-shell=${VER_OPENRESTY_SHELL} \
+    versions.lua-resty-signal=${VER_OPENRESTY_SIGNAL} \
+    versions.lua-resty-tablepool=${VER_OPENRESTY_TABLEPOOL} \
     versions.lua-resty-upstream-healthcheck=${VER_OPENRESTY_HEALTHCHECK} \
     versions.lua-resty-websocket=${VER_OPENRESTY_WEBSOCKET} \
     versions.lua-upstream=${VER_LUA_UPSTREAM} \

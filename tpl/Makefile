@@ -26,6 +26,8 @@ core:
 		/var/cache/nginx/uwsgi_temp \
 		/var/cache/nginx/scgi_temp
 	cd /nginx-${VER_NGINX} \
+		&& wget https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-${VER_NGINX}-socket_cloexec.patch \
+		&& patch -p1 < nginx-${VER_NGINX}-socket_cloexec.patch || exit 1 \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& make -j $(NPROC) build \
 	&& mv objs/nginx objs/nginx-debug \
@@ -39,7 +41,7 @@ core:
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
+deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
 
 # NGX Devel Kit
 # ##############################################################################
@@ -95,7 +97,8 @@ ifeq ($(EXTENDED_IMAGE), 1)
 	curl -Lo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz
 	tar -C / -xvzf /lua-resty-cookie.tar.gz
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
-	&& make
+	&& make \
+	&& make install
 endif
 
 # OpenResty Dns
@@ -151,6 +154,30 @@ ifeq ($(EXTENDED_IMAGE), 1)
 	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
 	&& make \
 	&& make install
+endif
+
+# OpenResty Tablepool
+# ##############################################################################
+dep-lua-openresty-tablepool:
+ifeq ($(EXTENDED_IMAGE), 1)
+	curl -Lo /lua-tablepool.tar.gz https://github.com/openresty/lua-tablepool/archive/refs/tags/v${VER_OPENRESTY_TABLEPOOL}.tar.gz
+	tar -C / -xvzf /lua-tablepool.tar.gz
+	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
+	&& make \
+	&& make install
+endif
+
+# OpenResty Signal
+# ##############################################################################
+dep-lua-openresty-signal:
+ifeq ($(EXTENDED_IMAGE), 1)
+	curl -Lo /lua-openresty-signal.tar.gz https://github.com/openresty/lua-resty-signal/archive/refs/tags/v${VER_OPENRESTY_SIGNAL}.tar.gz
+	tar -C / -xvzf /lua-openresty-signal.tar.gz
+	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
+	&& make \
+	&& make install \
+	&& install -d /usr/local/lib/lua/5.1 \
+	&& install /usr/local/share/lua/5.1/librestysignal.so /usr/local/lib/lua/5.1/librestysignal.so
 endif
 
 # OpenResty Upstream Healthcheck
