@@ -12,6 +12,8 @@ function test() {
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
     if [ "$FOUND" -ne "0" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
+        # TODO: THIS WORKS ONLY FOR ALPINE!!
+        docker exec -it nginx_lua_test "apk add gcc musl-dev coreutils && luarocks install lua-cjson"
         COUNT=0
         until [ $COUNT -eq 20 ] || [ "$(
             curl --output /dev/null --silent --head --fail http://localhost:8080
@@ -23,6 +25,17 @@ function test() {
         done
         curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1
         curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1
+        #curl -v --fail http://localhost:8080/status
+        #curl -v --fail http://localhost:8080/socket
+        #curl -v --fail http://localhost:8080/shell
+        #curl -v --fail http://localhost:8080/dns
+        #curl -v --fail http://localhost:8080/cookie
+        #curl -v --fail http://localhost:8080/bar
+        #curl -v --fail http://localhost:8080/type
+        #curl -v --fail http://localhost:8080/foo
+        # TODO: NEED TO TEST THIS ONLY ON COMPAT
+        #curl -v --fail http://localhost:8080/cjson
+
         docker rm -f nginx_lua_test
     fi
 }

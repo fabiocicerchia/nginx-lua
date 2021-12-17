@@ -28,7 +28,7 @@ ARG EXTENDED_IMAGE=1
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
-ARG VER_LUA=53
+ARG VER_LUA=5.4.3
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -45,6 +45,7 @@ ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
 ARG LUAJIT_INC=/usr/local/include/luajit-2.1
 ENV LUAJIT_INC=$LUAJIT_INC
+ENV LUA_INCDIR=$LUAJIT_INC
 ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
@@ -192,8 +193,6 @@ ARG BUILD_DEPS="\
         ca-certificates \
         gcc-c++ \
         gzip \
-        lua${VER_LUA} \
-        lua${VER_LUA}-devel \
         make \
         openssl-devel \
         pcre-devel \
@@ -225,6 +224,7 @@ RUN set -eux \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
         " \
+    && make -j "$(nproc)" lua-src \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
     && make -j "$(nproc)" luarocks \
@@ -282,8 +282,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         GeoIP-devel \
         ca-certificates \
-        lua${VER_LUA} \
-        lua${VER_LUA}-devel \
         openssl-devel \
         pcre-devel \
         unzip \
@@ -298,8 +296,11 @@ COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder /usr/local/bin/lua /usr/local/bin/lua
+COPY --from=builder /usr/local/bin/luajit /usr/local/bin/luajit
 COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
 COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
+COPY --from=builder $LUAJIT_INC $LUAJIT_INC
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
@@ -309,8 +310,6 @@ RUN set -eux \
     && yum install -y \
         $PKG_DEPS \
         shadow-utils \
-# Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \

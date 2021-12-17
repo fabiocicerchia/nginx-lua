@@ -4,25 +4,7 @@
 source ./bin/_common.sh
 source supported_versions
 
-function build() {
-    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
-    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile"
-
-    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
-    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
-    PATCH="$NGINX_VER"
-
-    if [ "$FORCE" == "0" ]; then
-        if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER")" == "0" ]; then
-            return
-        fi
-    fi
-
-    SUFFIX=""
-    if [ "$EXTENDED_IMAGE" -eq "0" ]; then
-        SUFFIX="${SUFFIX}-minimal"
-    fi
-
+function get_tags() {
     TAGS=""
     if [ "$LAST_VER_NGINX$LAST_VER_OS$DEFAULT_IMAGE" == "111" ]; then
         TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR$SUFFIX"
@@ -46,9 +28,69 @@ function build() {
     TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MINOR-$OS$OS_VER$SUFFIX"
     TAGS="$TAGS -t fabiocicerchia/nginx-lua:$MAJOR-$OS$OS_VER$SUFFIX"
 
+    echo $TAGS
+}
+
+function build() {
+    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
+    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile"
+
+    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
+    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
+    PATCH="$NGINX_VER"
+
+    SUFFIX=""
+    if [ "$EXTENDED_IMAGE" -eq "0" ]; then
+        SUFFIX="${SUFFIX}-minimal"
+    fi
+
+    if [ "$FORCE" == "0" ]; then
+        if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER$SUFFIX")" == "0" ]; then
+            return
+        fi
+    fi
+
+    TAGS=$(get_tags)
+
     BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     VCS_REF=$(git rev-parse --short HEAD)
-    time docker build \
+
+    # REF: https://pascalroeleven.nl/2021/09/09/ubuntu-21-10-and-fedora-35-in-docker/
+    #      https://github.com/docker/buildx/issues/99
+    time docker buildx build \
+        --progress=plain \
+        --build-arg EXTENDED_IMAGE="$EXTENDED_IMAGE" \
+        --build-arg BUILD_DATE="$BUILD_DATE" \
+        --build-arg VCS_REF="$VCS_REF" \
+        $TAGS \
+        -f "$DOCKERFILE" .
+}
+
+function build_compat() {
+    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
+    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile-compat"
+
+    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
+    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
+    PATCH="$NGINX_VER"
+
+    SUFFIX="-compat"
+    if [ "$EXTENDED_IMAGE" -eq "0" ]; then
+        SUFFIX="${SUFFIX}-minimal"
+    fi
+
+    if [ "$FORCE" == "0" ]; then
+        if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER$SUFFIX")" == "0" ]; then
+            return
+        fi
+    fi
+
+    TAGS=$(get_tags)
+
+    BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    VCS_REF=$(git rev-parse --short HEAD)
+    time docker buildx build \
+        --progress=plain \
         --build-arg EXTENDED_IMAGE="$EXTENDED_IMAGE" \
         --build-arg BUILD_DATE="$BUILD_DATE" \
         --build-arg VCS_REF="$VCS_REF" \
@@ -70,5 +112,6 @@ fi
 VERSIONS=($(get_versions "$OS"))
 
 loop_over_nginx_with_os "$OS" "build"
+loop_over_nginx_with_os "$OS" "build_compat"
 
 docker images

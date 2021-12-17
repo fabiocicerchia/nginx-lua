@@ -4,12 +4,8 @@
 source ./bin/_common.sh
 source supported_versions
 
-function init_dockerfile() {
-    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
-    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile"
-
-    mkdir -p "$DOCKERFILE_PATH" 2>/dev/null
-    cp "tpl/Dockerfile.$OS" "$DOCKERFILE"
+function patch_dockerfile() {
+    DOCKERFILE=$1
 
     if [ "$(uname)" == "Darwin" ]; then
         sed -i "" "s/{{DOCKER_IMAGE}}/fabiocicerchia\/nginx-lua/" "$DOCKERFILE"
@@ -24,10 +20,31 @@ function init_dockerfile() {
     fi
 }
 
+function init_dockerfile() {
+    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
+    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile"
+
+    mkdir -p "$DOCKERFILE_PATH" 2>/dev/null
+    cp "tpl/Dockerfile.$OS" "$DOCKERFILE"
+
+    patch_dockerfile "$DOCKERFILE"
+}
+
+function init_dockerfile_compat() {
+    DOCKERFILE_PATH="nginx/$NGINX_VER/$OS/$OS_VER"
+    DOCKERFILE="$DOCKERFILE_PATH/Dockerfile-compat"
+
+    mkdir -p "$DOCKERFILE_PATH" 2>/dev/null
+    cp "tpl/Dockerfile.$OS-compat" "$DOCKERFILE"
+
+    patch_dockerfile "$DOCKERFILE"
+}
+
 set -eux
 
 loop_over_nginx "init_dockerfile"
+loop_over_nginx "init_dockerfile_compat"
 
 rm ./Dockerfile
-DOCKEFILE=$(find nginx/*/alpine/*/Dockerfile -type f | sort -r | head -n1)
-cp "$DOCKEFILE" ./Dockerfile
+DOCKERFILE=$(find nginx/*/alpine/*/Dockerfile -type f | sort -r | head -n1)
+cp "$DOCKERFILE" ./Dockerfile

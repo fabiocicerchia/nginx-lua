@@ -115,7 +115,7 @@ ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.7.0
+ARG VER_LUAROCKS=3.8.0
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # lua-upstream-nginx-module
@@ -216,7 +216,7 @@ COPY tpl/Makefile Makefile
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-33-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-35-primary \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
@@ -227,7 +227,8 @@ RUN set -eux \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
         " \
     && make -j "$(nproc)" deps \
-    && make -j "$(nproc)" core
+    && make -j "$(nproc)" core \
+    && make -j "$(nproc)" luarocks
 
 RUN set -eux \
 # envsubst
@@ -296,12 +297,14 @@ COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
 COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
+COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-33-primary \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-35-primary \
     && dnf makecache \
     && dnf install -y \
         $PKG_DEPS \
