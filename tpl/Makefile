@@ -222,4 +222,5 @@ lua-src:
 	cd /lua-$${VER_LUA}; \
 	sed -i "s/DLUA_COMPAT_5_3/DLUA_COMPAT_5_1/" src/Makefile \
 	&& make all test \
-	&& make install
+	&& make install \
+	&& cp /lua-$${VER_LUA}/src/*.h /usr/include/
