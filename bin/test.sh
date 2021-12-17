@@ -15,8 +15,8 @@ function test() {
 
         # TODO: THIS WORKS ONLY FOR ALPINE!!
         if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
-            docker exec -it nginx_lua_test apk add gcc musl-dev coreutils
-            docker exec -it nginx_lua_test luarocks install lua-cjson
+            docker exec nginx_lua_test apk add gcc musl-dev coreutils
+            docker exec nginx_lua_test luarocks install lua-cjson
         fi
 
         COUNT=0
@@ -31,7 +31,7 @@ function test() {
 
         curl -v http://localhost:8080 | grep "Welcome to nginx" || exit 1
         curl -v http://localhost:8080/lua_content | grep "Hello world" || exit 1
-        docker exec -it nginx_lua_test curl -v --fail http://localhost:80/status | grep "Nginx Worker PID" || exit 1
+        docker exec nginx_lua_test curl -v --fail http://localhost:80/status | grep "Nginx Worker PID" || exit 1
         curl -H'Connection: upgrade' -H'Upgrade: websocket' -H'Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==' -H'Sec-WebSocket-Version: 13' http://localhost:8080/socket | grep -a "Hello world" || exit 1
         curl -v --fail http://localhost:8080/shell | grep "ok" | grep -v "not ok" || exit 1
         curl -v --fail http://localhost:8080/dns | grep "www.google.com" || exit 1
