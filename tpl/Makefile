@@ -18,6 +18,7 @@ core:
 # ##############################################################################
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
+# TODO: need to get all patches from openresty?
 	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
