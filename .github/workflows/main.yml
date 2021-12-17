@@ -28,9 +28,6 @@ jobs:
         continue-on-error: true
         run: rm -rf docs/metadata/*
 
-      - name: Configure docker buildx
-        run: docker buildx create --driver-opt image=moby/buildkit:master --use
-
       - name: Build images
         run: make build-${{ matrix.distro }}
         env:
