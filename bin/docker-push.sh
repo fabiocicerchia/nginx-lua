@@ -77,4 +77,4 @@ fi
 VERSIONS=($(get_versions "$OS"))
 
 loop_over_nginx_with_os "$OS" "push"
-loop_over_nginx_with_os "$OS" "push-compat"
+loop_over_nginx_with_os "$OS" "push_compat"
