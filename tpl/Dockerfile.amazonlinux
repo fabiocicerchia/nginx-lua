@@ -206,6 +206,7 @@ ARG BUILD_DEPS="\
         lua${VER_LUA}-devel \
         make \
         openssl-devel \
+        patch \
         pcre-devel \
         tar \
         unzip \

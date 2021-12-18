@@ -207,6 +207,7 @@ ARG BUILD_DEPS="\
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
         make \
+        patch \
         unzip \
         zlib1g-dev \
 "

@@ -205,6 +205,7 @@ ARG BUILD_DEPS="\
         gzip \
         make \
         openssl-dev \
+        patch \
         pcre-dev \
         tar \
         zlib-dev \
