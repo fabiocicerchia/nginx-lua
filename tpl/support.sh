@@ -13,5 +13,5 @@ echo ""
 
 # track execution runs
 if [ "$SKIP_TRACK" != "1" ]; then
-    curl -m 5 https://kodebeat.com/nginx-lua/stats/hit/boot.php?os=$DOCKER_IMAGE_OS&v=$VER_NGINX
+    curl -m 5 "https://kodebeat.com/nginx-lua/stats/hit/boot.php?os=$DOCKER_IMAGE_OS&v=$VER_NGINX"
 fi
