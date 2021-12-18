@@ -296,7 +296,6 @@ ARG PKG_DEPS="\
         gcc-c++ \
         lua-${VER_LUA} \
         lua-devel-${VER_LUA} \
-        luarocks \
         openssl-devel \
         pcre-devel \
         unzip \
