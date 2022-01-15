@@ -19,6 +19,7 @@ core:
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
 # TODO: need to get all patches from openresty?
+# TODO: Find a better way to fallback when openresty is behind the nginx latest version and no patch is available
 	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
@@ -27,8 +28,9 @@ core:
 		/var/cache/nginx/uwsgi_temp \
 		/var/cache/nginx/scgi_temp
 	cd /nginx-${VER_NGINX} \
-		&& curl -sLO https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-${VER_NGINX}-socket_cloexec.patch \
-		&& patch -p1 < nginx-${VER_NGINX}-socket_cloexec.patch || exit 1 \
+		&& (curl --fail -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-${VER_NGINX}-socket_cloexec.patch || \
+			curl -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-1.21.4-socket_cloexec.patch) \
+		&& patch -p1 < nginx-socket_cloexec.patch || exit 1 \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& make -j $(NPROC) build \
 	&& mv objs/nginx objs/nginx-debug \
