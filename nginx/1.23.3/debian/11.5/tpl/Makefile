@@ -47,7 +47,7 @@ core:
 
 deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
 ifeq ($(EXTENDED_IMAGE), YES)
-	make dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
+	make dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module dep-lua-openresty-misc
 endif
 
 # NGX Devel Kit
@@ -195,6 +195,12 @@ dep-lua-openresty-websocket:
 	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
 	&& make \
 	&& make install
+
+# OpenResty Nginx Misc
+# ##############################################################################
+dep-lua-openresty-misc:
+	curl -Lo /lua-openresty-misc.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_OPENRESTY_MISC}.tar.gz
+	tar -C / -xvzf /lua-openresty-misc.tar.gz
 
 # LUA Upstream
 # ##############################################################################

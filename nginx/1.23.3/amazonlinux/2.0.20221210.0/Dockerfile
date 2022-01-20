@@ -127,6 +127,11 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 ARG VER_OPENRESTY_WEBSOCKET=0.09
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
+# set-misc-nginx-module
+# https://github.com/openresty/set-misc-nginx-module/tags
+ARG VER_OPENRESTY_MISC=0.33
+ENV VER_OPENRESTY_MISC=$VER_OPENRESTY_MISC
+
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
 ARG VER_LUAROCKS=3.9.1
@@ -222,6 +227,7 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+            --add-module=/set-misc-nginx-module-${MISC_NGINX_MODULE_VERSION} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
@@ -303,15 +309,20 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua="${VER_LUA}" \
+    versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
+    versions.nginx="${VER_NGINX}" \
+    versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
+    versions.os="2.0.20221210.0" \
+    versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \
     versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
     versions.lua-resty-core="${VER_LUA_RESTY_CORE}" \
     versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \
     versions.lua-resty-lrucache="${VER_LUA_RESTY_LRUCACHE}" \
     versions.lua-resty-memcached="${VER_OPENRESTY_MEMCACHED}" \
+    versions.lua-resty-misc=${VER_OPENRESTY_MISC} \
     versions.lua-resty-mysql="${VER_OPENRESTY_MYSQL}" \
     versions.lua-resty-redis="${VER_OPENRESTY_REDIS}" \
     versions.lua-resty-shell="${VER_OPENRESTY_SHELL}" \
@@ -320,11 +331,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-upstream-healthcheck="${VER_OPENRESTY_HEALTHCHECK}" \
     versions.lua-resty-websocket="${VER_OPENRESTY_WEBSOCKET}" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
-    versions.luajit2="${VER_LUAJIT}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
-    versions.nginx="${VER_NGINX}" \
-    versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
-    versions.os="2.0.20221210.0" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
