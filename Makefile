@@ -4,7 +4,7 @@
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
 #
-# Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 PAGER:=
@@ -55,7 +55,7 @@ help: ## prints this help
 	echo "|__|__|___  ||__||__|__|__.__|      |__||_____|___._|"
 	echo "      |_____|"
 	echo ""
-	echo "Copyright (c) 2020 Fabio Cicerchia. https://fabiocicerchia.it. MIT License"
+	echo "Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License"
 	echo "Repo: https://github.com/fabiocicerchia/nginx-lua"
 	echo ""
 	@gawk 'function fix_value(value, str) { \

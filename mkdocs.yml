@@ -1,7 +1,7 @@
 site_name: fabiocicerchia/nginx-lua
 repo_url: https://github.com/fabiocicerchia/nginx-lua/
 site_author: Fabio Cicerchia <info@fabiocicerchia.it>
-copyright: Copyright (c) 2020 Fabio Cicerchia info@fabiocicerchia.it
+copyright: Copyright (c) 2022 Fabio Cicerchia info@fabiocicerchia.it
 theme:
   name: readthedocs
   highlightjs: true
