@@ -43,11 +43,12 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
+- [`almalinux`,`1-almalinux`,`1.21-almalinux`,`1.21.6-almalinux`,`1-almalinux8.5-20211112`,`1-almalinux8.5-20211112`,`1.21-almalinux8.5-20211112`,`1.21.6-almalinux8.5-20211112`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/almalinux/8.5-20211112/Dockerfile)
 - [`1`,`1.21`,`1.21.6`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.6-alpine`,`1-alpine3.15.0`,`1-alpine3.15.0`,`1.21-alpine3.15.0`,`1.21.6-alpine3.15.0`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/alpine/3.15.0/Dockerfile)
 - [`amazonlinux`,`1-amazonlinux`,`1.21-amazonlinux`,`1.21.6-amazonlinux`,`1-amazonlinux2.0.20220121.0`,`1-amazonlinux2.0.20220121.0`,`1.21-amazonlinux2.0.20220121.0`,`1.21.6-amazonlinux2.0.20220121.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/amazonlinux/2.0.20220121.0/Dockerfile)
 - [`debian`,`1-debian`,`1.21-debian`,`1-debian11.2`,`1-debian11.2`,`1.21.6-debian`,`1.21-debian11.2`,`1.21.6-debian11.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/debian/11.2/Dockerfile)
-- [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21-fedora35`,`1.21.6-fedora`,`1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
-- [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21.6-ubuntu`,`1.21-ubuntu20.04`,`1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
+- [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21.6-fedora`,`1.21-fedora35`,`1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
+- [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1.21.6-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21-ubuntu20.04`,`1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
@@ -77,6 +78,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 | | nginx-lua | OpenResty |
 |--|--|--|
 | nginx latest version | `1.21.6` | `1.19.x` (last tested: `1.19.9`)¹ |
+| Almalinux supported | ✅ | ❌ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -95,7 +97,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 - Security checks: Docker Bench Security, Snyk.
 - Docker Healthchecks.
 - Exposes default ports (`80` and `443`), easy to extend.
-- Support for multiple linux distros: Alpine, Amazon, Debian, Fedora, Ubuntu.
+- Support for multiple linux distros: Almalinux, Alpine, Amazon, Debian, Fedora, Ubuntu.
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
@@ -313,6 +315,7 @@ http {
 
   - [nginx](https://nginx.org/en/download.html)
   - Supported OS
+    - [Almalinux](https://hub.docker.com/_/almalinux) (~???)
     - [Alpine Linux](https://hub.docker.com/_/alpine) (~55MB)
     - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~230MB)
     - [Debian](https://hub.docker.com/_/debian) (~260MB)
@@ -664,6 +667,10 @@ services:
 ```
 
 More examples are available in the directory [`docs/examples`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/examples)
+
+## Contributing
+
+A [dedicated section](docs/CONTRIBUTING.mg) is available to know how to contribute to this project.
 
 ## License
 

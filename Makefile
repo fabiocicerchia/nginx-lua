@@ -22,7 +22,7 @@ PUSH_CMD:=./bin/docker-push.sh
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
 META_CMD:=./bin/docker-metadata.sh
-DISTROS=alpine amazonlinux centos debian fedora ubuntu
+DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')

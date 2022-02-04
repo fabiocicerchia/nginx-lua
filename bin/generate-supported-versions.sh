@@ -38,6 +38,13 @@ if [ "${#NGINX[@]}" != "1" ]; then
     exit 1
 fi
 
+VER_ALMALINUX=$(fetch_latest "almalinux")
+ALMALINUX=("$VER_ALMALINUX")
+if [ "$VER_ALMALINUX" = "" ]; then
+    echo "Wrong version count in ALMALINUX."
+    exit 1
+fi
+
 VER_ALPINE=$(fetch_latest "alpine")
 ALPINE=("$VER_ALPINE")
 if [ "$VER_ALPINE" = "" ]; then
@@ -75,6 +82,7 @@ fi
 
 IFS=$'\n'
 NGINX=($(sort -Vu <<<"${NGINX[*]}"))
+ALMALINUX=($(sort -Vu <<<"${ALMALINUX[*]}"))
 ALPINE=($(sort -Vu <<<"${ALPINE[*]}"))
 AMAZONLINUX=($(sort -Vu <<<"${AMAZONLINUX[*]}"))
 DEBIAN=($(sort -Vu <<<"${DEBIAN[*]}"))
@@ -85,6 +93,7 @@ unset IFS
 cp supported_versions supported_versions.bak
 
 echo "NGINX=(\"${NGINX[*]}\")" | sed 's/ /" "/g' >supported_versions
+echo "ALMALINUX=(\"${ALMALINUX[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "ALPINE=(\"${ALPINE[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "AMAZONLINUX=(\"${AMAZONLINUX[*]}\")" | sed 's/ /" "/g' >>supported_versions
 echo "DEBIAN=(\"${DEBIAN[*]}\")" | sed 's/ /" "/g' >>supported_versions
