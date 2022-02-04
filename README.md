@@ -72,9 +72,11 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 ## Why this repo and not OpenResty?
 
+With this project you'll get a fresh nginx + lua version the day after (or even less than a day) of the release of a new nginx version!
+
 | | nginx-lua | OpenResty |
 |--|--|--|
-| nginx latest version | `1.21.0` | `1.19.x` (last tested: `1.19.9`)¹ |
+| nginx latest version | `1.21.6` | `1.19.x` (last tested: `1.19.9`)¹ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -83,7 +85,7 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 | Ubuntu supported | ✅ | ✅ |
 | Windows supported | ❌ | ✅ |
 
-¹ Note: Between OpenResty compatibility for `1.17.4` (28 Sep 2019) and `1.19.3` (3 Nov 2020) have passed ~10 months, and nginx 1.19.3 has been released on 29 Sep 2020.
+¹ Note: Between official nginx `1.19.9` (30 Mar 2021) and OpenResty compatibility for `1.19.9.1` (6 Aug 2021) have passed ~4 months.
 
 ## Features
 
