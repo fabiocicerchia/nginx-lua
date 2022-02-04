@@ -11,7 +11,7 @@ function test() {
 
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
     if [ "$FOUND" -ne "0" ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
+        docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 
         # TODO: THIS WORKS ONLY FOR ALPINE!!
         if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
