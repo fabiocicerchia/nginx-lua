@@ -226,11 +226,6 @@ FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
-RUN set -eux \
-    && dnf install -y wget \
-    && wget https://github.com/PhilipHazel/pcre2/releases/download/pcre2-10.39/pcre2-10.39.tar.gz \
-    && tar -xvf pcre2-10.39.tar.gz -C /
-
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
@@ -247,9 +242,6 @@ RUN set -eux \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
         " \
-    # && cd /pcre2-10.39 \
-    # && ./configure; make; make install \
-    # && cd - \
     && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core
 
