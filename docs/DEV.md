@@ -72,30 +72,30 @@ UTILITIES
 
 Create two different files:
 
- - `tpl/Dockerfile.XXX`
- - `tpl/Dockerfile.XXX-compat`
+- `tpl/Dockerfile.XXX`
+- `tpl/Dockerfile.XXX-compat`
 
 The `compat` version is meant for having a compiled version of the LUA code, the main difference is in the section `Build Nginx with support for LUA` which has got `make lua-src` before actually building `deps` and `core`.
 
 Customise the shell script to use the new distro:
 
- - Clone the relative alpine sections to match the new distro, then run `make generate-supported-versions`
- - Add in the top-level `Makefile` the new distro name in the variable `DISTROS`
- - Add a case in the `get_versions` function in `bin/_common.sh`
- - Add the disto in the `loop_over_nginx` function in `bin/_common.sh`
+- Clone the relative alpine sections to match the new distro, then run `make generate-supported-versions`
+- Add in the top-level `Makefile` the new distro name in the variable `DISTROS`
+- Add a case in the `get_versions` function in `bin/_common.sh`
+- Add the disto in the `loop_over_nginx` function in `bin/_common.sh`
 
 Once added those two files generates the static Dockerfiles in the `nginx` folder by running the command `make generate-dockerfiles`.
 
 Do not forget to update the README to include the distro in the list:
 
- - Run `make update-tags` and `make update-readme` to include the new distro tags in the documentation
- - Add the new distro in the support comparison table with OpenResty
+- Run `make update-tags` and `make update-readme` to include the new distro tags in the documentation
+- Add the new distro in the support comparison table with OpenResty
 
 ### Differences between standard vs compat
 
- - Extra env var `LUA_INCDIR=$LUAJIT_INC`
- - No dependency on system packages `lua-${VER_LUA}` and `lua-devel-${VER_LUA}` and `luarocks`
- - Extra step for building lua from source: `make -j "$(nproc)" lua-src`
- - Extra step for building luarocks from source: `make luarocks`
- - Copying the binaries `lua`, `luajit`, `luarocks` and the whole `LUA_INCDIR` folder from the multistage build
- - Avoiding to symlink the `lua` binary
+- Extra env var `LUA_INCDIR=$LUAJIT_INC`
+- No dependency on system packages `lua-${VER_LUA}` and `lua-devel-${VER_LUA}` and `luarocks`
+- Extra step for building lua from source: `make -j "$(nproc)" lua-src`
+- Extra step for building luarocks from source: `make luarocks`
+- Copying the binaries `lua`, `luajit`, `luarocks` and the whole `LUA_INCDIR` folder from the multistage build
+- Avoiding to symlink the `lua` binary
