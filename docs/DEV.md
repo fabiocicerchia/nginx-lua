@@ -82,7 +82,8 @@ Customise the shell script to use the new distro:
 - Clone the relative alpine sections to match the new distro, then run `make generate-supported-versions`
 - Add in the top-level `Makefile` the new distro name in the variable `DISTROS`
 - Add a case in the `get_versions` function in `bin/_common.sh`
-- Add the disto in the `loop_over_nginx` function in `bin/_common.sh`
+- Add the distro in the `loop_over_nginx` function in `bin/_common.sh`
+- Add the distro in the `docker_build.strategy.matrix` in `.github/workflows/main.yml`
 
 Once added those two files generates the static Dockerfiles in the `nginx` folder by running the command `make generate-dockerfiles`.
 
