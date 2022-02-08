@@ -148,7 +148,7 @@ ARG VER_NGINX={{VER_NGINX}}
 ENV VER_NGINX=$VER_NGINX
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
-ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
+ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie -lpcre"
 ENV NGX_LDOPT=$NGX_LDOPT
 ARG NGINX_BUILD_CONFIG="\
             --prefix=/etc/nginx \
@@ -191,7 +191,6 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
-            --without-pcre2 \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
