@@ -11,7 +11,9 @@ function docker_tag_exists() {
 function get_versions() {
     OS=$1
     VERSIONS=()
-    if [ "$OS" == "alpine" ]; then
+    if [ "$OS" == "almalinux" ]; then
+        echo "${ALMALINUX[@]}"
+    elif [ "$OS" == "alpine" ]; then
         echo "${ALPINE[@]}"
     elif [ "$OS" == "amazonlinux" ]; then
         echo "${AMAZONLINUX[@]}"
@@ -60,6 +62,9 @@ function loop_over_nginx() {
             export LAST_VER_NGINX=1
         fi
 
+        export OS=almalinux
+        loop_over_os "$OS" "$FUNC"
+
         # Default image is Alpine
         export DEFAULT_IMAGE=1
         export OS=alpine
@@ -67,9 +72,6 @@ function loop_over_nginx() {
         export DEFAULT_IMAGE=0
 
         export OS=amazonlinux
-        loop_over_os "$OS" "$FUNC"
-
-        export OS=centos
         loop_over_os "$OS" "$FUNC"
 
         export OS=debian

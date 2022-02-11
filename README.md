@@ -43,11 +43,12 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
+- [`almalinux`,`1-almalinux`,`1.21-almalinux`,`1.21.6-almalinux`,`1-almalinux8.5-20211112`,`1-almalinux8.5-20211112`,`1.21-almalinux8.5-20211112`,`1.21.6-almalinux8.5-20211112`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/almalinux/8.5-20211112/Dockerfile)
 - [`1`,`1.21`,`1.21.6`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.6-alpine`,`1-alpine3.15.0`,`1-alpine3.15.0`,`1.21-alpine3.15.0`,`1.21.6-alpine3.15.0`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/alpine/3.15.0/Dockerfile)
 - [`amazonlinux`,`1-amazonlinux`,`1.21-amazonlinux`,`1.21.6-amazonlinux`,`1-amazonlinux2.0.20220121.0`,`1-amazonlinux2.0.20220121.0`,`1.21-amazonlinux2.0.20220121.0`,`1.21.6-amazonlinux2.0.20220121.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/amazonlinux/2.0.20220121.0/Dockerfile)
 - [`debian`,`1-debian`,`1.21-debian`,`1-debian11.2`,`1-debian11.2`,`1.21.6-debian`,`1.21-debian11.2`,`1.21.6-debian11.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/debian/11.2/Dockerfile)
-- [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21-fedora35`,`1.21.6-fedora`,`1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
-- [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21.6-ubuntu`,`1.21-ubuntu20.04`,`1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
+- [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21.6-fedora`,`1.21-fedora35`,`1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
+- [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1.21.6-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21-ubuntu20.04`,`1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
@@ -77,6 +78,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 | | nginx-lua | OpenResty |
 |--|--|--|
 | nginx latest version | `1.21.6` | `1.19.x` (last tested: `1.19.9`)¹ |
+| Almalinux supported | ✅ | ❌ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -95,7 +97,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 - Security checks: Docker Bench Security, Snyk.
 - Docker Healthchecks.
 - Exposes default ports (`80` and `443`), easy to extend.
-- Support for multiple linux distros: Alpine, Amazon, Debian, Fedora, Ubuntu.
+- Support for multiple linux distros: Almalinux, Alpine, Amazon, Debian, Fedora, Ubuntu.
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
@@ -311,52 +313,54 @@ http {
 
 ## Specs
 
-  - [nginx](https://nginx.org/en/download.html)
-  - Supported OS
-    - [Alpine Linux](https://hub.docker.com/_/alpine) (~55MB)
-    - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~230MB)
-    - [Debian](https://hub.docker.com/_/debian) (~260MB)
-    - [Fedora](https://hub.docker.com/_/fedora) (~400MB)
-    - [Ubuntu](https://hub.docker.com/_/ubuntu) (~220MB)
-  - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
-  - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
-  - [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
-  - [Lua-land LRU Cache based on LuaJIT FFI](https://github.com/openresty/lua-resty-lrucache)
-  - [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit)
-  - [LuaRocks](https://luarocks.org/)
-  - <details><summary>Additional Modules</summary>
+- [nginx](https://nginx.org/en/download.html)
+- Supported OS
+  - [Almalinux](https://hub.docker.com/_/almalinux) (~???)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~55MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~230MB)
+  - [Debian](https://hub.docker.com/_/debian) (~260MB)
+  - [Fedora](https://hub.docker.com/_/fedora) (~400MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~220MB)
+- [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
+- [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
+- [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
+- [Lua-land LRU Cache based on LuaJIT FFI](https://github.com/openresty/lua-resty-lrucache)
+- [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit)
+- [LuaRocks](https://luarocks.org/)
+- <details><summary>Additional Modules</summary>
 
-    - [ngx_http_addition_module](http://nginx.org/en/docs/http/ngx_http_addition_module.html)
-    - [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html)
-    - [ngx_http_dav_module](http://nginx.org/en/docs/http/ngx_http_dav_module.html)
-    - [ngx_http_flv_module](http://nginx.org/en/docs/http/ngx_http_flv_module.html)
-    - [ngx_http_geoip_module](http://nginx.org/en/docs/http/ngx_http_geoip_module.html)
-    - [ngx_http_gunzip_module](http://nginx.org/en/docs/http/ngx_http_gunzip_module.html)
-    - [ngx_http_gzip_static_module](http://nginx.org/en/docs/http/ngx_http_gzip_static_module.html)
-    - [ngx_http_mp4_module](http://nginx.org/en/docs/http/ngx_http_mp4_module.html)
-    - [ngx_http_random_index_module](http://nginx.org/en/docs/http/ngx_http_random_index_module.html)
-    - [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
-    - [ngx_http_secure_link_module](http://nginx.org/en/docs/http/ngx_http_secure_link_module.html)
-    - [ngx_http_slice_module](http://nginx.org/en/docs/http/ngx_http_slice_module.html)
-    - [ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
-    - [ngx_http_stub_status_module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
-    - [ngx_http_sub_module](http://nginx.org/en/docs/http/ngx_http_sub_module.html)
-    - [ngx_http_v2_module](http://nginx.org/en/docs/http/ngx_http_v2_module.html)
-    - [ngx_mail_ssl_module](http://nginx.org/en/docs/mail/ngx_mail_ssl_module.html)
-    - [ngx_stream_realip_module](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html)
-    - [ngx_stream_ssl_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html)
-    - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
-    - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
-    - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
-    - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
-    - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
-    - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
-    - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
-    - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
-    - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
-    - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
-    - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
-    - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
+  - [ngx_http_addition_module](http://nginx.org/en/docs/http/ngx_http_addition_module.html)
+  - [ngx_http_auth_request_module](http://nginx.org/en/docs/http/ngx_http_auth_request_module.html)
+  - [ngx_http_dav_module](http://nginx.org/en/docs/http/ngx_http_dav_module.html)
+  - [ngx_http_flv_module](http://nginx.org/en/docs/http/ngx_http_flv_module.html)
+  - [ngx_http_geoip_module](http://nginx.org/en/docs/http/ngx_http_geoip_module.html)
+  - [ngx_http_gunzip_module](http://nginx.org/en/docs/http/ngx_http_gunzip_module.html)
+  - [ngx_http_gzip_static_module](http://nginx.org/en/docs/http/ngx_http_gzip_static_module.html)
+  - [ngx_http_mp4_module](http://nginx.org/en/docs/http/ngx_http_mp4_module.html)
+  - [ngx_http_random_index_module](http://nginx.org/en/docs/http/ngx_http_random_index_module.html)
+  - [ngx_http_realip_module](http://nginx.org/en/docs/http/ngx_http_realip_module.html)
+  - [ngx_http_secure_link_module](http://nginx.org/en/docs/http/ngx_http_secure_link_module.html)
+  - [ngx_http_slice_module](http://nginx.org/en/docs/http/ngx_http_slice_module.html)
+  - [ngx_http_ssl_module](http://nginx.org/en/docs/http/ngx_http_ssl_module.html)
+  - [ngx_http_stub_status_module](http://nginx.org/en/docs/http/ngx_http_stub_status_module.html)
+  - [ngx_http_sub_module](http://nginx.org/en/docs/http/ngx_http_sub_module.html)
+  - [ngx_http_v2_module](http://nginx.org/en/docs/http/ngx_http_v2_module.html)
+  - [ngx_mail_ssl_module](http://nginx.org/en/docs/mail/ngx_mail_ssl_module.html)
+  - [ngx_stream_realip_module](http://nginx.org/en/docs/stream/ngx_stream_realip_module.html)
+  - [ngx_stream_ssl_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_module.html)
+  - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
+  - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
+  - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
+  - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
+  - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
+  - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
+  - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
+  - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
+  - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
+  - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
+  - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
+  - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
+
   </details>
 
 ### Compiled Version Details
@@ -664,6 +668,10 @@ services:
 ```
 
 More examples are available in the directory [`docs/examples`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/examples)
+
+## Contributing
+
+A [dedicated section](docs/CONTRIBUTING.mg) is available to know how to contribute to this project.
 
 ## License
 

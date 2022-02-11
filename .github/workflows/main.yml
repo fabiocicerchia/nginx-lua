@@ -17,7 +17,7 @@ jobs:
   docker_build:
     strategy:
       matrix:
-        distro: [alpine, amazonlinux, debian, fedora, ubuntu]
+        distro: [almalinux, alpine, amazonlinux, debian, fedora, ubuntu]
 
     name: Build Docker
     runs-on: ubuntu-20.04

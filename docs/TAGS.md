@@ -2,6 +2,7 @@
 
 ## Supported Tags
 
+- [`1.21.6-almalinux8.5-20211112`, `1.21.6-almalinux`, `1.21-almalinux8.5-20211112`, `1.21-almalinux`, `1-almalinux8.5-20211112`, `1-almalinux`, `almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/almalinux/8.5-20211112/Dockerfile)
 - [`1-alpine`, `1`, `1.21-alpine`, `1.21`, `1.21-alpine3.15.0`, `1-alpine3.15.0`, `1.21.6-alpine3.15.0`, `1.21.6-alpine`, `1.21-6`, `alpine`, `latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/alpine/3.15.0/Dockerfile)
 - [`1-amazonlinux`, `1.21-amazonlinux`, `1.21.6-amazonlinux`, `1.21.6-amazonlinux2.0.20220121.0`, `1.21-amazonlinux2.0.20220121.0`, `1-amazonlinux2.0.20220121.0`, `amazonlinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/amazonlinux/2.0.20220121.0/Dockerfile)
 - [`1-debian`, `1.21-debian`, `1.21-debian11.2`, `1-debian11.2`, `1.21.6-debian11.2`, `1.21.6-debian`, `debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/debian/11.2/Dockerfile)

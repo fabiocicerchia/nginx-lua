@@ -4,7 +4,9 @@ import re
 import subprocess
 
 # TODO: ADD SUPPORT FOR -compat
-files = subprocess.getoutput("find nginx -type f | sort -V | grep -v compat").splitlines()
+files = subprocess.getoutput(
+    "find nginx -type f | sort -V | grep -v compat"
+).splitlines()
 
 result = subprocess.run(["./bin/docker-supported.sh"], stdout=subprocess.PIPE)
 supported = result.stdout.decode("utf-8").splitlines()
