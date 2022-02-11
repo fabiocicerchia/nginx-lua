@@ -251,6 +251,7 @@ lua-src:
 	tar -C / -xzvf /luasrc.tar.gz
 	cd /lua-$${VER_LUA}; \
 	sed -i "s/DLUA_COMPAT_5_3/DLUA_COMPAT_5_1/" src/Makefile \
-	&& make all test \
+	&& sed -i "s/DLUA_COMPAT_5_2/DLUA_COMPAT_5_1/" src/Makefile \
+	&& make linux test \
 	&& make install \
 	&& cp /lua-$${VER_LUA}/src/*.h /usr/include/

@@ -230,6 +230,7 @@ ARG BUILD_DEPS="\
         gcc-c++ \
         gzip \
         make \
+        readline-devel \
         openssl-devel \
         patch \
         pcre-devel \
