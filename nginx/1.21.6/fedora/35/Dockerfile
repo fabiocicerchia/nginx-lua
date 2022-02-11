@@ -146,10 +146,31 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 # https://github.com/nginx/nginx/releases
 ARG VER_NGINX=1.21.6
 ENV VER_NGINX=$VER_NGINX
+# References:
+#  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
+#  - https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+# -g                        Generate debugging information
+# -O2                       Recommended optimizations
+# -fstack-protector-strong  Stack smashing protector
+# -Wformat                  Check calls to make sure that the arguments supplied have types appropriate to the format string specified
+# -Werror=format-security   Reject potentially unsafe format string arguents
+# -Wp,-D_FORTIFY_SOURCE=2   Run-time buffer overflow detection
+# -fPIC                     No text relocations
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
+# References
+#  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
+#  - https://wiki.debian.org/ToolChain/DSOLinking#Unresolved_symbols_in_shared_libraries
+#  - https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_node/ld_3.html
+#  - https://linux.die.net/man/1/ld
+# -Wl,-rpath,/usr/local/lib   Add a directory to the runtime library search path
+# -Wl,-z,relro                Read-only segments after relocation
+# -Wl,-z,now                  Disable lazy binding
+# -Wl,--as-needed             Only link with needed libraries
+# -pie                        Full ASLR for executables
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
+# Reference: http://nginx.org/en/docs/configure.html
 ARG NGINX_BUILD_CONFIG="\
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
