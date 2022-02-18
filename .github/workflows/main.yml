@@ -31,12 +31,12 @@ jobs:
       - name: Build images
         run: make build-${{ matrix.distro }}
         env:
-          FORCE: 1
+          FORCE: YES
 
       - name: Test images
         run: make test-${{ matrix.distro }}
         env:
-          FORCE: 1
+          FORCE: YES
 
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u ${{ github.actor }} --password-stdin
@@ -46,7 +46,7 @@ jobs:
         run: make push-${{ matrix.distro }}
         if: github.ref == 'refs/heads/main'
         env:
-          FORCE: 1
+          FORCE: YES
 
       - name: Archive metadata artifacts
         uses: actions/upload-artifact@v2

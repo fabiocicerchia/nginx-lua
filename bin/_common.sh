@@ -1,7 +1,34 @@
 #!/bin/bash
 # shellcheck disable=SC1091,SC2086,SC2207
 
+MAX_CPU=$(nproc)
+PARALLEL_PROCS=$((MAX_CPU/2))
+
 source supported_versions
+
+# https://unix.stackexchange.com/questions/103920/parallelize-a-bash-for-loop
+# initialize a semaphore with a given number of tokens
+open_sem(){
+    mkfifo pipe-$$
+    exec 3<>pipe-$$
+    rm pipe-$$
+    local i=$1
+    for((;i>0;i--)); do
+        printf %s 000 >&3
+    done
+}
+
+# run the given command asynchronously and pop/push tokens
+run_with_lock(){
+    local x
+    # this read waits until there is something to read
+    read -u 3 -n 3 x && ((0==x)) || exit $x
+    (
+     ( "$@"; )
+    # push the return code of the command to the semaphore
+    printf '%.3d' $? >&3
+    )&
+}
 
 function docker_tag_exists() {
     curl --silent -f -lSL "https://index.docker.io/v1/repositories/$1/tags/$2" >/dev/null
@@ -101,4 +128,19 @@ function loop_over_os() {
 
         ${FUNC}
     done
+    wait
+}
+
+# This is a very ugly way to make the AMD64 version of the images available in the host.
+# When building a multi-arch image the images will not be loaded in the docker engine.
+# In this way I'm taking advantage of some buildx cache to quickly recompile them and make
+# it available for testing the amd64 version.
+# NOTE: Except that it won't work due to BUILD_DATE being set to the second.
+function preload_amd64_images() {
+    source ./bin/_func_build.sh
+
+    EXTENDED_IMAGE=YES
+    MULTI_ARCH=0
+    loop_over_nginx_with_os "$OS" "build_classic"
+    loop_over_nginx_with_os "$OS" "build_compat"
 }

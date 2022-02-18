@@ -10,12 +10,12 @@
 PAGER:=
 DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|tpl)/" | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
-	SKIP=1
+	SKIP=YES
 else
-	SKIP=0
+	SKIP=NO
 endif
-ifeq ($(FORCE), 1)
-	SKIP=0
+ifeq ($(FORCE), YES)
+	SKIP=NO
 endif
 BUILD_CMD:=./bin/docker-build.sh
 PUSH_CMD:=./bin/docker-push.sh
@@ -86,7 +86,7 @@ help: ## prints this help
 build-all: $(build_targets) ## build all dockerfiles
 
 $(build_targets): ## build one distro
-ifeq ($(SKIP), 1)
+ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
 	DISTRO=$(subst build-,,$(@)); \
@@ -102,7 +102,7 @@ endif
 build-minimal-all: $(minimal_targets) ## build all dockerfiles (minimal)
 
 $(minimal_targets): ## build one distro (minimal)
-ifeq ($(SKIP), 1)
+ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
 	DISTRO=$(subst build-minimal-,,$(@)); \
@@ -117,7 +117,7 @@ endif
 test-all: $(test_targets) ## test all docker images
 
 $(test_targets): ## test one docker image
-ifeq ($(SKIP), 1)
+ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
 	DISTRO=$(subst test-,,$(@)); \
@@ -128,7 +128,7 @@ endif
 test-security: $(security_targets) ## test security all docker images
 
 $(security_targets): ## test security one docker images
-ifeq ($(SKIP), 1)
+ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
 	DISTRO=$(subst test-security-,,$(@)); \
@@ -143,13 +143,22 @@ endif
 push-all: $(push_targets) ## push all docker images to docker hub
 
 $(push_targets): ## push one docker images to docker hub
-ifeq ($(SKIP), 1)
+ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
 	DISTRO=$(subst push-,,$(@)); \
 	echo PUSHING $$DISTRO; \
 	$(PUSH_CMD) $$DISTRO 1
 endif
+
+################################################################################
+##@ DEPENDENCIES
+################################################################################
+# Ref: https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/
+qemu:
+	sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
+	#docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
+	docker run --rm --privileged tonistiigi/binfmt:latest -install arm64
 
 ################################################################################
 ##@ UTILITIES

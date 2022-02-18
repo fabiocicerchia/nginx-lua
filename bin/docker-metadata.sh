@@ -7,7 +7,7 @@ source supported_versions
 function metadata() {
     PATCH="$NGINX_VER"
 
-    if [ "$FORCE" == "0" ]; then
+    if [ "$FORCE" == "NO" ]; then
         if [ -f "docs/metadata/$PATCH-$OS$OS_VER.md" ]; then
             return
         fi
@@ -27,10 +27,7 @@ function metadata() {
 set -eux
 
 OS=$1
-FORCE=0
-if [ "$2" == "1" ]; then
-    FORCE=1
-fi
+FORCE=${2:-NO}
 VERSIONS=($(get_versions "$OS"))
 
 loop_over_nginx_with_os "$OS" "metadata"

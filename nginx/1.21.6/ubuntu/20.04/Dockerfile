@@ -7,16 +7,28 @@
 # Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+ARG DISTRO=ubuntu
+ARG DISTRO_VER=20.04
+
 #############################
 # Settings Common Variables #
 #############################
-FROM ubuntu:20.04 AS base
+FROM ${DISTRO}:${DISTRO_VER} AS base
+
+ARG TARGETPLATFORM
+ENV TARGETPLATFORM=$TARGETPLATFORM
+ARG TARGETOS
+ENV TARGETOS=$TARGETOS
+ARG TARGETARCH
+ENV TARGETARCH=$TARGETARCH
+ARG TARGETVARIAN
+ENV TARGETVARIAN=$TARGETVARIAN
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=ubuntu
+ARG DOCKER_IMAGE_OS=${DISTRO}
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=20.04
+ARG DOCKER_IMAGE_TAG=${DISTRO_VER}
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -24,7 +36,7 @@ ENV BUILD_DATE=$BUILD_DATE
 ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
-ARG EXTENDED_IMAGE=1
+ARG EXTENDED_IMAGE=YES
 ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
 
 # lua
@@ -218,7 +230,7 @@ ARG NGINX_BUILD_CONFIG="\
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
-ARG BUILD_DEPS="\
+ARG BUILD_DEPS_BASE="\
         ca-certificates \
         curl \
         g++ \
@@ -232,7 +244,13 @@ ARG BUILD_DEPS="\
         unzip \
         zlib1g-dev \
 "
-ENV BUILD_DEPS=$BUILD_DEPS
+ARG BUILD_DEPS_AMD64="\
+        ${BUILD_DEPS_BASE} \
+"
+ARG BUILD_DEPS_ARM64="\
+        ${BUILD_DEPS_BASE} \
+"
+ENV BUILD_DEPS=
 
 ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
@@ -248,14 +266,15 @@ COPY tpl/Makefile Makefile
 
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
-RUN set -eux \
+RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr 'a-z' 'A-Z')" \
+    && set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
         apt-utils \
     && apt-get install -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
-    && [ $EXTENDED_IMAGE -eq 1 ] && \
+    && [ "$EXTENDED_IMAGE" = "YES" ] && \
         NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
@@ -289,6 +308,9 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
     org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
+    image.target.platform="${TARGETPLATFORM}" \
+    image.target.os="${TARGETOS}" \
+    image.target.arch="${TARGETARCH}" \
     versions.extended=${EXTENDED_IMAGE} \
     versions.headers-more-nginx-module=${VER_OPENRESTY_HEADERS} \
     versions.lua=${VER_LUA} \

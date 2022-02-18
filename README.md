@@ -378,7 +378,7 @@ The following are the available build-time options. They can be set using the `-
 | `DOCKER_IMAGE_TAG`          | `3.15.0`                                   | The Docker image tag to build `FROM`. |
 | `BUILD_DATE`                |                                            | This label contains the Date/Time the image was built. |
 | `VCS_REF`                   |                                            | Identifier for the version of the source code from which this image was built. |
-| `EXTENDED_IMAGE`            | `1`                                        | Flag to identify if extended image (which contains extra modules). See [Minimal Image](#minimal-image). |
+| `EXTENDED_IMAGE`            | `YES`                                      | Flag to identify if extended image (which contains extra modules). See [Minimal Image](#minimal-image). |
 | `VER_NGX_DEVEL_KIT`         | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | `VER_LUAJIT`                | `2.1-20210510`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | `LUAJIT_LIB`                | `/usr/local/lib`                           | Tell nginx's build system where to find LuaJIT 2.0 |

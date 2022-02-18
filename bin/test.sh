@@ -82,6 +82,8 @@ set -eux
 OS=$1
 VERSIONS=($(get_versions "$OS"))
 
+preload_amd64_images
+
 docker images
 
 loop_over_nginx_with_os "$OS" "runtest"

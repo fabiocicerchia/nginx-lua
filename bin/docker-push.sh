@@ -18,7 +18,7 @@ function docker_push() {
 function push_images() {
     SUFFIX=$1
 
-    if [ "$FORCE" == "0" ]; then
+    if [ "$FORCE" == "NO" ]; then
         if [ "$(docker_tag_exists fabiocicerchia/nginx-lua "$PATCH-$OS$OS_VER$SUFFIX")" == "0" ]; then
             return
         fi
@@ -70,10 +70,7 @@ function push_compat() {
 set -eux
 
 OS=$1
-FORCE=0
-if [ "$2" == "1" ]; then
-    FORCE=1
-fi
+FORCE=${2:-NO}
 VERSIONS=($(get_versions "$OS"))
 
 loop_over_nginx_with_os "$OS" "push"
