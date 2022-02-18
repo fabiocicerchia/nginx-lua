@@ -28,6 +28,12 @@ jobs:
         continue-on-error: true
         run: rm -rf docs/metadata/*
 
+      - name: Enable Buildx
+        run: |
+          docker buildx create --use
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+          docker buildx inspect --bootstrap
+
       - name: Build images
         run: make build-${{ matrix.distro }}
         env:
