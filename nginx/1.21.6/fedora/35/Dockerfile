@@ -15,12 +15,17 @@ ARG DISTRO_VER=35
 #############################
 FROM ${DISTRO}:${DISTRO_VER} AS base
 
+# Ref: https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
+# platform of the build result. Eg linux/amd64, linux/arm/v7, windows/amd64.
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=$TARGETPLATFORM
+# OS component of TARGETPLATFORM
 ARG TARGETOS
 ENV TARGETOS=$TARGETOS
+# architecture component of TARGETPLATFORM
 ARG TARGETARCH
 ENV TARGETARCH=$TARGETARCH
+# variant component of TARGETPLATFORM
 ARG TARGETVARIAN
 ENV TARGETVARIAN=$TARGETVARIAN
 

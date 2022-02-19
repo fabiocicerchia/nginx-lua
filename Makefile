@@ -17,11 +17,11 @@ endif
 ifeq ($(FORCE), YES)
 	SKIP=NO
 endif
-BUILD_CMD:=./bin/docker-build.sh
-PUSH_CMD:=./bin/docker-push.sh
+BUILD_CMD:=./bin/docker-build.py
+PUSH_CMD:=./bin/docker-push.py
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
-META_CMD:=./bin/docker-metadata.sh
+META_CMD:=./bin/docker-metadata.py
 DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
@@ -91,8 +91,8 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst build-,,$(@)); \
 	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1; \
-	$(META_CMD) $$DISTRO 1
+	$(BUILD_CMD) $$DISTRO; \
+	$(META_CMD) $$DISTRO YES
 endif
 
 ################################################################################
@@ -107,7 +107,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst build-minimal-,,$(@)); \
 	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1 0
+	$(BUILD_CMD) $$DISTRO NO
 endif
 
 ################################################################################
@@ -122,7 +122,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst test-,,$(@)); \
 	echo TESTING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO 1
+	$(TEST_CMD) $$DISTRO
 endif
 
 test-security: $(security_targets) ## test security all docker images
@@ -148,7 +148,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst push-,,$(@)); \
 	echo PUSHING $$DISTRO; \
-	$(PUSH_CMD) $$DISTRO 1
+	$(PUSH_CMD) $$DISTRO
 endif
 
 ################################################################################
@@ -208,7 +208,7 @@ generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
 
 generate-dockerfiles: ## generate all dockerfiles
-	./bin/generate-dockerfiles.sh
+	./bin/generate-dockerfiles.py
 
 generate-metadata: ## generate all metadata for docker images
 	for DISTRO in $(DISTROS); do \

@@ -1,9 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC1091,SC2207
 
-source ./bin/_common.sh
-source supported_versions
-
 function test() {
     DOCKER_TAG=$1
 
@@ -49,41 +46,16 @@ function test() {
     fi
 }
 
-function runtest() {
-    MAJOR=$(echo "$NGINX_VER" | cut -d '.' -f 1)
-    MINOR="$MAJOR".$(echo "$NGINX_VER" | cut -d '.' -f 2)
-    PATCH="$NGINX_VER"
-
-    test "$PATCH-$OS$OS_VER"
-    test "$MINOR-$OS$OS_VER"
-    test "$MAJOR-$OS$OS_VER"
-
-    if [ "$LAST_VER_NGINX$LAST_VER_OS$DEFAULT_IMAGE" == "111" ]; then
-        test "$MAJOR"
-        test "$MINOR"
-        test "$PATCH"
-        test latest
-    fi
-
-    if [ "$LAST_VER_NGINX$LAST_VER_OS" == "11" ]; then
-        test "$MAJOR-$OS"
-        test "$MAJOR-$OS$OS_VER"
-    fi
-
-    if [ "$LAST_VER_OS" == "1" ]; then
-        test "$MINOR-$OS"
-        test "$PATCH-$OS"
-    fi
-
-}
-
 set -eux
 
 OS=$1
-VERSIONS=($(get_versions "$OS"))
 
-preload_amd64_images
+# preload amd64 images
+./docker-build.py $OS YES NO
 
 docker images
 
-loop_over_nginx_with_os "$OS" "runtest"
+for DOCKERFILE in $(find "nginx/*/$OS" -name "Dockerfile*" -type f | sort); do
+    TAG=$(echo $DOCKERFILE | awk -F '/' '{print $2"-"$3$4}')
+    test "$TAG"
+done
