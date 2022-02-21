@@ -91,7 +91,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst build-,,$(@)); \
 	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO; \
+	$(BUILD_CMD) $$DISTRO YES YES; \
 	$(META_CMD) $$DISTRO YES
 endif
 
@@ -107,7 +107,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst build-minimal-,,$(@)); \
 	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO NO
+	$(BUILD_CMD) $$DISTRO NO YES
 endif
 
 ################################################################################

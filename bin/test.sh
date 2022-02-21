@@ -51,7 +51,7 @@ set -eux
 OS=$1
 
 # preload amd64 images
-./docker-build.py $OS YES NO
+./bin/docker-build.py $OS YES NO
 
 docker images
 
