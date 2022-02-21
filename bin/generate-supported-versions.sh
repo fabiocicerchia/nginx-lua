@@ -28,7 +28,7 @@ fetch_latest() {
 set -eux
 
 VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/nginx/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n' | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
-if [ "${#NGINX[@]}" != "1" ]; then
+if [ "$VER_NGINX" = "" ]; then
     echo "Wrong version count in NGINX."
     exit 1
 fi

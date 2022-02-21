@@ -13,7 +13,7 @@ ARG DISTRO_VER=2.0.20220121.0
 #############################
 # Settings Common Variables #
 #############################
-FROM ${DISTRO}:${DISTRO_VER} AS base
+FROM $DISTRO:$DISTRO_VER AS base
 
 # Ref: https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
 # platform of the build result. Eg linux/amd64, linux/arm/v7, windows/amd64.
@@ -31,9 +31,9 @@ ENV TARGETVARIAN=$TARGETVARIAN
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=${DISTRO}
+ARG DOCKER_IMAGE_OS=$DISTRO
 ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=${DISTRO_VER}
+ARG DOCKER_IMAGE_TAG=$DISTRO_VER
 ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
 
 ARG BUILD_DATE
@@ -303,42 +303,42 @@ FROM base
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
-    org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.description="Nginx $VER_NGINX with Lua support based on $DOCKER_IMAGE_OS $DOCKER_IMAGE_TAG." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d $DOCKER_IMAGE:$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
-    org.label-schema.name="$DOCKER_IMAGE" \
+    org.label-schema.build-date="${BUILD_DATE}" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on ${DOCKER_IMAGE_OS} ${DOCKER_IMAGE_TAG}." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
+    org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
-    org.label-schema.url="https://github.com/$DOCKER_IMAGE" \
+    org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url="https://github.com/$DOCKER_IMAGE" \
-    org.label-schema.version="$VER_NGINX-$DOCKER_IMAGE_OS$DOCKER_IMAGE_TAG" \
+    org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
+    org.label-schema.version="${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${TARGETARCH}" \
-    versions.extended=${EXTENDED_IMAGE} \
-    versions.headers-more-nginx-module=${VER_OPENRESTY_HEADERS} \
-    versions.lua=${VER_LUA} \
-    versions.luarocks=${VER_LUAROCKS} \
-    versions.lua-nginx-module=${VER_LUA_NGINX_MODULE} \
-    versions.lua-resty-cookie=${VER_CLOUDFLARE_COOKIE} \
-    versions.lua-resty-core=${VER_LUA_RESTY_CORE} \
-    versions.lua-resty-dns=${VER_OPENRESTY_DNS} \
-    versions.lua-resty-lrucache=${VER_LUA_RESTY_LRUCACHE} \
-    versions.lua-resty-memcached=${VER_OPENRESTY_MEMCACHED} \
-    versions.lua-resty-mysql=${VER_OPENRESTY_MYSQL} \
-    versions.lua-resty-redis=${VER_OPENRESTY_REDIS} \
-    versions.lua-resty-shell=${VER_OPENRESTY_SHELL} \
-    versions.lua-resty-signal=${VER_OPENRESTY_SIGNAL} \
-    versions.lua-resty-tablepool=${VER_OPENRESTY_TABLEPOOL} \
-    versions.lua-resty-upstream-healthcheck=${VER_OPENRESTY_HEALTHCHECK} \
-    versions.lua-resty-websocket=${VER_OPENRESTY_WEBSOCKET} \
-    versions.lua-upstream=${VER_LUA_UPSTREAM} \
-    versions.luajit2=${VER_LUAJIT} \
-    versions.nginx-lua-prometheus=${VER_PROMETHEUS} \
-    versions.nginx=${VER_NGINX} \
-    versions.ngx_devel_kit=${VER_NGX_DEVEL_KIT} \
-    versions.os=${DOCKER_IMAGE_TAG} \
-    versions.stream-lua-nginx-module=${VER_OPENRESTY_STREAMLUA}
+    versions.extended="${EXTENDED_IMAGE}" \
+    versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
+    versions.lua="${VER_LUA}" \
+    versions.luarocks="${VER_LUAROCKS}" \
+    versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \
+    versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
+    versions.lua-resty-core="${VER_LUA_RESTY_CORE}" \
+    versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \
+    versions.lua-resty-lrucache="${VER_LUA_RESTY_LRUCACHE}" \
+    versions.lua-resty-memcached="${VER_OPENRESTY_MEMCACHED}" \
+    versions.lua-resty-mysql="${VER_OPENRESTY_MYSQL}" \
+    versions.lua-resty-redis="${VER_OPENRESTY_REDIS}" \
+    versions.lua-resty-shell="${VER_OPENRESTY_SHELL}" \
+    versions.lua-resty-signal="${VER_OPENRESTY_SIGNAL}" \
+    versions.lua-resty-tablepool="${VER_OPENRESTY_TABLEPOOL}" \
+    versions.lua-resty-upstream-healthcheck="${VER_OPENRESTY_HEALTHCHECK}" \
+    versions.lua-resty-websocket="${VER_OPENRESTY_WEBSOCKET}" \
+    versions.lua-upstream="${VER_LUA_UPSTREAM}" \
+    versions.luajit2="${VER_LUAJIT}" \
+    versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
+    versions.nginx="${VER_NGINX}" \
+    versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
+    versions.os="${DOCKER_IMAGE_TAG}" \
+    versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
         GeoIP-devel \
