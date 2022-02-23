@@ -279,15 +279,15 @@ RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr 'a-z' 'A-Z')" \
     && apt-get install -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
-    && [ "$EXTENDED_IMAGE" = "YES" ] && \
+    && rm -rf /var/lib/apt/lists/*
+RUN make -j "$(nproc)" deps
+RUN [ "$EXTENDED_IMAGE" = "YES" ] && \
         NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
         " \
-    && make -j "$(nproc)" deps \
     && make -j "$(nproc)" core \
-    && make luarocks \
-    && rm -rf /var/lib/apt/lists/*
+    && make luarocks
 
 RUN set -eux \
 # envsubst

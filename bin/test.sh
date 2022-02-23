@@ -51,7 +51,10 @@ set -eux
 OS=$1
 
 # preload amd64 images
-./bin/docker-build.py $OS YES NO
+for TARBALL in $(find dist -name "*.tar" -type f | sort); do
+    TAG=$(echo $TARBALL | sed -E "s/(.*)-nginx-(.*)-([a-z]*)-(.*)-Dockerfile.*/\2@\3\4/" | tr '-' '.' | tr '@' '-')
+    docker import "$TARBALL" "$TAG"
+done
 
 docker images
 

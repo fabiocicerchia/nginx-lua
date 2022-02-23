@@ -1,9 +1,10 @@
-import os
-import subprocess
-import shlex
-import requests
 from datetime import datetime
+import os
+import re
+import requests
+import shlex
 import shutil
+import subprocess
 
 supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
 default_distro = "alpine"
@@ -26,7 +27,7 @@ def run_command(command, print_stdout):
         if process.poll() is not None:
             break
         if print_stdout and output:
-            print(output.strip())
+            print(output.decode("ascii").strip())
     rc = process.poll()
     return [rc, "".join(whole_output)]
 
@@ -90,31 +91,49 @@ def get_tags(suffix, nginx_ver, os_distro, os_ver):
     tags.append("%s-%s%s%s" % (major, os_distro, os_ver, suffix))
 
     tags = map(lambda x: image_repo+":"+x, tags)
-    return tags
+    return list(tags)
 
 ### BUILD
 ################################################################################
 
+def get_tarball_file(nginx_ver, os_distro, os_ver, suffix = ""):
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    return get_tarball_file_from_dockerfile(dockerfile)
+
+def get_tarball_file_from_dockerfile(dockerfile):
+    tarball_file = "dist/multiarch-" + re.sub('[^0-9a-zA-Z]+', '-', "%s" % (dockerfile)) + ".tar"
+    return tarball_file
+
 def docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
-    build_date = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    build_date = now.strftime("%Y-%m-%d")
+
+    tarball_file = get_tarball_file_from_dockerfile(dockerfile)
+    os.makedirs(os.path.dirname(tarball_file), exist_ok=True)
 
     ext_img = "YES" if extended_image else "NO"
     run_command("""
         time docker buildx build
-        --platform=linux/amd64 --load
+        --platform=linux/amd64
         --build-arg EXTENDED_IMAGE="%s"
         --build-arg BUILD_DATE="%s"
         --build-arg VCS_REF="%s"
+        --output type=tar,dest=%s
         %s
-        -f %s .""" % (ext_img, build_date, vcs_ref, tags_param, dockerfile), True)
+        -f %s .""" % (ext_img, build_date, vcs_ref, tarball_file, tags_param, dockerfile), True)
 
 
-def docker_build(extended_image, vcs_ref, tags, dockerfile):
+def docker_build(extended_image, vcs_ref, tags, dockerfile, push=False):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
-    build_date = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    build_date = now.strftime("%Y-%m-%d")
+
+    tarball_file = get_tarball_file_from_dockerfile(dockerfile)
+    os.makedirs(os.path.dirname(tarball_file), exist_ok=True)
+
+    push_flag = "--push" if push else ""
+    output_tar = "--output type=tar,dest=%s" % (tarball_file) if not push else ""
 
     ext_img = "YES" if extended_image else "NO"
     run_command("""
@@ -124,8 +143,12 @@ def docker_build(extended_image, vcs_ref, tags, dockerfile):
         --build-arg BUILD_DATE="%s"
         --build-arg VCS_REF="%s"
         %s
-        -f %s .""" % (ext_img, build_date, vcs_ref, tags_param, dockerfile), True)
+        %s
+        %s
+        -f %s .""" % (ext_img, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile), True)
 
+def docker_rebuild_and_push(extended_image, vcs_ref, tags, dockerfile):
+    docker_build(extended_image, vcs_ref, tags, dockerfile, True)
 
 def build(
         suffix,
@@ -144,9 +167,9 @@ def build(
     vcs_ref = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
 
     if (multi_arch):
-        docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile)
-    else:
         docker_build(extended_image, vcs_ref, tags, dockerfile)
+    else:
+        docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile)
 
 
 def build_all(nginx_ver, os_distro, os_ver, extended_image, multi_arch=True):
@@ -157,8 +180,12 @@ def build_all(nginx_ver, os_distro, os_ver, extended_image, multi_arch=True):
 ################################################################################
 
 
-def docker_push(tag):
-    cmd = "docker push %s:%s >/dev/null" % (image_repo, tag)
+def docker_push(image_id, tag):
+    cmd = "docker tag %s %s" % (image_id, tag)
+    (exitcode, stdout) = run_command(cmd, True)
+
+    cmd = "docker push %s" % (tag)
+    print(cmd)
     (exitcode, stdout) = run_command(cmd, True)
 
     # retry
@@ -168,21 +195,21 @@ def docker_push(tag):
 
 def push_images(suffix, nginx_ver, os_distro, os_ver):
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
-    for tag in tags:
-        docker_push(tag)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    extended_image = True
+    vcs_ref = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
+    docker_rebuild_and_push(extended_image, vcs_ref, tags, dockerfile)
 
 
 def push(nginx_ver, os_distro, os_ver):
     push_images("", nginx_ver, os_distro, os_ver)
-
-
-def push_compat(nginx_ver, os_distro, os_ver):
     push_images("-compat", nginx_ver, os_distro, os_ver)
 
 ### METADATA
 ################################################################################
 
 def metadata(tag):
+    # TODO: CHECK
     # if (not force):
     #     metadata = "docs/metadata/%s-%s%s.md" % (nginx_ver, os_distro, os_ver)
     #     if (os.path.isfile(metadata)):
@@ -226,18 +253,6 @@ def get_supported_versions():
             get_dockerfile(nginx_ver, os_distro, versions[os_distro]))
 
     return supported_versions
-
-# # This is a very ugly way to make the AMD64 version of the images available in the host.
-# # When building a multi-arch image the images will not be loaded in the docker engine.
-# # In this way I'm taking advantage of some buildx cache to quickly recompile them and make
-# # it available for testing the amd64 version.
-# # NOTE: Except that it won't work due to BUILD_DATE being set to the second.
-# def preload_amd64_images(os_distro, force):
-#     if (not force):
-#         return
-
-#     loop_over_nginx_with_os(os_distro, "build_classic", True, False)
-#     loop_over_nginx_with_os(os_distro, "build_compat", True, False)
 
 ### GENERATE DOCKERFILES
 ################################################################################
