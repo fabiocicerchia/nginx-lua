@@ -25,9 +25,6 @@ ENV TARGETOS=$TARGETOS
 # architecture component of TARGETPLATFORM
 ARG TARGETARCH
 ENV TARGETARCH=$TARGETARCH
-# variant component of TARGETPLATFORM
-ARG TARGETVARIAN
-ENV TARGETVARIAN=$TARGETVARIAN
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
@@ -277,7 +274,7 @@ RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr 'a-z' 'A-Z')" \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS \
+        $NGINX_BUILD_DEPS
 RUN make -j "$(nproc)" deps
 RUN [ "$EXTENDED_IMAGE" = "YES" ] && \
         NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \

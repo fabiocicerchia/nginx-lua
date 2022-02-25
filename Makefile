@@ -83,13 +83,12 @@ help: ## prints this help
 ##@ BUILD
 ################################################################################
 
-build-all: $(build_targets) ## build all dockerfiles
+build-all: qemu $(build_targets) ## build all dockerfiles
 
 $(build_targets): ## build one distro
 ifeq ($(SKIP), YES)
 	echo SKIPPING $@
 else
-	docker buildx create --name multiarch --use
 	DISTRO=$(subst build-,,$(@)); \
 	echo BUILDING $$DISTRO; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
@@ -158,9 +157,9 @@ endif
 ################################################################################
 # Ref: https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/
 qemu:
+	docker buildx create --name multiarch --use
 	sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
-	#docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
-	docker run --rm --privileged tonistiigi/binfmt:latest -install arm64
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
 
 ################################################################################
 ##@ UTILITIES

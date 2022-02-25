@@ -107,7 +107,7 @@ def get_tarball_file_from_dockerfile(dockerfile):
 def docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
-    build_date = now.strftime("%Y-%m-%d")
+    build_date = now.strftime("%Y-%m-%dT00:00:00Z")
 
     tarball_file = get_tarball_file_from_dockerfile(dockerfile)
     os.makedirs(os.path.dirname(tarball_file), exist_ok=True)
@@ -127,7 +127,7 @@ def docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile):
 def docker_build(extended_image, vcs_ref, tags, dockerfile, push=False):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
-    build_date = now.strftime("%Y-%m-%d")
+    build_date = now.strftime("%Y-%m-%dT00:00:00Z")
 
     tarball_file = get_tarball_file_from_dockerfile(dockerfile)
     os.makedirs(os.path.dirname(tarball_file), exist_ok=True)

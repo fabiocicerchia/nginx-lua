@@ -56,7 +56,7 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Quick reference (cont.)
 
 - **Where to file issues:** [https://github.com/fabiocicerchia/nginx-lua/issues](https://github.com/fabiocicerchia/nginx-lua/issues)
-- **Supported architectures:** amd64
+- **Supported architectures:** amd64, arm64
 - **Published image artifact details:** [repo-info repo's docs/metadata/ directory](https://github.com/fabiocicerchia/nginx-lua/tree/main/docs/examples) ([history](https://github.com/fabiocicerchia/nginx-lua/commits/main/docs/metadata)) (image metadata, transfer size, etc)
 
 ## What is nginx?
@@ -376,8 +376,11 @@ The following are the available build-time options. They can be set using the `-
 | `DOCKER_IMAGE`              | `fabiocicerchia/nginx-lua`                 | The image name. |
 | `DOCKER_IMAGE_OS`           | `alpine`                                   | The Docker base image to build `FROM`. |
 | `DOCKER_IMAGE_TAG`          | `3.15.0`                                   | The Docker image tag to build `FROM`. |
-| `BUILD_DATE`                |                                            | This label contains the Date/Time the image was built. |
+| `BUILD_DATE`                |                                            | This label contains the Date the image was built. |
 | `VCS_REF`                   |                                            | Identifier for the version of the source code from which this image was built. |
+| `TARGETPLATFORM`            | `linux/amd64`                              | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
+| `TARGETOS`                  | `linux`                                    | OS component of `TARGETPLATFORM`. |
+| `TARGETARCH`                | `amd64`                                    | Architecture component of `TARGETPLATFORM`. |
 | `EXTENDED_IMAGE`            | `YES`                                      | Flag to identify if extended image (which contains extra modules). See [Minimal Image](#minimal-image). |
 | `VER_NGX_DEVEL_KIT`         | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | `VER_LUAJIT`                | `2.1-20210510`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
@@ -540,6 +543,9 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "org.label-schema.vcs-ref": "36db2a3",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
   "org.label-schema.version": "1.21.4-alpine3.15.0",
+  "image.target.platform": "amd64",
+  "image.target.os": "linux",
+  "image.target.arch": "amd64",
   "versions.extended": "1",
   "versions.headers-more-nginx-module": "d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17",
   "versions.lua": "5.4",
@@ -570,7 +576,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | Label Name                                | Description             |
 :------------------------------------------ |:----------------------- |
 | `maintainer`                              | Maintainer of the image |
-| `org.label-schema.build-date`             | This label contains the Date/Time the image was built. The value SHOULD be formatted according to RFC 3339. buildarg `BUILD_DATE` |
+| `org.label-schema.build-date`             | This label contains the Date the image was built. The value SHOULD be formatted according to RFC 3339. buildarg `BUILD_DATE` |
 | `org.label-schema.description`            | Text description of the image. May contain up to 300 characters. |
 | `org.label-schema.docker.cmd`             | How to run a container based on the image under the Docker runtime. |
 | `org.label-schema.name`                   | buildarg `DOCKER_IMAGE` |
@@ -579,6 +585,9 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `org.label-schema.vcs-ref`                | buildarg `VCS_REF` |
 | `org.label-schema.vcs-url`                | URL for the source code under version control from which this container image was built. |
 | `org.label-schema.version`                | Release identifier for the contents of the image. |
+| `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
+| `image.target.os`                         | OS component of `image.target.platform`. |
+| `image.target.arch`                       | Architecture component of `image.target.platform`. |
 | `versions.extended`                       | Flag to identify if extended image (which contains extra modules). |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua`                            | The version of [Lua](https://www.lua.org/) to use. |
