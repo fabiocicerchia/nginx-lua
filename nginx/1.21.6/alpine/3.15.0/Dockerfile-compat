@@ -276,7 +276,7 @@ COPY tpl/Makefile Makefile
 
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr 'a-z' 'A-Z')" \
+RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr '[:lower:]' '[:upper:]')" \
     && set -eux \
     && apk update \
     && apk add --no-cache \

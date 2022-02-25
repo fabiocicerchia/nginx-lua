@@ -164,7 +164,7 @@ def build(
 
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
 
-    vcs_ref = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
+    vcs_ref = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
 
     if (multi_arch):
         docker_build(extended_image, vcs_ref, tags, dockerfile)
@@ -182,22 +182,21 @@ def build_all(nginx_ver, os_distro, os_ver, extended_image, multi_arch=True):
 
 def docker_push(image_id, tag):
     cmd = "docker tag %s %s" % (image_id, tag)
-    (exitcode, stdout) = run_command(cmd, True)
+    exitcode = run_command(cmd, True)[0]
 
     cmd = "docker push %s" % (tag)
-    print(cmd)
-    (exitcode, stdout) = run_command(cmd, True)
+    exitcode = run_command(cmd, True)[0]
 
     # retry
     if (exitcode != 0):
-        (exitcode, stdout) = run_command(cmd, True)
+        exitcode = run_command(cmd, True)[0]
 
 
 def push_images(suffix, nginx_ver, os_distro, os_ver):
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
     extended_image = True
-    vcs_ref = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
+    vcs_ref = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
     docker_rebuild_and_push(extended_image, vcs_ref, tags, dockerfile)
 
 
@@ -215,13 +214,12 @@ def metadata(tag):
     #     if (os.path.isfile(metadata)):
     #         return
     cmd = "docker image ls -q %s:%s" % (image_repo, tag)
-    (exitcode, img_exists) = run_command(cmd, False)
+    img_exists = run_command(cmd, False)[1]
     if (img_exists != ""):
-        file = "docs/metadata/%s.md" % (tag)
         content = "# %s:%s\n" % (image_repo, tag)
         content = content + "```json\n"
         cmd = "docker image inspect %s:%s" % (image_repo, tag)
-        (exitcode, stdout) = run_command(cmd, False)
+        stdout = run_command(cmd, False)[1]
         content = content + stdout + "\n```"
         write_file("docs/metadata/%s.md" % (tag), content)
 
@@ -285,5 +283,4 @@ def tag(nginx_ver, os_distro, os_ver):
     tags = get_tags("", nginx_ver, os_distro, os_ver)
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
-    str = "- [%s](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)" % (", ".join(tags), dockerfile)
-    print(str)
+    print("- [%s](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)" % (", ".join(tags), dockerfile))

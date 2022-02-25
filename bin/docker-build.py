@@ -11,5 +11,5 @@ if __name__ == "__main__":
     versions = common.get_all_versions()
     common.build_all(versions["nginx"], os_distro, versions[os_distro], extended_image, multi_arch)
 
-    stdout = subprocess.check_output(['docker', 'images'])
+    stdout = subprocess.check_output(['/usr/bin/docker', 'images'])
     print(stdout)
