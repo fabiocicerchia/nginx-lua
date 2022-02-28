@@ -58,7 +58,7 @@ done
 
 docker images
 
-for DOCKERFILE in $(find "nginx/*/$OS" -name "Dockerfile*" -type f | sort); do
+for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort); do
     TAG=$(echo "$DOCKERFILE" | awk -F '/' '{print $2"-"$3$4}')
     test "$TAG"
 done

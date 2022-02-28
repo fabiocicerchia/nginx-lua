@@ -272,7 +272,7 @@ COPY tpl/Makefile Makefile
 
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo \"BUILD_DEPS_${TARGETARCH}\" | tr '[:lower:]' '[:upper:]')" \
+RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
     && set -eux \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
@@ -281,7 +281,7 @@ RUN eval BUILD_DEPS="\$$(echo \"BUILD_DEPS_${TARGETARCH}\" | tr '[:lower:]' '[:u
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS \
+        $NGINX_BUILD_DEPS
 RUN make -j "$(nproc)" deps
 RUN [ "$EXTENDED_IMAGE" = "YES" ] && \
         NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \

@@ -5,6 +5,7 @@ import requests
 import shlex
 import shutil
 import subprocess
+import sys
 
 supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
 default_distro = "alpine"
@@ -104,27 +105,7 @@ def get_tarball_file_from_dockerfile(dockerfile):
     tarball_file = "dist/multiarch-" + re.sub('[^0-9a-zA-Z]+', '-', "%s" % (dockerfile)) + ".tar"
     return tarball_file
 
-def docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile):
-    tags_param = " ".join(["-t %s" % (tag) for tag in tags])
-    now = datetime.now()  # current date and time
-    build_date = now.strftime("%Y-%m-%dT00:00:00Z")
-
-    tarball_file = get_tarball_file_from_dockerfile(dockerfile)
-    os.makedirs(os.path.dirname(tarball_file), exist_ok=True)
-
-    ext_img = "YES" if extended_image else "NO"
-    run_command("""
-        time docker buildx build
-        --platform=linux/amd64
-        --build-arg EXTENDED_IMAGE="%s"
-        --build-arg BUILD_DATE="%s"
-        --build-arg VCS_REF="%s"
-        --output type=tar,dest=%s
-        %s
-        -f %s .""" % (ext_img, build_date, vcs_ref, tarball_file, tags_param, dockerfile), True)
-
-
-def docker_build(extended_image, vcs_ref, tags, dockerfile, push=False):
+def docker_build(extended_image, vcs_ref, tags, dockerfile, arch, push=False):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
     build_date = now.strftime("%Y-%m-%dT00:00:00Z")
@@ -136,19 +117,22 @@ def docker_build(extended_image, vcs_ref, tags, dockerfile, push=False):
     output_tar = "--output type=tar,dest=%s" % (tarball_file) if not push else ""
 
     ext_img = "YES" if extended_image else "NO"
-    run_command("""
+    exit_code = run_command("""
         time docker buildx build
-        --platform=linux/amd64,linux/arm64/v8
+        --platform=linux/%s
         --build-arg EXTENDED_IMAGE="%s"
         --build-arg BUILD_DATE="%s"
         --build-arg VCS_REF="%s"
         %s
         %s
         %s
-        -f %s .""" % (ext_img, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile), True)
+        -f %s .""" % (arch, ext_img, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile), True)[0]
+
+    return exit_code
 
 def docker_rebuild_and_push(extended_image, vcs_ref, tags, dockerfile):
-    docker_build(extended_image, vcs_ref, tags, dockerfile, True)
+    docker_build(extended_image, vcs_ref, tags, dockerfile, "amd64", True)
+    docker_build(extended_image, vcs_ref, tags, dockerfile, "arm64/v8", True)
 
 def build(
         suffix,
@@ -156,7 +140,7 @@ def build(
         os_distro,
         os_ver,
         extended_image,
-        multi_arch=True):
+        arch):
     if (not extended_image):
         suffix = "%s-minimal" % (suffix)
 
@@ -166,15 +150,8 @@ def build(
 
     vcs_ref = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
 
-    if (multi_arch):
-        docker_build(extended_image, vcs_ref, tags, dockerfile)
-    else:
-        docker_build_amd64_only(extended_image, vcs_ref, tags, dockerfile)
-
-
-def build_all(nginx_ver, os_distro, os_ver, extended_image, multi_arch=True):
-    build("", nginx_ver, os_distro, os_ver, extended_image, multi_arch)
-    build("-compat", nginx_ver, os_distro, os_ver, extended_image, multi_arch)
+    exit_code = docker_build(extended_image, vcs_ref, tags, dockerfile, arch)
+    return exit_code
 
 ### PUSH
 ################################################################################

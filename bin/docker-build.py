@@ -6,14 +6,17 @@ import common
 if __name__ == "__main__":
     os_distro = sys.argv[1]
     suffix = sys.argv[2] or ""
-    extended_image = (sys.argv[3] or "YES") == "YES"
-    multi_arch = (sys.argv[4] or "YES") == "YES"
+    arch = sys.argv[3]
+    extended_image = (sys.argv[4] or "YES") == "YES"
 
     if suffix != "":
       suffix = "-%s" % (suffix)
 
     versions = common.get_all_versions()
-    common.build(suffix, versions["nginx"], os_distro, versions[os_distro], extended_image, multi_arch)
+    exit_code = common.build(suffix, versions["nginx"], os_distro, versions[os_distro], extended_image, arch)
+
+    if exit_code > 0:
+        sys.exit(1)
 
     stdout = subprocess.check_output(['/usr/bin/docker', 'images'])
     print(stdout)

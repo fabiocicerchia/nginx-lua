@@ -28,8 +28,12 @@ PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | h
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell make changelog)
 
-classic_compat_distros=$(addsuffix -classic, $(DISTROS)) $(addsuffix -compat, $(DISTROS))
+arm64_distros=$(addprefix amd64-, $(DISTROS))
+amd64_distros=$(addprefix arm64/v8-, $(DISTROS))
+arch_distros=$(amd64_distros) $(arm64_distros)
+classic_compat_distros=$(addsuffix -classic, $(arch_distros)) $(addsuffix -compat, $(arch_distros))
 build_targets=$(addprefix build-, $(classic_compat_distros))
+
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
@@ -90,11 +94,12 @@ $(build_targets): ## build one distro
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
-	COMPAT=$(shell echo $(DISTRO) | grep "\-compat" | sed 's/^-//'); \
-	DISTRO=$(subst -classic,,$(subst -compat,,$(subst build-,,$(@)))); \
+	ARCH=$(shell echo $(@) | cut -d"-" -f2); \
+	DISTRO=$(shell echo $(@) | cut -d"-" -f3); \
+	COMPAT=$(shell echo $(@) | grep "\-compat" | cut -d"-" -f4); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" YES YES; \
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH" YES; \
 	$(META_CMD) "$$DISTRO" YES
 endif
 
