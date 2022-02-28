@@ -43,12 +43,12 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`almalinux`,`1-almalinux`,`1.21-almalinux`,`1.21.6-almalinux`,`1-almalinux8.5-20211112`,`1-almalinux8.5-20211112`,`1.21-almalinux8.5-20211112`,`1.21.6-almalinux8.5-20211112`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/almalinux/8.5-20211112/Dockerfile)
-- [`1`,`1.21`,`1.21.6`,`alpine`,`1-alpine`,`1.21-alpine`,`1.21.6-alpine`,`1-alpine3.15.0`,`1-alpine3.15.0`,`1.21-alpine3.15.0`,`1.21.6-alpine3.15.0`,`latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/alpine/3.15.0/Dockerfile)
-- [`amazonlinux`,`1-amazonlinux`,`1.21-amazonlinux`,`1.21.6-amazonlinux`,`1-amazonlinux2.0.20220121.0`,`1-amazonlinux2.0.20220121.0`,`1.21-amazonlinux2.0.20220121.0`,`1.21.6-amazonlinux2.0.20220121.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/amazonlinux/2.0.20220121.0/Dockerfile)
-- [`debian`,`1-debian`,`1.21-debian`,`1-debian11.2`,`1-debian11.2`,`1.21.6-debian`,`1.21-debian11.2`,`1.21.6-debian11.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/debian/11.2/Dockerfile)
-- [`fedora`,`1-fedora`,`1-fedora35`,`1-fedora35`,`1.21-fedora`,`1.21-fedora35`,`1.21.6-fedora`,`1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
-- [`ubuntu`,`1-ubuntu`,`1.21-ubuntu`,`1-ubuntu20.04`,`1-ubuntu20.04`,`1.21.6-ubuntu`,`1.21-ubuntu20.04`,`1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
+- [`almalinux`, `1-almalinux`, `1.21-almalinux`, `1.21.6-almalinux`, `1-almalinux8.5-20211112`, `1.21-almalinux8.5-20211112`, `1.21.6-almalinux8.5-20211112`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/almalinux/8.5-20211112/Dockerfile)
+- [`1`, `1.21`, `alpine`, `1.21.6`, `latest`, `1-alpine`, `1.21-alpine`, `1.21.6-alpine`, `1-alpine3.15.0`, `1.21-alpine3.15.0`, `1.21.6-alpine3.15.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/alpine/3.15.0/Dockerfile)
+- [`amazonlinux`, `1-amazonlinux`, `1.21-amazonlinux`, `1.21.6-amazonlinux`, `1-amazonlinux2.0.20220121.0`, `1.21-amazonlinux2.0.20220121.0`, `1.21.6-amazonlinux2.0.20220121.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/amazonlinux/2.0.20220121.0/Dockerfile)
+- [`debian`, `1-debian`, `1.21-debian`, `1-debian11.2`, `1.21.6-debian`, `1.21-debian11.2`, `1.21.6-debian11.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/debian/11.2/Dockerfile)
+- [`fedora`, `1-fedora`, `1-fedora35`, `1.21-fedora`, `1.21-fedora35`, `1.21.6-fedora`, `1.21.6-fedora35`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/fedora/35/Dockerfile)
+- [`ubuntu`, `1-ubuntu`, `1.21-ubuntu`, `1-ubuntu20.04`, `1.21.6-ubuntu`, `1.21-ubuntu20.04`, `1.21.6-ubuntu20.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.21.6/ubuntu/20.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
@@ -381,7 +381,6 @@ The following are the available build-time options. They can be set using the `-
 | `TARGETPLATFORM`            | `linux/amd64`                              | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `TARGETOS`                  | `linux`                                    | OS component of `TARGETPLATFORM`. |
 | `TARGETARCH`                | `amd64`                                    | Architecture component of `TARGETPLATFORM`. |
-| `EXTENDED_IMAGE`            | `YES`                                      | Flag to identify if extended image (which contains extra modules). See [Minimal Image](#minimal-image). |
 | `VER_NGX_DEVEL_KIT`         | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | `VER_LUAJIT`                | `2.1-20210510`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | `LUAJIT_LIB`                | `/usr/local/lib`                           | Tell nginx's build system where to find LuaJIT 2.0 |
@@ -484,33 +483,6 @@ Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, Debian, Fed
 Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
 **WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
 
-### `fabiocicerchia/nginx-lua:<version>-minimal`
-
-Provides Nginx + Lua image. Uses Alpine for base image.  
-**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
-
-### `fabiocicerchia/nginx-lua:<version>-<distro>-minimal`
-
-Provides Nginx + Lua. Uses Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.  
-**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
-
-### `fabiocicerchia/nginx-lua:<version>-<distro><version>-minimal`
-
-Provides Nginx + Lua. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.  
-**WARNING:** Not available as tag, need manual build, see [Minimal Image](#minimal-image)
-
-## Minimal Image
-
-The extended image (default one) contains a set of extra packages for enhanced functionality.
-If you need a smaller version, like the official distros (containing only nginx and openresty's lua module),
-you could build specifying the build argument set to 0:
-
-```console
-$ docker build \
-  --build-arg EXTENDED=0 \
-  -f $DOCKERFILE .
-```
-
 ## Custom Builds
 
 If you need to extend the functionality of the existing image, you could build your own version using the following command.
@@ -546,7 +518,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "image.target.platform": "amd64",
   "image.target.os": "linux",
   "image.target.arch": "amd64",
-  "versions.extended": "1",
   "versions.headers-more-nginx-module": "d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17",
   "versions.lua": "5.4",
   "versions.lua-nginx-module": "0.10.20",
@@ -588,7 +559,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `image.target.os`                         | OS component of `image.target.platform`. |
 | `image.target.arch`                       | Architecture component of `image.target.platform`. |
-| `versions.extended`                       | Flag to identify if extended image (which contains extra modules). |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua`                            | The version of [Lua](https://www.lua.org/) to use. |
 | `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |

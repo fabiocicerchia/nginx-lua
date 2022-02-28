@@ -64,9 +64,9 @@ help: ## prints this help
 	echo "Repo: https://github.com/fabiocicerchia/nginx-lua"
 	echo ""
 	@gawk 'function fix_value(value, str) { \
-		padding=sprintf("%30s",""); \
+		padding=sprintf("%50s",""); \
 		ret=gensub("([^ ]+)", "\\1"padding"\n ", "g", "  "value); \
-		ret=gensub("(^|\n)(.{33}) *", "\\1\\2\033[0m"str"  \033[36m", "g", ret); \
+		ret=gensub("(^|\n)(.{53}) *", "\\1\\2\033[0m"str"  \033[36m", "g", ret); \
 		ret=substr(ret, 3, length(ret)-16-length(str)); \
 		return ret; \
 	} \
@@ -79,7 +79,7 @@ help: ## prints this help
 		gsub("\\$$\\(test_targets\\)",     fix_value("$(test_targets)", $$2),     $$1); \
 		gsub("\\$$\\(security_targets\\)", fix_value("$(security_targets)", $$2), $$1); \
 		gsub("\\$$\\(push_targets\\)",     fix_value("$(push_targets)", $$2),     $$1); \
-		printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2 \
+		printf "  \033[36m%-50s\033[0m %s\n", $$1, $$2 \
 	} /^##@/ { \
 		printf "\n\033[1m%s\033[0m\n", substr($$0, 5) \
 	}' $(MAKEFILE_LIST)
@@ -99,23 +99,8 @@ else
 	COMPAT=$(shell echo $(@) | grep "\-compat" | cut -d"-" -f4); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH" YES; \
-	$(META_CMD) "$$DISTRO" YES
-endif
-
-################################################################################
-##@ BUILD MINIMAL
-################################################################################
-
-build-minimal-all: $(minimal_targets) ## build all dockerfiles (minimal)
-
-$(minimal_targets): ## build one distro (minimal)
-ifeq ($(SKIP), YES)
-	echo "SKIPPING $@"
-else
-	DISTRO=$(subst build-minimal-,,$(@)); \
-	echo "BUILDING MINIMAL $$DISTRO"; \
-	$(BUILD_CMD) "$$DISTRO" NO YES
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH"; \
+	$(META_CMD) "$$DISTRO"
 endif
 
 ################################################################################

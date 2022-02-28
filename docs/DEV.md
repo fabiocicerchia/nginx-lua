@@ -110,3 +110,9 @@ any dockerfile in the last commit the flag `SKIP` will be set in the `Makefile`.
 FORCE=YES make build-all
 FORCE=YES make test-all
 ```
+
+## Minimal Image
+
+The extended image (default one) contains a set of extra packages for enhanced functionality.
+If you need a smaller version, like the official distros (containing only nginx and openresty's lua module),
+you could build changing the Makefile settings `EXTENDED_IMAGE` to `NO`.

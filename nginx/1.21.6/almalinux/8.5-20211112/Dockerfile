@@ -38,9 +38,6 @@ ENV BUILD_DATE=$BUILD_DATE
 ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
-ARG EXTENDED_IMAGE=YES
-ENV EXTENDED_IMAGE=$EXTENDED_IMAGE
-
 # lua
 ARG VER_LUA=5.3.4
 ENV VER_LUA=$VER_LUA
@@ -233,6 +230,8 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
+            --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
+            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
@@ -270,7 +269,6 @@ FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
-# TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
     && set -eux \
@@ -283,12 +281,7 @@ RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS
 RUN make -j "$(nproc)" deps
-RUN [ "$EXTENDED_IMAGE" = "YES" ] && \
-        NGINX_BUILD_CONFIG="${NGINX_BUILD_CONFIG} \
-            --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
-            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
-        " \
-    && make -j "$(nproc)" core
+RUN make -j "$(nproc)" core
 
 RUN set -eux \
 # envsubst
@@ -316,7 +309,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${TARGETARCH}" \
-    versions.extended="${EXTENDED_IMAGE}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua="${VER_LUA}" \
     versions.luarocks="${VER_LUAROCKS}" \

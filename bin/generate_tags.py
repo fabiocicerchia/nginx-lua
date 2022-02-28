@@ -15,28 +15,28 @@ tags = {}
 for file in files:
     pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile", file)
 
-    nginxVer, os_distro, osVer = pieces.group(1, 2, 3)
-    nginxVerPieces = re.split(r"\.", nginxVer)
-    nginxVerMajor, nginxVerMinor, nginxVerPatch = nginxVerPieces
+    nginx_ver, os_distro, osVer = pieces.group(1, 2, 3)
+    nginx_ver_pieces = re.split(r"\.", nginx_ver)
+    nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
 
     # tags[os_distro] = file # currently missing
-    tags[nginxVerMajor + "." + nginxVerMinor + "." +
-         nginxVerPatch + "-" + os_distro + osVer] = file
-    tags[nginxVerMajor + "." + nginxVerMinor +
-         "." + nginxVerPatch + "-" + os_distro] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor + "." +
+         nginx_ver_patch + "-" + os_distro + osVer] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor +
+         "." + nginx_ver_patch + "-" + os_distro] = file
     if os_distro == "alpine":
-        tags[nginxVerMajor + "." + nginxVerMinor + "-" + nginxVerPatch] = file
-    tags[nginxVerMajor + "." + nginxVerMinor + "-" + os_distro + osVer] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + nginx_ver_patch] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro + osVer] = file
     if not (os_distro == "amazonlinux" and osVer.startswith("2018")):
-        tags[nginxVerMajor + "." + nginxVerMinor + "-" + os_distro] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro] = file
     if os_distro == "alpine":
-        tags[nginxVerMajor + "." + nginxVerMinor] = file
-    tags[nginxVerMajor + "-" + os_distro + osVer] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor] = file
+    tags[nginx_ver_major + "-" + os_distro + osVer] = file
     tags[os_distro] = file
     if not (os_distro == "amazonlinux" and osVer.startswith("2018")):
-        tags[nginxVerMajor + "-" + os_distro] = file
+        tags[nginx_ver_major + "-" + os_distro] = file
     if os_distro == "alpine":
-        tags[nginxVerMajor] = file
+        tags[nginx_ver_major] = file
         tags["latest"] = file
 
 dockerfiles = {}

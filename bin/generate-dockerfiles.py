@@ -15,3 +15,11 @@ if __name__ == "__main__":
             dockerfiles.split("\n")))
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile")
+
+    (exitcode, dockerfiles) = common.run_command("find nginx -type f -name 'Dockerfile-compat'", False)
+    dockerfiles = list(
+        filter(
+            lambda elem: elem.find("alpine") != -1,
+            dockerfiles.split("\n")))
+    dockerfiles.sort(reverse=True)
+    shutil.copyfile(dockerfiles[0], "./Dockerfile-compat")
