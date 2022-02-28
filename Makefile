@@ -28,7 +28,8 @@ PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | h
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell make changelog)
 
-build_targets=$(addprefix build-, $(DISTROS))
+classic_compat_distros=$(addsuffix -classic, $(DISTROS)) $(addsuffix -compat, $(DISTROS))
+build_targets=$(addprefix build-, $(classic_compat_distros))
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
@@ -87,13 +88,14 @@ build-all: qemu $(build_targets) ## build all dockerfiles
 
 $(build_targets): ## build one distro
 ifeq ($(SKIP), YES)
-	echo SKIPPING $@
+	echo "SKIPPING $@"
 else
-	DISTRO=$(subst build-,,$(@)); \
-	echo BUILDING $$DISTRO; \
+	COMPAT=$(shell echo $(DISTRO) | grep "\-compat" | sed 's/^-//'); \
+	DISTRO=$(subst -classic,,$(subst -compat,,$(subst build-,,$(@)))); \
+	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) $$DISTRO YES YES; \
-	$(META_CMD) $$DISTRO YES
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" YES YES; \
+	$(META_CMD) "$$DISTRO" YES
 endif
 
 ################################################################################
@@ -104,11 +106,11 @@ build-minimal-all: $(minimal_targets) ## build all dockerfiles (minimal)
 
 $(minimal_targets): ## build one distro (minimal)
 ifeq ($(SKIP), YES)
-	echo SKIPPING $@
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst build-minimal-,,$(@)); \
-	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO NO YES
+	echo "BUILDING MINIMAL $$DISTRO"; \
+	$(BUILD_CMD) "$$DISTRO" NO YES
 endif
 
 ################################################################################
@@ -119,22 +121,22 @@ test-all: $(test_targets) ## test all docker images
 
 $(test_targets): ## test one docker image
 ifeq ($(SKIP), YES)
-	echo SKIPPING $@
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst test-,,$(@)); \
-	echo TESTING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO
+	echo "TESTING $$DISTRO"; \
+	$(TEST_CMD) "$$DISTRO"
 endif
 
 test-security: $(security_targets) ## test security all docker images
 
 $(security_targets): ## test security one docker images
 ifeq ($(SKIP), YES)
-	echo SKIPPING $@
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst test-security-,,$(@)); \
-	echo SECURITY $$DISTRO; \
-	$(SEC_CMD) $$DISTRO
+	echo "SECURITY $$DISTRO"; \
+	$(SEC_CMD) "$$DISTRO"
 endif
 
 ################################################################################
@@ -145,11 +147,11 @@ push-all: $(push_targets) ## push all docker images to docker hub
 
 $(push_targets): ## push one docker images to docker hub
 ifeq ($(SKIP), YES)
-	echo SKIPPING $@
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst push-,,$(@)); \
-	echo PUSHING $$DISTRO; \
-	$(PUSH_CMD) $$DISTRO
+	echo "PUSHING $$DISTRO"; \
+	$(PUSH_CMD) "$$DISTRO"
 endif
 
 ################################################################################

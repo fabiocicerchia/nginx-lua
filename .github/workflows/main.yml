@@ -18,6 +18,7 @@ jobs:
     strategy:
       matrix:
         distro: [almalinux, alpine, amazonlinux, debian, fedora, ubuntu]
+        version: [classic, compat]
 
     name: Build Docker
     runs-on: ubuntu-20.04
@@ -35,7 +36,7 @@ jobs:
           docker buildx inspect --bootstrap
 
       - name: Build images
-        run: make build-${{ matrix.distro }}
+        run: make build-${{ matrix.distro }}-${{ matrix.version }}
         env:
           FORCE: YES
 

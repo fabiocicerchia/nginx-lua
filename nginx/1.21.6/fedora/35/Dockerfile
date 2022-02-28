@@ -268,7 +268,7 @@ COPY tpl/Makefile Makefile
 
 # TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo "BUILD_DEPS_${TARGETARCH}" | tr '[:lower:]' '[:upper:]')" \
+RUN eval BUILD_DEPS="\$$(echo \"BUILD_DEPS_${TARGETARCH}\" | tr '[:lower:]' '[:upper:]')" \
     && set -eux \
     && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(source /etc/os-release; echo $VERSION_ID)-primary \
     && dnf makecache \
