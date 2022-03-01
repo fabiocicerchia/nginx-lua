@@ -269,8 +269,7 @@ COPY tpl/Makefile Makefile
 RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
     && set -eux \
     && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(source /etc/os-release; echo $VERSION_ID)-primary \
-    && dnf makecache \
-    && dnf install -y \
+    && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS
 RUN make -j "$(nproc)" deps
@@ -279,8 +278,7 @@ RUN make -j "$(nproc)" core
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && dnf makecache \
-    && dnf install -y \
+    && yum install -y \
         gettext
 
 ##########################################
@@ -352,17 +350,15 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(source /etc/os-release; echo $VERSION_ID)-primary \
-    && dnf makecache \
-    && dnf install -y \
+    && yum install -y \
         $PKG_DEPS \
 # Fix LUA alias
     && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && dnf install -y tzdata \
+    && yum install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && dnf install -y curl ca-certificates \
+    && yum install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -373,7 +369,7 @@ RUN set -eux \
     && mkdir /docker-entrypoint.d \
 # Cleanup
 # ##############################################################################
-    && dnf clean all \
+    && yum clean all \
     && rm -rf /var/cache/dnf
 
 COPY tpl/support.sh /
