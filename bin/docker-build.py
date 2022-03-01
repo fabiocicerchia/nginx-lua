@@ -11,6 +11,13 @@ if __name__ == "__main__":
     if suffix != "":
       suffix = "-%s" % (suffix)
 
+    # CircleCI workaround
+    if arch == "medium":
+      arch = "amd64"
+    if arch == "arm.medium":
+      arch = "arm64/v8"
+    # / CircleCI workaround
+
     versions = common.get_all_versions()
     exit_code = common.build(suffix, versions["nginx"], os_distro, versions[os_distro], arch)
 

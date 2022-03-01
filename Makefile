@@ -32,7 +32,13 @@ arm64_distros=$(addprefix amd64-, $(DISTROS))
 amd64_distros=$(addprefix arm64/v8-, $(DISTROS))
 arch_distros=$(amd64_distros) $(arm64_distros)
 classic_compat_distros=$(addsuffix -classic, $(arch_distros)) $(addsuffix -compat, $(arch_distros))
-build_targets=$(addprefix build-, $(classic_compat_distros))
+# CircleCI workaround
+cci_arm64_distros=$(addprefix medium-, $(DISTROS))
+cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
+cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
+cci_classic_compat_distros=$(addsuffix -classic, $(cci_arch_distros)) $(addsuffix -compat, $(cci_arch_distros))
+# / CircleCI workaround
+build_targets=$(addprefix build-, $(classic_compat_distros)) $(addprefix build-, $(cci_classic_compat_distros))
 
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))

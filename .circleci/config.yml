@@ -1,0 +1,150 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
+# See: https://circleci.com/docs/2.0/orb-intro/
+orbs:
+  node: circleci/docker@2.0.2
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - auto_update
+
+  docker_builds: # This is the name of the workflow, feel free to change it to better match your workflow.
+    # Inside the workflow, you define the jobs you want to run.
+    jobs:
+      - docker_build:
+          matrix:
+            parameters:
+              class: ["medium", "arm.medium"]
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              version: ["classic", "compat"]
+          filters:
+            # branches:
+            #   only: main
+            tags:
+              ignore: /.*/
+      - metadata:
+          requires:
+            - docker_build
+          filters:
+            # branches:
+            #   only: main
+            tags:
+              ignore: /.*/
+      - auto_update:
+          requires:
+            - metadata
+          filters:
+            branches:
+              only: main
+
+jobs:
+  docker_build:
+    parallelism: 3
+    parameters:
+      class:
+        type: string
+      distro:
+        type: string
+      version:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      image: ubuntu-2004:202101-01
+    resource_class: << parameters.class >>
+    steps:
+      - checkout
+
+      - run:
+          name: update pyenv
+          command: |
+            # Install pyenv-update to allow addition of python 3.10.0
+            git clone git://github.com/pyenv/pyenv-update.git $(pyenv root)/plugins/pyenv-update
+            pyenv update
+            pyenv install 3.10.0
+
+      - run:
+          name: Set Python Version
+          command: pyenv global 3.10.0
+
+      - run:
+          name: Cleanup metadata artifacts
+          command: rm -rf docs/metadata/* || true
+
+      - run:
+          name: Enable Buildx
+          command: |
+            docker buildx create --use
+            # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            docker buildx inspect --bootstrap
+
+      - run:
+          name: Build images
+          command: |
+            pip install -r bin/requirements.txt
+            make build-<< parameters.class >>-<< parameters.distro >>-<< parameters.version >>
+          environment:
+            FORCE: "YES"
+
+      - run:
+          name: Test images
+          command: make test-<< parameters.distro >>
+          environment:
+            FORCE: "YES"
+
+      - run:
+          name: Log into registry
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              echo "${DOCKER_HUB_TOKEN}" | docker login -u ${DOCKER_HUB_USER} --password-stdin
+            fi
+
+      - run:
+          name: Push images
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "main" ]; then
+              make push-<< parameters.distro >>
+            fi
+          environment:
+            FORCE: "YES"
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - docs/metadata
+
+  metadata:
+    docker:
+      - image: ubuntu:22.04
+    steps:
+      - checkout
+
+      #- name: Push metadata
+      #  run: make auto-commit-metadata
+      #  if: github.ref == 'refs/heads/main'
+
+  auto_update:
+    docker:
+      - image: ubuntu:22.04
+    steps:
+      - checkout
+
+      - run:
+          name: Generate Supported Versions
+          command: make auto-update-and-commit
+
+      - run:
+          name: Create Release
+          command: make release
