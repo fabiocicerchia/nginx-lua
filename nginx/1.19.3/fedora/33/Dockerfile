@@ -202,7 +202,6 @@ FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
-# TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
     && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/master/f/RPM-GPG-KEY-fedora-34-primary \
