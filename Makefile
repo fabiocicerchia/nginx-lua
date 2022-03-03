@@ -98,10 +98,20 @@ help: ## prints this help
 
 build-all: qemu $(build_targets) ## build all dockerfiles
 
-$(build_targets): single_build ## build one distro in one arch
-$(cci_build_targets): single_build ## build one distro in one arch (CircleCI internals)
+$(build_targets): ## build one distro in one arch
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
+else
+	ARCH=$(shell echo $(@) | cut -d"-" -f2); \
+	DISTRO=$(shell echo $(@) | cut -d"-" -f3); \
+	COMPAT=$(shell echo $(@) | grep "\-compat" | cut -d"-" -f4); \
+	echo "BUILDING $$DISTRO"; \
+	export DOCKER_CLI_EXPERIMENTAL=enabled; \
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH"; \
+	$(META_CMD) "$$DISTRO"
+endif
 
-build-single:
+$(cci_build_targets): ## build one distro in one arch (CircleCI internals)
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
