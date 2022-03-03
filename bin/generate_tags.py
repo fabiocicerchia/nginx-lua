@@ -20,10 +20,8 @@ for file in files:
     nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
 
     # tags[os_distro] = file # currently missing
-    tags[nginx_ver_major + "." + nginx_ver_minor + "." +
-         nginx_ver_patch + "-" + os_distro + osVer] = file
-    tags[nginx_ver_major + "." + nginx_ver_minor +
-         "." + nginx_ver_patch + "-" + os_distro] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor + "." + nginx_ver_patch + "-" + os_distro + osVer] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor + "." + nginx_ver_patch + "-" + os_distro] = file
     if os_distro == "alpine":
         tags[nginx_ver_major + "." + nginx_ver_minor + "-" + nginx_ver_patch] = file
     tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro + osVer] = file

@@ -265,9 +265,9 @@ FROM base AS builder
 COPY tpl/Makefile Makefile
 
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
-    && set -eux \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(source /etc/os-release; echo $VERSION_ID)-primary \
+RUN set -eux \
+    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
+    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(. /etc/os-release; echo $VERSION_ID)-primary \
     && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS

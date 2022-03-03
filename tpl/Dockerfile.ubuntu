@@ -266,8 +266,8 @@ FROM base AS builder
 COPY tpl/Makefile Makefile
 
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
-    && set -eux \
+RUN set -eux \
+    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
     && apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests \
         apt-utils \

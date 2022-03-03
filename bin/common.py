@@ -5,7 +5,6 @@ import requests
 import shlex
 import shutil
 import subprocess
-import sys
 
 supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
 default_distro = "alpine"
@@ -14,11 +13,11 @@ image_repo = "fabiocicerchia/nginx-lua"
 ### UTILS
 ################################################################################
 
+
 def run_command(command, print_stdout):
     process = subprocess.Popen(
-        shlex.split(command),
-        shell=False,
-        stdout=subprocess.PIPE)
+        shlex.split(command), shell=False, stdout=subprocess.PIPE
+    )
 
     whole_output = []
     # Poll process.stdout to show stdout live
@@ -35,24 +34,27 @@ def run_command(command, print_stdout):
 
 def read_file(file):
     content = ""
-    with open(file, encoding='utf8') as f:
+    with open(file, encoding="utf8") as f:
         for line in f:
             content += line
     return content
 
 
 def write_file(file, content):
-    with open(file, 'w', encoding='utf-8') as f:
+    with open(file, "w", encoding='utf-8') as f:
         f.write(content)
+
 
 ### MISC
 ################################################################################
+
 
 def docker_tag_exists(image, tag):
     url = "https://index.docker.io/v1/repositories/%s/tags/%s" % (image, tag)
     data = requests.get(url).json
 
     return data != []
+
 
 def fetch_version_parts(version):
     major = version.split(".")[0]
@@ -70,7 +72,7 @@ def get_tags(suffix, nginx_ver, os_distro, os_ver):
     # default image is alpine
     default_image = os_distro == default_distro
 
-    if (default_image):
+    if default_image:
         tags.append("%s%s" % (major, suffix))
         tags.append("%s%s" % (minor, suffix))
         tags.append("%s%s" % (patch, suffix))
@@ -87,20 +89,26 @@ def get_tags(suffix, nginx_ver, os_distro, os_ver):
     tags.append("%s-%s%s%s" % (minor, os_distro, os_ver, suffix))
     tags.append("%s-%s%s%s" % (major, os_distro, os_ver, suffix))
 
-    tags = list(set(map(lambda x: image_repo+":"+x, tags)))
+    tags = list(set(map(lambda x: image_repo + ":" + x, tags)))
     tags.sort(key=len)
     return tags
 
+
 ### BUILD
 ################################################################################
+
 
 def get_tarball_file(nginx_ver, os_distro, os_ver, suffix = ""):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
     return get_tarball_file_from_dockerfile(dockerfile)
 
+
 def get_tarball_file_from_dockerfile(dockerfile):
-    tarball_file = "dist/multiarch-" + re.sub('[^0-9a-zA-Z]+', '-', "%s" % (dockerfile)) + ".tar"
+    tarball_file = (
+        "dist/multiarch-" + re.sub('[^0-9a-zA-Z]+', '-', "%s" % (dockerfile)) + ".tar"
+    )
     return tarball_file
+
 
 def docker_build(vcs_ref, tags, dockerfile, arch, push=False):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
@@ -113,7 +121,8 @@ def docker_build(vcs_ref, tags, dockerfile, arch, push=False):
     push_flag = "--push" if push else ""
     output_tar = "--output type=tar,dest=%s" % (tarball_file) if not push else ""
 
-    exit_code = run_command("""
+    exit_code = run_command(
+        """
         time docker buildx build
         --progress=plain
         --platform=linux/%s
@@ -122,20 +131,20 @@ def docker_build(vcs_ref, tags, dockerfile, arch, push=False):
         %s
         %s
         %s
-        -f %s .""" % (arch, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile), True)[0]
+        -f %s ."""
+        % (arch, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile),
+        True
+    )[0]
 
     return exit_code
+
 
 def docker_rebuild_and_push(vcs_ref, tags, dockerfile):
     docker_build(vcs_ref, tags, dockerfile, "amd64", True)
     docker_build(vcs_ref, tags, dockerfile, "arm64/v8", True)
 
-def build(
-        suffix,
-        nginx_ver,
-        os_distro,
-        os_ver,
-        arch):
+
+def build(suffix, nginx_ver, os_distro, os_ver, arch):
 
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
 
@@ -145,6 +154,7 @@ def build(
 
     exit_code = docker_build(vcs_ref, tags, dockerfile, arch)
     return exit_code
+
 
 ### PUSH
 ################################################################################
@@ -158,14 +168,18 @@ def docker_push(image_id, tag):
     exitcode = run_command(cmd, True)[0]
 
     # retry
-    if (exitcode != 0):
+    if exitcode != 0:
         exitcode = run_command(cmd, True)[0]
 
 
 def push_images(suffix, nginx_ver, os_distro, os_ver):
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
-    vcs_ref = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
+    vcs_ref = (
+        subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD'])
+        .strip()
+        .decode('ascii')
+    )
     docker_rebuild_and_push(vcs_ref, tags, dockerfile)
 
 
@@ -173,13 +187,15 @@ def push(nginx_ver, os_distro, os_ver):
     push_images("", nginx_ver, os_distro, os_ver)
     push_images("-compat", nginx_ver, os_distro, os_ver)
 
+
 ### METADATA
 ################################################################################
+
 
 def metadata(tag):
     cmd = "docker image ls -q %s:%s" % (image_repo, tag)
     img_exists = run_command(cmd, False)[1]
-    if (img_exists != ""):
+    if img_exists != "":
         content = "# %s:%s\n" % (image_repo, tag)
         content = content + "```json\n"
         cmd = "docker image inspect %s:%s" % (image_repo, tag)
@@ -187,9 +203,10 @@ def metadata(tag):
         content = content + stdout + "\n```"
         write_file("docs/metadata/%s.md" % (tag), content)
 
+
 def get_all_versions():
     supported_versions = {}
-    with open('supported_versions', encoding='utf8') as f:
+    with open("supported_versions", encoding="utf8") as f:
         for line in f:
             os_distro, ver = line.strip().split("=")
             supported_versions[os_distro] = ver
@@ -201,7 +218,7 @@ def get_supported_os():
     return supported_os
 
 
-def get_dockerfile(nginx_ver, os_distro, os_ver, suffix = ""):
+def get_dockerfile(nginx_ver, os_distro, os_ver, suffix=""):
     return "nginx/%s/%s/%s/Dockerfile%s" % (nginx_ver, os_distro, os_ver, suffix)
 
 
@@ -212,12 +229,15 @@ def get_supported_versions():
     supported_versions = []
     for os_distro in get_supported_os():
         supported_versions.append(
-            get_dockerfile(nginx_ver, os_distro, versions[os_distro]))
+            get_dockerfile(nginx_ver, os_distro, versions[os_distro])
+        )
 
     return supported_versions
 
+
 ### GENERATE DOCKERFILES
 ################################################################################
+
 
 def patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver):
     content = read_file(dockerfile)
@@ -240,12 +260,17 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
+
 ### TAGS
 ################################################################################
 
+
 def tag(nginx_ver, os_distro, os_ver):
     tags = get_tags("", nginx_ver, os_distro, os_ver)
-    tags = "`, `".join(tags).replace(image_repo+":", "")
+    tags = "`, `".join(tags).replace(image_repo + ":", "")
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
-    print("- [`%s`](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)" % (tags, dockerfile))
+    print(
+        "- [`%s`](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)"
+        % (tags, dockerfile)
+    )

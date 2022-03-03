@@ -270,8 +270,8 @@ FROM base AS builder
 COPY tpl/Makefile Makefile
 
 # hadolint ignore=SC2086
-RUN eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
-    && set -eux \
+RUN set -eux \
+    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
     && dnf config-manager --set-enabled powertools \
