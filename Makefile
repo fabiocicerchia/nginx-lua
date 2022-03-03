@@ -32,13 +32,14 @@ arm64_distros=$(addprefix amd64-, $(DISTROS))
 amd64_distros=$(addprefix arm64/v8-, $(DISTROS))
 arch_distros=$(amd64_distros) $(arm64_distros)
 classic_compat_distros=$(addsuffix -classic, $(arch_distros)) $(addsuffix -compat, $(arch_distros))
+build_targets=$(addprefix build-, $(classic_compat_distros))
 # CircleCI workaround
 cci_arm64_distros=$(addprefix medium-, $(DISTROS))
 cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
 cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
 cci_classic_compat_distros=$(addsuffix -classic, $(cci_arch_distros)) $(addsuffix -compat, $(cci_arch_distros))
+cci_build_targets=$(addprefix build-, $(cci_classic_compat_distros))
 # / CircleCI workaround
-build_targets=$(addprefix build-, $(classic_compat_distros)) $(addprefix build-, $(cci_classic_compat_distros))
 
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))
@@ -80,11 +81,12 @@ help: ## prints this help
 		FS = ":.*##"; \
 		printf "Use: make \033[36m<target>\033[0m\n"; \
 	} /^\$$?\(?[a-zA-Z_-]+\)?:.*?##/ { \
-		gsub("\\$$\\(build_targets\\)",    fix_value("$(build_targets)", $$2),    $$1); \
-		gsub("\\$$\\(minimal_targets\\)",  fix_value("$(minimal_targets)", $$2),  $$1); \
-		gsub("\\$$\\(test_targets\\)",     fix_value("$(test_targets)", $$2),     $$1); \
-		gsub("\\$$\\(security_targets\\)", fix_value("$(security_targets)", $$2), $$1); \
-		gsub("\\$$\\(push_targets\\)",     fix_value("$(push_targets)", $$2),     $$1); \
+		gsub("\\$$\\(build_targets\\)",        fix_value("$(build_targets)", $$2),        $$1); \
+		gsub("\\$$\\(cci_build_targets\\)",    fix_value("$(cci_build_targets)", $$2),    $$1); \
+		gsub("\\$$\\(minimal_targets\\)",      fix_value("$(minimal_targets)", $$2),      $$1); \
+		gsub("\\$$\\(test_targets\\)",         fix_value("$(test_targets)", $$2),         $$1); \
+		gsub("\\$$\\(security_targets\\)",     fix_value("$(security_targets)", $$2),     $$1); \
+		gsub("\\$$\\(push_targets\\)",         fix_value("$(push_targets)", $$2),         $$1); \
 		printf "  \033[36m%-50s\033[0m %s\n", $$1, $$2 \
 	} /^##@/ { \
 		printf "\n\033[1m%s\033[0m\n", substr($$0, 5) \
@@ -96,7 +98,10 @@ help: ## prints this help
 
 build-all: qemu $(build_targets) ## build all dockerfiles
 
-$(build_targets): ## build one distro
+$(build_targets): single_build ## build one distro in one arch
+$(cci_build_targets): single_build ## build one distro in one arch (CircleCI internals)
+
+build-single:
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
