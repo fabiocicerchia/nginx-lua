@@ -6,7 +6,7 @@ import common
 
 # TODO: ADD SUPPORT FOR -compat
 files = subprocess.getoutput(
-    "find nginx -type f | sort -V | grep -v compat"
+    "find nginx -type f | sort -V | grep -v compat",
 ).splitlines()
 
 supported = common.get_supported_versions()
