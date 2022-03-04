@@ -26,5 +26,5 @@ if __name__ == "__main__":
     if exit_code > 0:
         sys.exit(1)
 
-    stdout = subprocess.check_output(["/usr/bin/docker", "images"])
+    stdout = subprocess.getoutput("/usr/bin/docker images")
     print(stdout)

@@ -10,8 +10,8 @@ supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubunt
 default_distro = "alpine"
 image_repo = "fabiocicerchia/nginx-lua"
 
-### UTILS
-################################################################################
+# UTILS
+# ##############################################################################
 
 
 def run_command(command, print_stdout):
@@ -41,12 +41,12 @@ def read_file(file):
 
 
 def write_file(file, content):
-    with open(file, "w", encoding='utf-8') as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(content)
 
 
-### MISC
-################################################################################
+# MISC
+# ##############################################################################
 
 
 def docker_tag_exists(image, tag):
@@ -94,11 +94,11 @@ def get_tags(suffix, nginx_ver, os_distro, os_ver):
     return tags
 
 
-### BUILD
-################################################################################
+# BUILD
+# ##############################################################################
 
 
-def get_tarball_file(nginx_ver, os_distro, os_ver, suffix = ""):
+def get_tarball_file(nginx_ver, os_distro, os_ver, suffix=""):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
     return get_tarball_file_from_dockerfile(dockerfile)
 
@@ -150,14 +150,14 @@ def build(suffix, nginx_ver, os_distro, os_ver, arch):
 
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
 
-    vcs_ref = subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD']).strip().decode('ascii')
+    vcs_ref = subprocess.getoutput("/usr/bin/git rev-parse --short HEAD").strip().decode("ascii")
 
     exit_code = docker_build(vcs_ref, tags, dockerfile, arch)
     return exit_code
 
 
-### PUSH
-################################################################################
+# PUSH
+# ##############################################################################
 
 
 def docker_push(image_id, tag):
@@ -176,9 +176,12 @@ def push_images(suffix, nginx_ver, os_distro, os_ver):
     tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
     vcs_ref = (
-        subprocess.check_output(['/usr/bin/git', 'rev-parse', '--short', 'HEAD'])
+        subprocess.check_output(
+            ['/usr/bin/git', 'rev-parse', '--short', 'HEAD'],
+            shell=False
+        )
         .strip()
-        .decode('ascii')
+        .decode("ascii")
     )
     docker_rebuild_and_push(vcs_ref, tags, dockerfile)
 
@@ -188,8 +191,8 @@ def push(nginx_ver, os_distro, os_ver):
     push_images("-compat", nginx_ver, os_distro, os_ver)
 
 
-### METADATA
-################################################################################
+# METADATA
+# ##############################################################################
 
 
 def metadata(tag):
@@ -235,8 +238,8 @@ def get_supported_versions():
     return supported_versions
 
 
-### GENERATE DOCKERFILES
-################################################################################
+# GENERATE DOCKERFILES
+# ##############################################################################
 
 
 def patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver):
@@ -261,8 +264,8 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
 
-### TAGS
-################################################################################
+# TAGS
+# ##############################################################################
 
 
 def tag(nginx_ver, os_distro, os_ver):
