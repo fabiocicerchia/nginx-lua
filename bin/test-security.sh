@@ -1,33 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC1091,SC2207
 
-source ./bin/_common.sh
-source supported_versions
-
-function runtest() {
-    NGINX_VER=$1
-    OS=$2
-    OS_VER=$3
-
-    snyk test \
-        --project-name=fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
-        --severity-threshold=medium \
-        --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
-        --file="nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile" || true
-
-    snyk monitor \
-        --project-name=fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
-        --severity-threshold=medium \
-        --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:"$NGINX_VER-$OS$OS_VER" \
-        --file="nginx/$NGINX_VER/$OS/$OS_VER/Dockerfile"
-}
-
 set -eux
-
-OS=$1
-VERSIONS=($(get_versions "$OS"))
 
 docker run -it --net host --pid host --userns host --cap-add audit_control \
     -v /etc:/etc \
@@ -36,4 +10,23 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
     --label docker_bench_security \
     docker/docker-bench-security
 
-loop_over_nginx_with_os "$OS" "runtest"
+for DOCKERFILE in $(find nginx/ -name "Dockerfile*" -type f | sort); do
+    TAG=$(echo "$DOCKERFILE" | awk -F '/' '{print $2"-"$3$4}')
+    docker run -it --rm -e SNY_TOKEN="$SNYK_TOKEN" snyk/snyk-cli:docker \
+        test \
+        --project-name=fabiocicerchia/nginx-lua:"$TAG" \
+        --severity-threshold=medium \
+        --exclude-base-image-vulns \
+        --docker fabiocicerchia/nginx-lua:"$TAG" \
+        --file="$DOCKERFILE" || true
+
+    docker run -it --rm -e SNY_TOKEN="$SNYK_TOKEN" snyk/snyk-cli:docker \
+        monitor \
+        --project-name=fabiocicerchia/nginx-lua:"$TAG" \
+        --severity-threshold=medium \
+        --exclude-base-image-vulns \
+        --docker fabiocicerchia/nginx-lua:"$TAG" \
+        --file="DOCKERFILE"
+done
+
+find bin -type f -name "*.sh" -exec docker run --rm -v "$PWD:/mnt" koalaman/shellcheck:stable {} \;

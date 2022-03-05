@@ -100,3 +100,19 @@ Do not forget to update the README to include the distro in the list:
 - Extra step for building luarocks from source: `make luarocks`
 - Copying the binaries `lua`, `luajit`, `luarocks` and the whole `LUA_INCDIR` folder from the multistage build
 - Avoiding to symlink the `lua` binary
+
+## Build locally
+
+The flag `FORCE` is needed most of the times, because if there are no changes in the environment to
+any dockerfile in the last commit the flag `SKIP` will be set in the `Makefile`.
+
+```bash
+FORCE=YES make build-all
+FORCE=YES make test-all
+```
+
+## Minimal Image
+
+The extended image (default one) contains a set of extra packages for enhanced functionality.
+If you need a smaller version, like the official distros (containing only nginx and openresty's lua module),
+you could build changing the Makefile settings `EXTENDED_IMAGE` to `NO`.

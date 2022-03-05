@@ -10,25 +10,37 @@
 PAGER:=
 DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|tpl)/" | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
-	SKIP=1
+	SKIP=YES
 else
-	SKIP=0
+	SKIP=NO
 endif
-ifeq ($(FORCE), 1)
-	SKIP=0
+ifeq ($(FORCE), YES)
+	SKIP=NO
 endif
-BUILD_CMD:=./bin/docker-build.sh
-PUSH_CMD:=./bin/docker-push.sh
+BUILD_CMD:=./bin/docker-build.py
+PUSH_CMD:=./bin/docker-push.py
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
-META_CMD:=./bin/docker-metadata.sh
+META_CMD:=./bin/docker-metadata.py
 DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell make changelog)
 
-build_targets=$(addprefix build-, $(DISTROS))
+arm64_distros=$(addprefix amd64-, $(DISTROS))
+amd64_distros=$(addprefix arm64/v8-, $(DISTROS))
+arch_distros=$(amd64_distros) $(arm64_distros)
+classic_compat_distros=$(addsuffix -classic, $(arch_distros)) $(addsuffix -compat, $(arch_distros))
+build_targets=$(addprefix build-, $(classic_compat_distros))
+# CircleCI workaround
+cci_arm64_distros=$(addprefix medium-, $(DISTROS))
+cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
+cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
+cci_classic_compat_distros=$(addsuffix -classic, $(cci_arch_distros)) $(addsuffix -compat, $(cci_arch_distros))
+cci_build_targets=$(addprefix build-, $(cci_classic_compat_distros))
+# / CircleCI workaround
+
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
@@ -59,9 +71,9 @@ help: ## prints this help
 	echo "Repo: https://github.com/fabiocicerchia/nginx-lua"
 	echo ""
 	@gawk 'function fix_value(value, str) { \
-		padding=sprintf("%30s",""); \
+		padding=sprintf("%50s",""); \
 		ret=gensub("([^ ]+)", "\\1"padding"\n ", "g", "  "value); \
-		ret=gensub("(^|\n)(.{33}) *", "\\1\\2\033[0m"str"  \033[36m", "g", ret); \
+		ret=gensub("(^|\n)(.{53}) *", "\\1\\2\033[0m"str"  \033[36m", "g", ret); \
 		ret=substr(ret, 3, length(ret)-16-length(str)); \
 		return ret; \
 	} \
@@ -69,12 +81,13 @@ help: ## prints this help
 		FS = ":.*##"; \
 		printf "Use: make \033[36m<target>\033[0m\n"; \
 	} /^\$$?\(?[a-zA-Z_-]+\)?:.*?##/ { \
-		gsub("\\$$\\(build_targets\\)",    fix_value("$(build_targets)", $$2),    $$1); \
-		gsub("\\$$\\(minimal_targets\\)",  fix_value("$(minimal_targets)", $$2),  $$1); \
-		gsub("\\$$\\(test_targets\\)",     fix_value("$(test_targets)", $$2),     $$1); \
-		gsub("\\$$\\(security_targets\\)", fix_value("$(security_targets)", $$2), $$1); \
-		gsub("\\$$\\(push_targets\\)",     fix_value("$(push_targets)", $$2),     $$1); \
-		printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2 \
+		gsub("\\$$\\(build_targets\\)",        fix_value("$(build_targets)", $$2),        $$1); \
+		gsub("\\$$\\(cci_build_targets\\)",    fix_value("$(cci_build_targets)", $$2),    $$1); \
+		gsub("\\$$\\(minimal_targets\\)",      fix_value("$(minimal_targets)", $$2),      $$1); \
+		gsub("\\$$\\(test_targets\\)",         fix_value("$(test_targets)", $$2),         $$1); \
+		gsub("\\$$\\(security_targets\\)",     fix_value("$(security_targets)", $$2),     $$1); \
+		gsub("\\$$\\(push_targets\\)",         fix_value("$(push_targets)", $$2),         $$1); \
+		printf "  \033[36m%-50s\033[0m %s\n", $$1, $$2 \
 	} /^##@/ { \
 		printf "\n\033[1m%s\033[0m\n", substr($$0, 5) \
 	}' $(MAKEFILE_LIST)
@@ -83,31 +96,32 @@ help: ## prints this help
 ##@ BUILD
 ################################################################################
 
-build-all: $(build_targets) ## build all dockerfiles
+build-all: qemu $(build_targets) ## build all dockerfiles
 
-$(build_targets): ## build one distro
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
+$(build_targets): ## build one distro in one arch
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
 else
-	DISTRO=$(subst build-,,$(@)); \
-	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1; \
-	$(META_CMD) $$DISTRO 1
+	ARCH=$(shell echo $(@) | cut -d"-" -f2); \
+	DISTRO=$(shell echo $(@) | cut -d"-" -f3); \
+	COMPAT=$(shell echo $(@) | grep "\-compat" | cut -d"-" -f4); \
+	echo "BUILDING $$DISTRO"; \
+	export DOCKER_CLI_EXPERIMENTAL=enabled; \
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH"; \
+	$(META_CMD) "$$DISTRO"
 endif
 
-################################################################################
-##@ BUILD MINIMAL
-################################################################################
-
-build-minimal-all: $(minimal_targets) ## build all dockerfiles (minimal)
-
-$(minimal_targets): ## build one distro (minimal)
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
+$(cci_build_targets): ## build one distro in one arch (CircleCI internals)
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
 else
-	DISTRO=$(subst build-minimal-,,$(@)); \
-	echo BUILDING $$DISTRO; \
-	$(BUILD_CMD) $$DISTRO 1 0
+	ARCH=$(shell echo $(@) | cut -d"-" -f2); \
+	DISTRO=$(shell echo $(@) | cut -d"-" -f3); \
+	COMPAT=$(shell echo $(@) | grep "\-compat" | cut -d"-" -f4); \
+	echo "BUILDING $$DISTRO"; \
+	export DOCKER_CLI_EXPERIMENTAL=enabled; \
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH"; \
+	$(META_CMD) "$$DISTRO"
 endif
 
 ################################################################################
@@ -117,23 +131,23 @@ endif
 test-all: $(test_targets) ## test all docker images
 
 $(test_targets): ## test one docker image
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst test-,,$(@)); \
-	echo TESTING $$DISTRO; \
-	$(TEST_CMD) $$DISTRO 1
+	echo "TESTING $$DISTRO"; \
+	$(TEST_CMD) "$$DISTRO"
 endif
 
 test-security: $(security_targets) ## test security all docker images
 
 $(security_targets): ## test security one docker images
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst test-security-,,$(@)); \
-	echo SECURITY $$DISTRO; \
-	$(SEC_CMD) $$DISTRO
+	echo "SECURITY $$DISTRO"; \
+	$(SEC_CMD) "$$DISTRO"
 endif
 
 ################################################################################
@@ -143,13 +157,22 @@ endif
 push-all: $(push_targets) ## push all docker images to docker hub
 
 $(push_targets): ## push one docker images to docker hub
-ifeq ($(SKIP), 1)
-	echo SKIPPING $@
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
 else
 	DISTRO=$(subst push-,,$(@)); \
-	echo PUSHING $$DISTRO; \
-	$(PUSH_CMD) $$DISTRO 1
+	echo "PUSHING $$DISTRO"; \
+	$(PUSH_CMD) "$$DISTRO"
 endif
+
+################################################################################
+##@ DEPENDENCIES
+################################################################################
+# Ref: https://www.stereolabs.com/docs/docker/building-arm-container-on-x86/
+qemu:
+	docker buildx create --name multiarch --use
+	sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
 
 ################################################################################
 ##@ UTILITIES
@@ -199,7 +222,7 @@ generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
 
 generate-dockerfiles: ## generate all dockerfiles
-	./bin/generate-dockerfiles.sh
+	./bin/generate-dockerfiles.py
 
 generate-metadata: ## generate all metadata for docker images
 	for DISTRO in $(DISTROS); do \

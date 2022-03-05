@@ -225,7 +225,6 @@ FROM base AS builder
 
 COPY tpl/Makefile Makefile
 
-# TODO: NGINX_BUILD_CONFIG not updated
 # hadolint ignore=SC2086
 RUN set -eux \
     && apt-get update \

@@ -7,6 +7,7 @@
 # Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+EXTENDED_IMAGE=YES
 NPROC := $(shell nproc)
 
 # ##############################################################################
@@ -44,7 +45,10 @@ core:
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
+deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
+ifeq ($(EXTENDED_IMAGE), YES)
+	make dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module
+endif
 
 # NGX Devel Kit
 # ##############################################################################
@@ -88,92 +92,75 @@ dep-lua-resty-lrucache:
 # OpenResty Headers
 # ##############################################################################
 dep-headers-more-nginx-module:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/${VER_OPENRESTY_HEADERS}.zip
 	unzip -d / /headers-more-nginx-module.zip
-endif
 
 # Cloudflare Cookie
 # ##############################################################################
 dep-lua-resty-cookie:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz
 	tar -C / -xvzf /lua-resty-cookie.tar.gz
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Dns
 # ##############################################################################
 dep-lua-openresty-dns:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-dns.tar.gz https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz
 	tar -C / -xvzf /lua-openresty-dns.tar.gz
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Memcached
 # ##############################################################################
 dep-lua-openresty-memcached:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-memcached.tar.gz https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz
 	tar -C / -xvzf /lua-openresty-memcached.tar.gz
 	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Mysql
 # ##############################################################################
 dep-lua-openresty-mysql:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-mysql.tar.gz https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz
 	tar -C / -xvzf /lua-openresty-mysql.tar.gz
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Redis
 # ##############################################################################
 dep-lua-openresty-redis:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-redis.tar.gz https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz
 	tar -C / -xvzf /lua-openresty-redis.tar.gz
 	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Shell
 # ##############################################################################
 dep-lua-openresty-shell:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-shell.tar.gz https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz
 	tar -C / -xvzf /lua-openresty-shell.tar.gz
 	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Tablepool
 # ##############################################################################
 dep-lua-openresty-tablepool:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-tablepool.tar.gz https://github.com/openresty/lua-tablepool/archive/refs/tags/v${VER_OPENRESTY_TABLEPOOL}.tar.gz
 	tar -C / -xvzf /lua-tablepool.tar.gz
 	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Signal
 # ##############################################################################
 dep-lua-openresty-signal:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-signal.tar.gz https://github.com/openresty/lua-resty-signal/archive/refs/tags/v${VER_OPENRESTY_SIGNAL}.tar.gz
 	tar -C / -xvzf /lua-openresty-signal.tar.gz
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
@@ -181,54 +168,43 @@ ifeq ($(EXTENDED_IMAGE), 1)
 	&& make install \
 	&& install -d /usr/local/lib/lua/5.1 \
 	&& install /usr/local/share/lua/5.1/librestysignal.so /usr/local/lib/lua/5.1/librestysignal.so
-endif
 
 # OpenResty Upstream Healthcheck
 # ##############################################################################
 dep-lua-resty-upstream-healthcheck:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-resty-upstream-healthcheck.tar.gz https://github.com/openresty/lua-resty-upstream-healthcheck/archive/v${VER_OPENRESTY_HEALTHCHECK}.tar.gz
 	tar -C / -xvzf /lua-resty-upstream-healthcheck.tar.gz
 	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
 	&& make \
 	&& make install
-endif
 
 # OpenResty Websocket
 # ##############################################################################
 dep-lua-openresty-websocket:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-openresty-websocket.tar.gz https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz
 	tar -C / -xvzf /lua-openresty-websocket.tar.gz
 	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
 	&& make \
 	&& make install
-endif
 
 # LUA Upstream
 # ##############################################################################
 dep-lua-upstream-nginx-module:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /lua-upstream-nginx-module.tar.gz https://github.com/openresty/lua-upstream-nginx-module/archive/v${VER_LUA_UPSTREAM}.tar.gz
 	tar -C / -xvzf /lua-upstream-nginx-module.tar.gz
-endif
 
 # Prometheus
 # ##############################################################################
 dep-nginx-lua-prometheus:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /nginx-lua-prometheus.tar.gz https://github.com/knyar/nginx-lua-prometheus/archive/${VER_PROMETHEUS}.tar.gz
 	tar -C / -xvzf /nginx-lua-prometheus.tar.gz
 	mv /nginx-lua-prometheus-${VER_PROMETHEUS}/*.lua ${LUA_LIB_DIR}/
-endif
 
 # OpenResty Stream Lua
 # ##############################################################################
 dep-stream-lua-nginx-module:
-ifeq ($(EXTENDED_IMAGE), 1)
 	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip
 	unzip -d / /stream-lua-nginx-module.zip
-endif
 
 # ##############################################################################
 # LUAROCKS
