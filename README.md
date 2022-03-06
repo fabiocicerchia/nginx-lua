@@ -315,11 +315,11 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [Almalinux](https://hub.docker.com/_/almalinux) (~???)
-  - [Alpine Linux](https://hub.docker.com/_/alpine) (~55MB)
-  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~230MB)
-  - [Debian](https://hub.docker.com/_/debian) (~260MB)
-  - [Fedora](https://hub.docker.com/_/fedora) (~400MB)
+  - [Almalinux](https://hub.docker.com/_/almalinux) (~430MB)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~65MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~240MB)
+  - [Debian](https://hub.docker.com/_/debian) (~250MB)
+  - [Fedora](https://hub.docker.com/_/fedora) (~450MB)
   - [Ubuntu](https://hub.docker.com/_/ubuntu) (~220MB)
 - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
 - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
@@ -366,23 +366,24 @@ http {
 ### Compiled Version Details
 
 ```console
-configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-a4a0686605161a6777d7d612d5aef79b9e7c13e0 --add-module=/stream-lua-nginx-module-0.0.10 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --without-pcre2 --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-a4a0686605161a6777d7d612d5aef79b9e7c13e0 --add-module=/stream-lua-nginx-module-0.0.10 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
 The following are the available build-time options. They can be set using the `--build-arg` CLI argument.
 
 | Key                         | Default                                    | Description |
 :---------------------------- | :----------------------------------------: |:----------- |
+| `ARCH`                      |                                            | The image name. |
+| `DISTRO`                    |                                            | The Docker base image to build `FROM`. |
+| `DISTRO_VER`                |                                            | The Docker image tag to build `FROM`. |
 | `DOCKER_IMAGE`              | `fabiocicerchia/nginx-lua`                 | The image name. |
-| `DOCKER_IMAGE_OS`           | `alpine`                                   | The Docker base image to build `FROM`. |
-| `DOCKER_IMAGE_TAG`          | `3.15.0`                                   | The Docker image tag to build `FROM`. |
 | `BUILD_DATE`                |                                            | This label contains the Date the image was built. |
 | `VCS_REF`                   |                                            | Identifier for the version of the source code from which this image was built. |
 | `TARGETPLATFORM`            | `linux/amd64`                              | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `TARGETOS`                  | `linux`                                    | OS component of `TARGETPLATFORM`. |
 | `TARGETARCH`                | `amd64`                                    | Architecture component of `TARGETPLATFORM`. |
 | `VER_NGX_DEVEL_KIT`         | `0.3.1`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
-| `VER_LUAJIT`                | `2.1-20210510`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
+| `VER_LUAJIT`                | `2.1-20211210`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | `LUAJIT_LIB`                | `/usr/local/lib`                           | Tell nginx's build system where to find LuaJIT 2.0 |
 | `LUAJIT_INC`                | `/usr/local/include/luajit-2.1`            | Tell nginx's build system where to find LuaJIT 2.0 |
 | `LD_LIBRARY_PATH`           | `/usr/local/lib/:$LD_LIBRARY_PATH`         | Search path environment variable for the linux shared library. |
@@ -392,8 +393,8 @@ The following are the available build-time options. They can be set using the `-
 | `VER_LUA_RESTY_CORE`        | `0.1.22`                                   | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) to use. |
 | `LUA_LIB_DIR`               | `/usr/local/share/lua/5.1`                 | Path to Lua library directory. |
 | `VER_LUA_RESTY_LRUCACHE`    | `0.11`                                     | The version of [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache) to use. |
-| `VER_OPENRESTY_HEADERS`     | `d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17` | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) to use. |
-| `VER_CLOUDFLARE_COOKIE`     | `303e32e512defced053a6484bc0745cf9dc0d39e` | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) to use. |
+| `VER_OPENRESTY_HEADERS`     | `a4a0686605161a6777d7d612d5aef79b9e7c13e0` | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) to use. |
+| `VER_CLOUDFLARE_COOKIE`     | `99be1005e38ce19ace54515272a2be1b9fdc5da2` | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) to use. |
 | `VER_OPENRESTY_DNS`         | `0.22`                                     | The version of [lua-resty-dns](https://github.com/openresty/lua-resty-dns) to use. |
 | `VER_OPENRESTY_MEMCACHED`   | `0.16`                                     | The version of [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached) to use. |
 | `VER_OPENRESTY_MYSQL`       | `0.24`                                     | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) to use. |
@@ -409,8 +410,10 @@ The following are the available build-time options. They can be set using the `-
 | `VER_NGINX`                 | `1.21.4`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
 | `NGX_LDOPT`                 | `-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie`                                   | Sets additional parameters that will be used during linking. |
-| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07` | Options to pass to nginx's `./configure` script. |
-| `BUILD_DEPS`                | Differs based on the distro                | List of needed packages to build properly the software. |
+| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --without-pcre2 --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-a4a0686605161a6777d7d612d5aef79b9e7c13e0 --add-module=/stream-lua-nginx-module-0.0.10` | Options to pass to nginx's `./configure` script. |
+| `BUILD_DEPS_BASE`           | Differs based on the distro                | List of common needed packages to build properly the software. |
+| `BUILD_DEPS_AMD64`          | Differs based on the distro                | List of needed packages to build properly the software on amd64. |
+| `BUILD_DEPS_ARM64V8`        | Differs based on the distro                | List of needed packages to build properly the software on arm64/v8. |
 | `NGINX_BUILD_DEPS`          | Differs based on the distro                | List of needed packages to build properly nginx. |
 | `PKG_DEPS`                  | Differs based on the distro                | List of needed packages to run properly the software. |
 
@@ -505,23 +508,23 @@ The image builds are labeled with various information. Here's an example of prin
 $ docker pull fabiocicerchia/nginx-lua:1-alpine
 $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 {
+  "image.target.arch": "amd64",
+  "image.target.os": "linux",
+  "image.target.platform": "linux/amd64",
   "maintainer": "Fabio Cicerchia <info@fabiocicerchia.it>",
   "org.label-schema.build-date": "1970-01-01T00:00:00Z",
-  "org.label-schema.description": "Nginx 1.21.4 with Lua support based on alpine 3.15.0.",
-  "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.21.4-alpine3.15.0",
+  "org.label-schema.description": "Nginx 1.21.6 with Lua support based on alpine 3.15.0.",
+  "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.21.6-alpine3.15.0",
   "org.label-schema.name": "fabiocicerchia/nginx-lua",
   "org.label-schema.schema-version": "1.0",
   "org.label-schema.url": "https://github.com/fabiocicerchia/nginx-lua",
-  "org.label-schema.vcs-ref": "36db2a3",
+  "org.label-schema.vcs-ref": "b3e7513",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
-  "org.label-schema.version": "1.21.4-alpine3.15.0",
-  "image.target.platform": "amd64",
-  "image.target.os": "linux",
-  "image.target.arch": "amd64",
-  "versions.headers-more-nginx-module": "d6d7ebab3c0c5b32ab421ba186783d3e5d2c6a17",
+  "org.label-schema.version": "1.21.6-",
+  "versions.headers-more-nginx-module": "a4a0686605161a6777d7d612d5aef79b9e7c13e0",
   "versions.lua": "5.4",
   "versions.lua-nginx-module": "0.10.20",
-  "versions.lua-resty-cookie": "303e32e512defced053a6484bc0745cf9dc0d39e",
+  "versions.lua-resty-cookie": "99be1005e38ce19ace54515272a2be1b9fdc5da2",
   "versions.lua-resty-core": "0.1.22",
   "versions.lua-resty-dns": "0.22",
   "versions.lua-resty-lrucache": "0.11",
@@ -534,9 +537,9 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.lua-resty-upstream-healthcheck": "0.06",
   "versions.lua-resty-websocket": "0.08",
   "versions.lua-upstream": "0.07",
-  "versions.luajit2": "2.1-20210510",
-  "versions.luarocks": "3.7.0",
-  "versions.nginx": "1.21.4",
+  "versions.luajit2": "2.1-20211210",
+  "versions.luarocks": "3.8.0",
+  "versions.nginx": "1.21.6",
   "versions.nginx-lua-prometheus": "0.20210206",
   "versions.ngx_devel_kit": "0.3.1",
   "versions.os": "3.15.0",

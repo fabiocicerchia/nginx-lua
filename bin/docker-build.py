@@ -12,10 +12,10 @@ if __name__ == "__main__":
         suffix = "-%s" % (suffix)
 
     # CircleCI workaround
-    if arch == "medium":
+    if arch == "large":
         arch = "amd64"
     if arch == "arm.medium":
-        arch = "arm64/v8"
+        arch = "arm64v8"
     # / CircleCI workaround
 
     versions = common.get_all_versions()

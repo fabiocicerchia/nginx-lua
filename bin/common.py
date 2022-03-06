@@ -64,7 +64,10 @@ def fetch_version_parts(version):
     return [major, minor, patch]
 
 
-def get_tags(suffix, nginx_ver, os_distro, os_ver):
+def get_tags(suffix, nginx_ver, os_distro, os_ver, arch):
+    if arch != "":
+        suffix = "%s-%s" % (suffix, arch)
+
     tags = []
 
     (major, minor, patch) = fetch_version_parts(nginx_ver)
@@ -110,7 +113,7 @@ def get_tarball_file_from_dockerfile(dockerfile):
     return tarball_file
 
 
-def docker_build(vcs_ref, tags, dockerfile, arch, push=False):
+def docker_build(vcs_ref, tags, dockerfile, arch):
     tags_param = " ".join(["-t %s" % (tag) for tag in tags])
     now = datetime.now()  # current date and time
     build_date = now.strftime("%Y-%m-%dT00:00:00Z")
@@ -118,39 +121,29 @@ def docker_build(vcs_ref, tags, dockerfile, arch, push=False):
     tarball_file = get_tarball_file_from_dockerfile(dockerfile)
     os.makedirs(os.path.dirname(tarball_file), exist_ok=True)
 
-    push_flag = "--push" if push else ""
-    output_tar = "--output type=tar,dest=%s" % (tarball_file) if not push else ""
-
     exit_code = run_command(
         """
-        time docker buildx build
+        time docker build
         --progress=plain
-        --platform=linux/%s
+        --build-arg ARCH="%s"
         --build-arg BUILD_DATE="%s"
         --build-arg VCS_REF="%s"
         %s
-        %s
-        %s
-        -f %s ."""
-        % (arch, build_date, vcs_ref, output_tar, push_flag, tags_param, dockerfile),
+        -f %s %s"""
+        % (arch, build_date, vcs_ref, tags_param, dockerfile, os.path.dirname(dockerfile)),
         True
     )[0]
 
     return exit_code
 
 
-def docker_rebuild_and_push(vcs_ref, tags, dockerfile):
-    docker_build(vcs_ref, tags, dockerfile, "amd64", True)
-    docker_build(vcs_ref, tags, dockerfile, "arm64/v8", True)
-
-
 def build(suffix, nginx_ver, os_distro, os_ver, arch):
 
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
 
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
+    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, arch)
 
-    vcs_ref = subprocess.getoutput("/usr/bin/git rev-parse --short HEAD").strip().decode("ascii")
+    vcs_ref = subprocess.getoutput("/usr/bin/git rev-parse --short HEAD").strip()
 
     exit_code = docker_build(vcs_ref, tags, dockerfile, arch)
     return exit_code
@@ -160,35 +153,90 @@ def build(suffix, nginx_ver, os_distro, os_ver, arch):
 # ##############################################################################
 
 
-def docker_push(image_id, tag):
-    cmd = "docker tag %s %s" % (image_id, tag)
-    exitcode = run_command(cmd, True)[0]
-
+def docker_push(tag):
     cmd = "docker push %s" % (tag)
-    exitcode = run_command(cmd, True)[0]
+    exit_code = run_command(cmd, True)[0]
 
     # retry
-    if exitcode != 0:
-        exitcode = run_command(cmd, True)[0]
+    if exit_code != 0:
+        exit_code = run_command(cmd, True)[0]
+
+    return exit_code
 
 
 def push_images(suffix, nginx_ver, os_distro, os_ver):
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver)
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
-    vcs_ref = (
-        subprocess.check_output(
-            ['/usr/bin/git', 'rev-parse', '--short', 'HEAD'],
-            shell=False
-        )
-        .strip()
-        .decode("ascii")
-    )
-    docker_rebuild_and_push(vcs_ref, tags, dockerfile)
+    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "amd64")
+    for tag in tags:
+        exit_code = docker_push(tag)
+        # if exit_code > 0:
+        #     return exit_code
+
+    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "arm64v8")
+    for tag in tags:
+        exit_code = docker_push(tag)
+        # if exit_code > 0:
+        #     return exit_code
+
+    return 0 # exit_code
 
 
 def push(nginx_ver, os_distro, os_ver):
-    push_images("", nginx_ver, os_distro, os_ver)
-    push_images("-compat", nginx_ver, os_distro, os_ver)
+    exit_code = push_images("", nginx_ver, os_distro, os_ver)
+
+    if exit_code > 0:
+        return exit_code
+
+    exit_code = push_images("-compat", nginx_ver, os_distro, os_ver)
+    return exit_code
+
+
+# BUNDLE
+# ##############################################################################
+
+
+def docker_bundle(tag):
+    tag_amd64 = "%s-amd64" % (tag)
+    tag_arm64 = "%s-arm64v8" % (tag)
+
+    exit_code = run_command(
+        """
+        time docker manifest create
+        %s
+        --amend %s
+        --amend %s
+        """
+        % (tag, tag_amd64, tag_arm64),
+        True
+    )[0]
+    if exit_code > 0:
+        return exit_code
+
+    exit_code = run_command(
+        """
+        time docker manifest push
+        %s
+        """
+        % (tag),
+        True
+    )[0]
+    if exit_code > 0:
+        return exit_code
+
+    # TODO: REMOVE arch tags from docker hub
+
+    return exit_code
+
+
+def bundle(suffix, nginx_ver, os_distro, os_ver):
+
+    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "")
+
+    for tag in tags:
+        exit_code = docker_bundle(tag)
+        if exit_code > 0:
+            return exit_code
+
+    return exit_code
 
 
 # METADATA
@@ -196,7 +244,7 @@ def push(nginx_ver, os_distro, os_ver):
 
 
 def metadata(tag):
-    cmd = "docker image ls -q %s:%s" % (image_repo, tag)
+    cmd = "docker pull %s:%s" % (image_repo, tag)
     img_exists = run_command(cmd, False)[1]
     if img_exists != "":
         content = "# %s:%s\n" % (image_repo, tag)
@@ -254,14 +302,23 @@ def patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver):
 
 def init_dockerfile(nginx_ver, os_distro, os_ver):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
+    folder = os.path.dirname(dockerfile)
 
-    os.makedirs(os.path.dirname(dockerfile), exist_ok=True)
+    os.makedirs(folder, exist_ok=True)
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, "-compat")
     shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
+
+    shutil.copyfile("tpl/10-listen-on-ipv6-by-default.sh", folder+"/10-listen-on-ipv6-by-default.sh")
+    shutil.copyfile("tpl/20-envsubst-on-templates.sh", folder+"/20-envsubst-on-templates.sh")
+    shutil.copyfile("tpl/default.conf", folder+"/default.conf")
+    shutil.copyfile("tpl/docker-entrypoint.sh", folder+"/docker-entrypoint.sh")
+    shutil.copyfile("tpl/Makefile", folder+"/Makefile")
+    shutil.copyfile("tpl/nginx.conf", folder+"/nginx.conf")
+    shutil.copyfile("tpl/support.sh", folder+"/support.sh")
 
 
 # TAGS

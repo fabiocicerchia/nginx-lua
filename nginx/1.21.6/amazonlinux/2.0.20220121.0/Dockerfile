@@ -249,7 +249,7 @@ ARG BUILD_DEPS_BASE="\
 ARG BUILD_DEPS_AMD64="\
         ${BUILD_DEPS_BASE} \
 "
-ARG BUILD_DEPS_ARM64="\
+ARG BUILD_DEPS_ARM64V8="\
         ${BUILD_DEPS_BASE} \
 "
 ENV BUILD_DEPS=
@@ -266,7 +266,7 @@ COPY tpl/Makefile Makefile
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
+    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
     && yum makecache \
     && yum install -y \
         $BUILD_DEPS \
@@ -304,7 +304,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.version="${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
-    image.target.arch="${TARGETARCH}" \
+    image.target.arch="${ARCH}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua="${VER_LUA}" \
     versions.luarocks="${VER_LUAROCKS}" \

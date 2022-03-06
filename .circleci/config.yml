@@ -27,22 +27,26 @@ workflows:
       - docker_build:
           matrix:
             parameters:
-              class: ["medium", "arm.medium"]
+              class: ["large", "arm.medium"]
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
-              version: ["classic", "compat"]
           filters:
-            # branches:
-            #   only: main
             tags:
               ignore: /.*/
-      - metadata:
+      - docker_bundle:
           requires:
             - docker_build
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
-            # branches:
-            #   only: main
-            tags:
-              ignore: /.*/
+            branches:
+              only: main
+      - metadata:
+          requires:
+            - docker_bundle
+          filters:
+            branches:
+              only: main
       - auto_update:
           requires:
             - metadata
@@ -52,55 +56,58 @@ workflows:
 
 jobs:
   docker_build:
-    parallelism: 3
     parameters:
       class:
         type: string
       distro:
         type: string
-      version:
-        type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2004:202101-01
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
     resource_class: << parameters.class >>
     steps:
       - checkout
 
       - run:
-          name: update pyenv
+          name: check docker
           command: |
-            # Install pyenv-update to allow addition of python 3.10.0
-            git clone git://github.com/pyenv/pyenv-update.git $(pyenv root)/plugins/pyenv-update
-            pyenv update
-            pyenv install 3.10.0
+            docker --version
+            # seccomp
+            # https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.14.0#faccessat2
+            sudo apt-get install -y libseccomp2
 
       - run:
-          name: Set Python Version
-          command: pyenv global 3.10.0
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
 
       - run:
           name: Cleanup metadata artifacts
           command: rm -rf docs/metadata/* || true
 
-      - run:
-          name: Enable Buildx
-          command: |
-            docker buildx create --use
-            # docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-            docker buildx inspect --bootstrap
+      # - run:
+      #     name: Enable Buildx
+      #     command: |
+      #       make qemu || true
+      #       docker buildx inspect --bootstrap
 
       - run:
-          name: Build images
+          name: Build docker image (classic)
           command: |
-            pip install -r bin/requirements.txt
-            make build-<< parameters.class >>-<< parameters.distro >>-<< parameters.version >>
+            make -j $(nproc) build-<< parameters.class >>-<< parameters.distro >>-classic
+          environment:
+            FORCE: "YES"
+
+      - run:
+          name: Build docker image (compat)
+          command: |
+            make -j $(nproc) build-<< parameters.class >>-<< parameters.distro >>-compat
           environment:
             FORCE: "YES"
 
       - run:
           name: Test images
-          command: make test-<< parameters.distro >>
+          command: make -j $(nproc) test-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
@@ -108,14 +115,16 @@ jobs:
           name: Log into registry
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              echo "${DOCKER_HUB_TOKEN}" | docker login -u ${DOCKER_HUB_USER} --password-stdin
+              docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
             fi
+          environment:
+            DEBIAN_FRONTEND: noninteractive
 
       - run:
           name: Push images
           command: |
             if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              make push-<< parameters.distro >>
+              make -j $(nproc) push-<< parameters.distro >>
             fi
           environment:
             FORCE: "YES"
@@ -125,9 +134,41 @@ jobs:
           paths:
             - docs/metadata
 
+  docker_bundle:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
+    steps:
+      - checkout
+
+      - run:
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Log into registry
+          command: |
+            docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
+          environment:
+            DEBIAN_FRONTEND: noninteractive
+
+      # TODO: what about -compat?
+      - run:
+          name: Bundle manifest
+          command: |
+              make -j $(nproc) bundle-<< parameters.distro >>
+          environment:
+            FORCE: "YES"
+
   metadata:
-    docker:
-      - image: ubuntu:22.04
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
     steps:
       - checkout
 
@@ -136,10 +177,16 @@ jobs:
       #  if: github.ref == 'refs/heads/main'
 
   auto_update:
-    docker:
-      - image: ubuntu:22.04
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      image: ubuntu-2004:202111-02
+      docker_layer_caching: true
     steps:
       - checkout
+
+      - run:
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
 
       - run:
           name: Generate Supported Versions

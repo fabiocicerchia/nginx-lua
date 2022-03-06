@@ -7,31 +7,21 @@
 # Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
+ARG ARCH=
 ARG DISTRO=almalinux
 ARG DISTRO_VER=8.5-20211112
 
 #############################
 # Settings Common Variables #
 #############################
-FROM $DISTRO:$DISTRO_VER AS base
+FROM ${ARCH}/$DISTRO:$DISTRO_VER AS base
 
-# Ref: https://docs.docker.com/engine/reference/builder/#automatic-platform-args-in-the-global-scope
-# platform of the build result. Eg linux/amd64, linux/arm/v7, windows/amd64.
-ARG TARGETPLATFORM
-ENV TARGETPLATFORM=$TARGETPLATFORM
-# OS component of TARGETPLATFORM
-ARG TARGETOS
-ENV TARGETOS=$TARGETOS
-# architecture component of TARGETPLATFORM
-ARG TARGETARCH
-ENV TARGETARCH=$TARGETARCH
+ARG ARCH=
+ENV ARCH=$ARCH
 
-ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
-ENV DOCKER_IMAGE=$DOCKER_IMAGE
-ARG DOCKER_IMAGE_OS=$DISTRO
-ENV DOCKER_IMAGE_OS=$DOCKER_IMAGE_OS
-ARG DOCKER_IMAGE_TAG=$DISTRO_VER
-ENV DOCKER_IMAGE_TAG=$DOCKER_IMAGE_TAG
+ENV DOCKER_IMAGE=fabiocicerchia/nginx-lua
+ENV DOCKER_IMAGE_OS=${DISTRO}
+ENV DOCKER_IMAGE_TAG=${DISTRO_VER}
 
 ARG BUILD_DATE
 ENV BUILD_DATE=$BUILD_DATE
@@ -251,12 +241,15 @@ ARG BUILD_DEPS_BASE="\
         unzip \
         zlib-devel \
 "
+ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
         ${BUILD_DEPS_BASE} \
 "
-ARG BUILD_DEPS_ARM64="\
+ENV BUILD_DEPS_AMD64=$BUILD_DEPS_AMD64
+ARG BUILD_DEPS_ARM64V8="\
         ${BUILD_DEPS_BASE} \
 "
+ENV BUILD_DEPS_ARM64V8=$BUILD_DEPS_ARM64V8
 ENV BUILD_DEPS=
 
 ARG NGINX_BUILD_DEPS=""
@@ -267,11 +260,9 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 ####################################
 FROM base AS builder
 
-COPY tpl/Makefile Makefile
-
 # hadolint ignore=SC2086
 RUN set -eux \
-    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${TARGETARCH} | tr '[:lower:]' '[:upper:]')" \
+    && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
     && dnf config-manager --set-enabled powertools \
@@ -280,8 +271,11 @@ RUN set -eux \
     && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS
-RUN make -j "$(nproc)" deps
-RUN make -j "$(nproc)" core
+
+COPY tpl/Makefile Makefile
+
+RUN make deps \
+    && make core
 
 RUN set -eux \
 # envsubst
@@ -308,7 +302,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.version="${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
-    image.target.arch="${TARGETARCH}" \
+    image.target.arch="${ARCH}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua="${VER_LUA}" \
     versions.luarocks="${VER_LUAROCKS}" \

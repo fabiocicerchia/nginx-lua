@@ -6,4 +6,7 @@ if __name__ == "__main__":
     os_distro = sys.argv[1]
 
     versions = common.get_all_versions()
-    common.push(versions["nginx"], os_distro, versions[os_distro])
+    exit_code = common.push(versions["nginx"], os_distro, versions[os_distro])
+
+    if exit_code > 0:
+        sys.exit(1)
