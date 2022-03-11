@@ -1,5 +1,5 @@
 nginx=1.21.6
-almalinux=8.5-20211112
+almalinux=8.5-20220306
 alpine=3.15.0
 amazonlinux=2.0.20220218.1
 debian=11.2
