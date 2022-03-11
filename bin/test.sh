@@ -49,16 +49,9 @@ function test() {
 set -eux
 
 OS=$1
-
-# preload amd64 images
-for TARBALL in $(find dist -name "*.tar" -type f | sort); do
-    TAG=$(echo "$TARBALL" | sed -E "s/(.*)-nginx-(.*)-([a-z]*)-(.*)-Dockerfile.*/\2@\3\4/" | tr '-' '.' | tr '@' '-')
-    docker import "$TARBALL" "$TAG"
-done
-
-docker images
+ARCH=$2
 
 for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort); do
     TAG=$(echo "$DOCKERFILE" | awk -F '/' '{print $2"-"$3$4}')
-    test "$TAG"
+    test "$TAG-$ARCH"
 done

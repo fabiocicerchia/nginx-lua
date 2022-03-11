@@ -4,20 +4,22 @@ import re
 import subprocess
 import common
 
-# TODO: ADD SUPPORT FOR -compat
 files = subprocess.getoutput(
-    "find nginx -type f | sort -V | grep -v compat",
+    "find nginx -type f -name 'Dockerfile*' | sort -V",
 ).splitlines()
 
 supported = common.get_supported_versions()
 
 tags = {}
 for file in files:
-    pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile", file)
+    pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile(-compat)?", file)
 
-    nginx_ver, os_distro, osVer = pieces.group(1, 2, 3)
+    nginx_ver, os_distro, osVer, compat = pieces.group(1, 2, 3, 4)
     nginx_ver_pieces = re.split(r"\.", nginx_ver)
     nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
+    suffix = ""
+    if compat != None:
+        suffix = "-compat"
 
     # tags[os_distro] = file # currently missing
     tags[
@@ -29,6 +31,7 @@ for file in files:
         + "-"
         + os_distro
         + osVer
+        + suffix
     ] = file
     tags[
         nginx_ver_major
@@ -38,21 +41,22 @@ for file in files:
         + nginx_ver_patch
         + "-"
         + os_distro
+        + suffix
     ] = file
     if os_distro == "alpine":
-        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + nginx_ver_patch] = file
-    tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro + osVer] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + nginx_ver_patch + suffix] = file
+    tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro + osVer + suffix] = file
     if not (os_distro == "amazonlinux" and osVer.startswith("2018")):
-        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor + "-" + os_distro + suffix] = file
     if os_distro == "alpine":
-        tags[nginx_ver_major + "." + nginx_ver_minor] = file
-    tags[nginx_ver_major + "-" + os_distro + osVer] = file
-    tags[os_distro] = file
+        tags[nginx_ver_major + "." + nginx_ver_minor + suffix] = file
+    tags[nginx_ver_major + "-" + os_distro + osVer + suffix] = file
+    tags[os_distro + suffix] = file
     if not (os_distro == "amazonlinux" and osVer.startswith("2018")):
-        tags[nginx_ver_major + "-" + os_distro] = file
+        tags[nginx_ver_major + "-" + os_distro + suffix] = file
     if os_distro == "alpine":
-        tags[nginx_ver_major] = file
-        tags["latest"] = file
+        tags[nginx_ver_major + suffix] = file
+        tags["latest" + suffix] = file
 
 dockerfiles = {}
 reversed = files

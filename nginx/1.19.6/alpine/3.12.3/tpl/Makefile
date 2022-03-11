@@ -19,8 +19,6 @@ core:
 # ##############################################################################
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
-# TODO: need to get all patches from openresty?
-# TODO: Find a better way to fallback when openresty is behind the nginx latest version and no patch is available
 	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \

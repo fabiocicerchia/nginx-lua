@@ -1,7 +1,6 @@
 from datetime import datetime
 import os
 import re
-import requests
 import shlex
 import shutil
 import subprocess
@@ -49,13 +48,6 @@ def write_file(file, content):
 # ##############################################################################
 
 
-def docker_tag_exists(image, tag):
-    url = "https://index.docker.io/v1/repositories/%s/tags/%s" % (image, tag)
-    data = requests.get(url).json
-
-    return data != []
-
-
 def fetch_version_parts(version):
     major = version.split(".")[0]
     minor = major + "." + version.split(".")[1]
@@ -93,7 +85,9 @@ def get_tags(suffix, nginx_ver, os_distro, os_ver, arch):
     tags.append("%s-%s%s%s" % (major, os_distro, os_ver, suffix))
 
     tags = list(set(map(lambda x: image_repo + ":" + x, tags)))
-    tags.sort(key=len)
+
+    tags.sort(key=lambda item: (len(item), item))
+
     return tags
 
 
@@ -282,6 +276,9 @@ def get_supported_versions():
         supported_versions.append(
             get_dockerfile(nginx_ver, os_distro, versions[os_distro])
         )
+        supported_versions.append(
+            get_dockerfile(nginx_ver, os_distro, versions[os_distro], "-compat")
+        )
 
     return supported_versions
 
@@ -304,7 +301,7 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
     folder = os.path.dirname(dockerfile)
 
-    os.makedirs(folder, exist_ok=True)
+    os.makedirs(folder+'/tpl', exist_ok=True)
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
@@ -312,23 +309,27 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
-    shutil.copyfile("tpl/10-listen-on-ipv6-by-default.sh", folder+"/10-listen-on-ipv6-by-default.sh")
-    shutil.copyfile("tpl/20-envsubst-on-templates.sh", folder+"/20-envsubst-on-templates.sh")
-    shutil.copyfile("tpl/default.conf", folder+"/default.conf")
-    shutil.copyfile("tpl/docker-entrypoint.sh", folder+"/docker-entrypoint.sh")
-    shutil.copyfile("tpl/Makefile", folder+"/Makefile")
-    shutil.copyfile("tpl/nginx.conf", folder+"/nginx.conf")
-    shutil.copyfile("tpl/support.sh", folder+"/support.sh")
+    shutil.copyfile("tpl/10-listen-on-ipv6-by-default.sh", folder+"/tpl/10-listen-on-ipv6-by-default.sh")
+    os.chmod(folder+"/tpl/10-listen-on-ipv6-by-default.sh", 0o775)
+    shutil.copyfile("tpl/20-envsubst-on-templates.sh", folder+"/tpl/20-envsubst-on-templates.sh")
+    os.chmod(folder+"/tpl/20-envsubst-on-templates.sh", 0o775)
+    shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
+    shutil.copyfile("tpl/docker-entrypoint.sh", folder+"/tpl/docker-entrypoint.sh")
+    os.chmod(folder+"/tpl/docker-entrypoint.sh", 0o775)
+    shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")
+    shutil.copyfile("tpl/nginx.conf", folder+"/tpl/nginx.conf")
+    shutil.copyfile("tpl/support.sh", folder+"/tpl/support.sh")
+    os.chmod(folder+"/tpl/support.sh", 0o775)
 
 
 # TAGS
 # ##############################################################################
 
 
-def tag(nginx_ver, os_distro, os_ver):
-    tags = get_tags("", nginx_ver, os_distro, os_ver)
+def tag(nginx_ver, os_distro, os_ver, suffix):
+    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "")
     tags = "`, `".join(tags).replace(image_repo + ":", "")
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
 
     print(
         "- [`%s`](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)"

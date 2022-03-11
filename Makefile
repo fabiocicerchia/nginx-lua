@@ -23,6 +23,7 @@ BUNDLE_CMD:=./bin/docker-bundle.py
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
 META_CMD:=./bin/docker-metadata.py
+META_ALL_CMD:=./bin/docker-metadata-all.py
 DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
@@ -104,9 +105,7 @@ help: ## prints this help
 ################################################################################
 
 build-all: build-amd64 build-arm64 ## build all dockerfiles
-
 build-amd64: $(build_targets_amd64) ## build all distros in amd64 arch
-
 build-arm64: $(build_targets_arm64) ## build all distros in arm64 arch
 
 $(build_targets_amd64): ## build one distro in amd64 arch
@@ -143,7 +142,8 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst test-,,$(@)); \
 	echo "TESTING $$DISTRO"; \
-	$(TEST_CMD) "$$DISTRO"
+	$(TEST_CMD) "$$DISTRO" "amd64"
+	$(TEST_CMD) "$$DISTRO" "arm64"
 endif
 
 test-security: $(security_targets) ## test security all docker images
@@ -231,7 +231,7 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_linux_amd64.tar.gz
 	tar xvzf ghr_v0.14.0_linux_amd64.tar.gz
-	./ghr_v0.14.0_linux_amd64/ghr -b "$(shell make changelog)" $(TAG_VER) .
+	IFS=$$'\n' ./ghr_v0.14.0_linux_amd64/ghr -b "$(shell make changelog)" $(TAG_VER)
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
@@ -239,9 +239,14 @@ generate-supported-versions: ## generate supported_versions file
 generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
 
-generate-metadata: ## generate all metadata for docker images
+generate-metadata: ## generate metadata for all OS docker images
 	for DISTRO in $(DISTROS); do \
 		$(META_CMD) $$DISTRO 0; \
+	done
+
+generate-metadata-all: ## generate all metadata for all OS docker images
+	for DISTRO in $(DISTROS); do \
+		$(META_ALL_CMD) $$DISTRO; \
 	done
 
 update-tags: ## update docker tags file
@@ -255,9 +260,10 @@ benchmark: ## benchmark (wip)
 
 changelog: ## generate a changelog since previous tag
 	git fetch --all --tags > /dev/null
-	echo "Changes:"
+	echo "## What's Changed"
 	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
 	cat CHANGELOG | egrep -v "Automated (metadata|updates)" | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | awk '!x[$$0]++' | tee CHANGELOG
+	echo "**Full Changelog**: https://github.com/fabiocicerchia/nginx-lua/compare/$(PREVIOUS_TAG)...$(TAG_VER)"
 	echo ""
-	echo "Supported Versions:"
+	echo "## Supported Versions"
 	cat supported_versions | sed 's/[()"]//g' | tr 'A-Z' 'a-z' | sed 's/^/ - /'

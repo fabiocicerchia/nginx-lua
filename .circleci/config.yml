@@ -156,7 +156,6 @@ jobs:
           environment:
             DEBIAN_FRONTEND: noninteractive
 
-      # TODO: what about -compat?
       - run:
           name: Bundle manifest
           command: |
