@@ -39,8 +39,8 @@ ARG VER_NGX_DEVEL_KIT=0.3.1
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
-# https://github.com/openresty/luajit2/releases
-ARG VER_LUAJIT=2.1-20211210
+# https://github.com/openresty/luajit2/tags
+ARG VER_LUAJIT=2.1-20220310
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -106,12 +106,12 @@ ARG VER_OPENRESTY_SHELL=0.03
 ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
 # lua-resty-signal
-# https://github.com/openresty/lua-resty-signal/releases
+# https://github.com/openresty/lua-resty-signal/tags
 ARG VER_OPENRESTY_SIGNAL=0.03
 ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-tablepool
-# https://github.com/openresty/lua-tablepool/releases
+# https://github.com/openresty/lua-tablepool/tags
 ARG VER_OPENRESTY_TABLEPOOL=0.02
 ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
@@ -137,7 +137,7 @@ ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus/tags
-ARG VER_PROMETHEUS=0.20210206
+ARG VER_PROMETHEUS=0.20220127
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # stream-lua-nginx-module
