@@ -332,13 +332,13 @@ ARG PKG_DEPS="\
 "
 ENV PKG_DEPS=$PKG_DEPS
 
-COPY --from=builder /etc/nginx /etc/nginx
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/share/lua /usr/local/share/lua
-COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
-COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
+COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
+COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
+COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
@@ -361,6 +361,12 @@ RUN set -eux \
     && groupadd --system --gid 101 nginx \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
     && mkdir /docker-entrypoint.d \
+# Fix permissions
+# ##############################################################################
+    && touch /var/run/nginx.pid \
+    && chown -R nginx:nginx \
+      /var/run/nginx.pid \
+      /var/log/nginx \
 # Upgrade software to latest version
 # ##############################################################################
     && yum upgrade -y \
@@ -369,12 +375,14 @@ RUN set -eux \
     && yum clean all \
     && rm -rf /var/cache/dnf
 
-COPY tpl/support.sh /
-COPY tpl/docker-entrypoint.sh /
-COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
-COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
-COPY tpl/nginx.conf /etc/nginx/nginx.conf
-COPY tpl/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=nginx:nginx tpl/support.sh /
+COPY --chown=nginx:nginx tpl/docker-entrypoint.sh /
+COPY --chown=nginx:nginx tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
+COPY --chown=nginx:nginx tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
+COPY --chown=nginx:nginx tpl/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nginx:nginx tpl/default.conf /etc/nginx/conf.d/default.conf
+
+USER nginx
 
 # smoke test
 # ##############################################################################
