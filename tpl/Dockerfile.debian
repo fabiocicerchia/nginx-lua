@@ -374,7 +374,6 @@ RUN set -eux \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup --system --gid 101 nginx \
     && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
-    && mkdir /docker-entrypoint.d \
 # Upgrade software to latest version
 # ##############################################################################
     && apt-get upgrade -y \
