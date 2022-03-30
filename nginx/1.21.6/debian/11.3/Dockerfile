@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=alpine
-ARG DISTRO_VER=3.15.3
+ARG DISTRO=debian
+ARG DISTRO_VER=11.3
 
 #############################
 # Settings Common Variables #
@@ -222,43 +222,34 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
+        ca-certificates \
         curl \
-        geoip-dev \
-        gzip \
+        g++ \
+        libgeoip-dev \
+        libpcre3-dev \
+        libssl-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
         make \
-        openssl-dev \
         patch \
-        pcre-dev \
-        tar \
-        zlib-dev \
+        unzip \
+        zlib1g-dev \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
         ${BUILD_DEPS_BASE} \
-        g++ \
 "
 ENV BUILD_DEPS_AMD64=$BUILD_DEPS_AMD64
 ARG BUILD_DEPS_ARM64V8="\
         ${BUILD_DEPS_BASE} \
-        gcc-aarch64-none-elf \
 "
 ENV BUILD_DEPS_ARM64V8=$BUILD_DEPS_ARM64V8
 ENV BUILD_DEPS=
 
-ARG NGINX_BUILD_DEPS="\
-# NGINX
-        alpine-sdk \
-        bash \
-        findutils \
-        gd-dev \
-        libedit-dev \
-        libxslt-dev \
-        linux-headers \
-        perl-dev \
-"
+ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
+
+ENV DEBIAN_FRONTEND noninteractive
 
 ####################################
 # Build Nginx with support for LUA #
@@ -268,16 +259,27 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && apk update \
-    && apk add --no-cache \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+        apt-utils \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS
+        $NGINX_BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY tpl/Makefile Makefile
 
 RUN make deps \
     && make core \
     && make luarocks
+
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
+        gettext-base \
+    && rm -rf /var/lib/apt/lists/*
 
 ##########################################
 # Combine everything with minimal layers #
@@ -323,13 +325,14 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
-        geoip-dev \
+        ca-certificates \
+        libgeoip-dev \
+        libpcre3-dev \
+        libssl-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
-        openssl-dev \
-        pcre-dev \
         unzip \
-        zlib-dev \
+        zlib1g-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -339,50 +342,39 @@ COPY --from=builder /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder /var/cache/nginx /var/cache/nginx
+COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
 COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
 COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache --virtual .pkg_deps \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests \
         $PKG_DEPS \
 # Fix LUA alias
     && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache --virtual .run_deps $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache --virtual pkg_tz tzdata \
+    && apt-get install -y --no-install-recommends --no-install-suggests tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
+    && apt-get install -y --no-install-recommends --no-install-suggests curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && addgroup --system --gid 101 nginx \
+    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
     && mkdir /docker-entrypoint.d \
 # Upgrade software to latest version
 # ##############################################################################
-    && apk upgrade
+    && apt-get upgrade -y \
+# Cleanup
+# ##############################################################################
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY tpl/support.sh /
 COPY tpl/docker-entrypoint.sh /
