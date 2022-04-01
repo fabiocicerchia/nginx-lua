@@ -341,13 +341,20 @@ ARG PKG_DEPS="\
 "
 ENV PKG_DEPS=$PKG_DEPS
 
-COPY --from=builder /etc/nginx /etc/nginx
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/share/lua /usr/local/share/lua
-COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
-COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY --from=builder /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
+COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
+COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
+COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
+
+COPY --chown=101:101 tpl/support.sh /
+COPY --chown=101:101 tpl/docker-entrypoint.sh /
+COPY --chown=101:101 tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
+COPY --chown=101:101 tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
+COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
@@ -374,7 +381,6 @@ RUN set -eux \
 # create nginx user/group first, to be consistent throughout docker variants
     && groupadd --system --gid 101 nginx \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
-    && mkdir /docker-entrypoint.d \
 # Upgrade software to latest version
 # ##############################################################################
     && dnf upgrade -y \
@@ -382,13 +388,6 @@ RUN set -eux \
 # ##############################################################################
     && dnf clean all \
     && rm -rf /var/cache/dnf
-
-COPY tpl/support.sh /
-COPY tpl/docker-entrypoint.sh /
-COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
-COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
-COPY tpl/nginx.conf /etc/nginx/nginx.conf
-COPY tpl/default.conf /etc/nginx/conf.d/default.conf
 
 # smoke test
 # ##############################################################################

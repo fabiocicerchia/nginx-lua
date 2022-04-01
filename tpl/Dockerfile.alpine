@@ -333,14 +333,21 @@ ARG PKG_DEPS="\
 "
 ENV PKG_DEPS=$PKG_DEPS
 
-COPY --from=builder /etc/nginx /etc/nginx
-COPY --from=builder /usr/local/lib /usr/local/lib
-COPY --from=builder /usr/local/share/lua /usr/local/share/lua
-COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
-COPY --from=builder /usr/sbin/nginx-debug /usr/sbin/nginx-debug
-COPY --from=builder /var/cache/nginx /var/cache/nginx
-COPY --from=builder /usr/local/bin/luarocks /usr/local/bin/luarocks
-COPY --from=builder /usr/local/etc/luarocks /usr/local/etc/luarocks
+COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
+COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
+COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
+COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
+COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
+
+COPY --chown=101:101 tpl/support.sh /
+COPY --chown=101:101 tpl/docker-entrypoint.sh /
+COPY --chown=101:101 tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
+COPY --chown=101:101 tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
+COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
@@ -379,17 +386,9 @@ RUN set -eux \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup -g 101 -S nginx \
     && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-    && mkdir /docker-entrypoint.d \
 # Upgrade software to latest version
 # ##############################################################################
     && apk upgrade
-
-COPY tpl/support.sh /
-COPY tpl/docker-entrypoint.sh /
-COPY tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
-COPY tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
-COPY tpl/nginx.conf /etc/nginx/nginx.conf
-COPY tpl/default.conf /etc/nginx/conf.d/default.conf
 
 # smoke test
 # ##############################################################################
