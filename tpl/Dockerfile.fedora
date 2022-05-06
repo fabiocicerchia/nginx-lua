@@ -60,7 +60,7 @@ ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 # This library is production ready.
 ARG VER_LUA_RESTY_CORE=0.1.22
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
-ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
+ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-resty-lrucache
