@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.15
+ARG DISTRO_VER=3.15.4
 
 #############################
 # Settings Common Variables #
@@ -40,6 +40,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
 # https://github.com/openresty/luajit2/tags
+# Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
 ARG VER_LUAJIT=2.1-20220310
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
