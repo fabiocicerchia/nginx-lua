@@ -40,6 +40,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
 # https://github.com/openresty/luajit2/tags
+# Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
 ARG VER_LUAJIT=2.1-20220310
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
@@ -60,7 +61,7 @@ ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 # This library is production ready.
 ARG VER_LUA_RESTY_CORE=0.1.22
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
-ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
+ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-resty-lrucache

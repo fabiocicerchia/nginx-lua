@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import shutil
 import common
+import re
 
 if __name__ == "__main__":
     versions = common.get_all_versions()
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     (exitcode, dockerfiles) = common.run_command("find nginx -type f -name 'Dockerfile'", False)
     dockerfiles = list(
         filter(
-            lambda elem: elem.find("alpine") != -1,
+            lambda elem: re.search("nginx/.+/alpine/\d+\.\d+\.\d+/", elem),
             dockerfiles.split("\n")))
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile")
