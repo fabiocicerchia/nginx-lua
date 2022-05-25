@@ -58,21 +58,21 @@ dep-ngx_devel_kit:
 
 # OpenResty LUAJIT2
 # ##############################################################################
-# This is because OpenResty LuaJIT2 is stuck on Lua 5.1 since 2009.
-# Also, since LUA_LIB_DIR is set on 5.4, the 5.1 folder is always empty and nginx
-# will try to look things in the wrong one, unless provided with:
-#  lua_package_path '/usr/local/share/lua/5.4/?.lua;;';
-#  lua_package_cpath '/usr/local/lib/lua/5.4/?.so;;';
-.workaround-luajit:
-	ln -s /usr/local/lib/lua/5.4 /usr/local/lib/lua/5.1
-	ln -s /usr/local/share/lua/5.4 /usr/local/share/lua/5.1
-
-dep-luajit: .workaround-luajit
+dep-luajit:
 	curl -sLo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz
 	tar -C / -xvzf /luajit.tar.gz
 	cd /luajit2-${VER_LUAJIT} \
 	&& make \
 	&& make install
+# This is because OpenResty LuaJIT2 is stuck on Lua 5.1 since 2009.
+# Also, since LUA_LIB_DIR is set on 5.4, the 5.1 folder is always empty and nginx
+# will try to look things in the wrong one, unless provided with:
+#  lua_package_path '/usr/local/share/lua/5.4/?.lua;;';
+#  lua_package_cpath '/usr/local/lib/lua/5.4/?.so;;';
+# it is safe to delete the folders as they have JUST been created
+	rm -r /usr/local/lib/lua/5.1 /usr/local/share/lua/5.1
+	ln -s /usr/local/lib/lua/5.4 /usr/local/lib/lua/5.1
+	ln -s /usr/local/share/lua/5.4 /usr/local/share/lua/5.1
 
 # Lua Nginx Module
 # ##############################################################################

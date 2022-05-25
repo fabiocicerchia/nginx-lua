@@ -117,7 +117,7 @@ def docker_build(vcs_ref, tags, dockerfile, arch):
 
     exit_code = run_command(
         """
-        time docker build
+        docker build
         --progress=plain
         --build-arg ARCH="%s"
         --build-arg BUILD_DATE="%s"
