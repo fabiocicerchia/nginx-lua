@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
+set -x
 set -e
 
 ME=$(basename $0)

@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 # vim:sw=4:ts=4:et
 
+set -x
 set -e
 
 ME=$(basename $0)

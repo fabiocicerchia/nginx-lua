@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+set -x
 
 echo "💗 Support the Project 💗"
 echo "This project is only maintained by one person, Fabio Cicerchia <https://github.com/fabiocicerchia>."

@@ -1,5 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 # vim:sw=4:ts=4:et
+
+set -x
+export PS4='[\D{%d.%m.%y} \t] '
 
 /support.sh
 
