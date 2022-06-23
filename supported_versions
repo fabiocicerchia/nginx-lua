@@ -1,4 +1,4 @@
-nginx=1.22.0
+nginx=1.23.0
 almalinux=8.6-20220512
 alpine=3.16.0
 amazonlinux=2.0.20220606.1

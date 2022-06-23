@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=alpine
-ARG DISTRO_VER=3.16.0
+ARG DISTRO=almalinux
+ARG DISTRO_VER=8.6-20220512
 
 #############################
 # Settings Common Variables #
@@ -29,7 +29,7 @@ ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
 # lua
-ARG VER_LUA=5.4
+ARG VER_LUA=5.3.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -173,6 +173,9 @@ ENV NGX_CFLAGS=$NGX_CFLAGS
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
 # Reference: http://nginx.org/en/docs/configure.html
+# NOTE: Almalinux is building with PCRE instead of PCRE2 mostly due to
+# https://github.com/openresty/lua-nginx-module/issues/1984.
+# More details on it: https://github.com/fabiocicerchia/nginx-lua/pull/40
 ARG NGINX_BUILD_CONFIG="\
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
@@ -214,6 +217,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
+            --without-pcre2 \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
@@ -223,42 +227,33 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
-        curl \
-        geoip-dev \
+        GeoIP-devel \
+        ca-certificates \
+        findutils \
+        gcc-c++ \
         gzip \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
+        lua-${VER_LUA} \
+        lua-devel-${VER_LUA} \
         make \
-        openssl-dev \
+        openssl-devel \
         patch \
-        pcre-dev \
+        pcre-devel \
         tar \
-        zlib-dev \
+        unzip \
+        zlib-devel \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
         ${BUILD_DEPS_BASE} \
-        g++ \
 "
 ENV BUILD_DEPS_AMD64=$BUILD_DEPS_AMD64
 ARG BUILD_DEPS_ARM64V8="\
         ${BUILD_DEPS_BASE} \
-        gcc-aarch64-none-elf \
 "
 ENV BUILD_DEPS_ARM64V8=$BUILD_DEPS_ARM64V8
 ENV BUILD_DEPS=
 
-ARG NGINX_BUILD_DEPS="\
-# NGINX
-        alpine-sdk \
-        bash \
-        findutils \
-        gd-dev \
-        libedit-dev \
-        libxslt-dev \
-        linux-headers \
-        perl-dev \
-"
+ARG NGINX_BUILD_DEPS=""
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ####################################
@@ -269,16 +264,26 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && apk update \
-    && apk add --no-cache \
+    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
+    && dnf install -y 'dnf-command(config-manager)' epel-release \
+    && dnf config-manager --set-enabled powertools \
+    && dnf config-manager --set-enabled epel \
+    && dnf makecache \
+    && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS
 
 COPY tpl/Makefile Makefile
 
 RUN make deps \
-    && make core \
-    && make luarocks
+    && make core
+
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && dnf makecache \
+    && dnf install -y \
+        gettext
 
 ##########################################
 # Combine everything with minimal layers #
@@ -324,13 +329,16 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
-        geoip-dev \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
-        openssl-dev \
-        pcre-dev \
+        GeoIP-devel \
+        ca-certificates \
+        gcc-c++ \
+        lua-${VER_LUA} \
+        lua-devel-${VER_LUA} \
+        luarocks \
+        openssl-devel \
+        pcre-devel \
         unzip \
-        zlib-dev \
+        zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
@@ -340,8 +348,7 @@ COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
-COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
-COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
 
 COPY --chown=101:101 tpl/support.sh /
 COPY --chown=101:101 tpl/docker-entrypoint.sh /
@@ -350,46 +357,38 @@ COPY --chown=101:101 tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
 COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache --virtual .pkg_deps \
+    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
+    && dnf install -y 'dnf-command(config-manager)' epel-release \
+    && dnf config-manager --set-enabled powertools \
+    && dnf config-manager --set-enabled epel \
+    && dnf makecache \
+    && dnf install -y \
         $PKG_DEPS \
 # Fix LUA alias
     && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache --virtual .run_deps $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache --virtual pkg_tz tzdata \
+    && dnf install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
+    && dnf install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Upgrade software to latest version
 # ##############################################################################
-    && apk upgrade
+    && dnf upgrade -y \
+# Cleanup
+# ##############################################################################
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 # smoke test
 # ##############################################################################
