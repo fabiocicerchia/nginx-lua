@@ -4,8 +4,8 @@
 
 - [`1-almalinux`, `1.23-almalinux`, `1.23-almalinux8.6-20220706`, `1-almalinux8.6-20220706`, `1.23.1-almalinux8.6-20220706`, `1.23.1-almalinux`, `almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/almalinux/8.6-20220706/Dockerfile)
 - [`1-almalinux-compat`, `1.23-almalinux-compat`, `1.23-almalinux8.6-20220706-compat`, `1-almalinux8.6-20220706-compat`, `1.23.1-almalinux8.6-20220706-compat`, `1.23.1-almalinux-compat`, `almalinux-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/almalinux/8.6-20220706/Dockerfile-compat)
-- [`1-alpine`, `1`, `1.23-alpine`, `1.23`, `1.23-alpine3.16.1`, `1-alpine3.16.1`, `1.23.1-alpine3.16.1`, `1.23.1-alpine`, `1.23-1`, `alpine`, `latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.1/Dockerfile)
-- [`1-alpine-compat`, `1-compat`, `1.23-alpine-compat`, `1.23-compat`, `1.23-alpine3.16.1-compat`, `1-alpine3.16.1-compat`, `1.23.1-alpine3.16.1-compat`, `1.23.1-alpine-compat`, `1.23-1-compat`, `alpine-compat`, `latest-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.1/Dockerfile-compat)
+- [`1-alpine`, `1`, `1.23-alpine`, `1.23`, `1.23.1-alpine`, `1.23-1`, `1.23.1-alpine3.16.2`, `1.23-alpine3.16.2`, `1-alpine3.16.2`, `alpine`, `latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.2/Dockerfile)
+- [`1-alpine-compat`, `1-compat`, `1.23-alpine-compat`, `1.23-compat`, `1.23.1-alpine-compat`, `1.23-1-compat`, `1.23.1-alpine3.16.2-compat`, `1.23-alpine3.16.2-compat`, `1-alpine3.16.2-compat`, `alpine-compat`, `latest-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.2/Dockerfile-compat)
 - [`1-amazonlinux`, `1-amazonlinux2.0.20220606.1`, `1.23-amazonlinux2.0.20220606.1`, `1.23-amazonlinux`, `1.23.1-amazonlinux2.0.20220606.1`, `1.23.1-amazonlinux`, `amazonlinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/amazonlinux/2.0.20220606.1/Dockerfile)
 - [`1-amazonlinux-compat`, `1-amazonlinux2.0.20220606.1-compat`, `1.23-amazonlinux2.0.20220606.1-compat`, `1.23-amazonlinux-compat`, `1.23.1-amazonlinux2.0.20220606.1-compat`, `1.23.1-amazonlinux-compat`, `amazonlinux-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/amazonlinux/2.0.20220606.1/Dockerfile-compat)
 - [`1-debian`, `1.23-debian`, `1.23-debian11.4`, `1-debian11.4`, `1.23.1-debian11.4`, `1.23.1-debian`, `debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/debian/11.4/Dockerfile)
@@ -17,6 +17,8 @@
 
 ## Unsupported Tags
 
+- [`1.23-alpine3.16.1-compat`, `1-alpine3.16.1-compat`, `1.23.1-alpine3.16.1-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.1/Dockerfile-compat)
+- [`1.23-alpine3.16.1`, `1-alpine3.16.1`, `1.23.1-alpine3.16.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.1/alpine/3.16.1/Dockerfile)
 - [`1.23.0-ubuntu22.04-compat`, `1.23.0-ubuntu-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.0/ubuntu/22.04/Dockerfile-compat)
 - [`1.23.0-ubuntu22.04`, `1.23.0-ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.0/ubuntu/22.04/Dockerfile)
 - [`1.23.0-fedora36-compat`, `1.23.0-fedora-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.0/fedora/36/Dockerfile-compat)
