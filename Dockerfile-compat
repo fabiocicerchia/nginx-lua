@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.16.0
+ARG DISTRO_VER=3.16.2
 
 #############################
 # Settings Common Variables #
@@ -147,7 +147,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.10
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.21.6
+ARG VER_NGINX=1.23.1
 ENV VER_NGINX=$VER_NGINX
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
