@@ -77,7 +77,7 @@ dep-luajit:
 # Lua Nginx Module
 # ##############################################################################
 dep-lua-nginx:
-	curl -sLo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz
+	curl -sLo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/${VER_LUA_NGINX_MODULE}.tar.gz
 	tar -C / -xvzf /lua-nginx.tar.gz
 
 # LUA Resty Core

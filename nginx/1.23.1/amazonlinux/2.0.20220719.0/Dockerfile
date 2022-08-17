@@ -29,7 +29,7 @@ ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
 # lua
-ARG VER_LUA=53
+ARG VER_LUA=54
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -41,7 +41,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 # luajit2
 # https://github.com/openresty/luajit2/tags
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
-ARG VER_LUAJIT=2.1-20220310
+ARG VER_LUAJIT=2.1-20220411
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -53,13 +53,14 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module/tags
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.20
+# TODO: Restore to 0.10.xx as the v0.10.21 has a bug fixed in the following commit:
+ARG VER_LUA_NGINX_MODULE=b6d167cf1a93c0c885c28db5a439f2404874cb26
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core/tags
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.22
+ARG VER_LUA_RESTY_CORE=0.1.23
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -67,12 +68,12 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 # lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache/tags
 # This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.11
+ARG VER_LUA_RESTY_LRUCACHE=0.13
 ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module/commits/master
-ARG VER_OPENRESTY_HEADERS=a4a0686605161a6777d7d612d5aef79b9e7c13e0
+ARG VER_OPENRESTY_HEADERS=bea1be3bbf6af28f6aa8cf0c01c07ee1637e2bd0
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
@@ -87,12 +88,12 @@ ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 
 # lua-resty-memcached
 # https://github.com/openresty/lua-resty-memcached/tags
-ARG VER_OPENRESTY_MEMCACHED=0.16
+ARG VER_OPENRESTY_MEMCACHED=0.17
 ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql/tags
-ARG VER_OPENRESTY_MYSQL=0.24
+ARG VER_OPENRESTY_MYSQL=0.25
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
@@ -122,12 +123,12 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket/tags
-ARG VER_OPENRESTY_WEBSOCKET=0.08
+ARG VER_OPENRESTY_WEBSOCKET=0.09
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.8.0
+ARG VER_LUAROCKS=3.9.1
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # lua-upstream-nginx-module
@@ -137,12 +138,12 @@ ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus/tags
-ARG VER_PROMETHEUS=0.20220127
+ARG VER_PROMETHEUS=0.20220527
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module/tags
-ARG VER_OPENRESTY_STREAMLUA=0.0.10
+ARG VER_OPENRESTY_STREAMLUA=0.0.11
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
