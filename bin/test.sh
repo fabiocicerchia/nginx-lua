@@ -13,8 +13,10 @@ function test() {
         # TODO: THIS WORKS ONLY FOR ALPINE!!
         if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
             docker exec nginx_lua_test apk add gcc musl-dev coreutils
-            docker exec nginx_lua_test luarocks install lua-cjson
         fi
+        # cannot run on almalinux (which uses 5.1) :
+        # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate
+        docker exec nginx_lua_test luarocks install lua-cjson
 
         COUNT=0
         until [ $COUNT -eq 20 ] || [ "$(
