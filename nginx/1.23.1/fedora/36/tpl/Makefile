@@ -83,7 +83,7 @@ dep-lua-nginx:
 # LUA Resty Core
 # ##############################################################################
 dep-lua-resty-core:
-	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz
+	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/${VER_LUA_RESTY_CORE}.tar.gz
 	tar -C / -xvzf /lua-resty-core.tar.gz
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 	&& make \
@@ -101,7 +101,7 @@ dep-lua-resty-lrucache:
 # OpenResty Headers
 # ##############################################################################
 dep-headers-more-nginx-module:
-	curl -sLo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/${VER_OPENRESTY_HEADERS}.zip
+	curl -sLo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/v${VER_OPENRESTY_HEADERS}.zip
 	unzip -d / /headers-more-nginx-module.zip
 
 # Cloudflare Cookie
@@ -212,7 +212,7 @@ dep-nginx-lua-prometheus:
 # OpenResty Stream Lua
 # ##############################################################################
 dep-stream-lua-nginx-module:
-	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip
+	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.zip
 	unzip -d / /stream-lua-nginx-module.zip
 
 # ##############################################################################
