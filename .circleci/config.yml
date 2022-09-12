@@ -188,6 +188,10 @@ jobs:
           command: pip3 install -r bin/requirements.txt
 
       - run:
+          name: Install Skopeo
+          command: apt-get install skopeo
+
+      - run:
           name: Generate Supported Versions
           command: make auto-update-and-commit
 

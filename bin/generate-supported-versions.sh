@@ -11,41 +11,40 @@ fetch_latest() {
     if [ "$FILTER" == "" ]; then
         FILTER=".+"
     fi
-    DIGEST=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags/latest" -O - | jq -rc '.images[] | select( .architecture == "amd64") | .digest')
+    DIGEST=$(skopeo inspect --override-arch amd64 docker://$DISTRO:latest | jq -r '.Digest')
+    TAGS=$(skopeo list-tags --override-arch amd64 docker://$DISTRO | jq -r '.Tags[]' | grep -E "$FILTER" | sort -Vr)
 
-    VER=""
-    PAGE=1
-    while [ "$VER" = "" ] && [ $PAGE -lt 100 ]; do
-        VER=$(wget -q "https://hub.docker.com/v2/repositories/library/$DISTRO/tags?page=$PAGE" -O - |
-            jq -rc '.results[] | select( .images[].digest == "'"$DIGEST"'" and .name != "latest" ) | .name' |
-            grep -E "$FILTER" | sort -Vr | head -n 1)
-        ((PAGE += 1))
+    for TAG in $TAGS; do
+        VER=$(skopeo inspect --override-arch amd64 docker://$DISTRO:$TAG | jq -rc 'select( .Digest == "'"$DIGEST"'")')
+        if [ "$VER" != "" ]; then
+            echo "$TAG";
+            return;
+        fi
     done
-
-    echo "$VER"
 }
 
 set -eux
 
-VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/nginx/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n' | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
+# VER_NGINX=$(wget -q https://registry.hub.docker.com/v1/repositories/nginx/tags -O - | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n' | cut -d: -f3 | grep -E "[0-9]+\.[0-9]+\.[0-9]+" | grep -E -v "alpine|perl" | sort -Vr | head -n 1)
+VER_NGINX=$(fetch_latest "nginx" "^[0-9]\.[0-9]{1,2}\.[0-9]{1,2}$")
 if [ "$VER_NGINX" = "" ]; then
     echo "Wrong version count in NGINX."
     exit 1
 fi
 
-VER_ALMALINUX=$(fetch_latest "almalinux")
+VER_ALMALINUX=$(fetch_latest "almalinux" "^[0-9]\.[0-9]{1,2}-[0-9]{8}$")
 if [ "$VER_ALMALINUX" = "" ]; then
     echo "Wrong version count in ALMALINUX."
     exit 1
 fi
 
-VER_ALPINE=$(fetch_latest "alpine")
+VER_ALPINE=$(fetch_latest "alpine" "^[0-9]\.[0-9]{1,2}\.[0-9]{1,2}$")
 if [ "$VER_ALPINE" = "" ]; then
     echo "Wrong version count in ALPINE."
     exit 1
 fi
 
-VER_AMAZONLINUX=$(fetch_latest "amazonlinux")
+VER_AMAZONLINUX=$(fetch_latest "amazonlinux" "^[0-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
 if [ "$VER_AMAZONLINUX" = "" ]; then
     echo "Wrong version count in AMAZONLINUX."
     exit 1
@@ -57,7 +56,7 @@ if [ "$VER_DEBIAN" = "" ]; then
     exit 1
 fi
 
-VER_FEDORA=$(fetch_latest "fedora")
+VER_FEDORA=$(fetch_latest "fedora" "^[0-9]{2}$")
 if [ "$VER_FEDORA" = "" ]; then
     echo "Wrong version count in FEDORA."
     exit 1
