@@ -12,21 +12,7 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
 
 for DOCKERFILE in $(find nginx/ -name "Dockerfile*" -type f | sort); do
     TAG=$(echo "$DOCKERFILE" | awk -F '/' '{print $2"-"$3$4}')
-    docker run -it --rm -e SNY_TOKEN="$SNYK_TOKEN" snyk/snyk-cli:docker \
-        test \
-        --project-name=fabiocicerchia/nginx-lua:"$TAG" \
-        --severity-threshold=medium \
-        --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:"$TAG" \
-        --file="$DOCKERFILE" || true
-
-    docker run -it --rm -e SNY_TOKEN="$SNYK_TOKEN" snyk/snyk-cli:docker \
-        monitor \
-        --project-name=fabiocicerchia/nginx-lua:"$TAG" \
-        --severity-threshold=medium \
-        --exclude-base-image-vulns \
-        --docker fabiocicerchia/nginx-lua:"$TAG" \
-        --file="DOCKERFILE"
+    docker scan fabiocicerchia/nginx-lua:"$TAG"
 done
 
 find bin -type f -name "*.sh" -exec docker run --rm -v "$PWD:/mnt" koalaman/shellcheck:stable {} \;
