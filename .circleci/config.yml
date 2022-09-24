@@ -189,7 +189,10 @@ jobs:
 
       - run:
           name: Install Skopeo
-          command: sudo apt-get install -y skopeo
+          command: |
+            sudo apt update
+            sudo apt install -y snapd
+            sudo snap install skopeo --edge
 
       - run:
           name: Generate Supported Versions
