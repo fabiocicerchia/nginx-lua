@@ -190,12 +190,13 @@ jobs:
       - run:
           name: Install Skopeo
           command: |
-            echo 'docker run quay.io/skopeo/stable:latest $@' > /usr/local/bin/skopeo
-            chmod +x /usr/local/bin/skopeo
+            echo 'docker run quay.io/skopeo/stable:latest $@' | sudo tee /usr/local/bin/skopeo
+            sudo chmod +x /usr/local/bin/skopeo
 
       - run:
           name: Generate Supported Versions
-          command: make auto-update-and-commit
+          command: |
+              make auto-update-and-commit
 
       - run:
           name: Create Release
