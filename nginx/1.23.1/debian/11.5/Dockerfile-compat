@@ -353,8 +353,7 @@ COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 
 COPY --chown=101:101 tpl/support.sh /
 COPY --chown=101:101 tpl/docker-entrypoint.sh /
-COPY --chown=101:101 tpl/10-listen-on-ipv6-by-default.sh /docker-entrypoint.d/
-COPY --chown=101:101 tpl/20-envsubst-on-templates.sh /docker-entrypoint.d/
+COPY --chown=101:101 tpl/??-*.sh /docker-entrypoint.d/
 COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
 

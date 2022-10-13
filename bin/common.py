@@ -1,9 +1,10 @@
-from datetime import datetime
+import glob
 import os
 import re
 import shlex
 import shutil
 import subprocess
+from datetime import datetime
 
 supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
 default_distro = "alpine"
@@ -22,11 +23,11 @@ def run_command(command, print_stdout):
     # Poll process.stdout to show stdout live
     while True:
         output = process.stdout.readline()
-        whole_output.append(output.decode("ascii"))
+        whole_output.append(output.decode("utf8"))
         if process.poll() is not None:
             break
         if print_stdout and output:
-            print(output.decode("ascii").strip())
+            print(output.decode("utf8").strip())
     rc = process.poll()
     return [rc, "".join(whole_output)]
 
@@ -309,17 +310,13 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
-    shutil.copyfile("tpl/10-listen-on-ipv6-by-default.sh", folder+"/tpl/10-listen-on-ipv6-by-default.sh")
-    os.chmod(folder+"/tpl/10-listen-on-ipv6-by-default.sh", 0o775)
-    shutil.copyfile("tpl/20-envsubst-on-templates.sh", folder+"/tpl/20-envsubst-on-templates.sh")
-    os.chmod(folder+"/tpl/20-envsubst-on-templates.sh", 0o775)
+    for file in glob.glob(r'tpl/*.sh'):
+      shutil.copyfile(file, folder+'/'+file)
+      os.chmod(folder+'/'+file, 0o775)
+
     shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
-    shutil.copyfile("tpl/docker-entrypoint.sh", folder+"/tpl/docker-entrypoint.sh")
-    os.chmod(folder+"/tpl/docker-entrypoint.sh", 0o775)
     shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")
     shutil.copyfile("tpl/nginx.conf", folder+"/tpl/nginx.conf")
-    shutil.copyfile("tpl/support.sh", folder+"/tpl/support.sh")
-    os.chmod(folder+"/tpl/support.sh", 0o775)
 
 
 # TAGS

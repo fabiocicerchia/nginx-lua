@@ -30,6 +30,8 @@ PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | h
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell make changelog)
 
+SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
+
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
 classic_compat_distros_amd64=$(addsuffix -classic, $(amd64_distros)) $(addsuffix -compat, $(amd64_distros))
@@ -238,6 +240,12 @@ generate-supported-versions: ## generate supported_versions file
 
 generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
+
+pull-nginx-entrypoints: ## retrieves the official entrypoint files
+	curl -sLo tpl/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/10-listen-on-ipv6-by-default.sh
+	curl -sLo tpl/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
+	curl -sLo tpl/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
+	curl -sLo tpl/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
 
 generate-metadata: ## generate metadata for all OS docker images
 	for DISTRO in $(DISTROS); do \
