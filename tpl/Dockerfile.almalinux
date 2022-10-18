@@ -41,7 +41,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 # luajit2
 # https://github.com/openresty/luajit2/tags
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
-ARG VER_LUAJIT=2.1-20220411
+ARG VER_LUAJIT=2.1-20220915
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -54,14 +54,14 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # https://github.com/openresty/lua-nginx-module/commits/master
 # Production ready.
 # TODO: Restore to 0.10.xx as the v0.10.21 has a bug fixed in commit b6d167cf1a93c0c885c28db5a439f2404874cb26
-ARG VER_LUA_NGINX_MODULE=cff86dd7f677e3b856fb7ca1de90746b24eb6411
+ARG VER_LUA_NGINX_MODULE=a318d250f547c854ea2b091d0e06372ac0c00fd5
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core/tags
 # This library is production ready.
 # TODO: Restore to 0.1.xx as the bug fixed in commit 79f520183bb5b1a278d8a8be3f53659737232253 is not on master
-ARG VER_LUA_RESTY_CORE=79f520183bb5b1a278d8a8be3f53659737232253
+ARG VER_LUA_RESTY_CORE=0346fa2c8aeb39a11eba577fbf57984fb8e110f3
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
