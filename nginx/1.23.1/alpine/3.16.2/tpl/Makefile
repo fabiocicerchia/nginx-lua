@@ -83,7 +83,7 @@ dep-lua-nginx:
 # LUA Resty Core
 # ##############################################################################
 dep-lua-resty-core:
-	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz
+	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/${VER_LUA_RESTY_CORE}.tar.gz
 	tar -C / -xvzf /lua-resty-core.tar.gz
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 	&& make \
