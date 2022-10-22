@@ -1,7 +1,7 @@
 nginx=1.23.2
 almalinux=8.6-20221001
 alpine=3.16.2
-amazonlinux=2.0.20220912.1
+amazonlinux=2.0.20221004.0
 debian=11.5
 fedora=36
 ubuntu=22.04
