@@ -3,5 +3,5 @@ almalinux=8.7-20221110
 alpine=3.16.3
 amazonlinux=2.0.20221004.0
 debian=11.5
-fedora=36
+fedora=37
 ubuntu=22.04
