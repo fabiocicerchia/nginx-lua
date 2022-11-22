@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.16.3
+ARG DISTRO_VER=3.16.2
 
 #############################
 # Settings Common Variables #

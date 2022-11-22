@@ -296,14 +296,14 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on ${DOCKER_IMAGE_OS} ${DOCKER_IMAGE_TAG}." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on almalinux (${ARCH}) 8.7-20221110." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-almalinux8.7-20221110" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-${DOCKER_IMAGE_OS}${DOCKER_IMAGE_TAG}" \
+    org.label-schema.version="${VER_NGINX}-almalinux8.7-20221110" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
@@ -328,7 +328,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
     versions.nginx="${VER_NGINX}" \
     versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
-    versions.os="${DOCKER_IMAGE_TAG}" \
+    versions.os="8.7-20221110" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
