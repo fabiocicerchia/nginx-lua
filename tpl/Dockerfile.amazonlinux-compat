@@ -36,7 +36,7 @@ ENV VER_LUA=$VER_LUA
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit/releases
 # The NDK is now considered to be stable.
-ARG VER_NGX_DEVEL_KIT=0.3.1
+ARG VER_NGX_DEVEL_KIT=0.3.2
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # luajit2
