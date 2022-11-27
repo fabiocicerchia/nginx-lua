@@ -10,8 +10,14 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
     --label docker_bench_security \
     docker/docker-bench-security
 
-for DOCKERFILE in $(find nginx/ -name "Dockerfile*" -type f | sort); do
-    TAG=$(echo "$DOCKERFILE" | awk -F '/' '{print $2"-"$3$4}')
+source supported_versions
+
+for OS_FOLDER in $(find nginx/$nginx -mindepth 1 -maxdepth 1 -type d); do
+    OS=$(echo "$OS_FOLDER" | awk -F '/' '{print $NF}')
+    TAG=$(echo "$OS_FOLDER/${!OS}/Dockerfile" | awk -F '/' '{print $2"-"$3$4}')
+    docker scan fabiocicerchia/nginx-lua:"$TAG"
+
+    TAG=$(echo "$OS_FOLDER/${!OS}/Dockerfile-compat" | awk -F '/' '{print $2"-"$3$4}')
     docker scan fabiocicerchia/nginx-lua:"$TAG"
 done
 

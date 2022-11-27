@@ -29,7 +29,8 @@ ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
 # lua
-ARG VER_LUA=5.4.2
+# https://packages.debian.org/stable/lua5.4
+ARG VER_LUA=5.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
