@@ -10,9 +10,15 @@ function test() {
     if [ "$FOUND" -ne "0" ]; then
         docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 
-        # TODO: THIS WORKS ONLY FOR ALPINE!!
         if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
             docker exec nginx_lua_test apk add gcc musl-dev coreutils wget
+        elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
+            docker exec nginx_lua_test apt update
+            docker exec nginx_lua_test apt install -y gcc musl-dev coreutils wget
+        elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
+            docker exec nginx_lua_test yum install -y gcc wget
+        elif [[ "$DOCKER_TAG" == *"fedora"* ]] || [[ "$DOCKER_TAG" == *"amazon"* ]]; then
+            docker exec nginx_lua_test yum install -y gcc musl-devel coreutils wget
         fi
         # cannot run on almalinux (which uses 5.1) :
         # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate
