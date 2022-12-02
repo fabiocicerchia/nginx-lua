@@ -30,7 +30,7 @@ ENV VCS_REF=$VCS_REF
 
 # lua
 # https://www.lua.org/versions.html
-ARG VER_LUA=5.4.4
+ARG VER_LUA=5.3.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
