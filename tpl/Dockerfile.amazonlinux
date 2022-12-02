@@ -29,7 +29,7 @@ ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
 # lua
-ARG VER_LUA=54
+ARG VER_LUA=53
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
