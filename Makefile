@@ -233,7 +233,9 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_linux_amd64.tar.gz
 	tar xvzf ghr_v0.14.0_linux_amd64.tar.gz
-	IFS=$$'\n' ./ghr_v0.14.0_linux_amd64/ghr -b "$(shell make changelog)" $(TAG_VER)
+	if [ "$(git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
+		IFS=$$'\n' ./ghr_v0.14.0_linux_amd64/ghr -b "$(shell make changelog)" $(TAG_VER); \
+	fi
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
@@ -269,7 +271,7 @@ benchmark: ## benchmark (wip)
 changelog: ## generate a changelog since previous tag
 	git fetch --all --tags > /dev/null
 	echo "## What's Changed"
-	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' > CHANGELOG
+	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | grep -Ev '^$$' | tee CHANGELOG
 	cat CHANGELOG | egrep -v "Automated (metadata|updates)" | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | awk '!x[$$0]++' | tee CHANGELOG
 	echo ""
 	echo "**Full Changelog**: https://github.com/fabiocicerchia/nginx-lua/compare/$(PREVIOUS_TAG)...$(TAG_VER)"
