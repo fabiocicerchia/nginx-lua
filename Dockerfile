@@ -149,7 +149,7 @@ ARG VER_OPENRESTY_STREAMLUA=9ce0848cff7c3c5eb0a7d5adfe2de22ea98e1e63
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.23.3
+ARG VER_NGINX=1.23.2
 ENV VER_NGINX=$VER_NGINX
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
