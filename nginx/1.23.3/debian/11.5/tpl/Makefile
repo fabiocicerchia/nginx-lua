@@ -199,7 +199,7 @@ dep-lua-openresty-websocket:
 # OpenResty Nginx Misc
 # ##############################################################################
 dep-lua-openresty-misc:
-	curl -Lo /lua-openresty-misc.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_OPENRESTY_MISC}.tar.gz
+	curl -Lo /lua-openresty-misc.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_MISC_NGINX}.tar.gz
 	tar -C / -xvzf /lua-openresty-misc.tar.gz
 
 # LUA Upstream
