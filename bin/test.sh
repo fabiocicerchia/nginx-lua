@@ -41,14 +41,25 @@ function test() {
         curl -v --fail http://localhost:8080/shell | grep "ok" | grep -v "not ok" || exit 1
         curl -v --fail http://localhost:8080/dns | grep "www.google.com" || exit 1
         curl -v --fail --cookie 'lang=en' http://localhost:8080/cookie 2>&1 | grep "Set-Cookie: Name=Bob" || exit 1
-        curl -v --fail http://localhost:8080/bar 2>&1 | grep "X-MyHeader: blah" || exit 1
+        curl -v --fail http://localhost:8080/headers 2>&1 | grep "X-MyHeader: blah" || exit 1
         curl -v --fail http://localhost:8080/type 2>&1 | grep "Content-Type: text/plain" || exit 1
-
-        if [[ "$DOCKER_TAG" == *"-compat" ]]; then
-            if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
-                curl -v --fail http://localhost:8080/cjson || exit 1
-            fi
-        fi
+        curl -v --fail http://localhost:8080/cjson || exit 1
+        curl -v --fail http://localhost:8080/memcached || exit 1
+        curl -v --fail http://localhost:8080/mysql || exit 1
+        curl -v --fail http://localhost:8080/redis || exit 1
+        curl -v --fail http://localhost:8080/foo || exit 1
+        curl -v --fail http://localhost:8080/bar-mysql || exit 1
+        curl -v --fail http://localhost:8080/bar-pgsql || exit 1
+        curl -v --fail http://localhost:8080/json || exit 1
+        curl -v --fail http://localhost:8080/baz || exit 1
+        curl -v --fail http://localhost:8080/foo || exit 1
+        curl -v --fail http://localhost:8080/base32 || exit 1
+        curl -v --fail http://localhost:8080/base64 || exit 1
+        curl -v --fail http://localhost:8080/hex || exit 1
+        curl -v --fail http://localhost:8080/sha1 || exit 1
+        curl -v --fail http://localhost:8080/today || exit 1
+        curl -v --fail http://localhost:8080/signature || exit 1
+        curl -v --fail http://localhost:8080/rand || exit 1
 
         docker rm -f nginx_lua_test
     fi
