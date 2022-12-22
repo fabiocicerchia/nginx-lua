@@ -11,6 +11,7 @@ server {
                 nameservers = {"8.8.8.8", {"8.8.4.4", 53} },
                 retrans = 5,  -- 5 retransmissions on receive timeout
                 timeout = 2000,  -- 2 sec
+                no_random = true, -- always start with first nameserver
             }
 
             if not r then

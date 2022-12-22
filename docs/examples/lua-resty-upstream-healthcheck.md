@@ -22,17 +22,20 @@ http {
         local ok, err = hc.spawn_checker{
             shm = "healthcheck",  -- defined by "lua_shared_dict"
             upstream = "foo.com", -- defined by "upstream"
-            type = "http",
+            type = "http", -- support "http" and "https"
 
             http_req = "GET /status HTTP/1.0\r\nHost: foo.com\r\n\r\n",
                     -- raw HTTP request for checking
 
+            port = nil,  -- the check port, it can be different than the original backend server port, default means the same as the original backend server
             interval = 2000,  -- run the check cycle every 2 sec
             timeout = 1000,   -- 1 sec is the timeout for network operations
             fall = 3,  -- # of successive failures before turning a peer down
             rise = 2,  -- # of successive successes before turning a peer up
             valid_statuses = {200, 302},  -- a list valid HTTP status code
             concurrency = 10,  -- concurrency level for test requests
+            -- ssl_verify = true, -- https type only, verify ssl certificate or not, default true
+            -- host = foo.com, -- https type only, host name in ssl handshake, default nil
         }
         if not ok then
             ngx.log(ngx.ERR, "failed to spawn health checker: ", err)
@@ -59,6 +62,21 @@ http {
                 local hc = require "resty.upstream.healthcheck"
                 ngx.say("Nginx Worker PID: ", ngx.worker.pid())
                 ngx.print(hc.status_page())
+            }
+        }
+
+        # status page for all the peers (prometheus format):
+        location = /metrics {
+            access_log off;
+            default_type text/plain;
+            content_by_lua_block {
+                local hc = require "resty.upstream.healthcheck"
+                st , err = hc.prometheus_status_page()
+                if not st then
+                    ngx.say(err)
+                    return
+                end
+                ngx.print(st)
             }
         }
     }
