@@ -541,7 +541,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.lua-resty-dns": "0.22",
   "versions.lua-resty-lrucache": "0.13",
   "versions.lua-resty-memcached": "0.17",
-  "versions.lua-resty-misc": "0.33",
+  "versions.set-misc-nginx": "0.33",
   "versions.lua-resty-mysql": "0.25",
   "versions.lua-resty-redis": "0.30",
   "versions.lua-resty-shell": "0.03",
