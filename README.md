@@ -412,6 +412,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_WEBSOCKET`   | `0.09`                                     | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) to use. |
 | `VER_LUA_UPSTREAM`          | `0.07`                                     | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) to use. |
 | `VER_PROMETHEUS`            | `0.20220537`                               | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) to use. |
+| `VER_MISC_NGINX`            | `0.33`                                     | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) to use. |
 | `VER_OPENRESTY_STREAMLUA`   | `9ce0848cff7c3c5eb0a7d5adfe2de22ea98e1e63` | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
 | `VER_NGINX`                 | `1.23.2`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
@@ -527,14 +528,20 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "org.label-schema.vcs-ref": "8fe952a",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
   "org.label-schema.version": "1.23.2-alpine3.16.3",
-  "versions.headers-more-nginx-module": "0.34",
   "versions.lua": "5.4",
+  "versions.luajit2": "2.1-20220915",
+  "versions.luarocks": "3.9.1",
+  "versions.nginx": "1.23.2",
+  "versions.ngx_devel_kit": "0.3.1",
+  "versions.os": "3.16.3",
+  "versions.headers-more-nginx-module": "0.34",
   "versions.lua-nginx-module": "a318d250f547c854ea2b091d0e06372ac0c00fd5",
   "versions.lua-resty-cookie": "99be1005e38ce19ace54515272a2be1b9fdc5da2",
   "versions.lua-resty-core": "0346fa2c8aeb39a11eba577fbf57984fb8e110f3",
   "versions.lua-resty-dns": "0.22",
   "versions.lua-resty-lrucache": "0.13",
   "versions.lua-resty-memcached": "0.17",
+  "versions.lua-resty-misc": "0.33",
   "versions.lua-resty-mysql": "0.25",
   "versions.lua-resty-redis": "0.30",
   "versions.lua-resty-shell": "0.03",
@@ -543,12 +550,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.lua-resty-upstream-healthcheck": "0.06",
   "versions.lua-resty-websocket": "0.09",
   "versions.lua-upstream": "0.07",
-  "versions.luajit2": "2.1-20220915",
-  "versions.luarocks": "3.9.1",
-  "versions.nginx": "1.23.2",
   "versions.nginx-lua-prometheus": "0.20220527",
-  "versions.ngx_devel_kit": "0.3.1",
-  "versions.os": "3.16.3",
   "versions.stream-lua-nginx-module": "9ce0848cff7c3c5eb0a7d5adfe2de22ea98e1e63"
 }
 
@@ -569,9 +571,13 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `image.target.os`                         | OS component of `image.target.platform`. |
 | `image.target.arch`                       | Architecture component of `image.target.platform`. |
-| `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua`                            | The version of [Lua](https://www.lua.org/) to use. |
+| `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
 | `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |
+| `versions.nginx`                          | The version of nginx used. |
+| `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
+| `versions.os`                             | The Docker base image. |
+| `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
 | `versions.lua-resty-cookie`               | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) used. |
 | `versions.lua-resty-core`                 | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) used. |
@@ -584,11 +590,8 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
 | `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
 | `versions.lua-upstream`                   | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) used. |
-| `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
-| `versions.nginx`                          | The version of nginx used. |
 | `versions.nginx-lua-prometheus`           | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) used. |
-| `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
-| `versions.os`                             | The Docker base image. |
+| `versions.set-misc-nginx`                 | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) used. |
 | `versions.stream-lua-nginx-module`        | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) used. |
 
 ## Benchmarks
