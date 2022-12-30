@@ -118,8 +118,8 @@ ARG VER_OPENRESTY_TABLEPOOL=0.02
 ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-resty-upstream-healthcheck
-# https://github.com/openresty/lua-resty-upstream-healthcheck/tags
-ARG VER_OPENRESTY_HEALTHCHECK=0.06
+# https://github.com/openresty/lua-resty-upstream-healthcheck/commits/master
+ARG VER_OPENRESTY_HEALTHCHECK=f0b6528fe08415e900d95e78133d2612860957b2
 ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket

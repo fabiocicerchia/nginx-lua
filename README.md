@@ -408,7 +408,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_SHELL`       | `0.03`                                     | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
 | `VER_OPENRESTY_SIGNAL`      | `0.03`                                     | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) to use. |
 | `VER_OPENRESTY_TABLEPOOL`   | `0.02`                                     | The version of [lua-tablepool](https://github.com/openresty/lua-tablepool) to use. |
-| `VER_OPENRESTY_HEALTHCHECK` | `0.06`                                     | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) to use. |
+| `VER_OPENRESTY_HEALTHCHECK` | `f0b6528fe08415e900d95e78133d2612860957b2` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) to use. |
 | `VER_OPENRESTY_WEBSOCKET`   | `0.09`                                     | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) to use. |
 | `VER_LUA_UPSTREAM`          | `0.07`                                     | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) to use. |
 | `VER_PROMETHEUS`            | `0.20220537`                               | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) to use. |
