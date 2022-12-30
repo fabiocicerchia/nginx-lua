@@ -42,6 +42,7 @@ function test() {
         curl -v http://localhost:8080 | grep "Welcome to nginx" || handle_error
         curl -v http://localhost:8080/lua_content | grep "Hello world" || handle_error
         docker exec nginx_lua_test curl -v --fail http://localhost:80/status | grep "Nginx Worker PID" || handle_error
+        docker exec nginx_lua_test curl -v --fail http://localhost:80/metrics || handle_error
         curl -H'Connection: upgrade' -H'Upgrade: websocket' -H'Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==' -H'Sec-WebSocket-Version: 13' http://localhost:8080/socket | grep -a "Hello world" || handle_error
         curl -v --fail http://localhost:8080/shell | grep "ok" | grep -v "not ok" || handle_error
         curl -v --fail http://localhost:8080/dns | grep "www.google.com" || handle_error
