@@ -8,7 +8,7 @@ $ make
 |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
       |_____|
 
-Copyright (c) 2022 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+Copyright (c) 2023 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 Repo: https://github.com/fabiocicerchia/nginx-lua
 
 Use: make <target>
