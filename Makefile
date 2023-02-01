@@ -231,14 +231,15 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 	fi
 
 release: ## create a github release
-	mkdir dist
+	mkdir -p dist && rm -rf dist/*
 	cp Dockerfile Dockerfile-compat dist/
 	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
-	wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_linux_amd64.tar.gz
-	tar xvzf ghr_v0.14.0_linux_amd64.tar.gz
+	wget https://github.com/tcnksm/ghr/releases/download/v0.16.0/ghr_v0.16.0_linux_amd64.tar.gz
+	tar xvzf ghr_v0.16.0_linux_amd64.tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
-		IFS=$$'\n' ./ghr_v0.14.0_linux_amd64/ghr -b "$(shell make changelog)" $(TAG_VER) dist; \
+		./ghr_v0.16.0_linux_amd64/ghr -b "$$(make --no-print-directory changelog)" $(TAG_VER) dist; \
 	fi
+
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
