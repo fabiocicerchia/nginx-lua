@@ -90,7 +90,7 @@ ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 
 # lua-resty-memcached
 # https://github.com/openresty/lua-resty-memcached/tags
-ARG VER_OPENRESTY_MEMCACHED=0.17
+ARG VER_OPENRESTY_MEMCACHED=0.16
 ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql

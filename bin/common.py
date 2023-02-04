@@ -245,9 +245,12 @@ def metadata(tag):
         content = "# %s:%s\n" % (image_repo, tag)
         content = content + "```json\n"
         cmd = "docker image inspect %s:%s" % (image_repo, tag)
-        stdout = run_command(cmd, False)[1]
+        exit_code, stdout = run_command(cmd, False)
         content = content + stdout + "\n```"
-        write_file("docs/metadata/%s.md" % (tag), content)
+        if exit_code == 0:
+            write_file("docs/metadata/%s.md" % (tag), content)
+        return exit_code
+    return 0
 
 
 def get_all_versions():

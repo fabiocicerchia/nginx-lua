@@ -7,4 +7,7 @@ if __name__ == "__main__":
     versions = common.get_all_versions()
 
     tag = "%s-%s%s" % (versions["nginx"], os_distro, versions[os_distro])
-    common.metadata(tag)
+    exit_code = common.metadata(tag)
+
+    if exit_code > 0:
+        sys.exit(1)

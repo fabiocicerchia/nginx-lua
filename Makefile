@@ -28,7 +28,7 @@ DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
-CHANGELOG=$(shell make changelog)
+CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
 
@@ -111,13 +111,13 @@ build-amd64: $(build_targets_amd64) ## build all distros in amd64 arch
 build-arm64: $(build_targets_arm64) ## build all distros in arm64 arch
 
 $(build_targets_amd64): ## build one distro in amd64 arch
-	TASK=$(@) make build-single
+	TASK=$(@) $(MAKE) build-single
 
 $(build_targets_arm64): ## build one distro in arm64/v8 arch
-	TASK=$(@) make build-single
+	TASK=$(@) $(MAKE) build-single
 
 $(cci_build_targets): ## build one distro in one arch (CircleCI internals)
-	TASK=$(@) make build-single
+	TASK=$(@) $(MAKE) build-single
 
 build-single:
 ifeq ($(SKIP), YES)
@@ -237,7 +237,7 @@ release: ## create a github release
 	wget https://github.com/tcnksm/ghr/releases/download/v0.16.0/ghr_v0.16.0_linux_amd64.tar.gz
 	tar xvzf ghr_v0.16.0_linux_amd64.tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
-		./ghr_v0.16.0_linux_amd64/ghr -b "$$(make --no-print-directory changelog)" $(TAG_VER) dist; \
+		./ghr_v0.16.0_linux_amd64/ghr -b "$$(printf '%q' $($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi
 
 
