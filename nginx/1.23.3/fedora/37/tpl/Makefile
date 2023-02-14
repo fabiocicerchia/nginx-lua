@@ -218,7 +218,7 @@ dep-nginx-lua-prometheus:
 # OpenResty Stream Lua
 # ##############################################################################
 dep-stream-lua-nginx-module:
-	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.zip
+	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip
 	unzip -d / /stream-lua-nginx-module.zip
 
 # ##############################################################################
