@@ -5,6 +5,7 @@ import shlex
 import shutil
 import subprocess
 from datetime import datetime
+from pathlib import Path
 
 supported_os = ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
 default_distro = "alpine"
@@ -103,7 +104,7 @@ def get_tarball_file(nginx_ver, os_distro, os_ver, suffix=""):
 
 def get_tarball_file_from_dockerfile(dockerfile):
     tarball_file = (
-        "dist/multiarch-" + re.sub('[^0-9a-zA-Z]+', '-', "%s" % (dockerfile)) + ".tar"
+        "dist/multiarch-" + re.sub("[^0-9a-zA-Z]+", "-", "%s" % (dockerfile)) + ".tar"
     )
     return tarball_file
 
@@ -298,6 +299,13 @@ def patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver):
     content = content.replace("{{DOCKER_IMAGE_TAG}}", os_ver)
     content = content.replace("{{VER_NGINX}}", nginx_ver)
 
+    base_folder = str(Path(dockerfile).parent.absolute())
+    for line in read_file(base_folder + "/tpl/.env.dist").split("\n"):
+        li = line.strip()
+        if not li.startswith("#") and li != "":
+            (env_name, env_value) = line.strip().split("=")
+            content = content.replace("{{" + env_name + "}}", env_value)
+
     write_file(dockerfile, content)
 
 
@@ -305,7 +313,9 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
     folder = os.path.dirname(dockerfile)
 
-    os.makedirs(folder+'/tpl', exist_ok=True)
+    shutil.copyfile("tpl/.env.dist", folder+"/tpl/.env.dist")
+
+    os.makedirs(folder+"/tpl", exist_ok=True)
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
@@ -313,9 +323,9 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
-    for file in glob.glob(r'tpl/*.sh'):
-      shutil.copyfile(file, folder+'/'+file)
-      os.chmod(folder+'/'+file, 0o775)
+    for file in glob.glob(r"tpl/*.sh"):
+      shutil.copyfile(file, folder+"/"+file)
+      os.chmod(folder+"/"+file, 0o775)
 
     shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
     shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")

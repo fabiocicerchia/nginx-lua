@@ -77,13 +77,13 @@ dep-luajit:
 # Lua Nginx Module
 # ##############################################################################
 dep-lua-nginx:
-	curl -sLo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/${VER_LUA_NGINX_MODULE}.tar.gz
+	curl -sLo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz
 	tar -C / -xvzf /lua-nginx.tar.gz
 
 # LUA Resty Core
 # ##############################################################################
 dep-lua-resty-core:
-	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/${VER_LUA_RESTY_CORE}.tar.gz
+	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz
 	tar -C / -xvzf /lua-resty-core.tar.gz
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 	&& make \
