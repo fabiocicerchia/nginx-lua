@@ -325,7 +325,7 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
 
     for file in glob.glob(r"tpl/*.sh"):
       shutil.copyfile(file, folder+"/"+file)
-      os.chmod(folder+"/"+file, 0o775)
+      os.chmod(folder+"/"+file, 0o755)
 
     shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
     shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")
