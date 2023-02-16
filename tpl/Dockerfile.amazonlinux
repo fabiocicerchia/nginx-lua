@@ -29,6 +29,7 @@ ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
 # lua
+# https://www.lua.org/versions.html
 ARG VER_LUA=53
 ENV VER_LUA=$VER_LUA
 
@@ -153,6 +154,16 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 # https://github.com/nginx/nginx/releases
 ARG VER_NGINX={{VER_NGINX}}
 ENV VER_NGINX=$VER_NGINX
+
+# https://github.com/nginx/njs
+ARG VER_NJS={{VER_NJS}}
+ENV VER_NJS=$VER_NJS
+
+# Replicate same official env variable
+ENV NGINX_VERSION   $VER_NGINX
+ENV NJS_VERSION     $VER_NJS
+ENV PKG_RELEASE     1
+
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 #  - https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
@@ -163,6 +174,7 @@ ENV VER_NGINX=$VER_NGINX
 # -Werror=format-security   Reject potentially unsafe format string arguents
 # -Wp,-D_FORTIFY_SOURCE=2   Run-time buffer overflow detection
 # -fPIC                     No text relocations
+# ORIGINAL VALUE: -g -O2 -ffile-prefix-map=/data/builder/debuild/nginx-1.23.3/debian/debuild-base/nginx-1.23.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC
 ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
 # References
@@ -175,6 +187,7 @@ ENV NGX_CFLAGS=$NGX_CFLAGS
 # -Wl,-z,now                  Disable lazy binding
 # -Wl,--as-needed             Only link with needed libraries
 # -pie                        Full ASLR for executables
+# ORIGINAL VALUE: -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
 # Reference: http://nginx.org/en/docs/configure.html
@@ -219,6 +232,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
+            --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
@@ -311,6 +325,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
     versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
+    versions.njs="${VER_NJS}" \
     versions.os="{{DOCKER_IMAGE_TAG}}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \

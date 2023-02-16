@@ -56,6 +56,16 @@ dep-ngx_devel_kit:
 	curl -sLo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
 	tar -C / -xvzf /ngx_devel_kit.tar.gz
 
+# njs
+# ##############################################################################
+dep-njs:
+	curl -sLo /njs.tar.gz https://github.com/nginx/njs/archive/refs/tags/${VER_NJS}.tar.gz
+	tar -C / -xvzf /njs.tar.gz
+	cd /njs-${VER_NJS} \
+	./configure \
+	&& make \
+	&& make install
+
 # OpenResty LUAJIT2
 # ##############################################################################
 dep-luajit:

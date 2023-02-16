@@ -155,6 +155,16 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 # https://github.com/nginx/nginx/releases
 ARG VER_NGINX={{VER_NGINX}}
 ENV VER_NGINX=$VER_NGINX
+
+# https://github.com/nginx/njs
+ARG VER_NJS={{VER_NJS}}
+ENV VER_NJS=$VER_NJS
+
+# Replicate same official env variable
+ENV NGINX_VERSION $VER_NGINX
+ENV NJS_VERSION   $VER_NJS
+ENV PKG_RELEASE   1
+
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 #  - https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
@@ -221,6 +231,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
+            --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
@@ -259,11 +270,13 @@ ARG NGINX_BUILD_DEPS="\
         alpine-sdk \
         bash \
         findutils \
-        gd-dev \
-        libedit-dev \
-        libxslt-dev \
+        gcc \
+        libc-dev \
         linux-headers \
-        perl-dev \
+        make \
+        openssl-dev \
+        pcre2-dev \
+        zlib-dev \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
@@ -365,12 +378,91 @@ RUN set -eux \
     && apk update \
     && apk add --no-cache --virtual .pkg_deps \
         $PKG_DEPS \
+    && mkdir -p /var/log/nginx \
+# Fix LUA alias
+    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua
+
+RUN set -x \
+# create nginx user/group first, to be consistent throughout docker variants
+    && addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/alpine-slim/Dockerfile
+# REASON: No need to use the existing distributed package as the binary is recompiled.
+#     && apkArch="$(cat /etc/apk/arch)" \
+#     && nginxPackages=" \
+#         nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
+#     " \
+# # install prerequisites for public key and pkg-oss checks
+#     && apk add --no-cache --virtual .checksum-deps \
+#         openssl \
+#     && case "$apkArch" in \
+#         x86_64|aarch64) \
+# # arches officially built by upstream
+#             set -x \
+#             && KEY_SHA512="e09fa32f0a0eab2b879ccbbc4d0e4fb9751486eedda75e35fac65802cc9faa266425edf83e261137a2f4d16281ce2c1a5f4502930fe75154723da014214f0655" \
+#             && wget -O /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub \
+#             && if echo "$KEY_SHA512 */tmp/nginx_signing.rsa.pub" | sha512sum -c -; then \
+#                 echo "key verification succeeded!"; \
+#                 mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/; \
+#             else \
+#                 echo "key verification failed!"; \
+#                 exit 1; \
+#             fi \
+#             && apk add -X "https://nginx.org/packages/mainline/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
+#             ;; \
+#         *) \
+# # we're on an architecture upstream doesn't officially build for
+# # let's build binaries from the published packaging sources
+#             set -x \
+#             && tempDir="$(mktemp -d)" \
+#             && chown nobody:nobody $tempDir \
+#             && apk add --no-cache --virtual .build-deps \
+#                 gcc \
+#                 libc-dev \
+#                 make \
+#                 openssl-dev \
+#                 pcre2-dev \
+#                 zlib-dev \
+#                 linux-headers \
+#                 bash \
+#                 alpine-sdk \
+#                 findutils \
+#             && su nobody -s /bin/sh -c " \
+#                 export HOME=${tempDir} \
+#                 && cd ${tempDir} \
+#                 && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
+#                 && PKGOSSCHECKSUM=\"52a80f6c3b3914462f8a0b2fbadea950bcd79c1bd528386aff4c28d5a80c6920d783575a061a47b60fea800eef66bf5a0178a137ea51c37277fe9c2779715990 *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
+#                 && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
+#                     echo \"pkg-oss tarball checksum verification succeeded!\"; \
+#                 else \
+#                     echo \"pkg-oss tarball checksum verification failed!\"; \
+#                     exit 1; \
+#                 fi \
+#                 && tar xzvf ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
+#                 && cd pkg-oss-${NGINX_VERSION}-${PKG_RELEASE} \
+#                 && cd alpine \
+#                 && make base \
+#                 && apk index -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
+#                 && abuild-sign -k ${tempDir}/.abuild/abuild-key.rsa ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz \
+#                 " \
+#             && cp ${tempDir}/.abuild/abuild-key.rsa.pub /etc/apk/keys/ \
+#             && apk del .build-deps \
+#             && apk add -X ${tempDir}/packages/alpine/ add--no-cache $nginxPackages \
+#             ;; \
+#     esac \
+# # remove checksum deps
+#     && apk del .checksum-deps \
+# # if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
+#     && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
+#     && if [ -n "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
+#     && if [ -n "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi \
 # Bring in gettext so we can get `envsubst`, then throw
 # the rest away. To do this, we need to install `gettext`
 # then move `envsubst` out of the way so `gettext` can
 # be deleted completely, then move `envsubst` back.
     && apk add --no-cache --virtual .gettext gettext \
     && mv /usr/bin/envsubst /tmp/ \
+    \
     && runDeps="$( \
         scanelf --needed --nobanner /tmp/envsubst \
             | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
@@ -378,24 +470,21 @@ RUN set -eux \
             | xargs -r apk info --installed \
             | sort -u \
     )" \
-    && apk add --no-cache --virtual .run_deps $runDeps \
+    && apk add --no-cache $runDeps \
     && apk del .gettext \
     && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache --virtual pkg_tz tzdata \
-# Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache --virtual pkg_dns curl ca-certificates \
+    && apk add --no-cache tzdata \
 # forward request and error logs to docker log collector
-    && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+# create a docker-entrypoint.d directory
+    && mkdir /docker-entrypoint.d
+
 # Upgrade software to latest version
 # ##############################################################################
-    && apk upgrade
+RUN apk upgrade
 
 # smoke test
 # ##############################################################################
