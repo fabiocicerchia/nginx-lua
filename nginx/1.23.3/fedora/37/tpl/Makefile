@@ -30,7 +30,7 @@ core:
 		/var/cache/nginx/scgi_temp
 	cd /nginx-${VER_NGINX} \
 		&& (curl --fail -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-${VER_NGINX}-socket_cloexec.patch || \
-			curl -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-1.21.4-socket_cloexec.patch) \
+			curl -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-1.23.0-socket_cloexec.patch) \
 		&& patch -p1 < nginx-socket_cloexec.patch || exit 1 \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& $(MAKE) build \
@@ -61,10 +61,6 @@ dep-ngx_devel_kit:
 dep-njs:
 	curl -sLo /njs.tar.gz https://github.com/nginx/njs/archive/refs/tags/${VER_NJS}.tar.gz
 	tar -C / -xvzf /njs.tar.gz
-	cd /njs-${VER_NJS} \
-	./configure \
-	&& $(MAKE) \
-	&& $(MAKE) install
 
 # OpenResty LUAJIT2
 # ##############################################################################
@@ -79,6 +75,7 @@ dep-luajit:
 # will try to look things in the wrong one, unless provided with:
 #  lua_package_path '/usr/local/share/lua/5.4/?.lua;;';
 #  lua_package_cpath '/usr/local/lib/lua/5.4/?.so;;';
+# Ref: https://github.com/openresty/luajit2/blob/v2.1-agentzh/Makefile#L21
 # it is safe to delete the folders as they have JUST been created
 	rm -r /usr/local/lib/lua/5.1 /usr/local/share/lua/5.1
 	ln -s /usr/local/lib/lua/5.4 /usr/local/lib/lua/5.1
