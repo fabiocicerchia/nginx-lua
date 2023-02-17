@@ -119,9 +119,7 @@ jobs:
             - run:
                 name: Log into registry
                 command: |
-                  if [ "${CIRCLE_BRANCH}" == "main" ]; then
-                    docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
-                  fi
+                  docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
                 environment:
                   DEBIAN_FRONTEND: noninteractive
 
