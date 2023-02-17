@@ -249,6 +249,8 @@ ARG BUILD_DEPS_BASE="\
         libgeoip-dev \
         libpcre3-dev \
         libssl-dev \
+        libxml2-dev \
+        libxslt1-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
         make \
