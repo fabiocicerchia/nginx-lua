@@ -249,6 +249,8 @@ ARG BUILD_DEPS_BASE="\
         findutils \
         gcc-c++ \
         gzip \
+        libxml2-devel \
+        libxslt-devel \
         make \
         openssl-devel \
         patch \
@@ -346,6 +348,7 @@ ARG PKG_DEPS="\
         GeoIP-devel \
         ca-certificates \
         gcc-c++ \
+        libxml2-devel \
         openssl-devel \
         pcre-devel \
         unzip \

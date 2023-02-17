@@ -275,6 +275,8 @@ ARG NGINX_BUILD_DEPS="\
         findutils \
         gcc \
         libc-dev \
+        libxml2-dev \
+        libxslt-dev \
         linux-headers \
         make \
         openssl-dev \
@@ -349,6 +351,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         geoip-dev \
+        libxml2-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
         openssl-dev \

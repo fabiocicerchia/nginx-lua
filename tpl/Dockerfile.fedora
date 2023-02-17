@@ -245,9 +245,10 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 ARG BUILD_DEPS_BASE="\
         GeoIP-devel \
         ca-certificates \
-        findutils \
         gcc-c++ \
         gzip \
+        libxml2-devel \
+        libxslt-devel \
         lua-${VER_LUA} \
         lua-devel-${VER_LUA} \
         make \
@@ -345,6 +346,7 @@ ARG PKG_DEPS="\
         GeoIP-devel \
         ca-certificates \
         gcc-c++ \
+        libxml2-devel \
         lua-${VER_LUA} \
         lua-devel-${VER_LUA} \
         luarocks \

@@ -248,6 +248,8 @@ ARG BUILD_DEPS_BASE="\
         ca-certificates \
         gcc-c++ \
         gzip \
+        libxml2-devel \
+        libxslt-devel \
         make \
         openssl-devel \
         patch \
@@ -350,6 +352,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         GeoIP-devel \
         ca-certificates \
+        libxml2-devel \
         openssl-devel \
         pcre-devel \
         unzip \

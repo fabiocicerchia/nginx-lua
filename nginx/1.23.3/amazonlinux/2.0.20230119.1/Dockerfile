@@ -247,6 +247,8 @@ ARG BUILD_DEPS_BASE="\
         ca-certificates \
         gcc-c++ \
         gzip \
+        libxml2-devel \
+        libxslt-devel \
         lua${VER_LUA} \
         lua${VER_LUA}-devel \
         make \
@@ -349,6 +351,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         GeoIP-devel \
         ca-certificates \
+        libxml2-devel \
         lua${VER_LUA} \
         lua${VER_LUA}-devel \
         openssl-devel \
