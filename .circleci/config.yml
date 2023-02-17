@@ -111,23 +111,31 @@ jobs:
           environment:
             FORCE: "YES"
 
-      - run:
-          name: Log into registry
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
-            fi
-          environment:
-            DEBIAN_FRONTEND: noninteractive
+      - when:
+          condition:
+            and:
+              - equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Log into registry
+                command: |
+                  if [ "${CIRCLE_BRANCH}" == "main" ]; then
+                    docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
+                  fi
+                environment:
+                  DEBIAN_FRONTEND: noninteractive
 
-      - run:
-          name: Push images
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "main" ]; then
-              make -j $(nproc) push-<< parameters.distro >>
-            fi
-          environment:
-            FORCE: "YES"
+      - when:
+          condition:
+            and:
+              - equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Push images
+                command: |
+                  make -j $(nproc) push-<< parameters.distro >>
+                environment:
+                  FORCE: "YES"
 
       - persist_to_workspace:
           root: .
