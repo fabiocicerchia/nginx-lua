@@ -33,21 +33,21 @@ core:
 			curl -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-1.21.4-socket_cloexec.patch) \
 		&& patch -p1 < nginx-socket_cloexec.patch || exit 1 \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
-	&& make -j $(NPROC) build \
+	&& $(MAKE) build \
 	&& mv objs/nginx objs/nginx-debug \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" \
-	&& make -j $(NPROC) build \
-	&& make -j $(NPROC) modules \
+	&& $(MAKE) build \
+	&& $(MAKE) modules \
 	&& install -m755 objs/nginx-debug /usr/sbin/nginx-debug \
-	&& make -j $(NPROC) install
+	&& $(MAKE) install
 
 # ##############################################################################
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
+deps: dep-ngx_devel_kit dep-njs dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
 ifeq ($(EXTENDED_IMAGE), YES)
-	make dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module dep-lua-openresty-misc
+	$(MAKE) dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module dep-lua-openresty-misc
 endif
 
 # NGX Devel Kit
@@ -63,8 +63,8 @@ dep-njs:
 	tar -C / -xvzf /njs.tar.gz
 	cd /njs-${VER_NJS} \
 	./configure \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty LUAJIT2
 # ##############################################################################
@@ -72,8 +72,8 @@ dep-luajit:
 	curl -sLo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz
 	tar -C / -xvzf /luajit.tar.gz
 	cd /luajit2-${VER_LUAJIT} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 # This is because OpenResty LuaJIT2 is stuck on Lua 5.1 since 2009.
 # Also, since LUA_LIB_DIR is set on 5.4, the 5.1 folder is always empty and nginx
 # will try to look things in the wrong one, unless provided with:
@@ -96,8 +96,8 @@ dep-lua-resty-core:
 	curl -sLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz
 	tar -C / -xvzf /lua-resty-core.tar.gz
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # LUA Resty LRUCache
 # ##############################################################################
@@ -105,8 +105,8 @@ dep-lua-resty-lrucache:
 	curl -sLo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz
 	tar -C / -xvzf /lua-resty-lrucache.tar.gz
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Headers
 # ##############################################################################
@@ -120,8 +120,8 @@ dep-lua-resty-cookie:
 	curl -sLo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz
 	tar -C / -xvzf /lua-resty-cookie.tar.gz
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Dns
 # ##############################################################################
@@ -129,8 +129,8 @@ dep-lua-openresty-dns:
 	curl -sLo /lua-openresty-dns.tar.gz https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz
 	tar -C / -xvzf /lua-openresty-dns.tar.gz
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Memcached
 # ##############################################################################
@@ -138,8 +138,8 @@ dep-lua-openresty-memcached:
 	curl -sLo /lua-openresty-memcached.tar.gz https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz
 	tar -C / -xvzf /lua-openresty-memcached.tar.gz
 	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Mysql
 # ##############################################################################
@@ -147,8 +147,8 @@ dep-lua-openresty-mysql:
 	curl -sLo /lua-openresty-mysql.tar.gz https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz
 	tar -C / -xvzf /lua-openresty-mysql.tar.gz
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Redis
 # ##############################################################################
@@ -156,8 +156,8 @@ dep-lua-openresty-redis:
 	curl -sLo /lua-openresty-redis.tar.gz https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz
 	tar -C / -xvzf /lua-openresty-redis.tar.gz
 	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Shell
 # ##############################################################################
@@ -165,8 +165,8 @@ dep-lua-openresty-shell:
 	curl -sLo /lua-openresty-shell.tar.gz https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz
 	tar -C / -xvzf /lua-openresty-shell.tar.gz
 	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Tablepool
 # ##############################################################################
@@ -174,8 +174,8 @@ dep-lua-openresty-tablepool:
 	curl -sLo /lua-tablepool.tar.gz https://github.com/openresty/lua-tablepool/archive/refs/tags/v${VER_OPENRESTY_TABLEPOOL}.tar.gz
 	tar -C / -xvzf /lua-tablepool.tar.gz
 	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Signal
 # ##############################################################################
@@ -183,8 +183,8 @@ dep-lua-openresty-signal:
 	curl -sLo /lua-openresty-signal.tar.gz https://github.com/openresty/lua-resty-signal/archive/refs/tags/v${VER_OPENRESTY_SIGNAL}.tar.gz
 	tar -C / -xvzf /lua-openresty-signal.tar.gz
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
-	&& make \
-	&& make install \
+	&& $(MAKE) \
+	&& $(MAKE) install \
 	&& install -d /usr/local/lib/lua/5.4 \
 	&& install /usr/local/share/lua/5.4/librestysignal.so /usr/local/lib/lua/5.4/librestysignal.so
 
@@ -194,8 +194,8 @@ dep-lua-resty-upstream-healthcheck:
 	curl -sLo /lua-resty-upstream-healthcheck.tar.gz https://github.com/openresty/lua-resty-upstream-healthcheck/archive/${VER_OPENRESTY_HEALTHCHECK}.tar.gz
 	tar -C / -xvzf /lua-resty-upstream-healthcheck.tar.gz
 	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Websocket
 # ##############################################################################
@@ -203,8 +203,8 @@ dep-lua-openresty-websocket:
 	curl -sLo /lua-openresty-websocket.tar.gz https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz
 	tar -C / -xvzf /lua-openresty-websocket.tar.gz
 	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 # OpenResty Nginx Misc
 # ##############################################################################
@@ -240,8 +240,8 @@ luarocks:
 	tar -C / -xzvf /luarocks.tar.gz
 	cd /luarocks-${VER_LUAROCKS}; \
 	./configure \
-	&& make \
-	&& make install
+	&& $(MAKE) \
+	&& $(MAKE) install
 
 ################################################################################
 ##@ COMPILE LUA
@@ -253,6 +253,6 @@ lua-src:
 	cd /lua-$${VER_LUA}; \
 	sed -i "s/DLUA_COMPAT_5_3/DLUA_COMPAT_5_1/" src/Makefile \
 	&& sed -i "s/DLUA_COMPAT_5_2/DLUA_COMPAT_5_1/" src/Makefile \
-	&& make linux test \
-	&& make install \
+	&& $(MAKE) linux test \
+	&& $(MAKE) install \
 	&& cp /lua-$${VER_LUA}/src/*.h /usr/include/
