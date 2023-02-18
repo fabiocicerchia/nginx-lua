@@ -155,6 +155,16 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 # https://github.com/nginx/nginx/releases
 ARG VER_NGINX=1.23.3
 ENV VER_NGINX=$VER_NGINX
+
+# https://github.com/nginx/njs
+ARG VER_NJS=0.7.10
+ENV VER_NJS=$VER_NJS
+
+# Replicate same official env variable
+ENV NGINX_VERSION   $VER_NGINX
+ENV NJS_VERSION     $VER_NJS
+ENV PKG_RELEASE     1~$DISTRO_VER
+
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
 #  - https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
@@ -348,6 +358,7 @@ ARG PKG_DEPS="\
         openssl-devel \
         pcre-devel \
         unzip \
+        which \
         zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS

@@ -280,7 +280,7 @@ ARG NGINX_BUILD_DEPS="\
         linux-headers \
         make \
         openssl-dev \
-        pcre2-dev \
+        pcre-dev \
         zlib-dev \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
@@ -350,6 +350,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
+        curl \
         geoip-dev \
         libxml2-dev \
         lua${VER_LUA} \
@@ -487,9 +488,7 @@ RUN set -x \
     && apk add --no-cache tzdata \
 # forward request and error logs to docker log collector
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create a docker-entrypoint.d directory
-    && mkdir /docker-entrypoint.d
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Upgrade software to latest version
 # ##############################################################################

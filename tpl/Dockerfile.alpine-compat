@@ -277,7 +277,7 @@ ARG NGINX_BUILD_DEPS="\
         linux-headers \
         make \
         openssl-dev \
-        pcre2-dev \
+        pcre-dev \
         zlib-dev \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
@@ -347,6 +347,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
+        curl \
         geoip-dev \
         libxml2-dev \
         openssl-dev \
@@ -381,9 +382,7 @@ RUN set -eux \
     && apk update \
     && apk add --no-cache --virtual .pkg_deps \
         $PKG_DEPS \
-    && mkdir -p /var/log/nginx \
-# Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua
+    && mkdir -p /var/log/nginx
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
@@ -481,9 +480,7 @@ RUN set -x \
     && apk add --no-cache tzdata \
 # forward request and error logs to docker log collector
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create a docker-entrypoint.d directory
-    && mkdir /docker-entrypoint.d
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
 # Upgrade software to latest version
 # ##############################################################################

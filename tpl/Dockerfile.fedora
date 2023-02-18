@@ -257,6 +257,7 @@ ARG BUILD_DEPS_BASE="\
         pcre-devel \
         tar \
         unzip \
+        which \
         zlib-devel \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
