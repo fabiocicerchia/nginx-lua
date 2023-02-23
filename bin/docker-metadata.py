@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import sys
+
 import common
+import sys
 
 if __name__ == "__main__":
     os_distro = sys.argv[1]
