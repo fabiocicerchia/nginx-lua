@@ -107,6 +107,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
+- NJS Support.
 
 ## Typical Uses
 
@@ -372,7 +373,7 @@ http {
 ### Compiled Version Details
 
 ```console
-configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --without-pcre2 --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-a4a0686605161a6777d7d612d5aef79b9e7c13e0 --add-module=/stream-lua-nginx-module-0.0.10 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
 The following are the available build-time options. They can be set using the `--build-arg` CLI argument.
@@ -389,6 +390,7 @@ The following are the available build-time options. They can be set using the `-
 | `TARGETOS`                  | `linux`                                    | OS component of `TARGETPLATFORM`. |
 | `TARGETARCH`                | `amd64`                                    | Architecture component of `TARGETPLATFORM`. |
 | `VER_NGX_DEVEL_KIT`         | `0.3.2`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
+| `VER_NJS`                   | `0.7.10`                                   | The version of [Njs](https://github.com/nginx/njs) to use. |
 | `VER_LUAJIT`                | `2.1-20230119`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
 | `LUAJIT_LIB`                | `/usr/local/lib`                           | Tell nginx's build system where to find LuaJIT 2.0 |
 | `LUAJIT_INC`                | `/usr/local/include/luajit-2.1`            | Tell nginx's build system where to find LuaJIT 2.0 |
@@ -417,7 +419,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_NGINX`                 | `1.23.2`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
 | `NGX_LDOPT`                 | `-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie`                                   | Sets additional parameters that will be used during linking. |
-| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --without-pcre2 --add-module=/lua-nginx-module-0.10.20 --add-module=/ngx_devel_kit-0.3.1 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-a4a0686605161a6777d7d612d5aef79b9e7c13e0 --add-module=/stream-lua-nginx-module-0.0.10` | Options to pass to nginx's `./configure` script. |
+| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'` | Options to pass to nginx's `./configure` script. |
 | `BUILD_DEPS_BASE`           | Differs based on the distro                | List of common needed packages to build properly the software. |
 | `BUILD_DEPS_AMD64`          | Differs based on the distro                | List of needed packages to build properly the software on amd64. |
 | `BUILD_DEPS_ARM64V8`        | Differs based on the distro                | List of needed packages to build properly the software on arm64/v8. |
@@ -549,6 +551,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.nginx": "1.23.3",
   "versions.nginx-lua-prometheus": "0.20221218",
   "versions.ngx_devel_kit": "0.3.2",
+  "versions.njs": "0.7.10",
   "versions.os": "3.17.2",
   "versions.set-misc-nginx": "0.33",
   "versions.stream-lua-nginx-module": "0.0.12"
@@ -576,6 +579,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |
 | `versions.nginx`                          | The version of nginx used. |
 | `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
+| `versions.njs`                            | The version of [Njs](https://github.com/nginx/njs) used. |
 | `versions.os`                             | The Docker base image. |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
@@ -673,6 +677,7 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 - [Nginx License](https://nginx.org/LICENSE)
 - [Lua License](https://www.lua.org/license.html)
+- [LuaJIT License](https://repo.or.cz/luajit-2.0.git/blob/HEAD:/COPYRIGHT)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
@@ -681,7 +686,7 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 
 MIT License
 
-Copyright (c) 2023 Fabio Cicerchia <info@fabiocicerchia.it>
+Copyright (c) 2020-2023 Fabio Cicerchia <info@fabiocicerchia.it>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -128,8 +128,8 @@ else
 	COMPAT=$(shell echo $$TASK | grep "\-compat" | cut -d"-" -f4); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH"; \
-	$(META_CMD) "$$DISTRO"
+	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH" \
+	&& $(META_CMD) "$$DISTRO"
 endif
 
 ################################################################################
@@ -184,8 +184,8 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst bundle-,,$(@)); \
 	echo "BUNDLING $$DISTRO"; \
-	$(BUNDLE_CMD) "$$DISTRO" ""; \
-	$(BUNDLE_CMD) "$$DISTRO" "-compat"
+	$(BUNDLE_CMD) "$$DISTRO" "" \
+	&& $(BUNDLE_CMD) "$$DISTRO" "-compat"
 endif
 
 ################################################################################
