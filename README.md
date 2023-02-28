@@ -107,6 +107,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
+- NJS Support.
 
 ## Typical Uses
 
