@@ -313,9 +313,9 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
     folder = os.path.dirname(dockerfile)
 
+    os.makedirs(folder+"/tpl", exist_ok=True)
     shutil.copyfile("tpl/.env.dist", folder+"/tpl/.env.dist")
 
-    os.makedirs(folder+"/tpl", exist_ok=True)
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
