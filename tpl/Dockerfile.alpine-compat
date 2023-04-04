@@ -245,7 +245,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         curl \
-        geoip-dev \
         gzip \
         make \
         openssl-dev \
@@ -351,7 +350,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         curl \
-        geoip-dev \
         libxml2-dev \
         openssl-dev \
         pcre-dev \

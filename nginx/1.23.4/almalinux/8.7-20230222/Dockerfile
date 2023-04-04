@@ -247,7 +247,6 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
-        GeoIP-devel \
         ca-certificates \
         findutils \
         gcc-c++ \
@@ -354,7 +353,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
-        GeoIP-devel \
         ca-certificates \
         gcc-c++ \
         libxml2-devel \

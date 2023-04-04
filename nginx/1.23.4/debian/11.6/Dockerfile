@@ -246,7 +246,6 @@ ARG BUILD_DEPS_BASE="\
         ca-certificates \
         curl \
         g++ \
-        libgeoip-dev \
         libpcre3-dev \
         libssl-dev \
         libxml2-dev \
@@ -343,7 +342,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         ca-certificates \
-        libgeoip-dev \
         libpcre3-dev \
         libssl-dev \
         libxml2-dev \

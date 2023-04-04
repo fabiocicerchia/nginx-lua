@@ -244,7 +244,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         curl \
-        geoip-dev \
         gzip \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
@@ -351,7 +350,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         curl \
-        geoip-dev \
         libxml2-dev \
         lua${VER_LUA} \
         lua${VER_LUA}-dev \
