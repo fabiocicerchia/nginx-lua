@@ -22,8 +22,10 @@ function test() {
             docker exec nginx_lua_test apt install -y gcc musl-dev coreutils wget || handle_error
         elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
             docker exec nginx_lua_test yum install -y gcc wget || handle_error
-        elif [[ "$DOCKER_TAG" == *"fedora"* ]] || [[ "$DOCKER_TAG" == *"amazon"* ]]; then
+        elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
             docker exec nginx_lua_test yum install -y gcc musl-devel coreutils wget || handle_error
+        elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
+            docker exec nginx_lua_test yum install -y gcc wget || handle_error
         fi
         # cannot run on almalinux (which uses 5.1) :
         # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate

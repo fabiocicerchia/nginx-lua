@@ -30,7 +30,7 @@ ENV VCS_REF=$VCS_REF
 
 # lua
 # https://www.lua.org/versions.html
-ARG VER_LUA=53
+ARG VER_LUA=5.4.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -243,14 +243,13 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
-        GeoIP-devel \
         ca-certificates \
         gcc-c++ \
         gzip \
         libxml2-devel \
         libxslt-devel \
-        lua${VER_LUA} \
-        lua${VER_LUA}-devel \
+        lua-${VER_LUA} \
+        lua-devel-${VER_LUA} \
         make \
         openssl-devel \
         patch \
@@ -350,11 +349,10 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
-        GeoIP-devel \
         ca-certificates \
         libxml2-devel \
-        lua${VER_LUA} \
-        lua${VER_LUA}-devel \
+        lua-${VER_LUA} \
+        lua-devel-${VER_LUA} \
         openssl-devel \
         pcre-devel \
         unzip \
@@ -369,7 +367,16 @@ COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
 COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
-COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
+# luajit
+# COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
+# COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
+COPY --from=builder --chown=101:101 /usr/local/bin/luajit* /usr/local/bin/
+COPY --from=builder --chown=101:101 /usr/local/share/man/man1/luajit* /usr/local/share/man/man1/
+COPY --from=builder --chown=101:101 /usr/local/share/luajit* /usr/local/share/
+COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
+# luarocks
+# COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
+COPY --from=builder --chown=101:101 /usr/local/bin/luarocks* /usr/local/bin/
 COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 COPY --chown=101:101 tpl/support.sh /
@@ -392,7 +399,7 @@ RUN set -eux \
 # variables
     && yum install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && yum install -y curl ca-certificates \
+    && yum install -y --allowerasing curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
