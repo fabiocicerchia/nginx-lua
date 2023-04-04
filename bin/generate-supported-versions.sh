@@ -44,7 +44,7 @@ if [ "$VER_ALPINE" = "" ]; then
     exit 1
 fi
 
-VER_AMAZONLINUX=$(fetch_latest "amazonlinux" "^[0-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
+VER_AMAZONLINUX=$(fetch_latest "amazonlinux" "^202[3-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
 if [ "$VER_AMAZONLINUX" = "" ]; then
     echo "Wrong version count in AMAZONLINUX."
     exit 1

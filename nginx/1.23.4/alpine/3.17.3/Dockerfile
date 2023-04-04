@@ -30,7 +30,7 @@ ENV VCS_REF=$VCS_REF
 
 # lua
 # https://www.lua.org/versions.html
-ARG VER_LUA=5.4.4
+ARG VER_LUA=5.4
 ENV VER_LUA=$VER_LUA
 
 # ngx_devel_kit
@@ -48,7 +48,6 @@ ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
 ARG LUAJIT_INC=/usr/local/include/luajit-2.1
 ENV LUAJIT_INC=$LUAJIT_INC
-ENV LUA_INCDIR=$LUAJIT_INC
 ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
@@ -247,6 +246,8 @@ ARG BUILD_DEPS_BASE="\
         curl \
         geoip-dev \
         gzip \
+        lua${VER_LUA} \
+        lua${VER_LUA}-dev \
         make \
         openssl-dev \
         patch \
@@ -300,7 +301,6 @@ RUN set -eux \
 COPY tpl/Makefile Makefile
 
 RUN make deps \
-    && make lua-src \
     && make core \
     && make luarocks
 
@@ -353,6 +353,8 @@ ARG PKG_DEPS="\
         curl \
         geoip-dev \
         libxml2-dev \
+        lua${VER_LUA} \
+        lua${VER_LUA}-dev \
         openssl-dev \
         pcre-dev \
         unzip \
@@ -366,11 +368,8 @@ COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
-COPY --from=builder --chown=101:101 /usr/local/bin/lua /usr/local/bin/lua
-COPY --from=builder --chown=101:101 /usr/local/bin/luajit /usr/local/bin/luajit
 COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
 COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
-COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 
 COPY --chown=101:101 tpl/support.sh /
 COPY --chown=101:101 tpl/docker-entrypoint.sh /
@@ -385,17 +384,23 @@ RUN set -eux \
     && apk update \
     && apk add --no-cache --virtual .pkg_deps \
         $PKG_DEPS \
-    && mkdir -p /var/log/nginx
+    && mkdir -p /var/log/nginx \
+# Fix LUA alias
+    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup -g 101 -S nginx \
     && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/alpine-slim/Dockerfile
+# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/alpine/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && apkArch="$(cat /etc/apk/arch)" \
 #     && nginxPackages=" \
 #         nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
+#         nginx-module-xslt=${NGINX_VERSION}-r${PKG_RELEASE} \
+#         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
+#         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
+#         nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
 #     " \
 # # install prerequisites for public key and pkg-oss checks
 #     && apk add --no-cache --virtual .checksum-deps \
