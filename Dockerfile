@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.17.2
+ARG DISTRO_VER=3.17.3
 
 #############################
 # Settings Common Variables #
@@ -152,7 +152,7 @@ ARG VER_OPENRESTY_STREAMLUA=0.0.12
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.23.3
+ARG VER_NGINX=1.23.4
 ENV VER_NGINX=$VER_NGINX
 
 # https://github.com/nginx/njs
@@ -312,14 +312,14 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.17.2." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.17.2" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.17.3." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.17.3" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-alpine3.17.2" \
+    org.label-schema.version="${VER_NGINX}-alpine3.17.3" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
@@ -329,7 +329,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.nginx="${VER_NGINX}" \
     versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
     versions.njs="${VER_NJS}" \
-    versions.os="3.17.2" \
+    versions.os="3.17.3" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \
     versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
