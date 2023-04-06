@@ -13,19 +13,22 @@ function test() {
 
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
     if [ "$FOUND" -ne "0" ]; then
-        docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf fabiocicerchia/nginx-lua:"$DOCKER_TAG"
+        docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
+            -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf \
+            -v "$PWD"/test/geoip:/etc/nginx/geoip \
+            fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 
         if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
-            docker exec nginx_lua_test apk add gcc musl-dev coreutils wget || handle_error
+            docker exec nginx_lua_test apk add gcc musl-dev coreutils || handle_error
         elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
             docker exec nginx_lua_test apt update || handle_error
-            docker exec nginx_lua_test apt install -y gcc musl-dev coreutils wget || handle_error
+            docker exec nginx_lua_test apt install -y gcc musl-dev coreutils || handle_error
         elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
-            docker exec nginx_lua_test yum install -y gcc wget || handle_error
+            docker exec nginx_lua_test yum install -y gcc || handle_error
         elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
-            docker exec nginx_lua_test yum install -y gcc musl-devel coreutils wget || handle_error
+            docker exec nginx_lua_test yum install -y gcc musl-devel coreutils || handle_error
         elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
-            docker exec nginx_lua_test yum install -y gcc wget || handle_error
+            docker exec nginx_lua_test yum install -y gcc || handle_error
         fi
         # cannot run on almalinux (which uses 5.1) :
         # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate
@@ -77,6 +80,8 @@ function test() {
         curl -v --fail http://localhost:8080/today || handle_error
         curl -v --fail http://localhost:8080/signature || handle_error
         curl -v --fail http://localhost:8080/rand || handle_error
+        curl -v --fail -H 'X-Fake-Source: 8.8.8.8' http://localhost:8080/geo/country | grep "US" || handle_error
+        curl -v --fail -H 'X-Fake-Source: 8.8.8.8' http://localhost:8080/geo/city | grep "Los Angeles" || handle_error
 
         docker rm -f nginx_lua_test
     fi
@@ -86,8 +91,9 @@ set -eux
 
 OS=$1
 ARCH=$2
+MAX=${3:-10}
 
-for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort); do
+for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort -Vr | head -n $MAX); do
     TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile\(-compat\)\?_\1-\2\3\4_')
     test "$TAG-$ARCH"
 done

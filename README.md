@@ -83,7 +83,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 
 | | nginx-lua | OpenResty |
 |--|--|--|
-| nginx latest version | `1.23.2` | `1.21.x` (last tested: `1.21.4`)¹ |
+| nginx latest version | `1.23.4` | `1.21.x` (last tested: `1.21.4`)¹ |
 | Almalinux supported | ✅ | ❌ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
@@ -322,12 +322,12 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [Almalinux](https://hub.docker.com/_/almalinux) (~430MB)
-  - [Alpine Linux](https://hub.docker.com/_/alpine) (~65MB)
-  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~240MB)
-  - [Debian](https://hub.docker.com/_/debian) (~250MB)
-  - [Fedora](https://hub.docker.com/_/fedora) (~450MB)
-  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~220MB)
+  - [Almalinux](https://hub.docker.com/_/almalinux) (~450MB)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~70MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~220MB)
+  - [Debian](https://hub.docker.com/_/debian) (~300MB)
+  - [Fedora](https://hub.docker.com/_/fedora) (~680MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~260MB)
 - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
 - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
 - [New FFI-based API for lua-nginx-module](https://github.com/openresty/lua-resty-core)
@@ -380,7 +380,7 @@ http {
 ### Compiled Version Details
 
 ```console
-configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --add-module=/ngx_http_geoip2_module-3.4 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
 The following are the available build-time options. They can be set using the `--build-arg` CLI argument.
