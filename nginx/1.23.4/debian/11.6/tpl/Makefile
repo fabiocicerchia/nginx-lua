@@ -65,6 +65,7 @@ dep-njs:
 # geoip2
 # ##############################################################################
 dep-geoip2:
+	mkdir -p /usr/lib64
 	curl -sLo /geoip2.tar.gz https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz
 	tar -C / -xvzf /geoip2.tar.gz
 
