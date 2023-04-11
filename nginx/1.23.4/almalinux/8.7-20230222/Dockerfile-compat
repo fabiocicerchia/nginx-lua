@@ -28,16 +28,40 @@ ENV BUILD_DATE=$BUILD_DATE
 ARG VCS_REF
 ENV VCS_REF=$VCS_REF
 
-# lua
-# https://www.lua.org/versions.html
-ARG VER_LUA=5.3.4
-ENV VER_LUA=$VER_LUA
+# NGINX
+################################################################################
+
+# nginx
+# https://github.com/nginx/nginx/releases
+ARG VER_NGINX=1.23.4
+ENV VER_NGINX=$VER_NGINX
+
+# NGINX MODULES
+################################################################################
 
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
 ARG VER_NGX_DEVEL_KIT=0.3.2
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
+
+# njs
+# https://github.com/nginx/njs
+ARG VER_NJS=0.7.10
+ENV VER_NJS=$VER_NJS
+
+# geoip2
+# https://github.com/leev/ngx_http_geoip2_module
+ARG VER_GEOIP=3.4
+ENV VER_GEOIP=$VER_GEOIP
+
+# LUA
+################################################################################
+
+# lua
+# https://www.lua.org/versions.html
+ARG VER_LUA=5.3.4
+ENV VER_LUA=$VER_LUA
 
 # luajit2
 # https://github.com/openresty/luajit2
@@ -66,11 +90,16 @@ ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
-# lua-resty-lrucache
-# https://github.com/openresty/lua-resty-lrucache
-# This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.13
-ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
+# LUAROCKS
+################################################################################
+
+# lua-rocks
+# https://luarocks.github.io/luarocks/releases/
+ARG VER_LUAROCKS=3.9.2
+ENV VER_LUAROCKS=$VER_LUAROCKS
+
+# LUA ADDONS
+################################################################################
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
@@ -86,6 +115,12 @@ ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 # https://github.com/openresty/lua-resty-dns
 ARG VER_OPENRESTY_DNS=0.22
 ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
+
+# lua-resty-lrucache
+# https://github.com/openresty/lua-resty-lrucache
+# This library is considered production ready.
+ARG VER_LUA_RESTY_LRUCACHE=0.13
+ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # lua-resty-memcached
 # https://github.com/openresty/lua-resty-memcached
@@ -112,11 +147,6 @@ ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 ARG VER_OPENRESTY_SIGNAL=0.03
 ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
-# lua-tablepool
-# https://github.com/openresty/lua-tablepool
-ARG VER_OPENRESTY_TABLEPOOL=0.02
-ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
-
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck
 ARG VER_OPENRESTY_HEALTHCHECK=f0b6528fe08415e900d95e78133d2612860957b2
@@ -127,10 +157,10 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 ARG VER_OPENRESTY_WEBSOCKET=0.10
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
-# lua-rocks
-# https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.9.2
-ENV VER_LUAROCKS=$VER_LUAROCKS
+# lua-tablepool
+# https://github.com/openresty/lua-tablepool
+ARG VER_OPENRESTY_TABLEPOOL=0.02
+ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module
@@ -152,13 +182,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 ARG VER_OPENRESTY_STREAMLUA=0.0.12
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
-# https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.23.4
-ENV VER_NGINX=$VER_NGINX
-
-# https://github.com/nginx/njs
-ARG VER_NJS=0.7.10
-ENV VER_NJS=$VER_NJS
+################################################################################
 
 # Replicate same official env variable
 ENV NGINX_VERSION   $VER_NGINX
@@ -212,6 +236,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-perl_modules_path=/usr/lib/perl5/vendor_perl \
             --user=nginx \
             --group=nginx \
+            `# OFFICIAL MODULES` \
             --with-compat \
             --with-file-aio \
             --with-threads \
@@ -236,14 +261,16 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
+            `# CUSTOM MODULES` \
             --without-pcre2 \
-            --add-module=/njs-${VER_NJS}/nginx \
-            --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
-            --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
-            --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
-            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+            --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
+            --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
+            --add-module=/ngx_devel_kit-${VER_NGX_DEVEL_KIT} \
+            --add-module=/ngx_http_geoip2_module-${VER_GEOIP} \
+            --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
+            --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
@@ -252,13 +279,15 @@ ARG BUILD_DEPS_BASE="\
         findutils \
         gcc-c++ \
         gzip \
+        # libmaxminddb \
+        libmaxminddb-devel \
         libxml2-devel \
         libxslt-devel \
         make \
-        readline-devel \
         openssl-devel \
         patch \
         pcre-devel \
+        readline-devel \
         tar \
         unzip \
         which \
@@ -328,13 +357,14 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
+    versions.os="8.7-20230222" \
     versions.lua="${VER_LUA}" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
     versions.ngx_devel_kit="${VER_NGX_DEVEL_KIT}" \
     versions.njs="${VER_NJS}" \
-    versions.os="8.7-20230222" \
+    versions.geoip="${VER_GEOIP}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \
     versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
@@ -342,7 +372,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \
     versions.lua-resty-lrucache="${VER_LUA_RESTY_LRUCACHE}" \
     versions.lua-resty-memcached="${VER_OPENRESTY_MEMCACHED}" \
-    versions.set-misc-nginx=${VER_MISC_NGINX} \
     versions.lua-resty-mysql="${VER_OPENRESTY_MYSQL}" \
     versions.lua-resty-redis="${VER_OPENRESTY_REDIS}" \
     versions.lua-resty-shell="${VER_OPENRESTY_SHELL}" \
@@ -352,6 +381,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-websocket="${VER_OPENRESTY_WEBSOCKET}" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
+    versions.set-misc-nginx=${VER_MISC_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
@@ -366,23 +396,24 @@ ARG PKG_DEPS="\
 ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
+COPY --from=builder --chown=101:101 /usr/local/bin/lua /usr/local/bin/lua
+COPY --from=builder --chown=101:101 /usr/local/bin/luajit /usr/local/bin/luajit
+COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
+COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
 COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
-COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
-COPY --from=builder --chown=101:101 /usr/local/bin/lua /usr/local/bin/lua
-COPY --from=builder --chown=101:101 /usr/local/bin/luajit /usr/local/bin/luajit
-COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
-COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 
-COPY --chown=101:101 tpl/support.sh /
-COPY --chown=101:101 tpl/docker-entrypoint.sh /
 COPY --chown=101:101 tpl/??-*.sh /docker-entrypoint.d/
-COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=101:101 tpl/docker-entrypoint.sh /
+COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=101:101 tpl/support.sh /
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 

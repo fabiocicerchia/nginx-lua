@@ -45,7 +45,7 @@ core:
 # DEPENDENCIES
 # ##############################################################################
 
-deps: dep-ngx_devel_kit dep-njs dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
+deps: dep-ngx_devel_kit dep-njs dep-geoip2 dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
 ifeq ($(EXTENDED_IMAGE), YES)
 	$(MAKE) dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module dep-lua-openresty-misc
 endif
@@ -61,6 +61,13 @@ dep-ngx_devel_kit:
 dep-njs:
 	curl -sLo /njs.tar.gz https://github.com/nginx/njs/archive/refs/tags/${VER_NJS}.tar.gz
 	tar -C / -xvzf /njs.tar.gz
+
+# geoip2
+# ##############################################################################
+dep-geoip2:
+	mkdir -p /usr/lib64
+	curl -sLo /geoip2.tar.gz https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz
+	tar -C / -xvzf /geoip2.tar.gz
 
 # OpenResty LUAJIT2
 # ##############################################################################

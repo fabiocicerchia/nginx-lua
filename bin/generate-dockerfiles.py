@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import shutil
 import common
+import subprocess
 import re
 
 if __name__ == "__main__":
@@ -9,18 +10,18 @@ if __name__ == "__main__":
     for os_distro in common.get_supported_os():
         common.init_dockerfile(versions["nginx"], os_distro, versions[os_distro])
 
-    (exitcode, dockerfiles) = common.run_command("find nginx -type f -name 'Dockerfile'", False)
+    dockerfiles = subprocess.check_output(['find', 'nginx', '-type', 'f', '-name', 'Dockerfile'])
     dockerfiles = list(
         filter(
             lambda elem: re.search("nginx/.+/alpine/\d+\.\d+\.\d+/", elem),
-            dockerfiles.split("\n")))
+            dockerfiles.decode("utf-8").split("\n")))
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile")
 
-    (exitcode, dockerfiles) = common.run_command("find nginx -type f -name 'Dockerfile-compat'", False)
+    dockerfiles = subprocess.check_output(['find', 'nginx', '-type', 'f', '-name', 'Dockerfile-compat'])
     dockerfiles = list(
         filter(
             lambda elem: elem.find("alpine") != -1,
-            dockerfiles.split("\n")))
+            dockerfiles.decode("utf-8").split("\n")))
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile-compat")

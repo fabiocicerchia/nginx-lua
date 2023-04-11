@@ -69,6 +69,10 @@ jobs:
     steps:
       - checkout
 
+      - restore_cache:
+          keys:
+            - mmdb-geoip2
+
       - run:
           name: check docker
           command: |
@@ -80,6 +84,26 @@ jobs:
       - run:
           name: Install Python Dependencies
           command: pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Install GeoIP2 MaxMindDB
+          command: |
+            mkdir -p test/geoip
+            cd test/geoip
+            if test ! -f "GeoLite2-City.mmdb"; then
+              curl "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" > GeoLite2-City.tar.gz
+              curl "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" > GeoLite2-Country.tar.gz
+              tar xvzf GeoLite2-City.tar.gz
+              tar xvzf GeoLite2-Country.tar.gz
+              mv GeoLite2-City_*/GeoLite2-City.mmdb ./
+              mv GeoLite2-Country_*/GeoLite2-Country.mmdb ./
+            fi
+
+      - save_cache:
+          key: mmdb-geoip2
+          paths:
+            - test/geoip/GeoLite2-City.mmdb
+            - test/geoip/GeoLite2-Country.mmdb
 
       - run:
           name: Cleanup metadata artifacts
