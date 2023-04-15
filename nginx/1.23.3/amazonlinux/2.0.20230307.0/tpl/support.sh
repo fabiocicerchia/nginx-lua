@@ -2,7 +2,7 @@
 
 echo "💗 Support the Project 💗"
 echo "This project is only maintained by one person, Fabio Cicerchia <https://github.com/fabiocicerchia>."
-echo "It started as a simple docker image, now it updates automatically periodically and provides support for multiple disto 😎"
+echo "It started as a simple docker image, now it updates automatically periodically and provides support for multiple distro 😎"
 echo "Maintaining a project is a very time consuming activity, especially when done alone 💪"
 echo "I really want to make this project better and become super cool 🚀"
 echo ""

@@ -29,7 +29,7 @@ Nginx 1.19+ with LUA support based on AlmaLinux, Alpine Linux, Amazon Linux, Deb
 ## 💗 Support the Project 💗
 
 This project is only maintained by one person, [Fabio Cicerchia](https://github.com/fabiocicerchia).  
-It started as a simple docker image, now it updates automatically periodically and provides support for multiple disto 😎  
+It started as a simple docker image, now it updates automatically periodically and provides support for multiple distro 😎  
 Maintaining a project is a very time consuming activity, especially when done alone 💪  
 I really want to make this project better and become super cool 🚀
 
