@@ -5,6 +5,8 @@
 
 ---
 
+[![Awesome Nginx](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/agile6v/awesome-nginx#tools)
+
 [![MIT License](https://img.shields.io/badge/License-MIT-lightgrey.svg?longCache=true)](LICENSE)
 [![Pull Requests](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?longCache=true)](https://github.com/fabiocicerchia/nginx-lua/pulls)
 ![Last Commit](https://img.shields.io/github/last-commit/fabiocicerchia/nginx-lua)
@@ -20,7 +22,7 @@
 [![Documentation Status](https://readthedocs.org/projects/nginx-lua/badge/?version=latest)](https://nginx-lua.readthedocs.io/en/latest/?badge=latest)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
-Nginx 1.19+ with Lua support based on Alpine Linux, Amazon Linux, Fedora and Ubuntu.
+Nginx 1.19+ with LUA support based on AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, and Ubuntu.
 
 ---
 
@@ -84,7 +86,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 | | nginx-lua | OpenResty |
 |--|--|--|
 | nginx latest version | `1.23.4` | `1.21.x` (last tested: `1.21.4`)¹ |
-| Almalinux supported | ✅ | ❌ |
+| AlmaLinux supported | ✅ | ❌ |
 | Alpine supported | ✅ | ✅ |
 | Amazon supported | ✅ | ✅ |
 | CentOS supported | ❌ | ✅ |
@@ -103,7 +105,7 @@ With this project you'll get a fresh nginx + lua version the day after (or even 
 - Security checks: Docker Bench Security, Snyk.
 - Docker Healthchecks.
 - Exposes default ports (`80` and `443`), easy to extend.
-- Support for multiple linux distros: Almalinux, Alpine, Amazon, Debian, Fedora, Ubuntu.
+- Support for multiple linux distros: AlmaLinux, Alpine, Amazon, Debian, Fedora, Ubuntu.
 - Extra Lua Modules.
 - Performance Benchmarks.
 - LuaRocks Support.
@@ -322,7 +324,7 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [Almalinux](https://hub.docker.com/_/almalinux) (~450MB)
+  - [AlmaLinux](https://hub.docker.com/_/almalinux) (~450MB)
   - [Alpine Linux](https://hub.docker.com/_/alpine) (~70MB)
   - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~220MB)
   - [Debian](https://hub.docker.com/_/debian) (~300MB)
@@ -479,29 +481,29 @@ $ docker run -it --rm -p 80:80 \
 
 ### `fabiocicerchia/nginx-lua:<version>`
 
-The default Nginx + Lua + extra lua modules image. Uses Alpine for base image.
+The default Nginx + Lua + extra lua modules image. Uses Alpine Linux for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>`
 
-Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>`
 
-Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image.
+Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
 ### `fabiocicerchia/nginx-lua:<version>-compat`
 
-The default Nginx + Lua + extra lua modules image. Uses Alpine for base image. Enables LUA 5.1 Compatibility.  
+The default Nginx + Lua + extra lua modules image. Uses Alpine Linux for base image. Enables LUA 5.1 Compatibility.  
 **WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro>-compat`
 
-Provides Nginx + Lua + extra lua modules. Uses Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
+Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
 **WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
 
 ### `fabiocicerchia/nginx-lua:<version>-<distro><version>-compat`
 
-Provides Nginx + Lua + extra lua modules. Uses pinned version for Alpine, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
+Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
 **WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
 
 ## Custom Builds
