@@ -10,13 +10,15 @@
 - [`1-amazonlinux-compat`, `1.23-amazonlinux-compat`, `1.23.4-amazonlinux2023.0.20230322.0-compat`, `1.23.4-amazonlinux-compat`, `1.23-amazonlinux2023.0.20230322.0-compat`, `1-amazonlinux2023.0.20230322.0-compat`, `amazonlinux-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/amazonlinux/2023.0.20230322.0/Dockerfile-compat)
 - [`1-debian`, `1.23-debian`, `1.23-debian11.6`, `1-debian11.6`, `1.23.4-debian11.6`, `1.23.4-debian`, `debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/debian/11.6/Dockerfile)
 - [`1-debian-compat`, `1.23-debian-compat`, `1.23-debian11.6-compat`, `1-debian11.6-compat`, `1.23.4-debian11.6-compat`, `1.23.4-debian-compat`, `debian-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/debian/11.6/Dockerfile-compat)
-- [`1-fedora`, `1.23-fedora`, `1.23-fedora37`, `1-fedora37`, `1.23.4-fedora37`, `1.23.4-fedora`, `fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/37/Dockerfile)
-- [`1-fedora-compat`, `1.23-fedora-compat`, `1.23-fedora37-compat`, `1-fedora37-compat`, `1.23.4-fedora37-compat`, `1.23.4-fedora-compat`, `fedora-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/37/Dockerfile-compat)
+- [`1-fedora`, `1.23-fedora`, `1.23.4-fedora`, `1.23.4-fedora38`, `1.23-fedora38`, `1-fedora38`, `fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/38/Dockerfile)
+- [`1-fedora-compat`, `1.23-fedora-compat`, `1.23.4-fedora-compat`, `1.23.4-fedora38-compat`, `1.23-fedora38-compat`, `1-fedora38-compat`, `fedora-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/38/Dockerfile-compat)
 - [`1-ubuntu`, `1-ubuntu22.04`, `1.23-ubuntu22.04`, `1.23-ubuntu`, `1.23.4-ubuntu22.04`, `1.23.4-ubuntu`, `ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/ubuntu/22.04/Dockerfile)
 - [`1-ubuntu-compat`, `1-ubuntu22.04-compat`, `1.23-ubuntu22.04-compat`, `1.23-ubuntu-compat`, `1.23.4-ubuntu22.04-compat`, `1.23.4-ubuntu-compat`, `ubuntu-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/ubuntu/22.04/Dockerfile-compat)
 
 ## Unsupported Tags
 
+- [`1.23-fedora37-compat`, `1-fedora37-compat`, `1.23.4-fedora37-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/37/Dockerfile-compat)
+- [`1.23-fedora37`, `1-fedora37`, `1.23.4-fedora37`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/fedora/37/Dockerfile)
 - [`1.23-almalinux8.7-20230222-compat`, `1-almalinux8.7-20230222-compat`, `1.23.4-almalinux8.7-20230222-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/almalinux/8.7-20230222/Dockerfile-compat)
 - [`1.23-almalinux8.7-20230222`, `1-almalinux8.7-20230222`, `1.23.4-almalinux8.7-20230222`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.4/almalinux/8.7-20230222/Dockerfile)
 - [`1.23.3-ubuntu22.04-compat`, `1.23.3-ubuntu-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.23.3/ubuntu/22.04/Dockerfile-compat)
