@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.7.10
+ARG VER_NJS=0.7.12
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -67,7 +67,7 @@ ENV VER_LUA=$VER_LUA
 # luajit2
 # https://github.com/openresty/luajit2
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
-ARG VER_LUAJIT=2.1-20230119
+ARG VER_LUAJIT=2.1-20230410
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -79,13 +79,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.23
+ARG VER_LUA_NGINX_MODULE=0.10.24
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.25
+ARG VER_LUA_RESTY_CORE=0.1.26
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -149,7 +149,7 @@ ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck
-ARG VER_OPENRESTY_HEALTHCHECK=f0b6528fe08415e900d95e78133d2612860957b2
+ARG VER_OPENRESTY_HEALTHCHECK=0.08
 ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
@@ -179,7 +179,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=0.0.12
+ARG VER_OPENRESTY_STREAMLUA=0.0.13
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 ################################################################################
