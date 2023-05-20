@@ -414,6 +414,7 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
+    && update-crypto-policies --set DEFAULT:SHA1 \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
     && dnf config-manager --set-enabled powertools \
