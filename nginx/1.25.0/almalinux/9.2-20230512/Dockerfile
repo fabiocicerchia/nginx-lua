@@ -60,7 +60,7 @@ ENV VER_GEOIP=$VER_GEOIP
 
 # lua
 # https://www.lua.org/versions.html
-ARG VER_LUA=5.3.4
+ARG VER_LUA=5.4.4
 ENV VER_LUA=$VER_LUA
 
 # luajit2
@@ -278,11 +278,12 @@ ARG BUILD_DEPS_BASE="\
         findutils \
         gcc-c++ \
         gzip \
+        libmaxminddb \
         libmaxminddb-devel \
         libxml2-devel \
         libxslt-devel \
         lua-${VER_LUA} \
-        lua-devel-${VER_LUA} \
+        lua-libs-${VER_LUA} \
         make \
         openssl-devel \
         patch \
@@ -314,10 +315,11 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
+    && update-crypto-policies --set DEFAULT:SHA1 \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled powertools \
     && dnf config-manager --set-enabled epel \
+    && dnf config-manager --set-enabled crb \
     && dnf makecache \
     && dnf install -y \
         $BUILD_DEPS \
@@ -417,8 +419,8 @@ RUN set -eux \
     && update-crypto-policies --set DEFAULT:SHA1 \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled powertools \
     && dnf config-manager --set-enabled epel \
+    && dnf config-manager --set-enabled crb \
     && dnf makecache \
     && dnf install -y \
         $PKG_DEPS \
@@ -428,7 +430,7 @@ RUN set -eux \
 # variables
     && dnf install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && dnf install -y curl ca-certificates \
+    && dnf install -y ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
