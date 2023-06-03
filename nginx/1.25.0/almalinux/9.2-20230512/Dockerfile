@@ -60,7 +60,7 @@ ENV VER_GEOIP=$VER_GEOIP
 
 # lua
 # https://www.lua.org/versions.html
-ARG VER_LUA=5.3.4
+ARG VER_LUA=5.4.4
 ENV VER_LUA=$VER_LUA
 
 # luajit2
@@ -278,11 +278,11 @@ ARG BUILD_DEPS_BASE="\
         findutils \
         gcc-c++ \
         gzip \
-        libmaxminddb-devel \
+        libmaxminddb \
         libxml2-devel \
         libxslt-devel \
         lua-${VER_LUA} \
-        lua-devel-${VER_LUA} \
+        lua-libs-${VER_LUA} \
         make \
         openssl-devel \
         patch \
@@ -314,9 +314,9 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
+    && update-crypto-policies --set DEFAULT:SHA1 \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled powertools \
     && dnf config-manager --set-enabled epel \
     && dnf makecache \
     && dnf install -y \
@@ -417,7 +417,6 @@ RUN set -eux \
     && update-crypto-policies --set DEFAULT:SHA1 \
     && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled powertools \
     && dnf config-manager --set-enabled epel \
     && dnf makecache \
     && dnf install -y \
