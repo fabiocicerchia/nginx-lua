@@ -80,8 +80,8 @@ function test() {
         curl -v --fail http://localhost:8080/today || handle_error
         curl -v --fail http://localhost:8080/signature || handle_error
         curl -v --fail http://localhost:8080/rand || handle_error
-        curl -v --fail -H 'X-Fake-Source: 8.8.8.8' http://localhost:8080/geo/country | grep "US" || handle_error
-        curl -v --fail -H 'X-Fake-Source: 8.8.8.8' http://localhost:8080/geo/city | grep "Los Angeles" || handle_error
+        curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" || handle_error # OPENDNS IP
+        curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | grep "Wright City" || handle_error
 
         docker rm -f nginx_lua_test
     fi
