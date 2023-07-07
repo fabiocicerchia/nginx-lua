@@ -73,6 +73,7 @@ ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
 ARG LUAJIT_INC=/usr/local/include/luajit-2.1
 ENV LUAJIT_INC=$LUAJIT_INC
+ENV LUA_INCDIR=$LUAJIT_INC
 ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
@@ -385,6 +386,7 @@ ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
 COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
+COPY --from=builder --chown=101:101 /usr/local/bin/luajit /usr/local/bin/luajit
 COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
 COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
@@ -392,6 +394,7 @@ COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 
 COPY --chown=101:101 tpl/??-*.sh /docker-entrypoint.d/
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf

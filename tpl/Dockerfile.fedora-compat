@@ -273,7 +273,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        # findutils \
         gcc-c++ \
         gzip \
         libmaxminddb-devel \

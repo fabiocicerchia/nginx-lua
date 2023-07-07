@@ -281,7 +281,6 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
-        # readline-devel \
         tar \
         unzip \
         which \
