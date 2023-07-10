@@ -58,12 +58,6 @@ ENV VER_GEOIP=$VER_GEOIP
 # LUA
 ################################################################################
 
-# lua
-# https://www.lua.org/versions.html
-# https://pkgs.alpinelinux.org/package/edge/main/x86/lua5.4
-ARG VER_LUA=5.4
-ENV VER_LUA=$VER_LUA
-
 # luajit2
 # https://github.com/openresty/luajit2
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
@@ -274,8 +268,6 @@ ARG BUILD_DEPS_BASE="\
         curl \
         gzip \
         libmaxminddb-dev \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
         make \
         openssl-dev \
         patch \
@@ -352,7 +344,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
     versions.os="3.18.2" \
-    versions.lua="${VER_LUA}" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -383,8 +374,6 @@ ARG PKG_DEPS="\
         curl \
         libmaxminddb-dev \
         libxml2-dev \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
         openssl-dev \
         pcre-dev \
         unzip \
@@ -401,6 +390,10 @@ COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
+COPY --from=builder --chown=101:101 /usr/local/bin/luajit* /usr/local/bin/
+COPY --from=builder --chown=101:101 /usr/local/share/luajit* /usr/local/share/
+COPY --from=builder --chown=101:101 /usr/local/share/man/man1/luajit.1 /usr/local/share/man/man1/luajit.1
 
 COPY --chown=101:101 tpl/??-*.sh /docker-entrypoint.d/
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
@@ -417,7 +410,7 @@ RUN set -eux \
         $PKG_DEPS \
     && mkdir -p /var/log/nginx \
 # Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
@@ -530,6 +523,7 @@ RUN apk upgrade
 RUN envsubst -V \
     && nginx -V \
     && nginx -t \
+    && luajit -v \
     && lua -v \
     && luarocks --version
 

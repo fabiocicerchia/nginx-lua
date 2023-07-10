@@ -119,7 +119,7 @@ $(build_targets_arm64): ## build one distro in arm64/v8 arch
 $(cci_build_targets): ## build one distro in one arch (CircleCI internals)
 	TASK=$(@) $(MAKE) build-single
 
-build-single:
+build-single: generate-dockerfiles
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
