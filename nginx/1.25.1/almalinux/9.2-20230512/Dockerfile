@@ -401,14 +401,14 @@ COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
 # luajit
-# COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
-# COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
+COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
+COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
 COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 COPY --from=builder --chown=101:101 /usr/local/bin/luajit* /usr/local/bin/
 COPY --from=builder --chown=101:101 /usr/local/share/luajit* /usr/local/share/
 COPY --from=builder --chown=101:101 /usr/local/share/man/man1/luajit* /usr/local/share/man/man1/
 # luarocks
-# COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
+COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
 COPY --from=builder --chown=101:101 /usr/local/bin/luarocks* /usr/local/bin/
 COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 
