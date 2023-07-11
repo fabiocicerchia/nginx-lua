@@ -34,8 +34,8 @@ SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
-classic_distros_amd64=$(addsuffix -classic, $(amd64_distros)))
-classic_distros_arm64=$(addsuffix -classic, $(arm64_distros)))
+classic_distros_amd64=$(addsuffix -classic, $(amd64_distros))
+classic_distros_arm64=$(addsuffix -classic, $(arm64_distros))
 build_targets_amd64=$(addprefix build-, $(classic_distros_amd64))
 build_targets_arm64=$(addprefix build-, $(classic_distros_arm64))
 build_targets=${build_targets_amd64} ${build_targets_arm64}
@@ -43,7 +43,7 @@ build_targets=${build_targets_amd64} ${build_targets_arm64}
 cci_arm64_distros=$(addprefix large-, $(DISTROS))
 cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
 cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
-cci_classic_distros=$(addsuffix -classic, $(cci_arch_distros)))
+cci_classic_distros=$(addsuffix -classic, $(cci_arch_distros))
 cci_build_targets=$(addprefix build-, $(cci_classic_distros))
 # / CircleCI workaround
 

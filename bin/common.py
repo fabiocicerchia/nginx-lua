@@ -58,9 +58,9 @@ def fetch_version_parts(version):
     return [major, minor, patch]
 
 
-def get_tags(suffix, nginx_ver, os_distro, os_ver, arch):
+def get_tags(nginx_ver, os_distro, os_ver, arch):
     if arch != "":
-        suffix = "%s-%s" % (suffix, arch)
+        suffix = "-%s" % (arch)
 
     tags = []
 
@@ -133,11 +133,11 @@ def docker_build(vcs_ref, tags, dockerfile, arch):
     return exit_code
 
 
-def build(suffix, nginx_ver, os_distro, os_ver, arch):
+def build(nginx_ver, os_distro, os_ver, arch):
 
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, arch)
+    tags = get_tags(nginx_ver, os_distro, os_ver, arch)
 
     vcs_ref = subprocess.getoutput("/usr/bin/git rev-parse --short HEAD").strip()
 
@@ -263,8 +263,8 @@ def get_supported_os():
     return supported_os
 
 
-def get_dockerfile(nginx_ver, os_distro, os_ver, suffix=""):
-    return "nginx/%s/%s/%s/Dockerfile%s" % (nginx_ver, os_distro, os_ver, suffix)
+def get_dockerfile(nginx_ver, os_distro, os_ver):
+    return "nginx/%s/%s/%s/Dockerfile" % (nginx_ver, os_distro, os_ver)
 
 
 def get_supported_versions():

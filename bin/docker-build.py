@@ -5,11 +5,7 @@ import common
 
 if __name__ == "__main__":
     os_distro = sys.argv[1]
-    suffix = sys.argv[2] or ""
-    arch = sys.argv[3]
-
-    if suffix != "":
-        suffix = "-%s" % (suffix)
+    arch = sys.argv[2]
 
     # CircleCI workaround
     if arch == "large":
@@ -20,7 +16,7 @@ if __name__ == "__main__":
 
     versions = common.get_all_versions()
     exit_code = common.build(
-        suffix, versions["nginx"], os_distro, versions[os_distro], arch
+        versions["nginx"], os_distro, versions[os_distro], arch
     )
 
     if exit_code > 0:
