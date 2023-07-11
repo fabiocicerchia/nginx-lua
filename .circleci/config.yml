@@ -117,13 +117,6 @@ jobs:
             FORCE: "YES"
 
       - run:
-          name: Build docker image (compat)
-          command: |
-            make -j $(nproc) build-<< parameters.class >>-<< parameters.distro >>-compat
-          environment:
-            FORCE: "YES"
-
-      - run:
           name: Test images
           command: make -j $(nproc) test-<< parameters.distro >>
           environment:

@@ -178,11 +178,6 @@ def push_images(suffix, nginx_ver, os_distro, os_ver):
 
 def push(nginx_ver, os_distro, os_ver):
     exit_code = push_images("", nginx_ver, os_distro, os_ver)
-
-    if exit_code > 0:
-        return exit_code
-
-    exit_code = push_images("-compat", nginx_ver, os_distro, os_ver)
     return exit_code
 
 
@@ -281,9 +276,6 @@ def get_supported_versions():
         supported_versions.append(
             get_dockerfile(nginx_ver, os_distro, versions[os_distro])
         )
-        supported_versions.append(
-            get_dockerfile(nginx_ver, os_distro, versions[os_distro], "-compat")
-        )
 
     return supported_versions
 
@@ -317,10 +309,6 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/.env.dist", folder+"/tpl/.env.dist")
 
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
-    patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
-
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, "-compat")
-    shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
     for file in glob.glob(r"tpl/*.sh"):

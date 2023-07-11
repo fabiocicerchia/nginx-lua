@@ -492,21 +492,6 @@ Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon L
 
 Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
-### `fabiocicerchia/nginx-lua:<version>-compat`
-
-The default Nginx + Lua + extra lua modules image. Uses Alpine Linux for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
-### `fabiocicerchia/nginx-lua:<version>-<distro>-compat`
-
-Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
-### `fabiocicerchia/nginx-lua:<version>-<distro><version>-compat`
-
-Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
 ## Custom Builds
 
 If you need to extend the functionality of the existing image, you could build your own version using the following command.
