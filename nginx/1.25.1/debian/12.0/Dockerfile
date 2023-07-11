@@ -58,22 +58,20 @@ ENV VER_GEOIP=$VER_GEOIP
 # LUA
 ################################################################################
 
-# lua
-# https://www.lua.org/versions.html
-# https://packages.debian.org/bullseye/lua5.4
-ARG VER_LUA=5.4
-ENV VER_LUA=$VER_LUA
-
 # luajit2
 # https://github.com/openresty/luajit2
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
+# OpenResty's LuaJIT headers will be used.
+# The `lua` interpreter is an alias of `luajit` to maintain the same version
+# consistently in the system. If needed to use the latest Lua version (ie >=5.4)
+# the os system package would be required, resulting in a system with multiple
+# versions available.
 ARG VER_LUAJIT=2.1-20230410
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
 ARG LUAJIT_INC=/usr/local/include/luajit-2.1
 ENV LUAJIT_INC=$LUAJIT_INC
-ENV LUA_INCDIR=$LUAJIT_INC
 ARG LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 
@@ -280,8 +278,6 @@ ARG BUILD_DEPS_BASE="\
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
         make \
         patch \
         unzip \
@@ -345,7 +341,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
     versions.os="12.0" \
-    versions.lua="${VER_LUA}" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -368,6 +363,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-websocket="${VER_OPENRESTY_WEBSOCKET}" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
+    versions.set-misc-nginx=${VER_MISC_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
@@ -376,23 +372,28 @@ ARG PKG_DEPS="\
         libpcre3-dev \
         libssl-dev \
         libxml2-dev \
-        lua${VER_LUA} \
-        lua${VER_LUA}-dev \
         unzip \
         zlib1g-dev \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
-COPY --from=builder --chown=101:101 /usr/local/bin/luajit /usr/local/bin/luajit
-COPY --from=builder --chown=101:101 /usr/local/bin/luarocks /usr/local/bin/luarocks
-COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
 COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
+# luajit
+# COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
+# COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
 COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
+COPY --from=builder --chown=101:101 /usr/local/bin/luajit* /usr/local/bin/
+COPY --from=builder --chown=101:101 /usr/local/share/luajit* /usr/local/share/
+COPY --from=builder --chown=101:101 /usr/local/share/man/man1/luajit* /usr/local/share/man/man1/
+# luarocks
+# COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
+COPY --from=builder --chown=101:101 /usr/local/bin/luarocks* /usr/local/bin/
+COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 
 COPY --chown=101:101 tpl/??-*.sh /docker-entrypoint.d/
 COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
@@ -410,7 +411,7 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/log/nginx \
 # Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
@@ -519,6 +520,7 @@ RUN apt-get upgrade -y \
 RUN envsubst -V \
     && nginx -V \
     && nginx -t \
+    && luajit -v \
     && lua -v \
     && luarocks --version
 
