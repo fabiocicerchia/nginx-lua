@@ -324,12 +324,12 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [AlmaLinux](https://hub.docker.com/_/almalinux) (~450MB)
-  - [Alpine Linux](https://hub.docker.com/_/alpine) (~70MB)
-  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~220MB)
-  - [Debian](https://hub.docker.com/_/debian) (~300MB)
+  - [AlmaLinux](https://hub.docker.com/_/almalinux) (~620MB)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~90MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~380MB)
+  - [Debian](https://hub.docker.com/_/debian) (~330MB)
   - [Fedora](https://hub.docker.com/_/fedora) (~680MB)
-  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~260MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~280MB)
 - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
   - Currently based on Lua 5.1.4
 - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
