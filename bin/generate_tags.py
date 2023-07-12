@@ -12,12 +12,14 @@ supported = common.get_supported_versions()
 
 tags = {}
 for file in files:
-    pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile", file)
+    pieces = re.search("nginx/(.+)/(.+)/(.+)/Dockerfile(-compat)?", file)
 
-    nginx_ver, os_distro, osVer = pieces.group(1, 2, 3)
+    nginx_ver, os_distro, osVer, compat = pieces.group(1, 2, 3, 4)
     nginx_ver_pieces = re.split(r"\.", nginx_ver)
     nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
     suffix = ""
+    if compat != None:
+        suffix = "-compat"
 
     # tags[os_distro] = file # currently missing
     tags[

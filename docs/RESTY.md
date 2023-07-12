@@ -170,7 +170,7 @@ return {
 
 #### Run
 
-**NOTE:** Tested on `fabiocicerchia/nginx-lua:1.25.1-alpine3.18.2-compat`.
+**NOTE:** Tested on `fabiocicerchia/nginx-lua:1.25.1-alpine3.18.2`.
 
 Official Repo: https://github.com/thibaultcha/lua-resty-busted
 

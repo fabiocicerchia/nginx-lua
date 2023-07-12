@@ -59,6 +59,7 @@ def fetch_version_parts(version):
 
 
 def get_tags(nginx_ver, os_distro, os_ver, arch):
+    suffix = ""
     if arch != "":
         suffix = "-%s" % (arch)
 
@@ -324,10 +325,10 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
 # ##############################################################################
 
 
-def tag(nginx_ver, os_distro, os_ver, suffix):
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "")
+def tag(nginx_ver, os_distro, os_ver):
+    tags = get_tags(nginx_ver, os_distro, os_ver, "")
     tags = "`, `".join(tags).replace(image_repo + ":", "")
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
     print(
         "- [`%s`](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)"
