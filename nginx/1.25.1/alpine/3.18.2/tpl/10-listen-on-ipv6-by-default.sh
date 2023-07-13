@@ -38,26 +38,26 @@ fi
 
 entrypoint_log "$ME: info: Getting the checksum of /$DEFAULT_CONF_FILE"
 
-# case "$ID" in
-#     "debian")
-#         CHECKSUM=$(dpkg-query --show --showformat='${Conffiles}\n' nginx | grep $DEFAULT_CONF_FILE | cut -d' ' -f 3)
-#         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | md5sum -c - >/dev/null 2>&1 || {
-#             entrypoint_log "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
-#             exit 0
-#         }
-#         ;;
-#     "alpine")
-#         CHECKSUM=$(apk manifest nginx 2>/dev/null| grep $DEFAULT_CONF_FILE | cut -d' ' -f 1 | cut -d ':' -f 2)
-#         echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | sha1sum -c - >/dev/null 2>&1 || {
-#             entrypoint_log "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
-#             exit 0
-#         }
-#         ;;
-#     *)
-#         entrypoint_log "$ME: info: Unsupported distribution"
-#         exit 0
-#         ;;
-# esac
+case "$ID" in
+    "debian")
+        CHECKSUM=$(dpkg-query --show --showformat='${Conffiles}\n' nginx | grep $DEFAULT_CONF_FILE | cut -d' ' -f 3)
+        echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | md5sum -c - >/dev/null 2>&1 || {
+            entrypoint_log "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
+            exit 0
+        }
+        ;;
+    "alpine")
+        CHECKSUM=$(apk manifest nginx 2>/dev/null| grep $DEFAULT_CONF_FILE | cut -d' ' -f 1 | cut -d ':' -f 2)
+        echo "$CHECKSUM  /$DEFAULT_CONF_FILE" | sha1sum -c - >/dev/null 2>&1 || {
+            entrypoint_log "$ME: info: /$DEFAULT_CONF_FILE differs from the packaged version"
+            exit 0
+        }
+        ;;
+    *)
+        entrypoint_log "$ME: info: Unsupported distribution"
+        exit 0
+        ;;
+esac
 
 # enable ipv6 on default.conf listen sockets
 sed -i -E 's,listen       80;,listen       80;\n    listen  [::]:80;,' /$DEFAULT_CONF_FILE

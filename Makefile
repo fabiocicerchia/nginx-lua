@@ -199,7 +199,7 @@ qemu:
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions pull-nginx-entrypoints generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
 	git config --global user.name "fabiocicerchia"
@@ -238,7 +238,6 @@ release: ## create a github release
 		./ghr_v0.16.0_linux_amd64/ghr -b "$$(printf '%q' $($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi
 
-
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
 
@@ -250,6 +249,7 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files
 	curl -sLo tpl/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
 	curl -sLo tpl/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
 	curl -sLo tpl/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
+	patch tpl/docker-entrypoint.sh tpl/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
 	for DISTRO in $(DISTROS); do \
