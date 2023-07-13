@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.7.12
+ARG VER_NJS=0.8.0
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -79,13 +79,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.24
+ARG VER_LUA_NGINX_MODULE=0.10.25
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.26
+ARG VER_LUA_RESTY_CORE=0.1.27
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -108,7 +108,7 @@ ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
 # https://github.com/cloudflare/lua-resty-cookie
-ARG VER_CLOUDFLARE_COOKIE=99be1005e38ce19ace54515272a2be1b9fdc5da2
+ARG VER_CLOUDFLARE_COOKIE=f418d77082eaef48331302e84330488fdc810ef4
 ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 
 # lua-resty-dns
@@ -169,7 +169,7 @@ ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus
-ARG VER_PROMETHEUS=0.20221218
+ARG VER_PROMETHEUS=0.20230607
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # set-misc-nginx-module
