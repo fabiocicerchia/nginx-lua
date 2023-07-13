@@ -179,8 +179,8 @@ dep-lua-openresty-signal:
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
 	&& $(MAKE) \
 	&& $(MAKE) install \
-	&& install -d /usr/local/lib/lua/5.4 \
-	&& install /usr/local/share/lua/5.4/librestysignal.so /usr/local/lib/lua/5.4/librestysignal.so
+	&& install -d /usr/local/lib/lua/5.1 \
+	&& install /usr/local/share/lua/5.1/librestysignal.so /usr/local/lib/lua/5.1/librestysignal.so
 
 # OpenResty Upstream Healthcheck
 # ##############################################################################
