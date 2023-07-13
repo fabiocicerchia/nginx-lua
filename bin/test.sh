@@ -94,6 +94,6 @@ ARCH=$2
 MAX=${3:-10}
 
 for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort -Vr | head -n $MAX); do
-    TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3\4_')
+    TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
     test "$TAG-$ARCH"
 done
