@@ -63,7 +63,7 @@ jobs:
         type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2022.10.2
+      image: ubuntu-2204:2023.04.2
       docker_layer_caching: true
     resource_class: << parameters.class >>
     steps:
@@ -108,12 +108,6 @@ jobs:
       - run:
           name: Cleanup metadata artifacts
           command: rm -rf docs/metadata/* || true
-
-      # - run:
-      #     name: Enable Buildx
-      #     command: |
-      #       make qemu || true
-      #       docker buildx inspect --bootstrap
 
       - run:
           name: Build docker image (classic)
@@ -170,7 +164,7 @@ jobs:
         type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2022.10.2
+      image: ubuntu-2204:2023.04.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -196,7 +190,7 @@ jobs:
   metadata:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2022.10.2
+      image: ubuntu-2204:2023.04.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -208,7 +202,7 @@ jobs:
   auto_update:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2022.10.2
+      image: ubuntu-2204:2023.04.2
       docker_layer_caching: true
     steps:
       - checkout
