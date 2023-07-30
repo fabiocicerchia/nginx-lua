@@ -161,14 +161,14 @@ def docker_push(tag):
     return exit_code
 
 
-def push_images(suffix, nginx_ver, os_distro, os_ver):
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "amd64")
+def push_images(nginx_ver, os_distro, os_ver):
+    tags = get_tags(nginx_ver, os_distro, os_ver, "amd64")
     for tag in tags:
         exit_code = docker_push(tag)
         # if exit_code > 0:
         #     return exit_code
 
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "arm64v8")
+    tags = get_tags(nginx_ver, os_distro, os_ver, "arm64v8")
     for tag in tags:
         exit_code = docker_push(tag)
         # if exit_code > 0:
@@ -178,7 +178,7 @@ def push_images(suffix, nginx_ver, os_distro, os_ver):
 
 
 def push(nginx_ver, os_distro, os_ver):
-    exit_code = push_images("", nginx_ver, os_distro, os_ver)
+    exit_code = push_images(nginx_ver, os_distro, os_ver)
     return exit_code
 
 
@@ -219,9 +219,9 @@ def docker_bundle(tag):
     return exit_code
 
 
-def bundle(suffix, nginx_ver, os_distro, os_ver):
+def bundle(nginx_ver, os_distro, os_ver):
 
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "")
+    tags = get_tags(nginx_ver, os_distro, os_ver, "")
 
     for tag in tags:
         exit_code = docker_bundle(tag)
