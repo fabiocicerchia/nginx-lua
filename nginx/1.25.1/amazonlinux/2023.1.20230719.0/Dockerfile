@@ -58,14 +58,14 @@ ENV VER_GEOIP=$VER_GEOIP
 # LUA
 ################################################################################
 
-# lua
-# https://www.lua.org/versions.html
-ARG VER_LUA=5.4.4
-ENV VER_LUA=$VER_LUA
-
 # luajit2
 # https://github.com/openresty/luajit2
 # Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
+# OpenResty's LuaJIT headers will be used.
+# The `lua` interpreter is an alias of `luajit` to maintain the same version
+# consistently in the system. If needed to use the latest Lua version (ie >=5.4)
+# the os system package would be required, resulting in a system with multiple
+# versions available.
 ARG VER_LUAJIT=2.1-20230410
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
@@ -86,7 +86,7 @@ ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 # This library is production ready.
 ARG VER_LUA_RESTY_CORE=0.1.27
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
-ARG LUA_LIB_DIR=/usr/local/share/lua/5.4
+ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # LUAROCKS
@@ -276,8 +276,6 @@ ARG BUILD_DEPS_BASE="\
         libmaxminddb-devel \
         libxml2-devel \
         libxslt-devel \
-        lua-${VER_LUA} \
-        lua-devel-${VER_LUA} \
         make \
         openssl-devel \
         patch \
@@ -351,7 +349,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
     versions.os="2023.1.20230719.0" \
-    versions.lua="${VER_LUA}" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -380,8 +377,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         ca-certificates \
         libxml2-devel \
-        lua-${VER_LUA} \
-        lua-devel-${VER_LUA} \
         openssl-devel \
         pcre-devel \
         unzip \
@@ -398,14 +393,14 @@ COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
 COPY --from=builder --chown=101:101 /usr/sbin/nginx-debug /usr/sbin/nginx-debug
 COPY --from=builder --chown=101:101 /var/cache/nginx /var/cache/nginx
 # luajit
-# COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
-# COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
+COPY --from=builder --chown=101:101 /usr/local/lib/libluajit* /usr/local/lib/
+COPY --from=builder --chown=101:101 /usr/local/lib/pkgconfig/luajit* /usr/local/lib/pkgconfig/
+COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 COPY --from=builder --chown=101:101 /usr/local/bin/luajit* /usr/local/bin/
 COPY --from=builder --chown=101:101 /usr/local/share/luajit* /usr/local/share/
 COPY --from=builder --chown=101:101 /usr/local/share/man/man1/luajit* /usr/local/share/man/man1/
-COPY --from=builder --chown=101:101 $LUAJIT_INC $LUAJIT_INC
 # luarocks
-# COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
+COPY --from=builder --chown=101:101 /usr/local/share/lua/5.1/luarocks /usr/local/share/lua/5.1/luarocks
 COPY --from=builder --chown=101:101 /usr/local/bin/luarocks* /usr/local/bin/
 COPY --from=builder --chown=101:101 /usr/local/etc/luarocks /usr/local/etc/luarocks
 
@@ -424,7 +419,7 @@ RUN set -eux \
         $PKG_DEPS \
         shadow-utils \
 # Fix LUA alias
-    && ln -sf /usr/bin/lua${VER_LUA} /usr/local/bin/lua \
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
     && yum install -y tzdata \

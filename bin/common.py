@@ -58,9 +58,10 @@ def fetch_version_parts(version):
     return [major, minor, patch]
 
 
-def get_tags(suffix, nginx_ver, os_distro, os_ver, arch):
+def get_tags(nginx_ver, os_distro, os_ver, arch):
+    suffix = ""
     if arch != "":
-        suffix = "%s-%s" % (suffix, arch)
+        suffix = "-%s" % (arch)
 
     tags = []
 
@@ -133,11 +134,11 @@ def docker_build(vcs_ref, tags, dockerfile, arch):
     return exit_code
 
 
-def build(suffix, nginx_ver, os_distro, os_ver, arch):
+def build(nginx_ver, os_distro, os_ver, arch):
 
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, arch)
+    tags = get_tags(nginx_ver, os_distro, os_ver, arch)
 
     vcs_ref = subprocess.getoutput("/usr/bin/git rev-parse --short HEAD").strip()
 
@@ -178,11 +179,6 @@ def push_images(suffix, nginx_ver, os_distro, os_ver):
 
 def push(nginx_ver, os_distro, os_ver):
     exit_code = push_images("", nginx_ver, os_distro, os_ver)
-
-    if exit_code > 0:
-        return exit_code
-
-    exit_code = push_images("-compat", nginx_ver, os_distro, os_ver)
     return exit_code
 
 
@@ -268,8 +264,8 @@ def get_supported_os():
     return supported_os
 
 
-def get_dockerfile(nginx_ver, os_distro, os_ver, suffix=""):
-    return "nginx/%s/%s/%s/Dockerfile%s" % (nginx_ver, os_distro, os_ver, suffix)
+def get_dockerfile(nginx_ver, os_distro, os_ver):
+    return "nginx/%s/%s/%s/Dockerfile" % (nginx_ver, os_distro, os_ver)
 
 
 def get_supported_versions():
@@ -280,9 +276,6 @@ def get_supported_versions():
     for os_distro in get_supported_os():
         supported_versions.append(
             get_dockerfile(nginx_ver, os_distro, versions[os_distro])
-        )
-        supported_versions.append(
-            get_dockerfile(nginx_ver, os_distro, versions[os_distro], "-compat")
         )
 
     return supported_versions
@@ -319,10 +312,6 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, "-compat")
-    shutil.copyfile("tpl/Dockerfile.%s-compat" % (os_distro), dockerfile)
-    patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
-
     for file in glob.glob(r"tpl/*.sh"):
       shutil.copyfile(file, folder+"/"+file)
       os.chmod(folder+"/"+file, 0o755)
@@ -336,10 +325,10 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
 # ##############################################################################
 
 
-def tag(nginx_ver, os_distro, os_ver, suffix):
-    tags = get_tags(suffix, nginx_ver, os_distro, os_ver, "")
+def tag(nginx_ver, os_distro, os_ver):
+    tags = get_tags(nginx_ver, os_distro, os_ver, "")
     tags = "`, `".join(tags).replace(image_repo + ":", "")
-    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver, suffix)
+    dockerfile = get_dockerfile(nginx_ver, os_distro, os_ver)
 
     print(
         "- [`%s`](https://github.com/fabiocicerchia/nginx-lua/blob/main/%s)"

@@ -119,7 +119,26 @@ Copyright (C) Yichun Zhang (agentzh). All rights reserved.
 
 ### Testing with `busted`
 
-#### Setup for Resty + Busted
+#### Run
+
+**NOTE:** Tested on `fabiocicerchia/nginx-lua:1.25.1-alpine3.18.2`.
+
+Official Repo: https://github.com/thibaultcha/lua-resty-busted
+
+```bash
+apk add git g++ make libc-dev # for alpine, otherwise use `apt` or `yum`
+# Ref: https://github.com/thibaultcha/lua-resty-busted/issues/1
+luarocks install https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/lua-resty-busted-0.0.1-0.rockspec
+```
+
+```bash
+$ curl -so spec/resty_busted_spec.lua https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/spec/resty_busted_spec.lua
+$ busted spec/
+●●
+2 successes / 0 failures / 0 errors / 0 pending : 0.000582 seconds
+```
+
+#### Alternative setup for Resty + Busted (optional)
 
 Reference: https://github.com/lunarmodules/busted/issues/414#issuecomment-792614808
 
@@ -168,21 +187,9 @@ return {
 }
 ```
 
-#### Run
-
-**NOTE:** Tested on `fabiocicerchia/nginx-lua:1.25.1-alpine3.18.2-compat`.
-
-Official Repo: https://github.com/thibaultcha/lua-resty-busted
+When running with this setup you get verbose output:
 
 ```bash
-apk add git g++ make libc-dev # for alpine, otherwise use `apt` or `yum`
-# Ref: https://github.com/thibaultcha/lua-resty-busted/issues/1
-luarocks install https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/lua-resty-busted-0.0.1-0.rockspec
-```
-
-```bash
-curl -so spec/resty_busted_spec.lua https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/spec/resty_busted_spec.lua
-busted spec/
 [==========] Running tests from scanned files.
 [----------] Global test environment setup.
 [----------] Running tests from spec/resty_busted_spec.lua

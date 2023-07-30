@@ -46,17 +46,11 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 
 <!-- START_SUPPORTED_TAGS -->
 - [`almalinux`, `1-almalinux`, `1.25-almalinux`, `1.25.1-almalinux`, `1-almalinux9.2-20230718`, `1.25-almalinux9.2-20230718`, `1.25.1-almalinux9.2-20230718`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/almalinux/9.2-20230718/Dockerfile)
-- [`almalinux-compat`, `1-almalinux-compat`, `1.25-almalinux-compat`, `1.25.1-almalinux-compat`, `1-almalinux9.2-20230718-compat`, `1.25-almalinux9.2-20230718-compat`, `1.25.1-almalinux9.2-20230718-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/almalinux/9.2-20230718/Dockerfile-compat)
 - [`1`, `1.25`, `1.25.1`, `alpine`, `latest`, `1-alpine`, `1.25-alpine`, `1.25.1-alpine`, `1-alpine3.18.2`, `1.25-alpine3.18.2`, `1.25.1-alpine3.18.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/alpine/3.18.2/Dockerfile)
-- [`1-compat`, `1.25-compat`, `1.25.1-compat`, `alpine-compat`, `latest-compat`, `1-alpine-compat`, `1.25-alpine-compat`, `1.25.1-alpine-compat`, `1-alpine3.18.2-compat`, `1.25-alpine3.18.2-compat`, `1.25.1-alpine3.18.2-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/alpine/3.18.2/Dockerfile-compat)
 - [`amazonlinux`, `1-amazonlinux`, `1.25-amazonlinux`, `1.25.1-amazonlinux`, `1-amazonlinux2023.1.20230719.0`, `1.25-amazonlinux2023.1.20230719.0`, `1.25.1-amazonlinux2023.1.20230719.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/amazonlinux/2023.1.20230719.0/Dockerfile)
-- [`amazonlinux-compat`, `1-amazonlinux-compat`, `1.25-amazonlinux-compat`, `1.25.1-amazonlinux-compat`, `1-amazonlinux2023.1.20230719.0-compat`, `1.25-amazonlinux2023.1.20230719.0-compat`, `1.25.1-amazonlinux2023.1.20230719.0-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/amazonlinux/2023.1.20230719.0/Dockerfile-compat)
 - [`debian`, `1-debian`, `1.25-debian`, `1-debian12.1`, `1.25.1-debian`, `1.25-debian12.1`, `1.25.1-debian12.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/debian/12.1/Dockerfile)
-- [`debian-compat`, `1-debian-compat`, `1.25-debian-compat`, `1-debian12.1-compat`, `1.25.1-debian-compat`, `1.25-debian12.1-compat`, `1.25.1-debian12.1-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/debian/12.1/Dockerfile-compat)
 - [`fedora`, `1-fedora`, `1-fedora38`, `1.25-fedora`, `1.25-fedora38`, `1.25.1-fedora`, `1.25.1-fedora38`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/fedora/38/Dockerfile)
-- [`fedora-compat`, `1-fedora-compat`, `1-fedora38-compat`, `1.25-fedora-compat`, `1.25-fedora38-compat`, `1.25.1-fedora-compat`, `1.25.1-fedora38-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/fedora/38/Dockerfile-compat)
 - [`ubuntu`, `1-ubuntu`, `1.25-ubuntu`, `1-ubuntu22.04`, `1.25.1-ubuntu`, `1.25-ubuntu22.04`, `1.25.1-ubuntu22.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/ubuntu/22.04/Dockerfile)
-- [`ubuntu-compat`, `1-ubuntu-compat`, `1.25-ubuntu-compat`, `1-ubuntu22.04-compat`, `1.25.1-ubuntu-compat`, `1.25-ubuntu22.04-compat`, `1.25.1-ubuntu22.04-compat`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/ubuntu/22.04/Dockerfile-compat)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
@@ -324,12 +318,12 @@ http {
 
 - [nginx](https://nginx.org/en/download.html)
 - Supported OS
-  - [AlmaLinux](https://hub.docker.com/_/almalinux) (~450MB)
-  - [Alpine Linux](https://hub.docker.com/_/alpine) (~70MB)
-  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~220MB)
-  - [Debian](https://hub.docker.com/_/debian) (~300MB)
+  - [AlmaLinux](https://hub.docker.com/_/almalinux) (~620MB)
+  - [Alpine Linux](https://hub.docker.com/_/alpine) (~90MB)
+  - [Amazon Linux](https://hub.docker.com/_/amazonlinux) (~380MB)
+  - [Debian](https://hub.docker.com/_/debian) (~330MB)
   - [Fedora](https://hub.docker.com/_/fedora) (~680MB)
-  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~260MB)
+  - [Ubuntu](https://hub.docker.com/_/ubuntu) (~280MB)
 - [OpenResty's Branch of LuaJIT 2](https://github.com/openresty/luajit2)
   - Currently based on Lua 5.1.4
 - [Embed the Power of Lua into NGINX HTTP servers](https://github.com/openresty/lua-nginx-module)
@@ -384,7 +378,11 @@ http {
 ### Compiled Version Details
 
 ```console
-configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --add-module=/ngx_http_geoip2_module-3.4 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+nginx version: nginx/1.25.1
+built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10) 
+built with OpenSSL 3.1.1 30 May 2023
+TLS SNI support enabled
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/headers-more-nginx-module-0.34 --add-module=/lua-nginx-module-0.10.24 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/ngx_devel_kit-0.3.2 --add-module=/ngx_http_geoip2_module-3.4 --add-module=/njs-0.7.12/nginx --add-module=/set-misc-nginx-module-0.33 --add-module=/stream-lua-nginx-module-0.0.13 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
 The following are the available build-time options. They can be set using the `--build-arg` CLI argument.
@@ -404,7 +402,6 @@ The following are the available build-time options. They can be set using the `-
 | `LUAJIT_INC`                | `/usr/local/include/luajit-2.1`            | Tell nginx's build system where to find LuaJIT 2.0 |
 | `LD_LIBRARY_PATH`           | `/usr/local/lib/:$LD_LIBRARY_PATH`         | Search path environment variable for the linux shared library. |
 | `LUA_LIB_DIR`               | `/usr/local/share/lua/5.1`                 | Path to Lua library directory. |
-| `VER_LUA`                   | `5.4`                                      | The version of [Lua](https://www.lua.org/) to use. |
 | `VER_NGX_DEVEL_KIT`         | `0.3.2`                                    | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) to use. |
 | `VER_NJS`                   | `0.8.0`                                   | The version of [Njs](https://github.com/nginx/njs) to use. |
 | `VER_GEOIP`                 | `3.4`                                      | The version of [GeoIP2](https://github.com/leev/ngx_http_geoip2_module) to use. |
@@ -431,7 +428,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_NGINX`                 | `1.25.1`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
 | `NGX_LDOPT`                 | `-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie`                                   | Sets additional parameters that will be used during linking. |
-| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/njs-0.7.10/nginx --add-module=/lua-nginx-module-0.10.23 --add-module=/ngx_devel_kit-0.3.2 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/headers-more-nginx-module-0.34 --add-module=/stream-lua-nginx-module-0.0.12 --add-module=/set-misc-nginx-module-0.33 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'` | Options to pass to nginx's `./configure` script. |
+| `NGINX_BUILD_CONFIG`        | `--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx ``# OFFICIAL MODULES`` --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module ``# CUSTOM MODULES`` --add-module=/headers-more-nginx-module-0.34 --add-module=/lua-nginx-module-0.10.24 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/ngx_devel_kit-0.3.2 --add-module=/ngx_http_geoip2_module-3.4 --add-module=/njs-0.7.12/nginx --add-module=/set-misc-nginx-module-0.33 --add-module=/stream-lua-nginx-module-0.0.13` | Options to pass to nginx's `./configure` script. |
 | `BUILD_DEPS_BASE`           | Differs based on the distro                | List of common needed packages to build properly the software. |
 | `BUILD_DEPS_AMD64`          | Differs based on the distro                | List of needed packages to build properly the software on amd64. |
 | `BUILD_DEPS_ARM64V8`        | Differs based on the distro                | List of needed packages to build properly the software on arm64/v8. |
@@ -492,21 +489,6 @@ Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon L
 
 Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image.
 
-### `fabiocicerchia/nginx-lua:<version>-compat`
-
-The default Nginx + Lua + extra lua modules image. Uses Alpine Linux for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
-### `fabiocicerchia/nginx-lua:<version>-<distro>-compat`
-
-Provides Nginx + Lua + extra lua modules. Uses AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
-### `fabiocicerchia/nginx-lua:<version>-<distro><version>-compat`
-
-Provides Nginx + Lua + extra lua modules. Uses pinned version for AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, Ubuntu for base image. Enables LUA 5.1 Compatibility.  
-**WARNING:** This version has a compiled version of LUA and not using the version distributed by the OS's packet manager.
-
 ## Custom Builds
 
 If you need to extend the functionality of the existing image, you could build your own version using the following command.
@@ -544,7 +526,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "org.label-schema.version": "1.25.1-alpine3.18.2",
   "versions.geoip": "3.4",
   "versions.headers-more-nginx-module": "0.34",
-  "versions.lua": "5.4",
   "versions.lua-nginx-module": "0.10.24",
   "versions.lua-resty-cookie": "99be1005e38ce19ace54515272a2be1b9fdc5da2",
   "versions.lua-resty-core": "0.1.26",
@@ -586,7 +567,6 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `image.target.os`                         | OS component of `image.target.platform`. |
 | `image.target.arch`                       | Architecture component of `image.target.platform`. |
-| `versions.lua`                            | The version of [Lua](https://www.lua.org/) to use. |
 | `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
 | `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |
 | `versions.nginx`                          | The version of nginx used. |

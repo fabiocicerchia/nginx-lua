@@ -2,7 +2,7 @@
 
 ```console
 $ make
-              __                     __
+              __                     __ 
 .-----.-----.|__|.-----.--.--.______|  |.--.--.---.-.
 |     |  _  ||  ||     |_   _|______|  ||  |  |  _  |
 |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
@@ -21,86 +21,62 @@ BUILD
   build-all                                           build all dockerfiles
   build-amd64                                         build all distros in amd64 arch
   build-arm64                                         build all distros in arm64 arch
-  build-amd64-almalinux-classic                       build one distro in amd64 arch
-  build-amd64-alpine-classic                          build one distro in amd64 arch
-  build-amd64-amazonlinux-classic                     build one distro in amd64 arch
-  build-amd64-debian-classic                          build one distro in amd64 arch
-  build-amd64-fedora-classic                          build one distro in amd64 arch
+  build-amd64-almalinux-classic                       build one distro in amd64 arch  
+  build-amd64-alpine-classic                          build one distro in amd64 arch  
+  build-amd64-amazonlinux-classic                     build one distro in amd64 arch  
+  build-amd64-debian-classic                          build one distro in amd64 arch  
+  build-amd64-fedora-classic                          build one distro in amd64 arch  
   build-amd64-ubuntu-classic                          build one distro in amd64 arch
-  build-amd64-almalinux-compat                        build one distro in amd64 arch
-  build-amd64-alpine-compat                           build one distro in amd64 arch
-  build-amd64-amazonlinux-compat                      build one distro in amd64 arch
-  build-amd64-debian-compat                           build one distro in amd64 arch
-  build-amd64-fedora-compat                           build one distro in amd64 arch
-  build-amd64-ubuntu-compat                           build one distro in amd64 arch
-  build-arm64v8-almalinux-classic                     build one distro in arm64/v8 arch
-  build-arm64v8-alpine-classic                        build one distro in arm64/v8 arch
-  build-arm64v8-amazonlinux-classic                   build one distro in arm64/v8 arch
-  build-arm64v8-debian-classic                        build one distro in arm64/v8 arch
-  build-arm64v8-fedora-classic                        build one distro in arm64/v8 arch
+  build-arm64v8-almalinux-classic                     build one distro in arm64/v8 arch  
+  build-arm64v8-alpine-classic                        build one distro in arm64/v8 arch  
+  build-arm64v8-amazonlinux-classic                   build one distro in arm64/v8 arch  
+  build-arm64v8-debian-classic                        build one distro in arm64/v8 arch  
+  build-arm64v8-fedora-classic                        build one distro in arm64/v8 arch  
   build-arm64v8-ubuntu-classic                        build one distro in arm64/v8 arch
-  build-arm64v8-almalinux-compat                      build one distro in arm64/v8 arch
-  build-arm64v8-alpine-compat                         build one distro in arm64/v8 arch
-  build-arm64v8-amazonlinux-compat                    build one distro in arm64/v8 arch
-  build-arm64v8-debian-compat                         build one distro in arm64/v8 arch
-  build-arm64v8-fedora-compat                         build one distro in arm64/v8 arch
-  build-arm64v8-ubuntu-compat                         build one distro in arm64/v8 arch
-  build-arm.medium-almalinux-classic                  build one distro in one arch (CircleCI internals)
-  build-arm.medium-alpine-classic                     build one distro in one arch (CircleCI internals)
-  build-arm.medium-amazonlinux-classic                build one distro in one arch (CircleCI internals)
-  build-arm.medium-debian-classic                     build one distro in one arch (CircleCI internals)
-  build-arm.medium-fedora-classic                     build one distro in one arch (CircleCI internals)
-  build-arm.medium-ubuntu-classic                     build one distro in one arch (CircleCI internals)
-  build-large-almalinux-classic                       build one distro in one arch (CircleCI internals)
-  build-large-alpine-classic                          build one distro in one arch (CircleCI internals)
-  build-large-amazonlinux-classic                     build one distro in one arch (CircleCI internals)
-  build-large-debian-classic                          build one distro in one arch (CircleCI internals)
-  build-large-fedora-classic                          build one distro in one arch (CircleCI internals)
+  build-arm.medium-almalinux-classic                  build one distro in one arch (CircleCI internals)  
+  build-arm.medium-alpine-classic                     build one distro in one arch (CircleCI internals)  
+  build-arm.medium-amazonlinux-classic                build one distro in one arch (CircleCI internals)  
+  build-arm.medium-debian-classic                     build one distro in one arch (CircleCI internals)  
+  build-arm.medium-fedora-classic                     build one distro in one arch (CircleCI internals)  
+  build-arm.medium-ubuntu-classic                     build one distro in one arch (CircleCI internals)  
+  build-large-almalinux-classic                       build one distro in one arch (CircleCI internals)  
+  build-large-alpine-classic                          build one distro in one arch (CircleCI internals)  
+  build-large-amazonlinux-classic                     build one distro in one arch (CircleCI internals)  
+  build-large-debian-classic                          build one distro in one arch (CircleCI internals)  
+  build-large-fedora-classic                          build one distro in one arch (CircleCI internals)  
   build-large-ubuntu-classic                          build one distro in one arch (CircleCI internals)
-  build-arm.medium-almalinux-compat                   build one distro in one arch (CircleCI internals)
-  build-arm.medium-alpine-compat                      build one distro in one arch (CircleCI internals)
-  build-arm.medium-amazonlinux-compat                 build one distro in one arch (CircleCI internals)
-  build-arm.medium-debian-compat                      build one distro in one arch (CircleCI internals)
-  build-arm.medium-fedora-compat                      build one distro in one arch (CircleCI internals)
-  build-arm.medium-ubuntu-compat                      build one distro in one arch (CircleCI internals)
-  build-large-almalinux-compat                        build one distro in one arch (CircleCI internals)
-  build-large-alpine-compat                           build one distro in one arch (CircleCI internals)
-  build-large-amazonlinux-compat                      build one distro in one arch (CircleCI internals)
-  build-large-debian-compat                           build one distro in one arch (CircleCI internals)
-  build-large-fedora-compat                           build one distro in one arch (CircleCI internals)
-  build-large-ubuntu-compat                           build one distro in one arch (CircleCI internals)
 
 TESTING
   test-all                                            test all docker images
-  test-almalinux                                      test one docker image
-  test-alpine                                         test one docker image
-  test-amazonlinux                                    test one docker image
-  test-debian                                         test one docker image
-  test-fedora                                         test one docker image
+  test-almalinux                                      test one docker image  
+  test-alpine                                         test one docker image  
+  test-amazonlinux                                    test one docker image  
+  test-debian                                         test one docker image  
+  test-fedora                                         test one docker image  
   test-ubuntu                                         test one docker image
   test-security                                       test security all docker images
-  test-security-almalinux                             test security one docker images
-  test-security-alpine                                test security one docker images
-  test-security-amazonlinux                           test security one docker images
-  test-security-debian                                test security one docker images
-  test-security-fedora                                test security one docker images
+  test-security-almalinux                             test security one docker images  
+  test-security-alpine                                test security one docker images  
+  test-security-amazonlinux                           test security one docker images  
+  test-security-debian                                test security one docker images  
+  test-security-fedora                                test security one docker images  
   test-security-ubuntu                                test security one docker images
 
 PUSH
   push-all                                            push all docker images to docker hub
-  push-almalinux                                      push one docker images to docker hub
-  push-alpine                                         push one docker images to docker hub
-  push-amazonlinux                                    push one docker images to docker hub
-  push-debian                                         push one docker images to docker hub
-  push-fedora                                         push one docker images to docker hub
+  push-almalinux                                      push one docker images to docker hub  
+  push-alpine                                         push one docker images to docker hub  
+  push-amazonlinux                                    push one docker images to docker hub  
+  push-debian                                         push one docker images to docker hub  
+  push-fedora                                         push one docker images to docker hub  
   push-ubuntu                                         push one docker images to docker hub
 
 BUNDLE
-  bundle-almalinux                                    bundle multiple docker images into one
-  bundle-alpine                                       bundle multiple docker images into one
-  bundle-amazonlinux                                  bundle multiple docker images into one
-  bundle-debian                                       bundle multiple docker images into one
-  bundle-fedora                                       bundle multiple docker images into one
+  bundle-almalinux                                    bundle multiple docker images into one  
+  bundle-alpine                                       bundle multiple docker images into one  
+  bundle-amazonlinux                                  bundle multiple docker images into one  
+  bundle-debian                                       bundle multiple docker images into one  
+  bundle-fedora                                       bundle multiple docker images into one  
   bundle-ubuntu                                       bundle multiple docker images into one
 
 DEPENDENCIES
@@ -110,13 +86,13 @@ UTILITIES
   release                                             create a github release
   generate-supported-versions                         generate supported_versions file
   generate-dockerfiles                                generate all dockerfiles
+  pull-nginx-entrypoints                              retrieves the official entrypoint files
   generate-metadata                                   generate metadata for all OS docker images
   generate-metadata-all                               generate all metadata for all OS docker images
   update-tags                                         update docker tags file
   update-readme                                       update supported docker tags in readme
   benchmark                                           benchmark (wip)
   changelog                                           generate a changelog since previous tag
-
 ```
 
 ## How to add a new supported OS
@@ -124,9 +100,6 @@ UTILITIES
 Create two different files:
 
 - `tpl/Dockerfile.XXX`
-- `tpl/Dockerfile.XXX-compat`
-
-The `compat` version is meant for having a compiled version of the LUA code, the main difference is in the section `Build Nginx with support for LUA` which has got `make lua-src` before actually building `deps` and `core`.
 
 Customise the shell script to use the new distro:
 
@@ -142,15 +115,6 @@ Do not forget to update the README to include the distro in the list:
 
 - Run `make update-tags` and `make update-readme` to include the new distro tags in the documentation
 - Add the new distro in the support comparison table with OpenResty
-
-### Differences between standard vs compat
-
-- Extra env var `LUA_INCDIR=$LUAJIT_INC`
-- No dependency on system packages `lua-${VER_LUA}` and `lua-devel-${VER_LUA}` and `luarocks`
-- Extra step for building lua from source: `make -j "$(nproc)" lua-src`
-- Extra step for building luarocks from source: `make luarocks`
-- Copying the binaries `lua`, `luajit`, `luarocks` and the whole `LUA_INCDIR` folder from the multistage build
-- Avoiding to symlink the `lua` binary
 
 ## Build locally
 

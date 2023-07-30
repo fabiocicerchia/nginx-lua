@@ -1,0 +1,11 @@
+--- docker-entrypoint.sh.orig	2023-07-13 07:31:28.120193375 +0200
++++ docker-entrypoint.sh	2023-07-13 07:31:33.076193561 +0200
+@@ -1,6 +1,8 @@
+ #!/bin/sh
+ # vim:sw=4:ts=4:et
+ 
++/support.sh
++
+ set -e
+ 
+ entrypoint_log() {

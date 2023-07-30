@@ -34,17 +34,17 @@ SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
-classic_compat_distros_amd64=$(addsuffix -classic, $(amd64_distros)) $(addsuffix -compat, $(amd64_distros))
-classic_compat_distros_arm64=$(addsuffix -classic, $(arm64_distros)) $(addsuffix -compat, $(arm64_distros))
-build_targets_amd64=$(addprefix build-, $(classic_compat_distros_amd64))
-build_targets_arm64=$(addprefix build-, $(classic_compat_distros_arm64))
+classic_distros_amd64=$(addsuffix -classic, $(amd64_distros))
+classic_distros_arm64=$(addsuffix -classic, $(arm64_distros))
+build_targets_amd64=$(addprefix build-, $(classic_distros_amd64))
+build_targets_arm64=$(addprefix build-, $(classic_distros_arm64))
 build_targets=${build_targets_amd64} ${build_targets_arm64}
 # CircleCI workaround
 cci_arm64_distros=$(addprefix large-, $(DISTROS))
 cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
 cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
-cci_classic_compat_distros=$(addsuffix -classic, $(cci_arch_distros)) $(addsuffix -compat, $(cci_arch_distros))
-cci_build_targets=$(addprefix build-, $(cci_classic_compat_distros))
+cci_classic_distros=$(addsuffix -classic, $(cci_arch_distros))
+cci_build_targets=$(addprefix build-, $(cci_classic_distros))
 # / CircleCI workaround
 
 test_targets=$(addprefix test-, $(DISTROS))
@@ -119,16 +119,15 @@ $(build_targets_arm64): ## build one distro in arm64/v8 arch
 $(cci_build_targets): ## build one distro in one arch (CircleCI internals)
 	TASK=$(@) $(MAKE) build-single
 
-build-single:
+build-single: generate-dockerfiles
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
 	ARCH=$(shell echo $$TASK | cut -d"-" -f2); \
 	DISTRO=$(shell echo $$TASK | cut -d"-" -f3); \
-	COMPAT=$(shell echo $$TASK | grep "\-compat" | cut -d"-" -f4); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$COMPAT" "$$ARCH" \
+	$(BUILD_CMD) "$$DISTRO" "$$ARCH" \
 	&& $(META_CMD) "$$DISTRO"
 endif
 
@@ -184,8 +183,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst bundle-,,$(@)); \
 	echo "BUNDLING $$DISTRO"; \
-	$(BUNDLE_CMD) "$$DISTRO" "" \
-	&& $(BUNDLE_CMD) "$$DISTRO" "-compat"
+	$(BUNDLE_CMD) "$$DISTRO"
 endif
 
 ################################################################################
@@ -201,7 +199,7 @@ qemu:
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions pull-nginx-entrypoints generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
 	git config --global user.name "fabiocicerchia"
@@ -232,14 +230,13 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/*
-	cp Dockerfile Dockerfile-compat dist/
+	cp Dockerfile dist/
 	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
 	wget https://github.com/tcnksm/ghr/releases/download/v0.16.0/ghr_v0.16.0_linux_amd64.tar.gz
 	tar xvzf ghr_v0.16.0_linux_amd64.tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
 		./ghr_v0.16.0_linux_amd64/ghr -b "$$(printf '%q' $($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi
-
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
@@ -252,6 +249,7 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files
 	curl -sLo tpl/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
 	curl -sLo tpl/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
 	curl -sLo tpl/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
+	patch tpl/docker-entrypoint.sh tpl/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
 	for DISTRO in $(DISTROS); do \

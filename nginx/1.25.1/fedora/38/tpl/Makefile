@@ -77,16 +77,6 @@ dep-luajit:
 	cd /luajit2-${VER_LUAJIT} \
 	&& $(MAKE) \
 	&& $(MAKE) install
-# This is because OpenResty LuaJIT2 is stuck on Lua 5.1 since 2009.
-# Also, since LUA_LIB_DIR is set on 5.4, the 5.1 folder is always empty and nginx
-# will try to look things in the wrong one, unless provided with:
-#  lua_package_path '/usr/local/share/lua/5.4/?.lua;;';
-#  lua_package_cpath '/usr/local/lib/lua/5.4/?.so;;';
-# Ref: https://github.com/openresty/luajit2/blob/v2.1-agentzh/Makefile#L21
-# it is safe to delete the folders as they have JUST been created
-	rm -r /usr/local/lib/lua/5.1 /usr/local/share/lua/5.1
-	ln -s /usr/local/lib/lua/5.4 /usr/local/lib/lua/5.1
-	ln -s /usr/local/share/lua/5.4 /usr/local/share/lua/5.1
 
 # Lua Nginx Module
 # ##############################################################################
@@ -189,8 +179,8 @@ dep-lua-openresty-signal:
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
 	&& $(MAKE) \
 	&& $(MAKE) install \
-	&& install -d /usr/local/lib/lua/5.4 \
-	&& install /usr/local/share/lua/5.4/librestysignal.so /usr/local/lib/lua/5.4/librestysignal.so
+	&& install -d /usr/local/lib/lua/5.1 \
+	&& install /usr/local/share/lua/5.1/librestysignal.so /usr/local/lib/lua/5.1/librestysignal.so
 
 # OpenResty Upstream Healthcheck
 # ##############################################################################
@@ -246,17 +236,3 @@ luarocks:
 	./configure \
 	&& $(MAKE) \
 	&& $(MAKE) install
-
-################################################################################
-##@ COMPILE LUA
-################################################################################
-
-lua-src:
-	curl -sLo /luasrc.tar.gz http://www.lua.org/ftp/lua-${VER_LUA}.tar.gz
-	tar -C / -xzvf /luasrc.tar.gz
-	cd /lua-$${VER_LUA}; \
-	sed -i "s/DLUA_COMPAT_5_3/DLUA_COMPAT_5_1/" src/Makefile \
-	&& sed -i "s/DLUA_COMPAT_5_2/DLUA_COMPAT_5_1/" src/Makefile \
-	&& $(MAKE) linux test \
-	&& $(MAKE) install \
-	&& cp /lua-$${VER_LUA}/src/*.h /usr/include/
