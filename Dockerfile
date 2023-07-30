@@ -307,6 +307,8 @@ ARG NGINX_BUILD_DEPS="\
         openssl-dev \
         pcre-dev \
         zlib-dev \
+# OPENRESTY PATCHES
+        git \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
