@@ -318,6 +318,7 @@ RUN set -eux \
     && rm -rf /var/cache/yum
 
 COPY tpl/Makefile Makefile
+COPY tpl/patches patches
 
 RUN make deps \
     && make core \

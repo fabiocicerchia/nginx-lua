@@ -319,6 +319,7 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/*
 
 COPY tpl/Makefile Makefile
+COPY tpl/patches patches
 
 RUN make deps \
     && make core \

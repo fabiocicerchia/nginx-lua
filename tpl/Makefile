@@ -18,6 +18,27 @@ FALLBACK_VER_NGINX=1.23.0
 # CORE
 # ##############################################################################
 
+openresty-patches:
+	mkdir -p /nginx-${VER_NGINX}/patches
+	git clone https://github.com/openresty/openresty.git; \
+	PATCH_VER=${VER_NGINX}; \
+	if [ "$(ls -1 openresty/patches/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
+		PATCH_VER=${FALLBACK_VER_NGINX}; \
+	fi; \
+	for patch_file in openresty/patches/nginx-$${PATCH_VER}-*.patch; do \
+		echo "copying openresty patch $${patch_file}"; \
+		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
+	done; \
+	for patch_file in /patches/*.patch; do \
+		echo "overriding openresty patch $${patch_file}"; \
+		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
+	done; \
+	cd /nginx-${VER_NGINX}; \
+	for patch_file in patches/*.patch; do \
+		echo "applying openresty patch $${patch_file}"; \
+		patch -p1 < "$${patch_file}"; \
+	done; \
+
 core:
 # NGINX
 # ##############################################################################
@@ -29,16 +50,10 @@ core:
 		/var/cache/nginx/proxy_temp \
 		/var/cache/nginx/fastcgi_temp \
 		/var/cache/nginx/uwsgi_temp \
-		/var/cache/nginx/scgi_temp \
-		/nginx-${VER_NGINX}/patches
-	git clone https://github.com/openresty/openresty.git
-	cp openresty/patches/nginx-${VER_NGINX}-*.patch /nginx-${VER_NGINX}/patches/
-	if [ "$(ls -1 /nginx-${VER_NGINX}/patches/)" = "" ]; then \
-		cp openresty/patches/nginx-${FALLBACK_VER_NGINX)-*.patch /nginx-${VER_NGINX}/patches/ \
-	fi
-	patch -p1 < /nginx-${VER_NGINX}/patches/nginx-*.patch || exit 1
-	cd /nginx-${VER_NGINX} \
-	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
+		/var/cache/nginx/scgi_temp
+	make openresty-patches
+	cd /nginx-${VER_NGINX}; \
+	./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& $(MAKE) build \
 	&& mv objs/nginx objs/nginx-debug \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" \

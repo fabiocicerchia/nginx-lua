@@ -327,6 +327,7 @@ RUN set -eux \
         $NGINX_BUILD_DEPS
 
 COPY tpl/Makefile Makefile
+COPY tpl/patches patches
 
 RUN make deps \
     && make core \
