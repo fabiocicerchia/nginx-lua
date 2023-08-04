@@ -294,7 +294,10 @@ ARG BUILD_DEPS_ARM64V8="\
 ENV BUILD_DEPS_ARM64V8=$BUILD_DEPS_ARM64V8
 ENV BUILD_DEPS=
 
-ARG NGINX_BUILD_DEPS=""
+ARG NGINX_BUILD_DEPS="\
+# OPENRESTY PATCHES
+        git \
+"
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -316,6 +319,7 @@ RUN set -eux \
     && rm -rf /var/lib/apt/lists/*
 
 COPY tpl/Makefile Makefile
+COPY tpl/patches patches
 
 RUN make deps \
     && make core \

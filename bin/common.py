@@ -316,6 +316,10 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
       shutil.copyfile(file, folder+"/"+file)
       os.chmod(folder+"/"+file, 0o755)
 
+    os.makedirs(folder+"/tpl/patches", exist_ok=True)
+    for file in glob.glob(r"tpl/patches/*.patch"):
+      shutil.copyfile(file, folder+"/"+file)
+
     shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
     shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")
     shutil.copyfile("tpl/nginx.conf", folder+"/tpl/nginx.conf")

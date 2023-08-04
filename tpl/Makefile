@@ -10,17 +10,40 @@
 EXTENDED_IMAGE=YES
 NPROC := $(shell nproc)
 
+# TODO: Find a better way to fallback when openresty is behind the nginx latest
+# version and no patch is available.
+FALLBACK_VER_NGINX=1.23.0
+
 # ##############################################################################
 # CORE
 # ##############################################################################
+
+openresty-patches:
+	mkdir -p /nginx-${VER_NGINX}/patches
+	git clone https://github.com/openresty/openresty.git; \
+	PATCH_VER=${VER_NGINX}; \
+	if [ "$(ls -1 openresty/patches/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
+		PATCH_VER=${FALLBACK_VER_NGINX}; \
+	fi; \
+	for patch_file in openresty/patches/nginx-$${PATCH_VER}-*.patch; do \
+		echo "copying openresty patch $${patch_file}"; \
+		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
+	done; \
+	for patch_file in /patches/*.patch; do \
+		echo "overriding openresty patch $${patch_file}"; \
+		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
+	done; \
+	cd /nginx-${VER_NGINX}; \
+	for patch_file in patches/*.patch; do \
+		echo "applying openresty patch $${patch_file}"; \
+		patch -p1 < "$${patch_file}"; \
+	done; \
 
 core:
 # NGINX
 # ##############################################################################
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
-# TODO: need to get all patches from openresty?
-# TODO: Find a better way to fallback when openresty is behind the nginx latest version and no patch is available
 	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
@@ -28,11 +51,9 @@ core:
 		/var/cache/nginx/fastcgi_temp \
 		/var/cache/nginx/uwsgi_temp \
 		/var/cache/nginx/scgi_temp
-	cd /nginx-${VER_NGINX} \
-		&& (curl --fail -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-${VER_NGINX}-socket_cloexec.patch || \
-			curl -sLo nginx-socket_cloexec.patch https://raw.githubusercontent.com/openresty/openresty/master/patches/nginx-1.23.0-socket_cloexec.patch) \
-		&& patch -p1 < nginx-socket_cloexec.patch || exit 1 \
-	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
+	make openresty-patches
+	cd /nginx-${VER_NGINX}; \
+	./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" --with-debug \
 	&& $(MAKE) build \
 	&& mv objs/nginx objs/nginx-debug \
 	&& ./configure ${NGINX_BUILD_CONFIG} --with-cc-opt="$(NGX_CFLAGS)" --with-ld-opt="$(NGX_LDOPT)" \

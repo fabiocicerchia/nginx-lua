@@ -307,6 +307,8 @@ ARG NGINX_BUILD_DEPS="\
         openssl-dev \
         pcre-dev \
         zlib-dev \
+# OPENRESTY PATCHES
+        git \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
@@ -324,6 +326,7 @@ RUN set -eux \
         $NGINX_BUILD_DEPS
 
 COPY tpl/Makefile Makefile
+COPY tpl/patches patches
 
 RUN make deps \
     && make core \
