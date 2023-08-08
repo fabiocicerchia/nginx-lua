@@ -46,8 +46,8 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 
 <!-- START_SUPPORTED_TAGS -->
 - [`almalinux`, `1-almalinux`, `1.25-almalinux`, `1.25.1-almalinux`, `1-almalinux9.2-20230718`, `1.25-almalinux9.2-20230718`, `1.25.1-almalinux9.2-20230718`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/almalinux/9.2-20230718/Dockerfile)
-- [`1`, `1.25`, `1.25.1`, `alpine`, `latest`, `1-alpine`, `1.25-alpine`, `1.25.1-alpine`, `1-alpine3.18.2`, `1.25-alpine3.18.2`, `1.25.1-alpine3.18.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/alpine/3.18.2/Dockerfile)
-- [`amazonlinux`, `1-amazonlinux`, `1.25-amazonlinux`, `1.25.1-amazonlinux`, `1-amazonlinux2023.1.20230719.0`, `1.25-amazonlinux2023.1.20230719.0`, `1.25.1-amazonlinux2023.1.20230719.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/amazonlinux/2023.1.20230719.0/Dockerfile)
+- [`1`, `1.25`, `1.25.1`, `alpine`, `latest`, `1-alpine`, `1.25-alpine`, `1.25.1-alpine`, `1-alpine3.18.3`, `1.25-alpine3.18.3`, `1.25.1-alpine3.18.3`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/alpine/3.18.3/Dockerfile)
+- [`amazonlinux`, `1-amazonlinux`, `1.25-amazonlinux`, `1.25.1-amazonlinux`, `1-amazonlinux2023.1.20230725.0`, `1.25-amazonlinux2023.1.20230725.0`, `1.25.1-amazonlinux2023.1.20230725.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/amazonlinux/2023.1.20230725.0/Dockerfile)
 - [`debian`, `1-debian`, `1.25-debian`, `1-debian12.1`, `1.25.1-debian`, `1.25-debian12.1`, `1.25.1-debian12.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/debian/12.1/Dockerfile)
 - [`fedora`, `1-fedora`, `1-fedora38`, `1.25-fedora`, `1.25-fedora38`, `1.25.1-fedora`, `1.25.1-fedora38`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/fedora/38/Dockerfile)
 - [`ubuntu`, `1-ubuntu`, `1.25-ubuntu`, `1-ubuntu22.04`, `1.25.1-ubuntu`, `1.25-ubuntu22.04`, `1.25.1-ubuntu22.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.1/ubuntu/22.04/Dockerfile)
