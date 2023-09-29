@@ -1,6 +1,6 @@
 nginx=1.25.2
 almalinux=9.2-20230718
-alpine=3.18.3
+alpine=3.18.4
 amazonlinux=2023.2.20230920.1
 debian=12.1
 fedora=38
