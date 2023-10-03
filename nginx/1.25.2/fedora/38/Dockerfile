@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.8.0
+ARG VER_NJS=0.8.1
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -66,7 +66,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT=2.1-20230410
+ARG VER_LUAJIT=2.1-20230911
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
