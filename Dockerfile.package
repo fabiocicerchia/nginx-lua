@@ -1,0 +1,49 @@
+ARG NGINX_VERSION
+ARG UBUNTU_VERSION=22.04
+FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-ubuntu$UBUNTU_VERSION AS base
+
+WORKDIR /
+
+RUN apt-get update && apt-get install -y ruby binutils
+
+# https://rubygems.org/gems/fpm
+ARG FPM_VERSION=1.15.1
+RUN gem install fpm --no-document -v $FPM_VERSION
+
+ARG PKG_ITERATION=1~jammy
+ARG FPM_OUTPUT_TYPE=deb
+
+# depends from nginx_1.25.2-1~bionic_amd64.deb
+RUN fpm \
+    --input-type dir \
+    --output-type $FPM_OUTPUT_TYPE \
+    --name nginx-lua \
+    --version $NGINX_VERSION \
+    --iteration $PKG_ITERATION \
+    --conflicts nginx \
+    --conflicts openresty \
+    --replaces nginx \
+    --replaces openresty \
+    --provides httpd \
+    --provides nginx \
+    --provides openresty \
+    --depends "libc6 (>= 2.35)" \
+    --depends "libpcre3" \
+    --depends "libssl3 (>= 3.0.2)" \
+    --depends "zlib1g (>= 1:1.2.11)" \
+    --depends "lsb-base (>= 11.1.0)" \
+    --depends adduser \
+    --chdir / \
+    etc/nginx \
+    usr/lib64 \
+    usr/local/lib \
+    usr/local/share/lua \
+    usr/sbin/nginx \
+    usr/sbin/nginx-debug \
+    var/cache/nginx \
+    usr/local/include/luajit-2.1 \
+    usr/local/bin/luajit* \
+    usr/local/share/luajit* \
+    usr/local/share/man/man1/luajit* \
+    usr/local/bin/luarocks* \
+    usr/local/etc/luarocks

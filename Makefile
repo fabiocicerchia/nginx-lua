@@ -31,6 +31,7 @@ TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
+PKG_ITERATION=1~jammy
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
@@ -195,6 +196,49 @@ qemu:
 	sudo apt-get update
 	sudo apt-get install --force-yes qemu binfmt-support qemu-user-static # Install the qemu packages
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
+
+################################################################################
+##@ PACKAGE
+################################################################################
+
+package-apk:
+	docker build \
+		-f Dockerfile.package \
+		-t package-nginx \
+		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
+		--build-arg FPM_OUTPUT_TYPE="apk" \
+		.
+	docker rm extract || true
+	docker create --name extract package-nginx
+	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.apk .
+	docker rm extract
+
+package-deb:
+	docker build \
+		-f Dockerfile.package \
+		-t package-nginx \
+		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
+		--build-arg FPM_OUTPUT_TYPE="deb" \
+		.
+	docker rm extract || true
+	docker create --name extract package-nginx
+	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.deb .
+	docker rm extract
+
+package-rpm:
+	docker build \
+		-f Dockerfile.package \
+		-t package-nginx \
+		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
+		--build-arg FPM_OUTPUT_TYPE="rpm" \
+		.
+	docker rm extract || true
+	docker create --name extract package-nginx
+	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.rpm .
+	docker rm extract
 
 ################################################################################
 ##@ UTILITIES
