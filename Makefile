@@ -34,7 +34,6 @@ SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
 SUPPORTED_ALPINE_VER=$(shell cat supported_versions | grep alpine | cut -d= -f2)
 SUPPORTED_FEDORA_VER=$(shell cat supported_versions | grep fedora | cut -d= -f2)
 SUPPORTED_UBUNTU_VER=$(shell cat supported_versions | grep ubuntu | cut -d= -f2)
-PKG_ITERATION=1~jammy
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
@@ -211,7 +210,6 @@ package-apk: ## creating the system package .apk (Alpine)
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="alpine" \
 		--build-arg OS_VERSION="$(SUPPORTED_ALPINE_VER)" \
-		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="apk" \
 		.
 	docker rm extract || true
@@ -226,7 +224,6 @@ package-deb: ## creating the system package .deb (Debian-like)
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="ubuntu" \
 		--build-arg OS_VERSION="$(SUPPORTED_UBUNTU_VER)" \
-		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="deb" \
 		.
 	docker rm extract || true
@@ -241,7 +238,6 @@ package-rpm: ## creating the system package .rpm (RHEL-like)
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="fedora" \
 		--build-arg OS_VERSION="$(SUPPORTED_FEDORA_VER)" \
-		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="rpm" \
 		.
 	docker rm extract || true

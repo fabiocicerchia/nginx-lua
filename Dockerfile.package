@@ -22,7 +22,7 @@ RUN \
 ARG FPM_VERSION=1.15.1
 RUN gem install fpm --no-document -v $FPM_VERSION
 
-ARG PKG_ITERATION=1~jammy
+ARG PKG_ITERATION=1~${UBUNTU_CODENAME:-ID}
 ARG FPM_OUTPUT_TYPE=deb
 
 # depends from nginx_1.25.2-1~bionic_amd64.deb
