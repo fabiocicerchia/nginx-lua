@@ -10,11 +10,12 @@ WORKDIR /
 
 RUN \
     if [ "$DISTRO" == "alpine" ]; then \
-      apk add -y ruby binutils; \
+      # https://github.com/jordansissel/fpm/issues/1375
+      apk add ruby binutils tar; \
     elif [ "$DISTRO" == "ubuntu" ]; then \
       apt-get update && apt-get install -y ruby binutils; \
     elif [ "$DISTRO" == "fedora" ]; then \
-      yum install -y ruby-devel binutils; \
+      yum install -y ruby-devel binutils rpm-build; \
     fi
 
 # https://rubygems.org/gems/fpm
@@ -38,15 +39,17 @@ RUN fpm \
     --provides httpd \
     --provides nginx \
     --provides openresty \
-    --depends "libc6 (>= 2.35)" \
-    --depends "libpcre3" \
-    --depends "libssl3 (>= 3.0.2)" \
-    --depends "zlib1g (>= 1:1.2.11)" \
-    --depends "lsb-base (>= 11.1.0)" \
-    --depends adduser \
+    # Only working for Ubuntu
+    # --depends "libc6 (>= 2.35)" \
+    # --depends "libpcre3" \
+    # --depends "libssl3 (>= 3.0.2)" \
+    # --depends "zlib1g (>= 1:1.2.11)" \
+    # --depends "lsb-base (>= 11.1.0)" \
+    # --depends adduser \
     --chdir / \
     etc/nginx \
-    usr/lib64 \
+    # Only working for Ubuntu and Fedora
+    # usr/lib64 \
     usr/local/lib \
     usr/local/share/lua \
     usr/sbin/nginx \

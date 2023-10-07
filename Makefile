@@ -216,7 +216,7 @@ package-apk: ## creating the system package .apk (Alpine)
 		.
 	docker rm extract || true
 	docker create --name extract package-nginx
-	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.apk .
+	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_noarch.apk .
 	docker rm extract
 
 package-deb: ## creating the system package .deb (Debian-like)
@@ -246,7 +246,7 @@ package-rpm: ## creating the system package .rpm (RHEL-like)
 		.
 	docker rm extract || true
 	docker create --name extract package-nginx
-	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.rpm .
+	docker cp extract:/nginx-lua-$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION).x86_64.rpm .
 	docker rm extract
 
 ################################################################################
