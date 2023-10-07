@@ -1,10 +1,21 @@
 ARG NGINX_VERSION
-ARG UBUNTU_VERSION=22.04
-FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-ubuntu$UBUNTU_VERSION AS base
+ARG DISTRO
+ARG OS_VERSION
+FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-$DISTRO$OS_VERSION AS base
+
+ARG DISTRO
+ENV DISTRO=$DISTRO
 
 WORKDIR /
 
-RUN apt-get update && apt-get install -y ruby binutils
+RUN \
+    if [ "$DISTRO" == "alpine" ]; then \
+      apk add -y ruby binutils; \
+    elif [ "$DISTRO" == "ubuntu" ]; then \
+      apt-get update && apt-get install -y ruby binutils; \
+    elif [ "$DISTRO" == "fedora" ]; then \
+      yum install -y ruby-devel binutils; \
+    fi
 
 # https://rubygems.org/gems/fpm
 ARG FPM_VERSION=1.15.1
@@ -42,8 +53,8 @@ RUN fpm \
     usr/sbin/nginx-debug \
     var/cache/nginx \
     usr/local/include/luajit-2.1 \
-    usr/local/bin/luajit* \
-    usr/local/share/luajit* \
-    usr/local/share/man/man1/luajit* \
-    usr/local/bin/luarocks* \
+    usr/local/bin/luajit \
+    # usr/local/share/luajit* \
+    usr/local/share/man/man1/luajit.1 \
+    usr/local/bin/luarocks \
     usr/local/etc/luarocks

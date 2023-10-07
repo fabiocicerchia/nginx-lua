@@ -31,6 +31,9 @@ TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
+SUPPORTED_ALPINE_VER=$(shell cat supported_versions | grep alpine | cut -d= -f2)
+SUPPORTED_FEDORA_VER=$(shell cat supported_versions | grep fedora | cut -d= -f2)
+SUPPORTED_UBUNTU_VER=$(shell cat supported_versions | grep ubuntu | cut -d= -f2)
 PKG_ITERATION=1~jammy
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
@@ -201,11 +204,13 @@ qemu:
 ##@ PACKAGE
 ################################################################################
 
-package-apk:
+package-apk: ## creating the system package .apk (Alpine)
 	docker build \
 		-f Dockerfile.package \
 		-t package-nginx \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg DISTRO="alpine" \
+		--build-arg OS_VERSION="$(SUPPORTED_ALPINE_VER)" \
 		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="apk" \
 		.
@@ -214,11 +219,13 @@ package-apk:
 	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.apk .
 	docker rm extract
 
-package-deb:
+package-deb: ## creating the system package .deb (Debian-like)
 	docker build \
 		-f Dockerfile.package \
 		-t package-nginx \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg DISTRO="ubuntu" \
+		--build-arg OS_VERSION="$(SUPPORTED_UBUNTU_VER)" \
 		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="deb" \
 		.
@@ -227,11 +234,13 @@ package-deb:
 	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.deb .
 	docker rm extract
 
-package-rpm:
+package-rpm: ## creating the system package .rpm (RHEL-like)
 	docker build \
 		-f Dockerfile.package \
 		-t package-nginx \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg DISTRO="fedora" \
+		--build-arg OS_VERSION="$(SUPPORTED_FEDORA_VER)" \
 		--build-arg PKG_ITERATION="$(PKG_ITERATION)" \
 		--build-arg FPM_OUTPUT_TYPE="rpm" \
 		.
