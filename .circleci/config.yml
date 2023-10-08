@@ -5,7 +5,8 @@ version: 2.1
 # Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
-  node: circleci/docker@2.2.0
+  # https://circleci.com/developer/orbs/orb/circleci/docker
+  node: circleci/docker@2.4.0
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -63,7 +64,8 @@ jobs:
         type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     resource_class: << parameters.class >>
     steps:
@@ -122,6 +124,16 @@ jobs:
           environment:
             FORCE: "YES"
 
+      - run:
+          name: Build packages .apk, .deb, .rpm
+          command: |
+            make -j $(nproc) packages
+            ls -lah *.apk *.deb *.rpm
+
+      - run:
+          name: Test packages .apk, .deb, .rpm
+          command: make -j $(nproc) package-test
+
       - when:
           condition:
             and:
@@ -157,7 +169,8 @@ jobs:
         type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -183,7 +196,8 @@ jobs:
   metadata:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -195,7 +209,8 @@ jobs:
   auto_update:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout

@@ -203,47 +203,50 @@ qemu:
 ##@ PACKAGE
 ################################################################################
 
-package-apk: ## creating the system package .apk (Alpine)
-	docker build \
-		-f Dockerfile.package \
-		-t package-nginx \
-		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
-		--build-arg DISTRO="alpine" \
-		--build-arg OS_VERSION="$(SUPPORTED_ALPINE_VER)" \
-		--build-arg FPM_OUTPUT_TYPE="apk" \
-		.
-	docker rm extract || true
-	docker create --name extract package-nginx
-	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_noarch.apk .
-	docker rm extract
+packages: ## creating the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
+	make package-apk
+	make package-deb
+	make package-rpm
 
-package-deb: ## creating the system package .deb (Debian-like)
-	docker build \
-		-f Dockerfile.package \
-		-t package-nginx \
-		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
-		--build-arg DISTRO="ubuntu" \
-		--build-arg OS_VERSION="$(SUPPORTED_UBUNTU_VER)" \
-		--build-arg FPM_OUTPUT_TYPE="deb" \
-		.
-	docker rm extract || true
-	docker create --name extract package-nginx
-	docker cp extract:/nginx-lua_$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION)_amd64.deb .
-	docker rm extract
+package-apk: PACKAGE_TYPE=apk
+package-apk: DISTRO=alpine
+package-apk: OS_VER=$(SUPPORTED_ALPINE_VER)
+package-apk: .package-base ## creating the system package .apk (Alpine)
 
-package-rpm: ## creating the system package .rpm (RHEL-like)
+package-deb: PACKAGE_TYPE=deb
+package-deb: DISTRO=ubuntu
+package-deb: OS_VER=$(SUPPORTED_UBUNTU_VER)
+package-deb: .package-base ## creating the system package .deb (Debian-like)
+
+package-rpm: PACKAGE_TYPE=rpm
+package-rpm: DISTRO=fedora
+package-rpm: OS_VER=$(SUPPORTED_FEDORA_VER)
+package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
+
+.package-base:
 	docker build \
 		-f Dockerfile.package \
-		-t package-nginx \
+		-t package-nginx-$(PACKAGE_TYPE) \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
-		--build-arg DISTRO="fedora" \
-		--build-arg OS_VERSION="$(SUPPORTED_FEDORA_VER)" \
-		--build-arg FPM_OUTPUT_TYPE="rpm" \
+		--build-arg DISTRO="$(DISTRO)" \
+		--build-arg OS_VERSION="$(OS_VER)" \
+		--build-arg FPM_OUTPUT_TYPE="$(PACKAGE_TYPE)" \
 		.
-	docker rm extract || true
-	docker create --name extract package-nginx
-	docker cp extract:/nginx-lua-$(SUPPORTED_NGINX_VER)-$(PKG_ITERATION).x86_64.rpm .
-	docker rm extract
+	docker rm -f extract-$(PACKAGE_TYPE) || true
+	docker run -d --name extract-$(PACKAGE_TYPE) package-nginx-$(PACKAGE_TYPE) && \
+	docker cp extract-$(PACKAGE_TYPE):$$(docker exec extract-$(PACKAGE_TYPE) sh -c "ls -1 /nginx-lua*.$(PACKAGE_TYPE)") .
+	docker rm -f extract-$(PACKAGE_TYPE)
+
+package-test: package-test-apk package-test-deb package-test-rpm ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
+
+package-test-apk: ## testing installation of the system package .apk (Alpine)
+	docker run -v $$PWD:/app -it alpine:latest /bin/sh -c "apk add --allow-untrusted /app/*.apk"
+
+package-test-deb: ## testing installation of the system package .deb (Debian-like)
+	docker run -v $$PWD:/app -it ubuntu:latest /bin/sh -c "dpkg -i /app/*.deb"
+
+package-test-rpm: ## testing installation of the system package .rpm (RHEL-like)
+	docker run -v $$PWD:/app -it fedora:latest /bin/sh -c "rpm -i /app/*.rpm"
 
 ################################################################################
 ##@ UTILITIES
