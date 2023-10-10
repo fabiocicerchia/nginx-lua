@@ -241,7 +241,7 @@ package-test: package-test-apk package-test-deb package-test-rpm ## testing inst
 
 package-test-apk: ## testing installation of the system package .apk (Alpine)
 	docker rm -f test-apk || true
-	docker run --name test-apk -v $$PWD:/app -d alpine:latest sleep infinity
+	docker run --name test-apk -v $$PWD/packages:/app -d alpine:latest sleep infinity
 	docker exec test-apk /bin/sh -c "apk add -v --allow-untrusted /app/*.apk"
 	docker exec test-apk /bin/sh -c "envsubst -V \
 		&& nginx -V \
@@ -253,7 +253,7 @@ package-test-apk: ## testing installation of the system package .apk (Alpine)
 
 package-test-deb: ## testing installation of the system package .deb (Debian-like)
 	docker rm -f test-deb || true
-	docker run --name test-deb -v $$PWD:/app -d ubuntu:latest sleep infinity
+	docker run --name test-deb -v $$PWD/packages:/app -d ubuntu:latest sleep infinity
 	docker exec test-deb /bin/sh -c "apt update && apt install -yf /app/*.deb"
 	docker exec test-deb /bin/sh -c "envsubst -V \
 		&& nginx -V \
@@ -265,7 +265,7 @@ package-test-deb: ## testing installation of the system package .deb (Debian-lik
 
 package-test-rpm: ## testing installation of the system package .rpm (RHEL-like)
 	docker rm -f test-rpm || true
-	docker run --name test-rpm -v $$PWD:/app -d fedora:latest sleep infinity
+	docker run --name test-rpm -v $$PWD/packages:/app -d fedora:latest sleep infinity
 	docker exec test-rpm /bin/sh -c "yum localinstall -y /app/*.rpm"
 	docker exec test-rpm /bin/sh -c "envsubst -V \
 		&& nginx -V \
