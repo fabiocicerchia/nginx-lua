@@ -225,13 +225,13 @@ package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
 
 .package-base:
 	docker build \
-		-f Dockerfile.package \
+		-f packages/Dockerfile-$(PACKAGE_TYPE).package \
 		-t package-nginx-$(PACKAGE_TYPE) \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="$(DISTRO)" \
 		--build-arg OS_VERSION="$(OS_VER)" \
 		--build-arg FPM_OUTPUT_TYPE="$(PACKAGE_TYPE)" \
-		.
+		packages
 	docker rm -f extract-$(PACKAGE_TYPE) || true
 	docker run -d --name extract-$(PACKAGE_TYPE) package-nginx-$(PACKAGE_TYPE) && \
 	docker cp extract-$(PACKAGE_TYPE):$$(docker exec extract-$(PACKAGE_TYPE) sh -c "ls -1 /nginx-lua*.$(PACKAGE_TYPE)") .
@@ -240,13 +240,40 @@ package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
 package-test: package-test-apk package-test-deb package-test-rpm ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
 
 package-test-apk: ## testing installation of the system package .apk (Alpine)
-	docker run -v $$PWD:/app -it alpine:latest /bin/sh -c "apk add --allow-untrusted /app/*.apk"
+	docker rm -f test-apk || true
+	docker run --name test-apk -v $$PWD:/app -d alpine:latest sleep infinity
+	docker exec test-apk /bin/sh -c "apk add -v --allow-untrusted /app/*.apk"
+	docker exec test-apk /bin/sh -c "envsubst -V \
+		&& nginx -V \
+		&& nginx -t \
+		&& luajit -v \
+		&& lua -v \
+		&& luarocks --version"
+	docker rm -f test-apk
 
 package-test-deb: ## testing installation of the system package .deb (Debian-like)
-	docker run -v $$PWD:/app -it ubuntu:latest /bin/sh -c "dpkg -i /app/*.deb"
+	docker rm -f test-deb || true
+	docker run --name test-deb -v $$PWD:/app -d ubuntu:latest sleep infinity
+	docker exec test-deb /bin/sh -c "apt update && apt install -yf /app/*.deb"
+	docker exec test-deb /bin/sh -c "envsubst -V \
+		&& nginx -V \
+		&& nginx -t \
+		&& luajit -v \
+		&& lua -v \
+		&& luarocks --version"
+	# docker rm -f test-deb
 
 package-test-rpm: ## testing installation of the system package .rpm (RHEL-like)
-	docker run -v $$PWD:/app -it fedora:latest /bin/sh -c "rpm -i /app/*.rpm"
+	docker rm -f test-rpm || true
+	docker run --name test-rpm -v $$PWD:/app -d fedora:latest sleep infinity
+	docker exec test-rpm /bin/sh -c "yum localinstall -y /app/*.rpm"
+	docker exec test-rpm /bin/sh -c "envsubst -V \
+		&& nginx -V \
+		&& nginx -t \
+		&& luajit -v \
+		&& lua -v \
+		&& luarocks --version"
+	docker rm -f test-rpm
 
 ################################################################################
 ##@ UTILITIES
