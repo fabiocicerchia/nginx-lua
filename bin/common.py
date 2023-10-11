@@ -307,22 +307,22 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     folder = os.path.dirname(dockerfile)
 
     os.makedirs(folder+"/tpl", exist_ok=True)
-    shutil.copyfile("tpl/.env.dist", folder+"/tpl/.env.dist")
+    shutil.copyfile("src/.env.dist", folder+"/tpl/.env.dist")
 
-    shutil.copyfile("tpl/Dockerfile.%s" % (os_distro), dockerfile)
+    shutil.copyfile("src/Dockerfile.%s" % (os_distro), dockerfile)
     patch_dockerfile(dockerfile, nginx_ver, os_distro, os_ver)
 
-    for file in glob.glob(r"tpl/*.sh"):
-      shutil.copyfile(file, folder+"/"+file)
-      os.chmod(folder+"/"+file, 0o755)
+    for file in glob.glob(r"src/*.sh"):
+      shutil.copyfile(file, folder+"/"+file.replace("src/", "tpl/"))
+      os.chmod(folder+"/"+file.replace("src/", "tpl/"), 0o755)
 
     os.makedirs(folder+"/tpl/patches", exist_ok=True)
-    for file in glob.glob(r"tpl/patches/*.patch"):
-      shutil.copyfile(file, folder+"/"+file)
+    for file in glob.glob(r"src/patches/*.patch"):
+      shutil.copyfile(file, folder+"/"+file.replace("src/", "tpl/"))
 
-    shutil.copyfile("tpl/default.conf", folder+"/tpl/default.conf")
-    shutil.copyfile("tpl/Makefile", folder+"/tpl/Makefile")
-    shutil.copyfile("tpl/nginx.conf", folder+"/tpl/nginx.conf")
+    shutil.copyfile("src/default.conf", folder+"/tpl/default.conf")
+    shutil.copyfile("src/Makefile", folder+"/tpl/Makefile")
+    shutil.copyfile("src/nginx.conf", folder+"/tpl/nginx.conf")
 
 
 # TAGS

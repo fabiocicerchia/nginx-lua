@@ -8,7 +8,7 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 PAGER:=
-DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|tpl)/" | wc -l | tr -d ' ')
+DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|src)/" | wc -l | tr -d ' ')
 ifeq ($(DOCKERFILE_CHANGES), 0)
 	SKIP=YES
 else
@@ -225,55 +225,50 @@ package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
 
 .package-base:
 	docker build \
-		-f packages/Dockerfile-$(PACKAGE_TYPE).package \
+		-f src/packages/Dockerfile.$(PACKAGE_TYPE) \
 		-t package-nginx-$(PACKAGE_TYPE) \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="$(DISTRO)" \
 		--build-arg OS_VERSION="$(OS_VER)" \
 		--build-arg FPM_OUTPUT_TYPE="$(PACKAGE_TYPE)" \
-		packages
+		src/packages
 	docker rm -f extract-$(PACKAGE_TYPE) || true
 	docker run -d --name extract-$(PACKAGE_TYPE) package-nginx-$(PACKAGE_TYPE) && \
-	docker cp extract-$(PACKAGE_TYPE):$$(docker exec extract-$(PACKAGE_TYPE) sh -c "ls -1 /nginx-lua*.$(PACKAGE_TYPE)") .
+	docker cp extract-$(PACKAGE_TYPE):$$(docker exec extract-$(PACKAGE_TYPE) sh -c "ls -1 /nginx-lua*.$(PACKAGE_TYPE)") dist/
 	docker rm -f extract-$(PACKAGE_TYPE)
 
-package-test: package-test-apk package-test-deb package-test-rpm ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
+package-test: ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
+	make package-test-apk
+	make package-test-deb
+	make package-test-rpm
 
-package-test-apk: ## testing installation of the system package .apk (Alpine)
-	docker rm -f test-apk || true
-	docker run --name test-apk -v $$PWD/packages:/app -d alpine:latest sleep infinity
-	docker exec test-apk /bin/sh -c "apk add -v --allow-untrusted /app/*.apk"
-	docker exec test-apk /bin/sh -c "envsubst -V \
+package-test-apk: PACKAGE_TYPE=apk
+package-test-apk: DISTRO=alpine
+package-test-apk: INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
+package-test-apk: .package-test-base .package-test-base ## testing installation of the system package .apk (Alpine)
+
+package-test-deb: PACKAGE_TYPE=deb
+package-test-deb: DISTRO=ubuntu
+package-test-deb: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
+package-test-deb: .package-test-base ## testing installation of the system package .deb (Debian-like)
+
+package-test-rpm: PACKAGE_TYPE=rpm
+package-test-rpm: DISTRO=fedora
+package-test-rpm: INSTALL_CMD="yum localinstall -y /app/*.rpm"
+package-test-rpm: .package-test-base ## testing installation of the system package .rpm (RHEL-like)
+
+.package-test-base:
+	docker rm -f test-$(PACKAGE_TYPE) || true
+	docker run --name test-$(PACKAGE_TYPE) -v $$PWD/dist:/app -d $(DISTRO):latest sleep infinity
+	docker exec test-$(PACKAGE_TYPE) /bin/sh -c $(INSTALL_CMD)
+	docker exec test-$(PACKAGE_TYPE) /bin/sh -c "envsubst -V \
 		&& nginx -V \
 		&& nginx -t \
 		&& luajit -v \
 		&& lua -v \
 		&& luarocks --version"
-	docker rm -f test-apk
-
-package-test-deb: ## testing installation of the system package .deb (Debian-like)
-	docker rm -f test-deb || true
-	docker run --name test-deb -v $$PWD/packages:/app -d ubuntu:latest sleep infinity
-	docker exec test-deb /bin/sh -c "apt update && apt install -yf /app/*.deb"
-	docker exec test-deb /bin/sh -c "envsubst -V \
-		&& nginx -V \
-		&& nginx -t \
-		&& luajit -v \
-		&& lua -v \
-		&& luarocks --version"
-	# docker rm -f test-deb
-
-package-test-rpm: ## testing installation of the system package .rpm (RHEL-like)
-	docker rm -f test-rpm || true
-	docker run --name test-rpm -v $$PWD/packages:/app -d fedora:latest sleep infinity
-	docker exec test-rpm /bin/sh -c "yum localinstall -y /app/*.rpm"
-	docker exec test-rpm /bin/sh -c "envsubst -V \
-		&& nginx -V \
-		&& nginx -t \
-		&& luajit -v \
-		&& lua -v \
-		&& luarocks --version"
-	docker rm -f test-rpm
+	docker rm -f test-$(PACKAGE_TYPE)
+	# TODO: bin/test.sh
 
 ################################################################################
 ##@ UTILITIES
@@ -324,11 +319,11 @@ generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
 
 pull-nginx-entrypoints: ## retrieves the official entrypoint files
-	curl -sLo tpl/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/10-listen-on-ipv6-by-default.sh
-	curl -sLo tpl/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
-	curl -sLo tpl/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
-	curl -sLo tpl/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
-	patch tpl/docker-entrypoint.sh tpl/docker-entrypoint.sh.patch
+	curl -sLo src/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/10-listen-on-ipv6-by-default.sh
+	curl -sLo src/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
+	curl -sLo src/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
+	curl -sLo src/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
+	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
 	for DISTRO in $(DISTROS); do \

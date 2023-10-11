@@ -128,7 +128,7 @@ jobs:
           name: Build packages .apk, .deb, .rpm
           command: |
             make -j $(nproc) packages
-            ls -lah packages/*.apk packages/*.deb packages/*.rpm
+            ls -lah *.{apk,deb,rpm}
 
       - run:
           name: Test packages .apk, .deb, .rpm
