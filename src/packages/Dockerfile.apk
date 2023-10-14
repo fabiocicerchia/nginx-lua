@@ -30,7 +30,7 @@ RUN source /etc/os-release \
       --input-type dir \
       --output-type $FPM_OUTPUT_TYPE \
       --iteration 1~${UBUNTU_CODENAME:-$ID} \
-      --after-install ./after-install.sh \
+      --after-install after-install.sh \
       --conflicts luajit \
       --conflicts nginx \
       --conflicts openresty \
