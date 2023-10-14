@@ -8,9 +8,9 @@ if __name__ == "__main__":
     arch = sys.argv[2]
 
     # CircleCI workaround
-    if arch == "large":
+    if arch == "x86_64":
         arch = "amd64"
-    if arch == "arm.medium":
+    if arch == "arm":
         arch = "arm64v8"
     # / CircleCI workaround
 

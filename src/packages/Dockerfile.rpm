@@ -1,7 +1,8 @@
 ARG NGINX_VERSION
 ARG DISTRO
 ARG OS_VERSION
-FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-$DISTRO$OS_VERSION AS base
+ARG ARCH
+FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-$DISTRO$OS_VERSION-$ARCH AS base
 
 ARG DISTRO
 ENV DISTRO=$DISTRO
@@ -43,6 +44,7 @@ RUN source /etc/os-release \
       --replaces nginx \
       --replaces openresty \
       # Only for Fedora
+      --depends "gettext-envsubst>=0.21" \
       --depends "libmaxminddb >= 1.7.1" \
       --depends "pcre >= 8.45" \
       --chdir / \

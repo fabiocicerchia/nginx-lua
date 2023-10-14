@@ -28,7 +28,7 @@ workflows:
       - docker_build:
           matrix:
             parameters:
-              class: ["large", "arm.medium"]
+              class: ["large", "arm.medium"] # large = amd64, arm.medium = arm64
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
@@ -114,7 +114,7 @@ jobs:
       - run:
           name: Build docker image (classic)
           command: |
-            make -j $(nproc) build-<< parameters.class >>-<< parameters.distro >>-classic
+            make -j $(nproc) build-$(uname -i)-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
@@ -125,14 +125,14 @@ jobs:
             FORCE: "YES"
 
       - run:
-          name: Build packages .apk, .deb, .rpm
+          name: Build packages
           command: |
-            make -j $(nproc) package-<< parameters.distro >>
+            make -j $(nproc) package-$(uname -i)-<< parameters.distro >>
             ls -lah dist/nginx-lua*.*
 
       - run:
-          name: Test packages .apk, .deb, .rpm
-          command: make -j $(nproc) package-test-<< parameters.distro >>
+          name: Test packages
+          command: make -j $(nproc) package-test-$(uname -i)-<< parameters.distro >>
 
       - when:
           condition:

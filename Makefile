@@ -37,17 +37,15 @@ SUPPORTED_UBUNTU_VER=$(shell cat supported_versions | grep ubuntu | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64v8-, $(DISTROS))
-classic_distros_amd64=$(addsuffix -classic, $(amd64_distros))
-classic_distros_arm64=$(addsuffix -classic, $(arm64_distros))
-build_targets_amd64=$(addprefix build-, $(classic_distros_amd64))
-build_targets_arm64=$(addprefix build-, $(classic_distros_arm64))
+build_targets_amd64=$(addprefix build-, $(amd64_distros))
+build_targets_arm64=$(addprefix build-, $(arm64_distros))
 build_targets=${build_targets_amd64} ${build_targets_arm64}
 # CircleCI workaround
-cci_arm64_distros=$(addprefix large-, $(DISTROS))
-cci_amd64_distros=$(addprefix arm.medium-, $(DISTROS))
+# TODO: Refactor to reconcile with amd64/arm64v8
+cci_arm64_distros=$(addprefix x86_64-, $(DISTROS))
+cci_amd64_distros=$(addprefix arm-, $(DISTROS))
 cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
-cci_classic_distros=$(addsuffix -classic, $(cci_arch_distros))
-cci_build_targets=$(addprefix build-, $(cci_classic_distros))
+cci_build_targets=$(addprefix build-, $(cci_arch_distros))
 # / CircleCI workaround
 
 test_targets=$(addprefix test-, $(DISTROS))
@@ -211,30 +209,66 @@ packages: ## creating the system package .apk (Alpine), .deb (Debian-like), .rpm
 	make package-fedora
 	make package-ubuntu
 
+package-x86_64-alpine: ARCH=amd64
+package-x86_64-alpine: package-alpine
+
+package-arm-alpine: ARCH=arm64
+package-arm-alpine: package-alpine
+
 package-alpine: PACKAGE_TYPE=apk
 package-alpine: DISTRO=alpine
 package-alpine: OS_VER=$(SUPPORTED_ALPINE_VER)
 package-alpine: .package-base ## creating the system package .apk (Alpine)
+
+package-x86_64-ubuntu: ARCH=amd64
+package-x86_64-ubuntu: package-ubuntu
+
+package-arm-ubuntu: ARCH=arm64
+package-arm-ubuntu: package-ubuntu
 
 package-ubuntu: PACKAGE_TYPE=deb
 package-ubuntu: DISTRO=ubuntu
 package-ubuntu: OS_VER=$(SUPPORTED_UBUNTU_VER)
 package-ubuntu: .package-base ## creating the system package .deb (Debian-like) on Ubuntu
 
+package-x86_64-debian: ARCH=amd64
+package-x86_64-debian: package-debian
+
+package-arm-debian: ARCH=arm64
+package-arm-debian: package-debian
+
 package-debian: PACKAGE_TYPE=deb
 package-debian: DISTRO=debian
 package-debian: OS_VER=$(SUPPORTED_UBUNTU_VER)
 package-debian: .package-base ## creating the system package .deb (Debian-like) on Debian
+
+package-x86_64-fedora: ARCH=amd64
+package-x86_64-fedora: package-fedora
+
+package-arm-fedora: ARCH=arm64
+package-arm-fedora: package-fedora
 
 package-fedora: PACKAGE_TYPE=rpm
 package-fedora: DISTRO=fedora
 package-fedora: OS_VER=$(SUPPORTED_FEDORA_VER)
 package-fedora: .package-base ## creating the system package .rpm (RHEL-like) on Fedora
 
+package-x86_64-amazonlinux: ARCH=amd64
+package-x86_64-amazonlinux: package-amazonlinux
+
+package-arm-amazonlinux: ARCH=arm64
+package-arm-amazonlinux: package-amazonlinux
+
 package-amazonlinux: PACKAGE_TYPE=rpm
 package-amazonlinux: DISTRO=amazonlinux
 package-amazonlinux: OS_VER=$(SUPPORTED_FEDORA_VER)
 package-amazonlinux: .package-base ## creating the system package .rpm (RHEL-like) on Amazonlinux
+
+package-x86_64-almalinux: ARCH=amd64
+package-x86_64-almalinux: package-almalinux
+
+package-arm-almalinux: ARCH=arm64
+package-arm-almalinux: package-almalinux
 
 package-almalinux: PACKAGE_TYPE=rpm
 package-almalinux: DISTRO=almalinux
@@ -245,6 +279,7 @@ package-almalinux: .package-base ## creating the system package .rpm (RHEL-like)
 	docker build \
 		-f src/packages/Dockerfile.$(PACKAGE_TYPE) \
 		-t package-nginx-$(PACKAGE_TYPE) \
+		--build-arg ARCH="$(ARCH)" \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="$(DISTRO)" \
 		--build-arg OS_VERSION="$(OS_VER)" \
@@ -263,30 +298,66 @@ package-test: ## testing installation of the system package .apk (Alpine), .deb 
 	make package-test-fedora
 	make package-test-ubuntu
 
+package-test-x86_64-alpine: ARCH=amd64
+package-test-x86_64-alpine: package-test-alpine
+
+package-test-arm-alpine: ARCH=arm64
+package-test-arm-alpine: package-test-alpine
+
 package-test-alpine: PACKAGE_TYPE=apk
 package-test-alpine: DISTRO=alpine
 package-test-alpine: INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
 package-test-alpine: .package-test-base .package-test-base ## testing installation of the system package .apk (Alpine)
+
+package-test-x86_64-ubuntu: ARCH=amd64
+package-test-x86_64-ubuntu: package-test-ubuntu
+
+package-test-arm-ubuntu: ARCH=arm64
+package-test-arm-ubuntu: package-test-ubuntu
 
 package-test-ubuntu: PACKAGE_TYPE=deb
 package-test-ubuntu: DISTRO=ubuntu
 package-test-ubuntu: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
 package-test-ubuntu: .package-test-base ## testing installation of the system package .deb (Debian-like) on Ubuntu
 
+package-test-x86_64-debian: ARCH=amd64
+package-test-x86_64-debian: package-test-debian
+
+package-test-arm-debian: ARCH=arm64
+package-test-arm-debian: package-test-debian
+
 package-test-debian: PACKAGE_TYPE=deb
 package-test-debian: DISTRO=debian
 package-test-debian: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
 package-test-debian: .package-test-base ## testing installation of the system package .deb (Debian-like) on Debian
+
+package-test-x86_64-fedora: ARCH=amd64
+package-test-x86_64-fedora: package-test-fedora
+
+package-test-arm-fedora: ARCH=arm64
+package-test-arm-fedora: package-test-fedora
 
 package-test-fedora: PACKAGE_TYPE=rpm
 package-test-fedora: DISTRO=fedora
 package-test-fedora: INSTALL_CMD="yum localinstall -y /app/*.rpm"
 package-test-fedora: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Fedora
 
+package-test-x86_64-amazon: ARCH=amd64
+package-test-x86_64-amazon: package-test-amazon
+
+package-test-arm-amazon: ARCH=arm64
+package-test-arm-amazon: package-test-amazon
+
 package-test-amazon: PACKAGE_TYPE=rpm
 package-test-amazon: DISTRO=amazonlinux
 package-test-amazon: INSTALL_CMD="yum localinstall -y /app/*.rpm"
 package-test-amazon: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Amazonlinux
+
+package-test-x86_64-almalinux: ARCH=amd64
+package-test-x86_64-almalinux: package-test-almalinux
+
+package-test-arm-almalinux: ARCH=arm64
+package-test-arm-almalinux: package-test-almalinux
 
 package-test-almalinux: PACKAGE_TYPE=rpm
 package-test-almalinux: DISTRO=almalinux
