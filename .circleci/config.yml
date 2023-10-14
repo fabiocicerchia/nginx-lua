@@ -127,12 +127,12 @@ jobs:
       - run:
           name: Build packages .apk, .deb, .rpm
           command: |
-            make -j $(nproc) packages
-            ls -lah *.{apk,deb,rpm}
+            make -j $(nproc) package-<< parameters.distro >>
+            ls -lah dist/nginx-lua*.*
 
       - run:
           name: Test packages .apk, .deb, .rpm
-          command: make -j $(nproc) package-test
+          command: make -j $(nproc) package-test-<< parameters.distro >>
 
       - when:
           condition:

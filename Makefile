@@ -204,24 +204,42 @@ qemu:
 ################################################################################
 
 packages: ## creating the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-	make package-apk
-	make package-deb
-	make package-rpm
+	make package-almalinux
+	make package-alpine
+	make package-amazonlinux
+	make package-debian
+	make package-fedora
+	make package-ubuntu
 
-package-apk: PACKAGE_TYPE=apk
-package-apk: DISTRO=alpine
-package-apk: OS_VER=$(SUPPORTED_ALPINE_VER)
-package-apk: .package-base ## creating the system package .apk (Alpine)
+package-alpine: PACKAGE_TYPE=apk
+package-alpine: DISTRO=alpine
+package-alpine: OS_VER=$(SUPPORTED_ALPINE_VER)
+package-alpine: .package-base ## creating the system package .apk (Alpine)
 
-package-deb: PACKAGE_TYPE=deb
-package-deb: DISTRO=ubuntu
-package-deb: OS_VER=$(SUPPORTED_UBUNTU_VER)
-package-deb: .package-base ## creating the system package .deb (Debian-like)
+package-ubuntu: PACKAGE_TYPE=deb
+package-ubuntu: DISTRO=ubuntu
+package-ubuntu: OS_VER=$(SUPPORTED_UBUNTU_VER)
+package-ubuntu: .package-base ## creating the system package .deb (Debian-like) on Ubuntu
 
-package-rpm: PACKAGE_TYPE=rpm
-package-rpm: DISTRO=fedora
-package-rpm: OS_VER=$(SUPPORTED_FEDORA_VER)
-package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
+package-debian: PACKAGE_TYPE=deb
+package-debian: DISTRO=debian
+package-debian: OS_VER=$(SUPPORTED_UBUNTU_VER)
+package-debian: .package-base ## creating the system package .deb (Debian-like) on Debian
+
+package-fedora: PACKAGE_TYPE=rpm
+package-fedora: DISTRO=fedora
+package-fedora: OS_VER=$(SUPPORTED_FEDORA_VER)
+package-fedora: .package-base ## creating the system package .rpm (RHEL-like) on Fedora
+
+package-amazonlinux: PACKAGE_TYPE=rpm
+package-amazonlinux: DISTRO=amazonlinux
+package-amazonlinux: OS_VER=$(SUPPORTED_FEDORA_VER)
+package-amazonlinux: .package-base ## creating the system package .rpm (RHEL-like) on Amazonlinux
+
+package-almalinux: PACKAGE_TYPE=rpm
+package-almalinux: DISTRO=almalinux
+package-almalinux: OS_VER=$(SUPPORTED_FEDORA_VER)
+package-almalinux: .package-base ## creating the system package .rpm (RHEL-like) on Almalinux
 
 .package-base:
 	docker build \
@@ -238,24 +256,42 @@ package-rpm: .package-base ## creating the system package .rpm (RHEL-like)
 	docker rm -f extract-$(PACKAGE_TYPE)
 
 package-test: ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-	make package-test-apk
-	make package-test-deb
-	make package-test-rpm
+	make package-test-almalinux
+	make package-test-alpine
+	make package-test-amazonlinux
+	make package-test-debian
+	make package-test-fedora
+	make package-test-ubuntu
 
-package-test-apk: PACKAGE_TYPE=apk
-package-test-apk: DISTRO=alpine
-package-test-apk: INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
-package-test-apk: .package-test-base .package-test-base ## testing installation of the system package .apk (Alpine)
+package-test-alpine: PACKAGE_TYPE=apk
+package-test-alpine: DISTRO=alpine
+package-test-alpine: INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
+package-test-alpine: .package-test-base .package-test-base ## testing installation of the system package .apk (Alpine)
 
-package-test-deb: PACKAGE_TYPE=deb
-package-test-deb: DISTRO=ubuntu
-package-test-deb: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
-package-test-deb: .package-test-base ## testing installation of the system package .deb (Debian-like)
+package-test-ubuntu: PACKAGE_TYPE=deb
+package-test-ubuntu: DISTRO=ubuntu
+package-test-ubuntu: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
+package-test-ubuntu: .package-test-base ## testing installation of the system package .deb (Debian-like) on Ubuntu
 
-package-test-rpm: PACKAGE_TYPE=rpm
-package-test-rpm: DISTRO=fedora
-package-test-rpm: INSTALL_CMD="yum localinstall -y /app/*.rpm"
-package-test-rpm: .package-test-base ## testing installation of the system package .rpm (RHEL-like)
+package-test-debian: PACKAGE_TYPE=deb
+package-test-debian: DISTRO=debian
+package-test-debian: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
+package-test-debian: .package-test-base ## testing installation of the system package .deb (Debian-like) on Debian
+
+package-test-fedora: PACKAGE_TYPE=rpm
+package-test-fedora: DISTRO=fedora
+package-test-fedora: INSTALL_CMD="yum localinstall -y /app/*.rpm"
+package-test-fedora: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Fedora
+
+package-test-amazon: PACKAGE_TYPE=rpm
+package-test-amazon: DISTRO=amazonlinux
+package-test-amazon: INSTALL_CMD="yum localinstall -y /app/*.rpm"
+package-test-amazon: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Amazonlinux
+
+package-test-almalinux: PACKAGE_TYPE=rpm
+package-test-almalinux: DISTRO=almalinux
+package-test-almalinux: INSTALL_CMD="yum localinstall -y /app/*.rpm"
+package-test-almalinux: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Almalinux
 
 .package-test-base:
 	docker rm -f test-$(PACKAGE_TYPE) || true
