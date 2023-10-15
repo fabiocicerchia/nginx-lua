@@ -44,7 +44,7 @@ RUN source /etc/os-release \
       --replaces nginx \
       --replaces openresty \
       # Only for Fedora
-      --depends "gettext-envsubst>=0.21" \
+      --depends "gettext >= 0.21.1" \
       --depends "libmaxminddb >= 1.7.1" \
       --depends "pcre >= 8.45" \
       --chdir / \

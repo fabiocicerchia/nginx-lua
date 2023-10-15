@@ -112,7 +112,7 @@ jobs:
           command: rm -rf docs/metadata/* || true
 
       - run:
-          name: Build docker image (classic)
+          name: Build docker image
           command: |
             make -j $(nproc) build-$(uname -i)-<< parameters.distro >>
           environment:

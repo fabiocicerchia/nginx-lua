@@ -43,6 +43,7 @@ RUN source /etc/os-release \
       --replaces nginx \
       --replaces openresty \
       # Only for Ubuntu
+      --depends "libpcre3 (>= 2:8.39-15)" \
       --depends "gettext (>= 0.21)" \
       --depends "libmaxminddb0 (>= 1.5.2)" \
       --depends "libxml2 (>= 2.9.13)" \

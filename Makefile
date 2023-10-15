@@ -217,7 +217,6 @@ package-arm-alpine: package-alpine
 
 package-alpine: PACKAGE_TYPE=apk
 package-alpine: DISTRO=alpine
-package-alpine: OS_VER=$(SUPPORTED_ALPINE_VER)
 package-alpine: .package-base ## creating the system package .apk (Alpine)
 
 package-x86_64-ubuntu: ARCH=amd64
@@ -228,7 +227,6 @@ package-arm-ubuntu: package-ubuntu
 
 package-ubuntu: PACKAGE_TYPE=deb
 package-ubuntu: DISTRO=ubuntu
-package-ubuntu: OS_VER=$(SUPPORTED_UBUNTU_VER)
 package-ubuntu: .package-base ## creating the system package .deb (Debian-like) on Ubuntu
 
 package-x86_64-debian: ARCH=amd64
@@ -239,7 +237,6 @@ package-arm-debian: package-debian
 
 package-debian: PACKAGE_TYPE=deb
 package-debian: DISTRO=debian
-package-debian: OS_VER=$(SUPPORTED_UBUNTU_VER)
 package-debian: .package-base ## creating the system package .deb (Debian-like) on Debian
 
 package-x86_64-fedora: ARCH=amd64
@@ -261,7 +258,6 @@ package-arm-amazonlinux: package-amazonlinux
 
 package-amazonlinux: PACKAGE_TYPE=rpm
 package-amazonlinux: DISTRO=amazonlinux
-package-amazonlinux: OS_VER=$(SUPPORTED_FEDORA_VER)
 package-amazonlinux: .package-base ## creating the system package .rpm (RHEL-like) on Amazonlinux
 
 package-x86_64-almalinux: ARCH=amd64
@@ -272,7 +268,6 @@ package-arm-almalinux: package-almalinux
 
 package-almalinux: PACKAGE_TYPE=rpm
 package-almalinux: DISTRO=almalinux
-package-almalinux: OS_VER=$(SUPPORTED_FEDORA_VER)
 package-almalinux: .package-base ## creating the system package .rpm (RHEL-like) on Almalinux
 
 .package-base:
