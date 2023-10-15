@@ -43,16 +43,14 @@ RUN source /etc/os-release \
       --replaces luajit \
       --replaces nginx \
       --replaces openresty \
-      # Only for Fedora
-      --depends "gettext >= 0.21.1" \
-      --depends "libmaxminddb >= 1.7.1" \
-      --depends "pcre >= 8.45" \
+      --depends "gettext >= 0.21" \
+      --depends "libmaxminddb >= 1.5.2" \
+      --depends "pcre >= 8.44" \
+      --depends "shadow-utils >= 2:4.9" \
       --chdir / \
       # usr/local/share/luajit* \
       after-install.sh \
       etc/nginx \
-      # Only working for Ubuntu and Fedora
-      # usr/lib64 \
       usr/local/bin/lua \
       usr/local/bin/luajit \
       usr/local/bin/luajit \

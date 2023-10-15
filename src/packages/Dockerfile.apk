@@ -41,7 +41,6 @@ RUN source /etc/os-release \
       --replaces luajit \
       --replaces nginx \
       --replaces openresty \
-      # Only for Alpine
       --depends "gettext-envsubst>=0.21" \
       --depends "libgcc>=12.2.1" \
       --depends "libmaxminddb>=1.7.1" \
