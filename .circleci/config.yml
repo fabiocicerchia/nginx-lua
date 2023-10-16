@@ -22,20 +22,46 @@ workflows:
     jobs:
       - auto_update
 
-  docker_builds: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  builds:
     jobs:
-      - docker_build:
+      - docker_build_amd:
+          name: docker_build-<< matrix.distro >>-amd
           matrix:
             parameters:
-              class: ["large", "arm.medium"] # large = amd64, arm.medium = arm64
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - docker_build_arm:
+          name: docker_build-<< matrix.distro >>-arm
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - package_build_amd:
+          requires:
+            - docker_build-<< matrix.distro >>-amd
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - package_build_arm:
+          requires:
+            - docker_build-<< matrix.distro >>-arm
+          matrix:
+            parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
       - docker_bundle:
           requires:
-            - docker_build
+            - docker_build-<< matrix.distro >>-amd
+            - docker_build-<< matrix.distro >>-arm
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
@@ -55,19 +81,11 @@ workflows:
             branches:
               only: main
 
-jobs:
+commands:
   docker_build:
     parameters:
-      class:
-        type: string
       distro:
         type: string
-    machine:
-      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      # https://circleci.com/developer/machine/image/ubuntu-2204
-      image: ubuntu-2204:2023.07.2
-      docker_layer_caching: true
-    resource_class: << parameters.class >>
     steps:
       - checkout
 
@@ -114,7 +132,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            make -j $(nproc) build-$(uname -i)-<< parameters.distro >>
+            make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
@@ -155,8 +173,24 @@ jobs:
 
   package_build:
     parameters:
-      class:
+      distro:
         type: string
+    steps:
+      - checkout
+
+      - run:
+          name: Build packages
+          command: |
+            make -j $(nproc) package-$(dpkg --print-architecture)-<< parameters.distro >>
+            ls -lah dist/nginx-lua*.*
+
+      - run:
+          name: Test packages
+          command: make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
+
+jobs:
+  docker_build_amd:
+    parameters:
       distro:
         type: string
     machine:
@@ -164,19 +198,52 @@ jobs:
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
-    resource_class: << parameters.class >>
+    resource_class: large
     steps:
-      - checkout
+      - docker_build:
+          distro: << parameters.distro >>
 
-      - run:
-          name: Build packages
-          command: |
-            make -j $(nproc) package-$(uname -i)-<< parameters.distro >>
-            ls -lah dist/nginx-lua*.*
+  docker_build_arm:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: arm.medium
+    steps:
+      - docker_build:
+          distro: << parameters.distro >>
 
-      - run:
-          name: Test packages
-          command: make -j $(nproc) package-test-$(uname -i)-<< parameters.distro >>
+  package_build_amd:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: large
+    steps:
+      - package_build:
+          distro: << parameters.distro >>
+
+  package_build_arm:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: arm.medium
+    steps:
+      - package_build:
+          distro: << parameters.distro >>
 
   docker_bundle:
     parameters:

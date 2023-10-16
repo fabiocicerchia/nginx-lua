@@ -31,22 +31,17 @@ TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
-SUPPORTED_ALPINE_VER=$(shell cat supported_versions | grep alpine | cut -d= -f2)
-SUPPORTED_FEDORA_VER=$(shell cat supported_versions | grep fedora | cut -d= -f2)
-SUPPORTED_UBUNTU_VER=$(shell cat supported_versions | grep ubuntu | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
-arm64_distros=$(addprefix arm64v8-, $(DISTROS))
+arm64_distros=$(addprefix arm64-, $(DISTROS))
 build_targets_amd64=$(addprefix build-, $(amd64_distros))
 build_targets_arm64=$(addprefix build-, $(arm64_distros))
 build_targets=${build_targets_amd64} ${build_targets_arm64}
-# CircleCI workaround
-# TODO: Refactor to reconcile with amd64/arm64v8
-cci_amd64_distros=$(addprefix x86_64-, $(DISTROS))
-cci_arm64_distros=$(addprefix aarch64-, $(DISTROS))
-cci_arch_distros=$(cci_amd64_distros) $(cci_arm64_distros)
-cci_build_targets=$(addprefix build-, $(cci_arch_distros))
-# / CircleCI workaround
+package_targets_amd64=$(addprefix package-, $(amd64_distros))
+package_targets_arm64=$(addprefix package-, $(arm64_distros))
+package_targets=${package_targets_amd64} ${package_targets_arm64}
+packagetest_targets_amd64=$(addprefix package-test-, $(amd64_distros))
+packagetest_targets_arm64=$(addprefix package-test-, $(arm64_distros))
 
 test_targets=$(addprefix test-, $(DISTROS))
 push_targets=$(addprefix push-, $(DISTROS))
@@ -89,15 +84,20 @@ help: ## prints this help
 		FS = ":.*##"; \
 		printf "Use: make \033[36m<target>\033[0m\n"; \
 	} /^\$$?\(?[a-zA-Z0-9_-]+\)?:.*?##/ { \
-		gsub("\\$$\\(build_targets\\)",        fix_value("$(build_targets)", $$2),        $$1); \
-		gsub("\\$$\\(build_targets_amd64\\)",  fix_value("$(build_targets_amd64)", $$2),  $$1); \
-		gsub("\\$$\\(build_targets_arm64\\)",  fix_value("$(build_targets_arm64)", $$2),  $$1); \
-		gsub("\\$$\\(cci_build_targets\\)",    fix_value("$(cci_build_targets)", $$2),    $$1); \
-		gsub("\\$$\\(minimal_targets\\)",      fix_value("$(minimal_targets)", $$2),      $$1); \
-		gsub("\\$$\\(test_targets\\)",         fix_value("$(test_targets)", $$2),         $$1); \
-		gsub("\\$$\\(security_targets\\)",     fix_value("$(security_targets)", $$2),     $$1); \
-		gsub("\\$$\\(push_targets\\)",         fix_value("$(push_targets)", $$2),         $$1); \
-		gsub("\\$$\\(bundle_targets\\)",       fix_value("$(bundle_targets)", $$2),       $$1); \
+		gsub("\\$$\\(build_targets\\)",              fix_value("$(build_targets)", $$2),              $$1); \
+		gsub("\\$$\\(build_targets_amd64\\)",        fix_value("$(build_targets_amd64)", $$2),        $$1); \
+		gsub("\\$$\\(build_targets_arm64\\)",        fix_value("$(build_targets_arm64)", $$2),        $$1); \
+		gsub("\\$$\\(package_targets\\)",            fix_value("$(package_targets)", $$2),            $$1); \
+		gsub("\\$$\\(package_targets_amd64\\)",      fix_value("$(package_targets_amd64)", $$2),      $$1); \
+		gsub("\\$$\\(package_targets_arm64\\)",      fix_value("$(package_targets_arm64)", $$2),      $$1); \
+		gsub("\\$$\\(packagetest_targets\\)",        fix_value("$(packagetest_targets)", $$2),        $$1); \
+		gsub("\\$$\\(packagetest_targets_amd64\\)",  fix_value("$(packagetest_targets_amd64)", $$2),  $$1); \
+		gsub("\\$$\\(packagetest_targets_arm64\\)",  fix_value("$(packagetest_targets_arm64)", $$2),  $$1); \
+		gsub("\\$$\\(minimal_targets\\)",            fix_value("$(minimal_targets)", $$2),            $$1); \
+		gsub("\\$$\\(test_targets\\)",               fix_value("$(test_targets)", $$2),               $$1); \
+		gsub("\\$$\\(security_targets\\)",           fix_value("$(security_targets)", $$2),           $$1); \
+		gsub("\\$$\\(push_targets\\)",               fix_value("$(push_targets)", $$2),               $$1); \
+		gsub("\\$$\\(bundle_targets\\)",             fix_value("$(bundle_targets)", $$2),             $$1); \
 		printf "  \033[36m%-50s\033[0m %s\n", $$1, $$2 \
 	} /^##@/ { \
 		printf "\n\033[1m%s\033[0m\n", substr($$0, 5) \
@@ -109,15 +109,12 @@ help: ## prints this help
 
 build-all: build-amd64 build-arm64 ## build all dockerfiles
 build-amd64: $(build_targets_amd64) ## build all distros in amd64 arch
-build-arm64: $(build_targets_arm64) ## build all distros in arm64 arch
+build-arm64: $(build_targets_arm64) ## build all distros in arm64/v8 arch
 
 $(build_targets_amd64): ## build one distro in amd64 arch
 	TASK=$(@) $(MAKE) build-single
 
 $(build_targets_arm64): ## build one distro in arm64/v8 arch
-	TASK=$(@) $(MAKE) build-single
-
-$(cci_build_targets): ## build one distro in one arch (CircleCI internals)
 	TASK=$(@) $(MAKE) build-single
 
 build-single: generate-dockerfiles
@@ -201,175 +198,70 @@ qemu:
 ##@ PACKAGE
 ################################################################################
 
-packages: ## creating the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-	make package-almalinux
-	make package-alpine
-	make package-amazonlinux
-	make package-debian
-	make package-fedora
-	make package-ubuntu
+packages: $(package_targets_amd64) $(package_targets_arm64) ## creating the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
 
-package-x86_64-alpine: ARCH=amd64
-package-x86_64-alpine: package-alpine
+$(package_targets_amd64): ## creating the system package in amd64 arch
+	ARCH=amd64 DISTRO=$(subst package-amd64-,,$(@)) $(MAKE) .package-base
 
-package-aarch64-alpine: ARCH=arm64v8
-package-aarch64-alpine: package-alpine
-
-package-alpine: PACKAGE_TYPE=apk
-package-alpine: DISTRO=alpine
-package-alpine: .package-base ## creating the system package .apk (Alpine)
-
-package-x86_64-ubuntu: ARCH=amd64
-package-x86_64-ubuntu: package-ubuntu
-
-package-aarch64-ubuntu: ARCH=arm64v8
-package-aarch64-ubuntu: package-ubuntu
-
-package-ubuntu: PACKAGE_TYPE=deb
-package-ubuntu: DISTRO=ubuntu
-package-ubuntu: .package-base ## creating the system package .deb (Debian-like) on Ubuntu
-
-package-x86_64-debian: ARCH=amd64
-package-x86_64-debian: package-debian
-
-package-aarch64-debian: ARCH=arm64v8
-package-aarch64-debian: package-debian
-
-package-debian: PACKAGE_TYPE=deb
-package-debian: DISTRO=debian
-package-debian: .package-base ## creating the system package .deb (Debian-like) on Debian
-
-package-x86_64-fedora: ARCH=amd64
-package-x86_64-fedora: package-fedora
-
-package-aarch64-fedora: ARCH=arm64v8
-package-aarch64-fedora: package-fedora
-
-package-fedora: PACKAGE_TYPE=rpm
-package-fedora: DISTRO=fedora
-package-fedora: OS_VER=$(SUPPORTED_FEDORA_VER)
-package-fedora: .package-base ## creating the system package .rpm (RHEL-like) on Fedora
-
-package-x86_64-amazonlinux: ARCH=amd64
-package-x86_64-amazonlinux: package-amazonlinux
-
-package-aarch64-amazonlinux: ARCH=arm64v8
-package-aarch64-amazonlinux: package-amazonlinux
-
-package-amazonlinux: PACKAGE_TYPE=rpm
-package-amazonlinux: DISTRO=amazonlinux
-package-amazonlinux: .package-base ## creating the system package .rpm (RHEL-like) on Amazonlinux
-
-package-x86_64-almalinux: ARCH=amd64
-package-x86_64-almalinux: package-almalinux
-
-package-aarch64-almalinux: ARCH=arm64v8
-package-aarch64-almalinux: package-almalinux
-
-package-almalinux: PACKAGE_TYPE=rpm
-package-almalinux: DISTRO=almalinux
-package-almalinux: .package-base ## creating the system package .rpm (RHEL-like) on Almalinux
+$(package_targets_arm64): ## creating the system package in arm64/v8 arch
+	ARCH=arm64v8 DISTRO=$(subst package-arm64-,,$(@)) $(MAKE) .package-base
 
 .package-base:
+	if [ "$(DISTRO)" = "alpine" ]; then \
+		PACKAGE_TYPE=apk; \
+	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
+		PACKAGE_TYPE=rpm; \
+	elif [ "$(DISTRO)" = "debian" -o "$(DISTRO)" = "ubuntu" ]; then \
+		PACKAGE_TYPE=deb; \
+	fi; \
+	mkdir dist; \
 	docker build \
-		-f src/packages/Dockerfile.$(PACKAGE_TYPE) \
-		-t package-nginx-$(PACKAGE_TYPE) \
+		-f src/packages/Dockerfile.$$PACKAGE_TYPE \
+		-t package-nginx-$$PACKAGE_TYPE \
 		--build-arg ARCH="$(ARCH)" \
 		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
 		--build-arg DISTRO="$(DISTRO)" \
 		--build-arg OS_VERSION="$(OS_VER)" \
-		--build-arg FPM_OUTPUT_TYPE="$(PACKAGE_TYPE)" \
-		src/packages
-	docker rm -f extract-$(PACKAGE_TYPE) || true
-	docker run -d --name extract-$(PACKAGE_TYPE) package-nginx-$(PACKAGE_TYPE) && \
-	docker cp extract-$(PACKAGE_TYPE):$$(docker exec extract-$(PACKAGE_TYPE) sh -c "ls -1 /nginx-lua*.$(PACKAGE_TYPE)") dist/
-	docker rm -f extract-$(PACKAGE_TYPE)
+		--build-arg FPM_OUTPUT_TYPE="$$PACKAGE_TYPE" \
+		src/packages; \
+	docker rm -f extract-$$PACKAGE_TYPE || true; \
+	docker run -d --name extract-$$PACKAGE_TYPE package-nginx-$$PACKAGE_TYPE && \
+	docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE"; \
+	docker cp extract-$$PACKAGE_TYPE:$$(docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE") dist/; \
+	docker rm -f extract-$$PACKAGE_TYPE
 
-package-test: ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-	make package-test-almalinux
-	make package-test-alpine
-	make package-test-amazonlinux
-	make package-test-debian
-	make package-test-fedora
-	make package-test-ubuntu
+package-test: $(packagetest_targets_amd64) $(packagetest_targets_arm64) ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
 
-package-test-x86_64-alpine: ARCH=amd64
-package-test-x86_64-alpine: package-test-alpine
+$(packagetest_targets_amd64): ## testing the system package in amd64 arch
+	ARCH=amd64 DISTRO=$(subst package-test-amd64-,,$(@)) $(MAKE) .package-test-base
 
-package-test-aarch64-alpine: ARCH=arm64v8
-package-test-aarch64-alpine: package-test-alpine
-
-package-test-alpine: PACKAGE_TYPE=apk
-package-test-alpine: DISTRO=alpine
-package-test-alpine: INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
-package-test-alpine: .package-test-base .package-test-base ## testing installation of the system package .apk (Alpine)
-
-package-test-x86_64-ubuntu: ARCH=amd64
-package-test-x86_64-ubuntu: package-test-ubuntu
-
-package-test-aarch64-ubuntu: ARCH=arm64v8
-package-test-aarch64-ubuntu: package-test-ubuntu
-
-package-test-ubuntu: PACKAGE_TYPE=deb
-package-test-ubuntu: DISTRO=ubuntu
-package-test-ubuntu: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
-package-test-ubuntu: .package-test-base ## testing installation of the system package .deb (Debian-like) on Ubuntu
-
-package-test-x86_64-debian: ARCH=amd64
-package-test-x86_64-debian: package-test-debian
-
-package-test-aarch64-debian: ARCH=arm64v8
-package-test-aarch64-debian: package-test-debian
-
-package-test-debian: PACKAGE_TYPE=deb
-package-test-debian: DISTRO=debian
-package-test-debian: INSTALL_CMD="apt update && apt install -yf /app/*.deb"
-package-test-debian: .package-test-base ## testing installation of the system package .deb (Debian-like) on Debian
-
-package-test-x86_64-fedora: ARCH=amd64
-package-test-x86_64-fedora: package-test-fedora
-
-package-test-aarch64-fedora: ARCH=arm64v8
-package-test-aarch64-fedora: package-test-fedora
-
-package-test-fedora: PACKAGE_TYPE=rpm
-package-test-fedora: DISTRO=fedora
-package-test-fedora: INSTALL_CMD="yum localinstall -y /app/*.rpm"
-package-test-fedora: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Fedora
-
-package-test-x86_64-amazonlinux: ARCH=amd64
-package-test-x86_64-amazonlinux: package-test-amazon
-
-package-test-aarch64-amazonlinux: ARCH=arm64v8
-package-test-aarch64-amazonlinux: package-test-amazon
-
-package-test-amazon: PACKAGE_TYPE=rpm
-package-test-amazon: DISTRO=amazonlinux
-package-test-amazon: INSTALL_CMD="yum localinstall -y /app/*.rpm"
-package-test-amazon: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Amazonlinux
-
-package-test-x86_64-almalinux: ARCH=amd64
-package-test-x86_64-almalinux: package-test-almalinux
-
-package-test-aarch64-almalinux: ARCH=arm64v8
-package-test-aarch64-almalinux: package-test-almalinux
-
-package-test-almalinux: PACKAGE_TYPE=rpm
-package-test-almalinux: DISTRO=almalinux
-package-test-almalinux: INSTALL_CMD="yum localinstall -y /app/*.rpm"
-package-test-almalinux: .package-test-base ## testing installation of the system package .rpm (RHEL-like) on Almalinux
+$(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
+	ARCH=arm64 DISTRO=$(subst package-test-arm64-,,$(@)) $(MAKE) .package-test-base
 
 .package-test-base:
-	docker rm -f test-$(PACKAGE_TYPE) || true
-	docker run --name test-$(PACKAGE_TYPE) -v $$PWD/dist:/app -d $(DISTRO):latest sleep infinity
-	docker exec test-$(PACKAGE_TYPE) /bin/sh -c $(INSTALL_CMD)
-	docker exec test-$(PACKAGE_TYPE) /bin/sh -c "envsubst -V \
+	if [ "$(DISTRO)" = "alpine" ]; then \
+		PACKAGE_TYPE=apk; \
+		INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"; \
+	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
+		PACKAGE_TYPE=rpm; \
+		INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"; \
+		if [ "$(ARCH)" = "arm64" ]; then \
+			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"; \
+		fi; \
+	elif [ "$(DISTRO)" = "debian" -o "$(DISTRO)" = "ubuntu" ]; then \
+		PACKAGE_TYPE=deb; \
+		INSTALL_CMD="apt update && apt install -yf /app/*_$(ARCH).deb"; \
+	fi; \
+	docker rm -f test-$$PACKAGE_TYPE || true; \
+	docker run --name test-$$PACKAGE_TYPE -v $$PWD/dist:/app -d $(DISTRO):latest sleep infinity; \
+	docker exec test-$$PACKAGE_TYPE /bin/sh -c $$INSTALL_CMD; \
+	docker exec test-$$PACKAGE_TYPE /bin/sh -c "envsubst -V \
 		&& nginx -V \
 		&& nginx -t \
 		&& luajit -v \
 		&& lua -v \
-		&& luarocks --version"
-	docker rm -f test-$(PACKAGE_TYPE)
+		&& luarocks --version"; \
+	docker rm -f test-$$PACKAGE_TYPE
 	# TODO: bin/test.sh
 
 ################################################################################

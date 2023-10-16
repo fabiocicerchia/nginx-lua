@@ -52,7 +52,6 @@ RUN source /etc/os-release \
       etc/nginx \
       usr/local/bin/lua \
       usr/local/bin/luajit \
-      usr/local/bin/luajit \
       usr/local/bin/luarocks \
       usr/local/etc/luarocks \
       usr/local/include/luajit-2.1 \

@@ -15,7 +15,7 @@ RUN yum install -y ruby-devel binutils rpm-build
 ARG FPM_VERSION=1.15.1
 RUN gem install fpm --no-document -v $FPM_VERSION
 
-ARG FPM_OUTPUT_TYPE=deb
+ARG FPM_OUTPUT_TYPE=rpm
 
 COPY *.sh /
 
@@ -52,7 +52,6 @@ RUN source /etc/os-release \
       after-install.sh \
       etc/nginx \
       usr/local/bin/lua \
-      usr/local/bin/luajit \
       usr/local/bin/luajit \
       usr/local/bin/luarocks \
       usr/local/etc/luarocks \

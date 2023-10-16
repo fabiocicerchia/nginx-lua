@@ -168,7 +168,7 @@ def push_images(nginx_ver, os_distro, os_ver):
         # if exit_code > 0:
         #     return exit_code
 
-    tags = get_tags(nginx_ver, os_distro, os_ver, "arm64v8")
+    tags = get_tags(nginx_ver, os_distro, os_ver, "arm64")
     for tag in tags:
         exit_code = docker_push(tag)
         # if exit_code > 0:
@@ -188,7 +188,7 @@ def push(nginx_ver, os_distro, os_ver):
 
 def docker_bundle(tag):
     tag_amd64 = "%s-amd64" % (tag)
-    tag_arm64 = "%s-arm64v8" % (tag)
+    tag_arm64 = "%s-arm64" % (tag)
 
     exit_code = run_command(
         """
