@@ -124,16 +124,6 @@ jobs:
           environment:
             FORCE: "YES"
 
-      - run:
-          name: Build packages
-          command: |
-            make -j $(nproc) package-$(uname -i)-<< parameters.distro >>
-            ls -lah dist/nginx-lua*.*
-
-      - run:
-          name: Test packages
-          command: make -j $(nproc) package-test-$(uname -i)-<< parameters.distro >>
-
       - when:
           condition:
             and:
@@ -162,6 +152,31 @@ jobs:
           root: .
           paths:
             - docs/metadata
+
+  package_build:
+    parameters:
+      class:
+        type: string
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: << parameters.class >>
+    steps:
+      - checkout
+
+      - run:
+          name: Build packages
+          command: |
+            make -j $(nproc) package-$(uname -i)-<< parameters.distro >>
+            ls -lah dist/nginx-lua*.*
+
+      - run:
+          name: Test packages
+          command: make -j $(nproc) package-test-$(uname -i)-<< parameters.distro >>
 
   docker_bundle:
     parameters:
