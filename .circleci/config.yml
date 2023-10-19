@@ -20,69 +20,69 @@ workflows:
               only:
                 - main
     jobs:
-      - auto_update
+      - Auto Update
 
   builds:
     jobs:
-      - docker_build_amd:
-          name: docker_build-<< matrix.distro >>-amd
+      - Docker AMD:
+          name: Docker AMD << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
-      - docker_build_arm:
-          name: docker_build-<< matrix.distro >>-arm
+      - Docker ARM:
+          name: Docker ARM << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
-      - package_build_amd:
+      - Package AMD:
           requires:
-            - docker_build-<< matrix.distro >>-amd
+            - Docker AMD << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
-      - package_build_arm:
+      - Package ARM:
           requires:
-            - docker_build-<< matrix.distro >>-arm
+            - Docker ARM << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
-      - docker_bundle:
+      - Docker Bundle:
           requires:
-            - docker_build-<< matrix.distro >>-amd
-            - docker_build-<< matrix.distro >>-arm
+            - Docker AMD << matrix.distro >>
+            - Docker ARM << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             branches:
               only: main
-      - metadata:
+      - Metadata:
           requires:
-            - docker_bundle
+            - Docker Bundle
           filters:
             branches:
               only: main
-      - auto_update:
+      - Auto Update:
           requires:
-            - metadata
+            - Metadata
           filters:
             branches:
               only: main
 
 commands:
-  docker_build:
+  docker:
     parameters:
       distro:
         type: string
@@ -171,7 +171,7 @@ commands:
           paths:
             - docs/metadata
 
-  package_build:
+  package:
     parameters:
       distro:
         type: string
@@ -189,7 +189,7 @@ commands:
           command: make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
 
 jobs:
-  docker_build_amd:
+  Docker AMD:
     parameters:
       distro:
         type: string
@@ -200,10 +200,10 @@ jobs:
       docker_layer_caching: true
     resource_class: large
     steps:
-      - docker_build:
+      - docker:
           distro: << parameters.distro >>
 
-  docker_build_arm:
+  Docker ARM:
     parameters:
       distro:
         type: string
@@ -214,10 +214,10 @@ jobs:
       docker_layer_caching: true
     resource_class: arm.medium
     steps:
-      - docker_build:
+      - docker:
           distro: << parameters.distro >>
 
-  package_build_amd:
+  Package AMD:
     parameters:
       distro:
         type: string
@@ -228,10 +228,10 @@ jobs:
       docker_layer_caching: true
     resource_class: large
     steps:
-      - package_build:
+      - package:
           distro: << parameters.distro >>
 
-  package_build_arm:
+  Package ARM:
     parameters:
       distro:
         type: string
@@ -242,10 +242,10 @@ jobs:
       docker_layer_caching: true
     resource_class: arm.medium
     steps:
-      - package_build:
+      - package:
           distro: << parameters.distro >>
 
-  docker_bundle:
+  Docker Bundle:
     parameters:
       distro:
         type: string
@@ -275,7 +275,7 @@ jobs:
           environment:
             FORCE: "YES"
 
-  metadata:
+  Metadata:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
@@ -288,7 +288,7 @@ jobs:
       #  run: make auto-commit-metadata
       #  if: github.ref == 'refs/heads/main'
 
-  auto_update:
+  Auto Update:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
