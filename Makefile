@@ -141,8 +141,8 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst test-,,$(@)); \
 	echo "TESTING $$DISTRO"; \
-	$(TEST_CMD) "$$DISTRO" "amd64"
-	$(TEST_CMD) "$$DISTRO" "arm64"
+	$(TEST_CMD) "$$DISTRO" "amd64" "" "docker"
+	$(TEST_CMD) "$$DISTRO" "arm64" "" "docker"
 endif
 
 test-security: $(security_targets) ## test security all docker images
@@ -262,7 +262,7 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 		&& lua -v \
 		&& luarocks --version"; \
 	docker rm -f test-$$PACKAGE_TYPE
-	# TODO: bin/test.sh
+	$(TEST_CMD) "$(DISTRO)" "$(ARCH)" "" "package"
 
 ################################################################################
 ##@ UTILITIES
