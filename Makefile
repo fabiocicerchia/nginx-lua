@@ -36,6 +36,8 @@ amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64-, $(DISTROS))
 build_targets_amd64=$(addprefix build-, $(amd64_distros))
 build_targets_arm64=$(addprefix build-, $(arm64_distros))
+dockertest_targets_amd64=$(addprefix docker-test-, $(amd64_distros))
+dockertest_targets_arm64=$(addprefix docker-test-, $(arm64_distros))
 build_targets=${build_targets_amd64} ${build_targets_arm64}
 package_targets_amd64=$(addprefix package-, $(amd64_distros))
 package_targets_arm64=$(addprefix package-, $(arm64_distros))
@@ -43,7 +45,7 @@ package_targets=${package_targets_amd64} ${package_targets_arm64}
 packagetest_targets_amd64=$(addprefix package-test-, $(amd64_distros))
 packagetest_targets_arm64=$(addprefix package-test-, $(arm64_distros))
 
-test_targets=$(addprefix test-, $(DISTROS))
+test_targets=${dockertest_targets_amd64} ${dockertest_targets_arm64}
 push_targets=$(addprefix push-, $(DISTROS))
 bundle_targets=$(addprefix bundle-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
@@ -139,10 +141,10 @@ $(test_targets): ## test one docker image
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
+	ARCH=$(shell echo $$TASK | cut -d"-" -f2); \
 	DISTRO=$(subst test-,,$(@)); \
 	echo "TESTING $$DISTRO"; \
-	$(TEST_CMD) "$$DISTRO" "amd64" "" "docker"; \
-	$(TEST_CMD) "$$DISTRO" "arm64" "" "docker"
+	$(TEST_CMD) "$$DISTRO" "$$ARCH" "" "docker"
 endif
 
 test-security: $(security_targets) ## test security all docker images

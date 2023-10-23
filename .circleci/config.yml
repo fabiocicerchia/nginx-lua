@@ -137,8 +137,8 @@ commands:
             FORCE: "YES"
 
       - run:
-          name: Test images
-          command: make -j $(nproc) test-<< parameters.distro >>
+          name: Test image
+          command: make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
