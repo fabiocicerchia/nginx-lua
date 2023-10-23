@@ -1,6 +1,8 @@
 #!/bin/bash
 # shellcheck disable=SC1091,SC2207
 
+set -e
+
 function handle_error() {
     docker logs nginx_lua_test
     exit 1
@@ -146,9 +148,9 @@ TYPE=${4:-docker}
 for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort -Vr | head -n $MAX); do
     TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
-    if [ "$TYPE" = "docker"]; then
+    if [ "$TYPE" = "docker" ]; then
         test_docker_image "$TAG-$ARCH"
-    elif [ "$TYPE" = "package"]; then
+    elif [ "$TYPE" = "package" ]; then
         test_system_package "$TAG-$ARCH"
     fi
 done

@@ -141,7 +141,7 @@ ifeq ($(SKIP), YES)
 else
 	DISTRO=$(subst test-,,$(@)); \
 	echo "TESTING $$DISTRO"; \
-	$(TEST_CMD) "$$DISTRO" "amd64" "" "docker"
+	$(TEST_CMD) "$$DISTRO" "amd64" "" "docker"; \
 	$(TEST_CMD) "$$DISTRO" "arm64" "" "docker"
 endif
 
