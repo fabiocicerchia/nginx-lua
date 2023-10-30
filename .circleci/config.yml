@@ -186,7 +186,9 @@ commands:
 
       - run:
           name: Test packages
-          command: make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
+          command: |
+            ls -lah dist/nginx-lua*.*
+            make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
 
 jobs:
   Docker AMD:

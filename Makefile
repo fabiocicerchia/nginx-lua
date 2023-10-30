@@ -256,7 +256,8 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 	fi; \
 	docker rm -f test-$$PACKAGE_TYPE || true; \
 	docker run --name test-$$PACKAGE_TYPE -v $$PWD/dist:/app -d $(DISTRO):latest sleep infinity; \
-	docker exec test-$$PACKAGE_TYPE /bin/sh -c $$INSTALL_CMD; \
+	docker exec test-$$PACKAGE_TYPE /bin/sh -c "ls -lah /app"; \
+	docker exec test-$$PACKAGE_TYPE /bin/sh -c "$$INSTALL_CMD"; \
 	docker exec test-$$PACKAGE_TYPE /bin/sh -c "envsubst -V \
 		&& nginx -V \
 		&& nginx -t \
