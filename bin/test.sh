@@ -26,27 +26,47 @@ function run_container() {
 
 function run_container_base() {
     DOCKER_TAG=$1
-
-    docker rm -f nginx_lua_test 2>/dev/null || true
+    ARCH=$(dpkg --print-architecture)
 
     if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
         IMAGE=alpine
+		INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"
     elif [[ "$DOCKER_TAG" == *"ubuntu"* ]]; then
         IMAGE=ubuntu
+		INSTALL_CMD="apt update && apt install -o Dpkg::Options::="--force-confold" --force-yes -yf /app/*_$ARCH.deb"
     elif [[ "$DOCKER_TAG" == *"debian"* ]]; then
         IMAGE=debian
+		INSTALL_CMD="apt update && apt install -o Dpkg::Options::="--force-confold" --force-yes -yf /app/*_$ARCH.deb"
     elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
         IMAGE=almalinux
+		INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"
+		if [ "$ARCH" = "arm64" ]; then
+			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
+		fi
     elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
         IMAGE=fedora
+		INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"
+		if [ "$ARCH" = "arm64" ]; then
+			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
+		fi
     elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
         IMAGE=amazonlinux
+		INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"
+		if [ "$ARCH" = "arm64" ]; then
+			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
+		fi
     fi
+
+    docker rm -f nginx_lua_test 2>/dev/null || true
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
-        $IMAGE:latest
+        -v $PWD/dist:/app \
+        $IMAGE:latest sleep infinity
+
+    docker exec nginx_lua_test /bin/sh -c "$INSTALL_CMD"
+    docker exec nginx_lua_test /bin/sh -c "/usr/sbin/nginx"
 }
 
 function inject_dependencies() {
@@ -56,7 +76,7 @@ function inject_dependencies() {
         docker exec nginx_lua_test apk add gcc musl-dev coreutils || handle_error
     elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
         docker exec nginx_lua_test apt update || handle_error
-        docker exec nginx_lua_test apt install -y gcc musl-dev coreutils || handle_error
+        docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip || handle_error
     elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
         docker exec nginx_lua_test yum install -y gcc || handle_error
     elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
@@ -76,7 +96,7 @@ function wait_for_nginx() {
         echo $?
     )" == "0" ]; do
         echo -n '.'
-        sleep 0.5
+        sleep 1
         COUNT=$((COUNT + 1))
     done
 }
@@ -133,6 +153,7 @@ function test_system_package() {
     DOCKER_TAG=$1
 
     run_container_base $DOCKER_TAG
+    inject_dependencies $DOCKER_TAG
     wait_for_nginx
     exec_tests
     tear_down_container
