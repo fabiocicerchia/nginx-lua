@@ -131,6 +131,7 @@ commands:
 
       - run:
           name: Build docker image
+          no_output_timeout: 30m
           command: |
             make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
@@ -177,6 +178,10 @@ commands:
         type: string
     steps:
       - checkout
+
+      - restore_cache:
+          keys:
+            - mmdb-geoip2
 
       - run:
           name: Build packages
