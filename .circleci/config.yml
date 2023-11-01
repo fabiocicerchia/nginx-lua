@@ -131,7 +131,7 @@ commands:
 
       - run:
           name: Build docker image
-          no_output_timeout: 30m
+          no_output_timeout: 60m
           command: |
             make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
