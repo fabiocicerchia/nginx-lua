@@ -219,7 +219,7 @@ jobs:
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
-    resource_class: arm.medium
+    resource_class: arm.large
     steps:
       - docker:
           distro: << parameters.distro >>
