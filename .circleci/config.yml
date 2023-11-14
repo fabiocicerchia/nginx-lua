@@ -27,7 +27,7 @@ workflows:
       - docker_build:
           matrix:
             parameters:
-              class: ["large", "arm.medium"]
+              class: ["large", "arm.large"]
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
