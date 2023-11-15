@@ -158,7 +158,7 @@ you could build changing the Makefile settings `EXTENDED_IMAGE` to `NO`.
 
 Run the following command:
 
-```
+```console
 $ make qemu
 ```
 

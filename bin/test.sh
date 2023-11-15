@@ -62,8 +62,8 @@ function run_container_base() {
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf.new \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
-        -v $PWD/dist:/app \
-        $IMAGE:latest sleep infinity
+        -v "$PWD"/dist:/app \
+        "$IMAGE:latest" sleep infinity
 
     docker exec nginx_lua_test /bin/sh -c "$INSTALL_CMD"
     docker exec nginx_lua_test /bin/sh -c "cp /etc/nginx/nginx.conf.new /etc/nginx/nginx.conf"
@@ -144,8 +144,8 @@ function exec_tests() {
 function test_docker_image() {
     DOCKER_TAG=$1
 
-    run_container $DOCKER_TAG
-    inject_dependencies $DOCKER_TAG
+    run_container "$DOCKER_TAG"
+    inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
     tear_down_container
@@ -154,8 +154,8 @@ function test_docker_image() {
 function test_system_package() {
     DOCKER_TAG=$1
 
-    run_container_base $DOCKER_TAG
-    inject_dependencies $DOCKER_TAG
+    run_container "$DOCKER_TAG"
+    inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
     tear_down_container
