@@ -238,7 +238,7 @@ $(packagetest_targets_amd64): ## testing the system package in amd64 arch
 	ARCH=amd64 DISTRO=$(subst package-test-amd64-,,$(@)) $(MAKE) .package-test-base
 
 $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
-	ARCH=arm64 DISTRO=$(subst package-test-arm64-,,$(@)) $(MAKE) .package-test-base
+	ARCH=arm64v8 DISTRO=$(subst package-test-arm64-,,$(@)) $(MAKE) .package-test-base
 
 .package-test-base:
 	if [ "$(DISTRO)" = "alpine" ]; then \

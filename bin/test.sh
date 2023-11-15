@@ -15,7 +15,7 @@ function run_container() {
 
     FOUND=$(docker image ls -q fabiocicerchia/nginx-lua:"$DOCKER_TAG" | wc -l)
     if [ "$FOUND" -eq "0" ]; then
-        return;
+        return 0;
     fi
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
@@ -144,7 +144,10 @@ function exec_tests() {
 function test_docker_image() {
     DOCKER_TAG=$1
 
-    run_container "$DOCKER_TAG"
+    RET=$(run_container "$DOCKER_TAG")
+    if [ "$RET" = "0" ]; then
+        return;
+    fi
     inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
@@ -154,7 +157,10 @@ function test_docker_image() {
 function test_system_package() {
     DOCKER_TAG=$1
 
-    run_container "$DOCKER_TAG"
+    RET=$(run_container "$DOCKER_TAG")
+    if [ "$RET" = "0" ]; then
+        return;
+    fi
     inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
@@ -165,10 +171,12 @@ set -eux
 
 OS=$1
 ARCH=$2
-MAX=${3:-10}
+MAX=${3:-1}
 TYPE=${4:-docker}
 
-for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile*" -type f | sort -Vr | head -n $MAX); do
+docker images
+
+for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n $MAX); do
     TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
     if [ "$TYPE" = "docker" ]; then
