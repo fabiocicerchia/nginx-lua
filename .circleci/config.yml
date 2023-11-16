@@ -143,23 +143,29 @@ commands:
           environment:
             FORCE: "YES"
 
-      - when:
-          condition:
-            and:
-              - equal: [ main, << pipeline.git.branch >> ]
-          steps:
-            - run:
-                name: Log into registry
-                command: |
-                  docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
-                environment:
-                  DEBIAN_FRONTEND: noninteractive
+      # passing docker images to another job
+      - run:
+          name: Save image as tar
+          command: |
+            set -x
+            mkdir -p images || true
+            ARCH=$(dpkg --print-architecture)
+            TAG=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $2 }' | sort | head -n1)
+            echo "${TAG}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+            docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
 
       - when:
           condition:
             and:
               - equal: [ main, << pipeline.git.branch >> ]
           steps:
+
+            - run:
+                name: Log into registry
+                command: |
+                  docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
+                environment:
+                  DEBIAN_FRONTEND: noninteractive
             - run:
                 name: Push images
                 command: |
@@ -171,6 +177,7 @@ commands:
           root: .
           paths:
             - docs/metadata
+            - images
 
   package:
     parameters:
@@ -179,9 +186,21 @@ commands:
     steps:
       - checkout
 
+      - attach_workspace:
+          at: .
+
       - restore_cache:
           keys:
             - mmdb-geoip2
+
+      - run:
+          name: Load image
+          command: |
+            ARCH=$(dpkg --print-architecture)
+            SAVED_TAG=$(cat images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
+            docker image load < "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker images
 
       - run:
           name: Build packages

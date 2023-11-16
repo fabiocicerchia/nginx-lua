@@ -216,12 +216,16 @@ $(package_targets_arm64): ## creating the system package in arm64/v8 arch
 	elif [ "$(DISTRO)" = "debian" -o "$(DISTRO)" = "ubuntu" ]; then \
 		PACKAGE_TYPE=deb; \
 	fi; \
+	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER); \
+	if [ "$${SAVED_TAG}" != "" ]; then \
+		SUPPORTED_NGINX_VER=1; \
+	fi; \
 	mkdir dist; \
 	docker build \
 		-f src/packages/Dockerfile.$$PACKAGE_TYPE \
 		-t package-nginx-$$PACKAGE_TYPE \
 		--build-arg ARCH="$(ARCH)" \
-		--build-arg NGINX_VERSION="$(SUPPORTED_NGINX_VER)" \
+		--build-arg NGINX_VERSION="$${SUPPORTED_NGINX_VER}" \
 		--build-arg DISTRO="$(DISTRO)" \
 		--build-arg OS_VERSION="$(OS_VER)" \
 		--build-arg FPM_OUTPUT_TYPE="$$PACKAGE_TYPE" \

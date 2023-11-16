@@ -180,8 +180,10 @@ for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | h
     TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
     if [ "$TYPE" = "docker" ]; then
+        echo "TESTING TAG: $TAG-$ARCH"
         test_docker_image "$TAG-$ARCH"
     elif [ "$TYPE" = "package" ]; then
-        test_system_package "$TAG-$ARCH"
+        echo "TESTING TAG: ${SAVED_TAG:-$TAG-$ARCH}"
+        test_system_package "${SAVED_TAG:-$TAG-$ARCH}"
     fi
 done
