@@ -20,7 +20,7 @@ workflows:
               only:
                 - main
     jobs:
-      - Auto Update
+      - Release
 
   builds:
     jobs:
@@ -28,7 +28,15 @@ workflows:
           name: Docker AMD << matrix.distro >>
           matrix:
             parameters:
-              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
           filters:
             tags:
               ignore: /.*/
@@ -36,7 +44,15 @@ workflows:
           name: Docker ARM << matrix.distro >>
           matrix:
             parameters:
-              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
           filters:
             tags:
               ignore: /.*/
@@ -46,7 +62,15 @@ workflows:
             - Docker AMD << matrix.distro >>
           matrix:
             parameters:
-              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
           filters:
             tags:
               ignore: /.*/
@@ -56,17 +80,34 @@ workflows:
             - Docker ARM << matrix.distro >>
           matrix:
             parameters:
-              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
           filters:
             tags:
               ignore: /.*/
       - Docker Bundle:
+          name: Docker Bundle << matrix.distro >>
           requires:
             - Package AMD << matrix.distro >>
             - Package ARM << matrix.distro >>
           matrix:
             parameters:
-              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
           filters:
             branches:
               only: main
@@ -76,7 +117,7 @@ workflows:
           filters:
             branches:
               only: main
-      - Auto Update:
+      - Release:
           requires:
             - Metadata
           filters:
@@ -152,16 +193,17 @@ commands:
             set -x
             mkdir -p images || true
             ARCH=$(dpkg --print-architecture)
+            IMAGE_ID=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $3 }' | sort | head -n1)
             TAG=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $2 }' | sort | head -n1)
-            echo "${TAG}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+            TAGS=$(docker images | grep ${IMAGE_ID} | awk '{ print $2 }' | sort)
+            echo "${TAGS}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
 
       - when:
           condition:
             and:
-              - equal: [ main, << pipeline.git.branch >> ]
+              - equal: [main, << pipeline.git.branch >>]
           steps:
-
             - run:
                 name: Log into registry
                 command: |
@@ -178,7 +220,6 @@ commands:
       - persist_to_workspace:
           root: .
           paths:
-            - docs/metadata
             - images
 
   package:
@@ -189,7 +230,7 @@ commands:
       - checkout
 
       - attach_workspace:
-          at: .
+          at: /tmp/previous-jobs
 
       - restore_cache:
           keys:
@@ -199,9 +240,13 @@ commands:
           name: Load image
           command: |
             ARCH=$(dpkg --print-architecture)
-            SAVED_TAG=$(cat images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            SAVED_TAG=$(head -n1 /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
             echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
-            docker image load < "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
+              docker image tag fabiocicerchia/nginx-lua:$SAVED_TAG fabiocicerchia/nginx-lua:$TAG;
+            done
+
             docker images
 
       - run:
@@ -290,9 +335,33 @@ jobs:
     steps:
       - checkout
 
+      - attach_workspace:
+          at: /tmp/previous-jobs
+
+      - run:
+          name: Load image
+          command: |
+            ARCH=amd64
+            SAVED_TAG=$(head -n1 /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
+            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
+              docker image tag fabiocicerchia/nginx-lua:$SAVED_TAG fabiocicerchia/nginx-lua:$TAG;
+            done
+
+            ARCH=arm64
+            SAVED_TAG=$(head -n1 /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
+            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
+              docker image tag fabiocicerchia/nginx-lua:$SAVED_TAG fabiocicerchia/nginx-lua:$TAG;
+            done
+
+            docker images
+
       - run:
           name: Install Python Dependencies
-          command: pip3 install -r bin/requirements.txt
+          command: pip3 install -vvv -r bin/requirements.txt
 
       - run:
           name: Log into registry
@@ -304,7 +373,7 @@ jobs:
       - run:
           name: Bundle manifest
           command: |
-              make -j $(nproc) bundle-<< parameters.distro >>
+            make -j $(nproc) bundle-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
@@ -317,11 +386,11 @@ jobs:
     steps:
       - checkout
 
-      #- name: Push metadata
-      #  run: make auto-commit-metadata
-      #  if: github.ref == 'refs/heads/main'
+      - run:
+          name: Push metadata
+          command: make auto-commit-metadata
 
-  Auto Update:
+  Release:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
@@ -331,7 +400,7 @@ jobs:
       - checkout
 
       - attach_workspace:
-          at: .
+          at: /tmp/previous-jobs
 
       - run:
           name: Install Python Dependencies
@@ -346,7 +415,9 @@ jobs:
       - run:
           name: Generate Supported Versions
           command: |
-              make auto-update-and-commit
+            git pull
+            find /tmp/previous-jobs && cp -r /tmp/previous-jobs/dist ./dist || true
+            make auto-update-and-commit
 
       - run:
           name: Create Release
