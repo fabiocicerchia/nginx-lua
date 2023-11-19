@@ -41,6 +41,7 @@ workflows:
             tags:
               ignore: /.*/
       - Package AMD:
+          name: Package AMD << matrix.distro >>
           requires:
             - Docker AMD << matrix.distro >>
           matrix:
@@ -50,6 +51,7 @@ workflows:
             tags:
               ignore: /.*/
       - Package ARM:
+          name: Package ARM << matrix.distro >>
           requires:
             - Docker ARM << matrix.distro >>
           matrix:
@@ -60,8 +62,8 @@ workflows:
               ignore: /.*/
       - Docker Bundle:
           requires:
-            - Docker AMD << matrix.distro >>
-            - Docker ARM << matrix.distro >>
+            - Package AMD << matrix.distro >>
+            - Package ARM << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
