@@ -214,6 +214,11 @@ commands:
             ls -lah dist/nginx-lua*.*
             make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
 jobs:
   Docker AMD:
     parameters:
@@ -322,6 +327,9 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
+
+      - attach_workspace:
+          at: .
 
       - run:
           name: Install Python Dependencies
