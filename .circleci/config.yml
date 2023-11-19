@@ -152,8 +152,10 @@ commands:
             set -x
             mkdir -p images || true
             ARCH=$(dpkg --print-architecture)
+            IMAGE_ID=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $3 }' | sort | head -n1)
             TAG=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $2 }' | sort | head -n1)
-            echo "${TAG}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+            TAGS=$(docker images | grep ${IMAGE_ID} | awk '{ print $2 }' | sort)
+            echo "${TAGS}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
 
       - when:
@@ -178,7 +180,7 @@ commands:
       - persist_to_workspace:
           root: .
           paths:
-            - docs/metadata
+            # - docs/metadata
             - images
 
   package:
@@ -189,7 +191,7 @@ commands:
       - checkout
 
       - attach_workspace:
-          at: .
+          at: /tmp/previous-jobs
 
       - restore_cache:
           keys:
@@ -199,9 +201,12 @@ commands:
           name: Load image
           command: |
             ARCH=$(dpkg --print-architecture)
-            SAVED_TAG=$(cat images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            SAVED_TAG=$(head -n1 /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
             echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
-            docker image load < "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
+              docker image tag fabiocicerchia/nginx-lua:$SAVED_TAG fabiocicerchia/nginx-lua:$TAG;
+            done
             docker images
 
       - run:
@@ -290,9 +295,19 @@ jobs:
     steps:
       - checkout
 
+      - attach_workspace:
+          at: /tmp/previous-jobs
+
+      - run:
+          name: Load image
+          command: |
+            docker image load < "/tmp/previous-jobs/images/arm64-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker image load < "/tmp/previous-jobs/images/amd64-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker images
+
       - run:
           name: Install Python Dependencies
-          command: pip3 install -r bin/requirements.txt
+          command: pip3 install -vvv -r bin/requirements.txt
 
       - run:
           name: Log into registry

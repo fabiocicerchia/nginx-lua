@@ -16,6 +16,7 @@ image_repo = "fabiocicerchia/nginx-lua"
 
 
 def run_command(command, print_stdout):
+    print("running command: %s" % (command))
     process = subprocess.Popen(
         shlex.split(command), shell=False, stdout=subprocess.PIPE
     )
