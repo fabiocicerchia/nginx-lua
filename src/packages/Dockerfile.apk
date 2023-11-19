@@ -25,6 +25,7 @@ RUN source /etc/os-release \
     && fpm \
       --name nginx-lua \
       --version $NGINX_VERSION \
+      --architecture $ARCH \
       --url https://github.com/fabiocicerchia/nginx-lua \
       --description "Nginx $NGINX_VERSION with LUA support." \
       --vendor "fabiocicerchia" \
