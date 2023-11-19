@@ -16,6 +16,7 @@ image_repo = "fabiocicerchia/nginx-lua"
 
 
 def run_command(command, print_stdout):
+    print("running command: %s" % (command))
     process = subprocess.Popen(
         shlex.split(command), shell=False, stdout=subprocess.PIPE
     )
@@ -188,7 +189,7 @@ def push(nginx_ver, os_distro, os_ver):
 
 def docker_bundle(tag):
     tag_amd64 = "%s-amd64" % (tag)
-    tag_arm64 = "%s-arm64" % (tag)
+    tag_arm64 = "%s-arm64v8" % (tag)
 
     exit_code = run_command(
         """
