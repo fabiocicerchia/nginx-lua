@@ -1,0 +1,65 @@
+ARG NGINX_VERSION
+ARG DISTRO
+ARG OS_VERSION
+ARG ARCH
+FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-$DISTRO$OS_VERSION-$ARCH AS base
+
+ARG DISTRO
+ENV DISTRO=$DISTRO
+
+WORKDIR /
+
+RUN yum install -y ruby-devel binutils rpm-build
+
+# https://rubygems.org/gems/fpm
+ARG FPM_VERSION=1.15.1
+RUN gem install fpm --no-document -v $FPM_VERSION
+
+ARG FPM_OUTPUT_TYPE=rpm
+
+COPY *.sh /
+
+# depends from nginx 1.25.2
+RUN source /etc/os-release \
+    && fpm \
+      --name nginx-lua \
+      --version $NGINX_VERSION \
+      --url https://github.com/fabiocicerchia/nginx-lua \
+      --description "Nginx $NGINX_VERSION with LUA support." \
+      --vendor "fabiocicerchia" \
+      --input-type dir \
+      --output-type $FPM_OUTPUT_TYPE \
+      --iteration 1~${UBUNTU_CODENAME:-$ID} \
+      --rpm-os linux \
+      --rpm-use-file-permissions \
+	    --rpm-user root --rpm-group root \
+      --after-install ./after-install.sh \
+      --conflicts luajit \
+      --conflicts nginx \
+      --conflicts openresty \
+      --provides luajit \
+      --provides nginx \
+      --provides openresty \
+      --replaces luajit \
+      --replaces nginx \
+      --replaces openresty \
+      --depends "gettext >= 0.21" \
+      --depends "libmaxminddb >= 1.5.2" \
+      --depends "pcre >= 8.44" \
+      --depends "shadow-utils >= 2:4.9" \
+      --chdir / \
+      # usr/local/share/luajit* \
+      after-install.sh \
+      etc/nginx \
+      usr/local/bin/lua \
+      usr/local/bin/luajit \
+      usr/local/bin/luarocks \
+      usr/local/etc/luarocks \
+      usr/local/include/luajit-2.1 \
+      usr/local/lib \
+      usr/local/share/lua \
+      usr/local/share/man/man1/luajit.1 \
+      usr/sbin/nginx \
+      usr/sbin/nginx-debug \
+      var/cache/nginx \
+      var/log/nginx

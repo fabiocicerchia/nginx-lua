@@ -5,7 +5,8 @@ version: 2.1
 # Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
-  node: circleci/docker@2.2.0
+  # https://circleci.com/developer/orbs/orb/circleci/docker
+  node: circleci/docker@2.4.0
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -19,53 +20,72 @@ workflows:
               only:
                 - main
     jobs:
-      - auto_update
+      - Auto Update
 
-  docker_builds: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  builds:
     jobs:
-      - docker_build:
+      - Docker AMD:
+          name: Docker AMD << matrix.distro >>
           matrix:
             parameters:
-              class: ["large", "arm.medium"]
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             tags:
               ignore: /.*/
-      - docker_bundle:
+      - Docker ARM:
+          name: Docker ARM << matrix.distro >>
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - Package AMD:
           requires:
-            - docker_build
+            - Docker AMD << matrix.distro >>
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - Package ARM:
+          requires:
+            - Docker ARM << matrix.distro >>
+          matrix:
+            parameters:
+              distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
+          filters:
+            tags:
+              ignore: /.*/
+      - Docker Bundle:
+          requires:
+            - Docker AMD << matrix.distro >>
+            - Docker ARM << matrix.distro >>
           matrix:
             parameters:
               distro: ["almalinux", "alpine", "amazonlinux", "debian", "fedora", "ubuntu"]
           filters:
             branches:
               only: main
-      - metadata:
+      - Metadata:
           requires:
-            - docker_bundle
+            - Docker Bundle
           filters:
             branches:
               only: main
-      - auto_update:
+      - Auto Update:
           requires:
-            - metadata
+            - Metadata
           filters:
             branches:
               only: main
 
-jobs:
-  docker_build:
+commands:
+  docker:
     parameters:
-      class:
-        type: string
       distro:
         type: string
-    machine:
-      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
-      docker_layer_caching: true
-    resource_class: << parameters.class >>
     steps:
       - checkout
 
@@ -110,35 +130,42 @@ jobs:
           command: rm -rf docs/metadata/* || true
 
       - run:
-          name: Build docker image (classic)
+          name: Build docker image
+          no_output_timeout: 60m
           command: |
-            make -j $(nproc) build-<< parameters.class >>-<< parameters.distro >>-classic
+            make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
             FORCE: "YES"
 
       - run:
-          name: Test images
-          command: make -j $(nproc) test-<< parameters.distro >>
+          name: Test image
+          command: make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
           environment:
             FORCE: "YES"
+
+      # passing docker images to another job
+      - run:
+          name: Save image as tar
+          command: |
+            set -x
+            mkdir -p images || true
+            ARCH=$(dpkg --print-architecture)
+            TAG=$(docker images | grep nginx-lua | grep ${ARCH} | grep << parameters.distro >> | awk '{ print $2 }' | sort | head -n1)
+            echo "${TAG}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+            docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
 
       - when:
           condition:
             and:
               - equal: [ main, << pipeline.git.branch >> ]
           steps:
+
             - run:
                 name: Log into registry
                 command: |
                   docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
                 environment:
                   DEBIAN_FRONTEND: noninteractive
-
-      - when:
-          condition:
-            and:
-              - equal: [ main, << pipeline.git.branch >> ]
-          steps:
             - run:
                 name: Push images
                 command: |
@@ -150,14 +177,113 @@ jobs:
           root: .
           paths:
             - docs/metadata
+            - images
 
-  docker_bundle:
+  package:
+    parameters:
+      distro:
+        type: string
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: .
+
+      - restore_cache:
+          keys:
+            - mmdb-geoip2
+
+      - run:
+          name: Load image
+          command: |
+            ARCH=$(dpkg --print-architecture)
+            SAVED_TAG=$(cat images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt)
+            echo "export SAVED_TAG=$SAVED_TAG" >> $BASH_ENV
+            docker image load < "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}"
+            docker images
+
+      - run:
+          name: Build packages
+          command: |
+            make -j $(nproc) package-$(dpkg --print-architecture)-<< parameters.distro >>
+            ls -lah dist/nginx-lua*.*
+
+      - run:
+          name: Test packages
+          command: |
+            ls -lah dist/nginx-lua*.*
+            make -j $(nproc) package-test-$(dpkg --print-architecture)-<< parameters.distro >>
+
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+jobs:
+  Docker AMD:
     parameters:
       distro:
         type: string
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: large
+    steps:
+      - docker:
+          distro: << parameters.distro >>
+
+  Docker ARM:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: arm.large
+    steps:
+      - docker:
+          distro: << parameters.distro >>
+
+  Package AMD:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: large
+    steps:
+      - package:
+          distro: << parameters.distro >>
+
+  Package ARM:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
+      docker_layer_caching: true
+    resource_class: arm.medium
+    steps:
+      - package:
+          distro: << parameters.distro >>
+
+  Docker Bundle:
+    parameters:
+      distro:
+        type: string
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -180,10 +306,11 @@ jobs:
           environment:
             FORCE: "YES"
 
-  metadata:
+  Metadata:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout
@@ -192,13 +319,17 @@ jobs:
       #  run: make auto-commit-metadata
       #  if: github.ref == 'refs/heads/main'
 
-  auto_update:
+  Auto Update:
     machine:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-      image: ubuntu-2204:2023.04.2
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2204:2023.07.2
       docker_layer_caching: true
     steps:
       - checkout
+
+      - attach_workspace:
+          at: .
 
       - run:
           name: Install Python Dependencies

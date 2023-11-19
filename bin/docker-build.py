@@ -7,12 +7,8 @@ if __name__ == "__main__":
     os_distro = sys.argv[1]
     arch = sys.argv[2]
 
-    # CircleCI workaround
-    if arch == "large":
-        arch = "amd64"
-    if arch == "arm.medium":
+    if arch == "arm64":
         arch = "arm64v8"
-    # / CircleCI workaround
 
     versions = common.get_all_versions()
     exit_code = common.build(
