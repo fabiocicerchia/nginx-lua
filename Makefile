@@ -217,7 +217,7 @@ $(package_targets_arm64): ## creating the system package in arm64/v8 arch
 		PACKAGE_TYPE=deb; \
 	fi; \
 	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER); \
-	if [ "$${SAVED_TAG}" != "" ]; then \
+	if [ "$${IMAGE_ID}" != "" ]; then \
 		SUPPORTED_NGINX_VER=1; \
 	fi; \
 	mkdir dist; \
