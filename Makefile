@@ -285,7 +285,7 @@ auto-update-and-commit: .setup_gitrepo auto-update
 	git add -A || true; \
 	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" != "0" ]; then \
-		git commit -m "Automated updates"; \
+		git commit -m "[ci skip] Automated updates"; \
 		git pull origin main || true; \
 		git push origin main; \
 	else \
@@ -296,7 +296,7 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add -A || true; \
 	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" != "0" ]; then \
-		git commit -m "Automated metadata"; \
+		git commit -m "[ci skip] Automated metadata"; \
 		git pull origin main || true; \
 		git push origin main; \
 	else \
