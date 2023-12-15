@@ -102,7 +102,7 @@ ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS=0.35
+ARG VER_OPENRESTY_HEADERS=0.36
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
@@ -112,7 +112,7 @@ ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 
 # lua-resty-dns
 # https://github.com/openresty/lua-resty-dns
-ARG VER_OPENRESTY_DNS=0.22
+ARG VER_OPENRESTY_DNS=0.23
 ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 
 # lua-resty-lrucache
@@ -153,12 +153,12 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket
-ARG VER_OPENRESTY_WEBSOCKET=0.10
+ARG VER_OPENRESTY_WEBSOCKET=0.11
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-tablepool
 # https://github.com/openresty/lua-tablepool
-ARG VER_OPENRESTY_TABLEPOOL=0.02
+ARG VER_OPENRESTY_TABLEPOOL=0.03
 ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-upstream-nginx-module
