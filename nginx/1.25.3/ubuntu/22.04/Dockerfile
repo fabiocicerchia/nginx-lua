@@ -181,6 +181,11 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 ARG VER_OPENRESTY_STREAMLUA=0.0.13
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
+# lua-resty-limit-traffic
+# https://github.com/openresty/lua-resty-limit-traffic/tags
+ARG VER_OPENRESTY_LIMITTRAFFIC=0.09
+ENV VER_OPENRESTY_LIMITTRAFFIC=$VER_OPENRESTY_LIMITTRAFFIC
+
 ################################################################################
 
 # Replicate same official env variable
@@ -266,6 +271,7 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
+            --add-module=/lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
@@ -356,6 +362,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
     versions.lua-resty-core="${VER_LUA_RESTY_CORE}" \
     versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \
+    versions.lua-resty-limit-traffic="${VER_OPENRESTY_LIMITTRAFFIC}" \
     versions.lua-resty-lrucache="${VER_LUA_RESTY_LRUCACHE}" \
     versions.lua-resty-memcached="${VER_OPENRESTY_MEMCACHED}" \
     versions.lua-resty-mysql="${VER_OPENRESTY_MYSQL}" \

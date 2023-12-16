@@ -246,6 +246,12 @@ dep-stream-lua-nginx-module:
 	curl -sLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/v${VER_OPENRESTY_STREAMLUA}.zip
 	unzip -d / /stream-lua-nginx-module.zip
 
+# OpenResty Limit Traffic
+# ##############################################################################
+dep-lua-resty-limit-traffic:
+	curl -sLo /lua-resty-limit-traffic.zip https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip
+	unzip -d / /lua-resty-limit-traffic.zip
+
 # ##############################################################################
 # LUAROCKS
 # ##############################################################################
