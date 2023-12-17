@@ -20,6 +20,7 @@ function run_container() {
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf \
+        -v "$PWD"/test/tests.conf.d:/etc/nginx/tests.conf.d \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
         fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 }
@@ -61,6 +62,7 @@ function run_container_base() {
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf.new \
+        -v "$PWD"/test/tests.conf.d:/etc/nginx/tests.conf.d \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
         -v "$PWD"/dist:/app \
         "$IMAGE:latest" sleep infinity
