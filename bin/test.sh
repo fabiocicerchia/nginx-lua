@@ -139,6 +139,7 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/rand || handle_error
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" || handle_error # OPENDNS IP
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | grep "Wright City" || handle_error
+    curl -v --fail http://localhost:8080/limit || handle_error
 }
 
 function test_docker_image() {
