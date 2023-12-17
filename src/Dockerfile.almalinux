@@ -275,7 +275,6 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
-            --add-module=/lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 

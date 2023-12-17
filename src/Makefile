@@ -256,6 +256,10 @@ dep-stream-lua-nginx-module:
 dep-lua-resty-limit-traffic:
 	curl -sLo /lua-resty-limit-traffic.zip https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip
 	unzip -d / /lua-resty-limit-traffic.zip
+	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+	&& $(MAKE) \
+	&& $(MAKE) install
+
 
 # ##############################################################################
 # LUAROCKS
