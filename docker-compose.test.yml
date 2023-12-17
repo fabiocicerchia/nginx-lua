@@ -6,6 +6,7 @@ services:
       - 8080:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   nginx:
     image: nginx:latest
     ports:
@@ -18,37 +19,50 @@ services:
       - 8082:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
 
+  almalinux:
+    image: fabiocicerchia/nginx-lua:1-almalinux
+    ports:
+      - 8090:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   alpine:
     image: fabiocicerchia/nginx-lua:1-alpine
     ports:
       - 8090:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
+  amazonlinux:
+    image: fabiocicerchia/nginx-lua:1-amazonlinux
+    ports:
+      - 8090:80
+    volumes:
+      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   ubuntu:
     image: fabiocicerchia/nginx-lua:1-ubuntu
     ports:
       - 8091:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   debian:
     image: fabiocicerchia/nginx-lua:1-debian
     ports:
       - 8092:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   fedora:
     image: fabiocicerchia/nginx-lua:1-fedora
     ports:
       - 8093:80
     volumes:
       - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
-  centos:
-    image: fabiocicerchia/nginx-lua:1-centos
-    ports:
-      - 8094:80
-    volumes:
-      - ./test/nginx-lua.conf:/etc/nginx/nginx.conf
+      - ./test/tests.conf.d:/etc/nginx/tests.conf.d
   sut:
     build: .
     command: echo pass
