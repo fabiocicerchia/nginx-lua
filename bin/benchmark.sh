@@ -63,8 +63,12 @@ echo "ARTILLERY - OPENRESTY"
 
 #####
 
+echo "ARTILLERY - ALMALINUX"
+./node_modules/.bin/artillery run test/artillery-almalinux.yml >artillery.almalinux.1.txt
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.1.txt
+echo "ARTILLERY - AMAZONLINUX"
+./node_modules/.bin/artillery run test/artillery-amazonlinux.yml >artillery.amazonlinux.1.txt
 echo "ARTILLERY - UBUNTU"
 ./node_modules/.bin/artillery run test/artillery-ubuntu.yml >artillery.ubuntu.1.txt
 echo "ARTILLERY - DEBIAN"
@@ -72,8 +76,12 @@ echo "ARTILLERY - DEBIAN"
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.1.txt
 
+echo "ARTILLERY - ALMALINUX"
+./node_modules/.bin/artillery run test/artillery-almalinux.yml >artillery.almalinux.2.txt
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.2.txt
+echo "ARTILLERY - AMAZONLINUX"
+./node_modules/.bin/artillery run test/artillery-amazonlinux.yml >artillery.amazonlinux.2.txt
 echo "ARTILLERY - UBUNTU"
 ./node_modules/.bin/artillery run test/artillery-ubuntu.yml >artillery.ubuntu.2.txt
 echo "ARTILLERY - DEBIAN"
@@ -81,8 +89,12 @@ echo "ARTILLERY - DEBIAN"
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.2.txt
 
+echo "ARTILLERY - ALMALINUX"
+./node_modules/.bin/artillery run test/artillery-almalinux.yml >artillery.almalinux.3.txt
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.3.txt
+echo "ARTILLERY - AMAZONLINUX"
+./node_modules/.bin/artillery run test/artillery-amazonlinux.yml >artillery.amazonlinux.3.txt
 echo "ARTILLERY - UBUNTU"
 ./node_modules/.bin/artillery run test/artillery-ubuntu.yml >artillery.ubuntu.3.txt
 echo "ARTILLERY - DEBIAN"
@@ -90,8 +102,12 @@ echo "ARTILLERY - DEBIAN"
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.3.txt
 
+echo "ARTILLERY - ALMALINUX"
+./node_modules/.bin/artillery run test/artillery-almalinux.yml >artillery.almalinux.4.txt
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.4.txt
+echo "ARTILLERY - AMAZONLINUX"
+./node_modules/.bin/artillery run test/artillery-amazonlinux.yml >artillery.amazonlinux.4.txt
 echo "ARTILLERY - UBUNTU"
 ./node_modules/.bin/artillery run test/artillery-ubuntu.yml >artillery.ubuntu.4.txt
 echo "ARTILLERY - DEBIAN"
@@ -99,8 +115,12 @@ echo "ARTILLERY - DEBIAN"
 echo "ARTILLERY - FEDORA"
 ./node_modules/.bin/artillery run test/artillery-fedora.yml >artillery.fedora.4.txt
 
+echo "ARTILLERY - ALMALINUX"
+./node_modules/.bin/artillery run test/artillery-almalinux.yml >artillery.almalinux.5.txt
 echo "ARTILLERY - ALPINE"
 ./node_modules/.bin/artillery run test/artillery-alpine.yml >artillery.alpine.5.txt
+echo "ARTILLERY - AMAZONLINUX"
+./node_modules/.bin/artillery run test/artillery-amazonlinux.yml >artillery.amazonlinux.5.txt
 echo "ARTILLERY - UBUNTU"
 ./node_modules/.bin/artillery run test/artillery-ubuntu.yml >artillery.ubuntu.5.txt
 echo "ARTILLERY - DEBIAN"
@@ -118,8 +138,14 @@ echo OpenResty
 TESTS=$(grep -r virtual docs/benchmark/reports/different_images/*openresty* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')
 echo "scale=2; (${TESTS%?})/3" | bc
 
+echo Almalinux
+TESTS=$(grep -r virtual docs/benchmark/reports/distros/*almalinux* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')
+echo "scale=2; (${TESTS%?})/3" | bc
 echo Alpine
 TESTS=$(grep -r virtual docs/benchmark/reports/distros/*alpine* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')
+echo "scale=2; (${TESTS%?})/3" | bc
+echo Amazonlinux
+TESTS=$(grep -r virtual docs/benchmark/reports/distros/*amazonlinux* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')
 echo "scale=2; (${TESTS%?})/3" | bc
 echo Ubuntu
 TESTS=$(grep -r virtual docs/benchmark/reports/distros/*ubuntu* -A10 | grep 'median' | sed 's/.*: //' | sort -n | tail -n4 | head -n3 | tr '\n' '+')

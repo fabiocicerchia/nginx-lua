@@ -20,6 +20,7 @@ function run_container() {
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf \
+        -v "$PWD"/test/tests.conf.d:/etc/nginx/tests.conf.d \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
         fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 }
@@ -61,6 +62,7 @@ function run_container_base() {
 
     docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
         -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf.new \
+        -v "$PWD"/test/tests.conf.d:/etc/nginx/tests.conf.d \
         -v "$PWD"/test/geoip:/etc/nginx/geoip \
         -v "$PWD"/dist:/app \
         "$IMAGE:latest" sleep infinity
@@ -139,6 +141,9 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/rand || handle_error
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" || handle_error # OPENDNS IP
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | grep "Wright City" || handle_error
+    curl -v --fail http://localhost:8080/limit-1 || handle_error
+    curl -v --fail http://localhost:8080/limit-2 || handle_error
+    curl -v --fail http://localhost:8080/limit-3 || handle_error
 }
 
 function test_docker_image() {
