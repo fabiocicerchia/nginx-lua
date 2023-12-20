@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=debian
-ARG DISTRO_VER=12.4
+ARG DISTRO=amazonlinux
+ARG DISTRO_VER=2023.3.20231218.0
 
 #############################
 # Settings Common Variables #
@@ -191,7 +191,7 @@ ENV VER_OPENRESTY_LIMITTRAFFIC=$VER_OPENRESTY_LIMITTRAFFIC
 # Replicate same official env variable
 ENV NGINX_VERSION   $VER_NGINX
 ENV NJS_VERSION     $VER_NJS
-ENV PKG_RELEASE     1~$DISTRO_VER
+ENV PKG_RELEASE     1
 
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
@@ -276,17 +276,19 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        curl \
-        g++ \
-        libmaxminddb-dev \
-        libpcre3-dev \
-        libssl-dev \
-        libxml2-dev \
-        libxslt1-dev \
+        gcc-c++ \
+        gzip \
+        libmaxminddb-devel \
+        libxml2-devel \
+        libxslt-devel \
         make \
+        openssl-devel \
         patch \
+        pcre-devel \
+        tar \
         unzip \
-        zlib1g-dev \
+        which \
+        zlib-devel \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -305,8 +307,6 @@ ARG NGINX_BUILD_DEPS="\
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
-ENV DEBIAN_FRONTEND noninteractive
-
 ####################################
 # Build Nginx with support for LUA #
 ####################################
@@ -315,13 +315,12 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
-        apt-utils \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && yum makecache \
+    && yum install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
-    && rm -rf /var/lib/apt/lists/*
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 COPY tpl/Makefile Makefile
 COPY tpl/patches patches
@@ -329,6 +328,15 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && yum makecache \
+    && yum install -y \
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
@@ -338,18 +346,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on debian (${ARCH}) 12.4." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-debian12.4" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on amazonlinux (${ARCH}) 2023.3.20231218.0." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-amazonlinux2023.3.20231218.0" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-debian12.4" \
+    org.label-schema.version="${VER_NGINX}-amazonlinux2023.3.20231218.0" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="12.4" \
+    versions.os="2023.3.20231218.0" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -378,16 +386,17 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         ca-certificates \
-        libmaxminddb-dev \
-        libpcre3-dev \
-        libssl-dev \
-        libxml2-dev \
+        libxml2-devel \
+        openssl-devel \
+        pcre-devel \
         unzip \
-        zlib1g-dev \
+        zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
 COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
 COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
@@ -411,126 +420,43 @@ COPY --chown=101:101 tpl/docker-entrypoint.sh /
 COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/support.sh /
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && yum makecache \
+    && yum install -y \
         $PKG_DEPS \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /var/log/nginx \
+        shadow-utils \
 # Fix LUA alias
-    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
-
-RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup --system --gid 101 nginx \
-    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
-    && apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/debian/Dockerfile
-# REASON: No need to use the existing distributed package as the binary is recompiled.
-#     && \
-#     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
-#     NGINX_GPGKEY_PATH=/usr/share/keyrings/nginx-archive-keyring.gpg; \
-#     export GNUPGHOME="$(mktemp -d)"; \
-#     found=''; \
-#     for server in \
-#         hkp://keyserver.ubuntu.com:80 \
-#         pgp.mit.edu \
-#     ; do \
-#         echo "Fetching GPG key $NGINX_GPGKEY from $server"; \
-#         gpg1 --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
-#     done; \
-#     test -z "$found" && echo >&2 "error: failed to fetch GPG key $NGINX_GPGKEY" && exit 1; \
-#     gpg1 --export "$NGINX_GPGKEY" > "$NGINX_GPGKEY_PATH" ; \
-#     rm -rf "$GNUPGHOME"; \
-#     apt-get remove --purge --auto-remove -y gnupg1 && rm -rf /var/lib/apt/lists/* \
-#     && dpkgArch="$(dpkg --print-architecture)" \
-#     && nginxPackages=" \
-#         nginx=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${PKG_RELEASE} \
-#     " \
-#     && case "$dpkgArch" in \
-#         amd64|arm64) \
-# # arches officialy built by upstream
-#             echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
-#             && apt-get update \
-#             ;; \
-#         *) \
-# # we're on an architecture upstream doesn't officially build for
-# # let's build binaries from the published source packages
-#             echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
-#             \
-# # new directory for storing sources and .deb files
-#             && tempDir="$(mktemp -d)" \
-#             && chmod 777 "$tempDir" \
-# # (777 to ensure APT's "_apt" user can access it too)
-#             \
-# # save list of currently-installed packages so build dependencies can be cleanly removed later
-#             && savedAptMark="$(apt-mark showmanual)" \
-#             \
-# # build .deb files from upstream's source packages (which are verified by apt-get)
-#             && apt-get update \
-#             && apt-get build-dep -y $nginxPackages \
-#             && ( \
-#                 cd "$tempDir" \
-#                 && DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
-#                     apt-get source --compile $nginxPackages \
-#             ) \
-# # we don't remove APT lists here because they get re-downloaded and removed later
-#             \
-# # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-# # (which is done after we install the built packages so we don't have to redownload any overlapping dependencies)
-#             && apt-mark showmanual | xargs apt-mark auto > /dev/null \
-#             && { [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; } \
-#             \
-# # create a temporary local APT repo to install from (so that dependency resolution can be handled by APT, as it should be)
-#             && ls -lAFh "$tempDir" \
-#             && ( cd "$tempDir" && dpkg-scanpackages . > Packages ) \
-#             && grep '^Package: ' "$tempDir/Packages" \
-#             && echo "deb [ trusted=yes ] file://$tempDir ./" > /etc/apt/sources.list.d/temp.list \
-# # work around the following APT issue by using "Acquire::GzipIndexes=false" (overriding "/etc/apt/apt.conf.d/docker-gzip-indexes")
-# #   Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
-# #   ...
-# #   E: Failed to fetch store:/var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages  Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
-#             && apt-get -o Acquire::GzipIndexes=false update \
-#             ;; \
-#     esac \
-#     \
-    && apt-get install --no-install-recommends --no-install-suggests -y \
-#                         $nginxPackages \
-                        gettext-base \
-                        curl \
-    && apt-get remove --purge --auto-remove -y && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/nginx.list \
-    \
-# if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
-#    && if [ -n "$tempDir" ]; then \
-#        apt-get purge -y --auto-remove \
-#        && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
-#    fi \
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
+# Bring in tzdata so users could set the timezones through the environment
+# variables
+    && yum install -y tzdata \
+# Bring in curl and ca-certificates to make registering on DNS SD easier
+    && yum install -y --allowerasing curl ca-certificates \
 # forward request and error logs to docker log collector
+    && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
-
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# create nginx user/group first, to be consistent throughout docker variants
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Upgrade software to latest version
 # ##############################################################################
-RUN apt-get upgrade -y \
+    && yum upgrade -y \
 # Cleanup
 # ##############################################################################
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+    && yum remove -y \
+        shadow-utils \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # smoke test
 # ##############################################################################
 RUN envsubst -V \
     && nginx -V \
     && nginx -t \
-    && luajit -v \
     && lua -v \
     && luarocks --version
 
