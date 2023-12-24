@@ -368,7 +368,12 @@ http {
   - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
   - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   - [lua-resty-signal](https://github.com/openresty/lua-resty-signal)
+<<<<<<< HEAD
   - [lua-resty-balancer](https://github.com/openresty/lua-resty-balancer)
+=======
+  - [lua-resty-string](https://github.com/openresty/lua-resty-string)
+  - [lua-tablepool](https://github.com/openresty/lua-tablepool)
+>>>>>>> 70556cc (added lua-resty-string)
   - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
   - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
   - [lua-tablepool](https://github.com/openresty/lua-tablepool)
@@ -428,6 +433,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_SHELL`        | `0.03`                                     | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
 | `VER_OPENRESTY_SIGNAL`       | `0.03`                                     | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) to use. |
 | `VER_OPENRESTY_STREAMLUA`    | `0.0.13`                                   | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
+| `VER_OPENRESTY_STRING`       | `0.15`                                     | The version of [lua-resty-string](https://github.com/openresty/lua-resty-string) to use. |
 | `VER_OPENRESTY_TABLEPOOL`    | `0.02`                                     | The version of [lua-tablepool](https://github.com/openresty/lua-tablepool) to use. |
 | `VER_OPENRESTY_UPLOAD`       | `0.15`                                     | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) to use. |
 | `VER_OPENRESTY_WEBSOCKET`    | `0.10`                                     | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) to use. |
@@ -595,7 +601,11 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `versions.lua-resty-lock`                 | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) used. |
 | `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
 | `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
+<<<<<<< HEAD
 | `versions.lua-resty-upload`               | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) used. |
+=======
+| `versions.lua-resty-string`               | The version of [lua-resty-string](https://github.com/openresty/lua-resty-string) used. |
+>>>>>>> 70556cc (added lua-resty-string)
 | `versions.lua-upstream`                   | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) used. |
 | `versions.nginx-lua-prometheus`           | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) used. |
 | `versions.set-misc-nginx`                 | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) used. |
