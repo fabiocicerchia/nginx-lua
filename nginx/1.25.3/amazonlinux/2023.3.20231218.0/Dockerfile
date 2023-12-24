@@ -191,6 +191,11 @@ ENV VER_OPENRESTY_LIMITTRAFFIC=$VER_OPENRESTY_LIMITTRAFFIC
 ARG VER_OPENRESTY_UPLOAD=0.11
 ENV VER_OPENRESTY_UPLOAD=$VER_OPENRESTY_UPLOAD
 
+# lua-resty-lock
+# https://github.com/openresty/lua-resty-lock/tags
+ARG VER_OPENRESTY_LOCK=0.09
+ENV VER_OPENRESTY_LOCK=$VER_OPENRESTY_LOCK
+
 ################################################################################
 
 # Replicate same official env variable
@@ -375,6 +380,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-core="${VER_LUA_RESTY_CORE}" \
     versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \
     versions.lua-resty-limit-traffic="${VER_OPENRESTY_LIMITTRAFFIC}" \
+    versions.lua-resty-lock="${VER_OPENRESTY_LOCK}" \
     versions.lua-resty-lrucache="${VER_LUA_RESTY_LRUCACHE}" \
     versions.lua-resty-memcached="${VER_OPENRESTY_MEMCACHED}" \
     versions.lua-resty-mysql="${VER_OPENRESTY_MYSQL}" \
