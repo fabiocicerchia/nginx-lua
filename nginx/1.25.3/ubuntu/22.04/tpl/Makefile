@@ -73,7 +73,8 @@ ifeq ($(EXTENDED_IMAGE), YES)
 		dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal \
 		dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket \
 		dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module \
-		dep-lua-openresty-misc dep-lua-resty-limit-traffic dep-lua-resty-upload dep-lua-resty-lock
+		dep-lua-openresty-misc dep-lua-resty-limit-traffic dep-lua-resty-upload \
+		dep-lua-resty-lock dep-lua-resty-balancer
 endif
 
 # NGX Devel Kit
@@ -261,6 +262,7 @@ dep-lua-resty-limit-traffic:
 	&& $(MAKE) install
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # OpenResty Upload
 # ##############################################################################
 dep-lua-resty-upload:
@@ -275,6 +277,14 @@ dep-lua-resty-lock:
 	unzip -d / /lua-resty-lock.zip
 	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
 >>>>>>> 52a0c53 (added lua-resty-lock)
+=======
+# OpenResty Balancer
+# ##############################################################################
+dep-lua-resty-balancer:
+	curl -sLo /lua-resty-balancer.zip https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.zip
+	unzip -d / /lua-resty-balancer.zip
+	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+>>>>>>> 5e6dbed (added lua-resty-balancer)
 	&& $(MAKE) \
 	&& $(MAKE) install
 
