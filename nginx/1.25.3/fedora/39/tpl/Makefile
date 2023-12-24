@@ -73,7 +73,7 @@ ifeq ($(EXTENDED_IMAGE), YES)
 		dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal \
 		dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket \
 		dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module \
-		dep-lua-openresty-misc dep-lua-resty-limit-traffic
+		dep-lua-openresty-misc dep-lua-resty-limit-traffic dep-lua-resty-upload
 endif
 
 # NGX Devel Kit
@@ -257,6 +257,15 @@ dep-lua-resty-limit-traffic:
 	curl -sLo /lua-resty-limit-traffic.zip https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip
 	unzip -d / /lua-resty-limit-traffic.zip
 	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+	&& $(MAKE) \
+	&& $(MAKE) install
+
+# OpenResty Upload
+# ##############################################################################
+dep-lua-resty-upload:
+	curl -sLo /lua-resty-upload.zip https://github.com/openresty/lua-resty-upload/archive/v${VER_OPENRESTY_UPLOAD}.zip
+	unzip -d / /lua-resty-upload.zip
+	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
 	&& $(MAKE) \
 	&& $(MAKE) install
 

@@ -144,6 +144,7 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/limit-1 || handle_error
     curl -v --fail http://localhost:8080/limit-2 || handle_error
     curl -v --fail http://localhost:8080/limit-3 || handle_error
+    curl -v --fail http://localhost:8080/upload || handle_error
 }
 
 function test_docker_image() {

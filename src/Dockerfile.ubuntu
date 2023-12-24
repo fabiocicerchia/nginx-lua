@@ -186,6 +186,11 @@ ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 ARG VER_OPENRESTY_LIMITTRAFFIC={{VER_OPENRESTY_LIMITTRAFFIC}}
 ENV VER_OPENRESTY_LIMITTRAFFIC=$VER_OPENRESTY_LIMITTRAFFIC
 
+# lua-resty-upload
+# https://github.com/openresty/lua-resty-upload/tags
+ARG VER_OPENRESTY_UPLOAD={{VER_OPENRESTY_UPLOAD}}
+ENV VER_OPENRESTY_UPLOAD=$VER_OPENRESTY_UPLOAD
+
 ################################################################################
 
 # Replicate same official env variable
@@ -369,6 +374,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-shell="${VER_OPENRESTY_SHELL}" \
     versions.lua-resty-signal="${VER_OPENRESTY_SIGNAL}" \
     versions.lua-resty-tablepool="${VER_OPENRESTY_TABLEPOOL}" \
+    versions.lua-resty-upload="${VER_OPENRESTY_UPLOAD}" \
     versions.lua-resty-upstream-healthcheck="${VER_OPENRESTY_HEALTHCHECK}" \
     versions.lua-resty-websocket="${VER_OPENRESTY_WEBSOCKET}" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
