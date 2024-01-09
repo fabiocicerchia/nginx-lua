@@ -56,6 +56,7 @@ RUN source /etc/os-release \
       usr/local/include/luajit-2.1 \
       usr/local/lib \
       usr/local/share/lua \
+      usr/local/share/luajit* \
       usr/local/share/man/man1/luajit.1 \
       usr/sbin/nginx \
       usr/sbin/nginx-debug \
