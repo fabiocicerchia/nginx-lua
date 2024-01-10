@@ -196,6 +196,11 @@ ENV VER_OPENRESTY_UPLOAD=$VER_OPENRESTY_UPLOAD
 ARG VER_OPENRESTY_LOCK=0.09
 ENV VER_OPENRESTY_LOCK=$VER_OPENRESTY_LOCK
 
+# lua-resty-balancer
+# https://github.com/openresty/lua-resty-balancer/tags
+ARG VER_OPENRESTY_BALANCER=0.05
+ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
+
 ################################################################################
 
 # Replicate same official env variable
@@ -375,6 +380,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.geoip="${VER_GEOIP}" \
     versions.headers-more-nginx-module="${VER_OPENRESTY_HEADERS}" \
     versions.lua-nginx-module="${VER_LUA_NGINX_MODULE}" \
+    versions.lua-resty-balancer="${VER_OPENRESTY_BALANCER}" \
     versions.lua-resty-cookie="${VER_CLOUDFLARE_COOKIE}" \
     versions.lua-resty-core="${VER_LUA_RESTY_CORE}" \
     versions.lua-resty-dns="${VER_OPENRESTY_DNS}" \

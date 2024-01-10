@@ -48,7 +48,6 @@ RUN source /etc/os-release \
       --depends "libxml2>=2.11.4" \
       --depends "pcre>=8.45" \
       --chdir / \
-      # usr/local/share/luajit* \
       after-install.sh \
       etc/nginx \
       usr/local/bin/lua \

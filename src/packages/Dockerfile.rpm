@@ -48,7 +48,6 @@ RUN source /etc/os-release \
       --depends "pcre >= 8.44" \
       --depends "shadow-utils >= 2:4.9" \
       --chdir / \
-      # usr/local/share/luajit* \
       after-install.sh \
       etc/nginx \
       usr/local/bin/lua \

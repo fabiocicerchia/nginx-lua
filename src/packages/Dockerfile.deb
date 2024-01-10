@@ -47,7 +47,6 @@ RUN source /etc/os-release \
       --depends "libmaxminddb0 (>= 1.5.2)" \
       --depends "libxml2 (>= 2.9.13)" \
       --chdir / \
-      # usr/local/share/luajit* \
       after-install.sh \
       etc/nginx \
       usr/local/bin/lua \
