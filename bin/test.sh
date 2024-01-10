@@ -144,6 +144,8 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/limit-1 || handle_error
     curl -v --fail http://localhost:8080/limit-2 || handle_error
     curl -v --fail http://localhost:8080/limit-3 || handle_error
+    echo "hello world" > /tmp/a.txt
+    curl -v --fail -F "file1=@/tmp/a.txt" http://localhost:8080/upload || handle_error
     curl -v --fail http://localhost:8080/lrucache || handle_error
     curl -v --fail http://localhost:8080/signal || handle_error
     curl -v --fail http://localhost:8080/tablepool || handle_error

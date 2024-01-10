@@ -425,6 +425,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_PROMETHEUS`            | `0.20230607`                               | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) to use. |
 | `VER_MISC_NGINX`            | `0.33`                                     | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) to use. |
 | `VER_OPENRESTY_STREAMLUA`   | `0.0.13`                                   | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
+| `VER_OPENRESTY_UPLOAD`      | `0.15`                                   | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) to use. |
 | `VER_NGINX`                 | `1.25.1`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
 | `NGX_LDOPT`                 | `-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie`                                   | Sets additional parameters that will be used during linking. |
@@ -585,6 +586,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `versions.lua-resty-shell`                | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) used. |
 | `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
 | `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
+| `versions.lua-resty-upload`               | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) used. |
 | `versions.lua-upstream`                   | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) used. |
 | `versions.nginx-lua-prometheus`           | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) used. |
 | `versions.set-misc-nginx`                 | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) used. |
