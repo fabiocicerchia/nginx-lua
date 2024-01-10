@@ -364,6 +364,7 @@ http {
   - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
   - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
   - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
+  - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   - [lua-resty-signal](https://github.com/openresty/lua-resty-signal)
   - [lua-tablepool](https://github.com/openresty/lua-tablepool)
   - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
@@ -373,6 +374,7 @@ http {
   - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
   - [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module)
   - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
+  - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   </details>
 
 ### Compiled Version Details
@@ -416,6 +418,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_MEMCACHED`   | `0.17`                                     | The version of [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached) to use. |
 | `VER_OPENRESTY_MYSQL`       | `0.26`                                     | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) to use. |
 | `VER_OPENRESTY_REDIS`       | `0.30`                                     | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) to use. |
+| `VER_OPENRESTY_LOCK`       | `0.09`                                     | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) to use. |
 | `VER_OPENRESTY_SHELL`       | `0.03`                                     | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
 | `VER_OPENRESTY_SIGNAL`      | `0.03`                                     | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) to use. |
 | `VER_OPENRESTY_TABLEPOOL`   | `0.02`                                     | The version of [lua-tablepool](https://github.com/openresty/lua-tablepool) to use. |
@@ -426,6 +429,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_MISC_NGINX`            | `0.33`                                     | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) to use. |
 | `VER_OPENRESTY_STREAMLUA`   | `0.0.13`                                   | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
 | `VER_OPENRESTY_UPLOAD`      | `0.15`                                   | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) to use. |
+| `VER_OPENRESTY_LOCK`        | `0.09`                                   | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) to use. |
 | `VER_NGINX`                 | `1.25.1`                                   | The version of nginx to use. |
 | `NGX_CFLAGS`                | `-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC`                                   | Sets additional parameters that will be added to the CFLAGS variable. |
 | `NGX_LDOPT`                 | `-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie`                                   | Sets additional parameters that will be used during linking. |
@@ -538,6 +542,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "versions.lua-resty-shell": "0.03",
   "versions.lua-resty-signal": "0.03",
   "versions.lua-resty-tablepool": "0.02",
+  "versions.lua-resty-lock": "0.09",
   "versions.lua-resty-upstream-healthcheck": "0.08",
   "versions.lua-resty-websocket": "0.10",
   "versions.lua-upstream": "0.07",
@@ -584,6 +589,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `versions.lua-resty-mysql`                | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) used. |
 | `versions.lua-resty-redis`                | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) used. |
 | `versions.lua-resty-shell`                | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) used. |
+| `versions.lua-resty-lock`                 | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) used. |
 | `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
 | `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
 | `versions.lua-resty-upload`               | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) used. |
