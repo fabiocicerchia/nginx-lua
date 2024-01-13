@@ -7,7 +7,7 @@
 # Copyright (c) 2023 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM amazonlinux:2.0.20201111.0 AS base
+FROM amazonlinux:2.0.20240109.0 AS base
 
 #############################
 # Settings Common Variables #
@@ -230,7 +230,7 @@ RUN set -eux \
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
-FROM amazonlinux:2.0.20201111.0
+FROM amazonlinux:2.0.20240109.0
 
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
