@@ -10,7 +10,7 @@
 #############################
 # Settings Common Variables #
 #############################
-FROM amazonlinux:2.0.20210701.0 AS base
+FROM amazonlinux:2.0.20240109.0 AS base
 
 ARG DOCKER_IMAGE=fabiocicerchia/nginx-lua
 ENV DOCKER_IMAGE=$DOCKER_IMAGE
