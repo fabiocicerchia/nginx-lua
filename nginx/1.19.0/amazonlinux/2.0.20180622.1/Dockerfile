@@ -7,7 +7,7 @@
 # Copyright (c) 2023 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
-FROM amazonlinux:2.0.20180622.1
+FROM amazonlinux:2.0.20240109.0
 
 LABEL maintainer="info@fabiocicerchia.it"
 
