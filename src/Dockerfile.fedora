@@ -201,6 +201,11 @@ ENV VER_OPENRESTY_LOCK=$VER_OPENRESTY_LOCK
 ARG VER_OPENRESTY_BALANCER={{VER_OPENRESTY_BALANCER}}
 ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
 
+# lua-resty-string
+# https://github.com/openresty/lua-resty-string/tags
+ARG VER_OPENRESTY_STRING={{VER_OPENRESTY_STRING}}
+ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
+
 ################################################################################
 
 # Replicate same official env variable
@@ -389,6 +394,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-resty-redis="${VER_OPENRESTY_REDIS}" \
     versions.lua-resty-shell="${VER_OPENRESTY_SHELL}" \
     versions.lua-resty-signal="${VER_OPENRESTY_SIGNAL}" \
+    versions.lua-resty-string="${VER_OPENRESTY_STRING}" \
     versions.lua-resty-tablepool="${VER_OPENRESTY_TABLEPOOL}" \
     versions.lua-resty-upload="${VER_OPENRESTY_UPLOAD}" \
     versions.lua-resty-upstream-healthcheck="${VER_OPENRESTY_HEALTHCHECK}" \
