@@ -357,23 +357,19 @@ http {
   - [ngx_stream_ssl_preread_module](http://nginx.org/en/docs/stream/ngx_stream_ssl_preread_module.html)
   - [njs](https://nginx.org/en/docs/njs/reference.html)
   - [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module)
-  - [lua-resty-balancer/tags](https://github.com/openresty/lua-resty-balancer/tags)
+  - [lua-resty-balancer](https://github.com/openresty/lua-resty-balancer)
   - [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie)
   - [lua-resty-dns](https://github.com/openresty/lua-resty-dns)
-  - [lua-resty-limit-traffic/tags](https://github.com/openresty/lua-resty-limit-traffic/tags)
+  - [lua-resty-limit-traffic](https://github.com/openresty/lua-resty-limit-traffic)
+  - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   - [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache)
   - [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached)
   - [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql)
   - [lua-resty-redis](https://github.com/openresty/lua-resty-redis)
   - [lua-resty-shell](https://github.com/openresty/lua-resty-shell)
-  - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   - [lua-resty-signal](https://github.com/openresty/lua-resty-signal)
-<<<<<<< HEAD
-  - [lua-resty-balancer](https://github.com/openresty/lua-resty-balancer)
-=======
   - [lua-resty-string](https://github.com/openresty/lua-resty-string)
-  - [lua-tablepool](https://github.com/openresty/lua-tablepool)
->>>>>>> 70556cc (added lua-resty-string)
+  - [lua-resty-upload](https://github.com/openresty/lua-resty-upload)
   - [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck)
   - [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket)
   - [lua-tablepool](https://github.com/openresty/lua-tablepool)
@@ -381,17 +377,16 @@ http {
   - [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus)
   - [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module)
   - [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module)
-  - [lua-resty-lock](https://github.com/openresty/lua-resty-lock)
   </details>
 
 ### Compiled Version Details
 
 ```console
 nginx version: nginx/1.25.3
-built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r10) 
+built by gcc 13.2.1 20231014 (Alpine 13.2.1_git20231014)
 built with OpenSSL 3.1.4 24 Oct 2023
 TLS SNI support enabled
-configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/headers-more-nginx-module-0.35 --add-module=/lua-nginx-module-0.10.25 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/ngx_devel_kit-0.3.3 --add-module=/ngx_http_geoip2_module-3.4 --add-module=/njs-0.8.2/nginx --add-module=/set-misc-nginx-module-0.33 --add-module=/stream-lua-nginx-module-0.0.13 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
+configure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --with-perl_modules_path=/usr/lib/perl5/vendor_perl --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --add-module=/headers-more-nginx-module-0.36 --add-module=/lua-nginx-module-0.10.25 --add-module=/lua-upstream-nginx-module-0.07 --add-module=/ngx_devel_kit-0.3.3 --add-module=/ngx_http_geoip2_module-3.4 --add-module=/njs-0.8.2/nginx --add-module=/set-misc-nginx-module-0.33 --add-module=/stream-lua-nginx-module-0.0.13 --with-cc-opt='-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'
 ```
 
 The following are the available build-time options. They can be set using the `--build-arg` CLI argument.
@@ -528,39 +523,43 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "image.target.os": "",
   "image.target.platform": "",
   "maintainer": "Fabio Cicerchia <info@fabiocicerchia.it>",
-  "org.label-schema.build-date": "2023-07-11T00:00:00Z",
-  "org.label-schema.description": "Nginx 1.25.1 with Lua support based on alpine (amd64) 3.18.2.",
-  "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.25.1-alpine3.18.2",
+  "org.label-schema.build-date": "2024-01-17T00:00:00Z",
+  "org.label-schema.description": "Nginx 1.25.3 with Lua support based on alpine (amd64) 3.19.0.",
+  "org.label-schema.docker.cmd": "docker run -p 80:80 -d fabiocicerchia/nginx-lua:1.25.3-alpine3.19.0",
   "org.label-schema.name": "fabiocicerchia/nginx-lua",
   "org.label-schema.schema-version": "1.0",
   "org.label-schema.url": "https://github.com/fabiocicerchia/nginx-lua",
-  "org.label-schema.vcs-ref": "748cf72",
+  "org.label-schema.vcs-ref": "b0482b3",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
-  "org.label-schema.version": "1.25.1-alpine3.18.2",
+  "org.label-schema.version": "1.25.3-alpine3.19.0",
   "versions.geoip": "3.4",
-  "versions.headers-more-nginx-module": "0.35",
-  "versions.lua-nginx-module": "0.10.24",
-  "versions.lua-resty-cookie": "99be1005e38ce19ace54515272a2be1b9fdc5da2",
-  "versions.lua-resty-core": "0.1.26",
-  "versions.lua-resty-dns": "0.22",
+  "versions.headers-more-nginx-module": "0.36",
+  "versions.lua-nginx-module": "0.10.25",
+  "versions.lua-resty-balancer": "0.05",
+  "versions.lua-resty-cookie": "f418d77082eaef48331302e84330488fdc810ef4",
+  "versions.lua-resty-core": "0.1.27",
+  "versions.lua-resty-dns": "0.23",
+  "versions.lua-resty-limit-traffic": "0.09",
+  "versions.lua-resty-lock": "0.09",
   "versions.lua-resty-lrucache": "0.13",
   "versions.lua-resty-memcached": "0.17",
   "versions.lua-resty-mysql": "0.26",
   "versions.lua-resty-redis": "0.30",
   "versions.lua-resty-shell": "0.03",
   "versions.lua-resty-signal": "0.03",
-  "versions.lua-resty-tablepool": "0.02",
-  "versions.lua-resty-lock": "0.09",
+  "versions.lua-resty-string": "0.15",
+  "versions.lua-resty-tablepool": "0.03",
+  "versions.lua-resty-upload": "0.11",
   "versions.lua-resty-upstream-healthcheck": "0.08",
-  "versions.lua-resty-websocket": "0.10",
+  "versions.lua-resty-websocket": "0.11",
   "versions.lua-upstream": "0.07",
   "versions.luajit2": "2.1-20231117",
   "versions.luarocks": "3.9.2",
-  "versions.nginx": "1.25.1",
-  "versions.nginx-lua-prometheus": "0.20221218",
+  "versions.nginx": "1.25.3",
+  "versions.nginx-lua-prometheus": "0.20230607",
   "versions.ngx_devel_kit": "0.3.3",
   "versions.njs": "0.8.2",
-  "versions.os": "3.18.2",
+  "versions.os": "3.19.0",
   "versions.set-misc-nginx": "0.33",
   "versions.stream-lua-nginx-module": "0.0.13"
 }
@@ -568,6 +567,9 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 
 | Label Name                                | Description             |
 :------------------------------------------ |:----------------------- |
+| `image.target.arch`                       | Architecture component of `image.target.platform`. |
+| `image.target.os`                         | OS component of `image.target.platform`. |
+| `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
 | `maintainer`                              | Maintainer of the image |
 | `org.label-schema.build-date`             | This label contains the Date the image was built. The value SHOULD be formatted according to RFC 3339. buildarg `BUILD_DATE` |
 | `org.label-schema.description`            | Text description of the image. May contain up to 300 characters. |
@@ -578,36 +580,34 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `org.label-schema.vcs-ref`                | buildarg `VCS_REF` |
 | `org.label-schema.vcs-url`                | URL for the source code under version control from which this container image was built. |
 | `org.label-schema.version`                | Release identifier for the contents of the image. |
-| `image.target.platform`                   | Platform of the build result. eg. `linux/amd64`, `linux/arm/v7`, `windows/amd64`. |
-| `image.target.os`                         | OS component of `image.target.platform`. |
-| `image.target.arch`                       | Architecture component of `image.target.platform`. |
-| `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
-| `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |
-| `versions.nginx`                          | The version of nginx used. |
-| `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
-| `versions.njs`                            | The version of [Njs](https://github.com/nginx/njs) used. |
-| `versions.os`                             | The Docker base image. |
+| `versions.geoip`                          | The version of [geoip](https://github.com/leev/ngx_http_geoip2_module) used. |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
-| `versions.lua-resty-cookie`               | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) used. |
 | `versions.lua-resty-balancer`             | The version of [lua-resty-balancer](https://github.com/cloudflare/lua-resty-balancer) used. |
+| `versions.lua-resty-cookie`               | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) used. |
 | `versions.lua-resty-core`                 | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) used. |
 | `versions.lua-resty-dns`                  | The version of [lua-resty-dns](https://github.com/openresty/lua-resty-dns) used. |
+| `versions.lua-resty-limit-traffic`        | The version of [lua-resty-limit-traffic](https://github.com/openresty/lua-resty-limit-traffic) used. |
+| `versions.lua-resty-lock`                 | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) used. |
 | `versions.lua-resty-lrucache`             | The version of [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache) used. |
 | `versions.lua-resty-memcached`            | The version of [lua-resty-memcached](https://github.com/openresty/lua-resty-memcached) used. |
 | `versions.lua-resty-mysql`                | The version of [lua-resty-mysql](https://github.com/openresty/lua-resty-mysql) used. |
 | `versions.lua-resty-redis`                | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) used. |
 | `versions.lua-resty-shell`                | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) used. |
-| `versions.lua-resty-lock`                 | The version of [lua-resty-lock](https://github.com/openresty/lua-resty-lock) used. |
+| `versions.lua-resty-signal`               | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) used. |
+| `versions.lua-resty-string`               | The version of [lua-resty-string](https://github.com/openresty/lua-resty-string) used. |
+| `versions.lua-resty-tablepool`            | The version of [lua-resty-tablepool](https://github.com/openresty/lua-resty-tablepool) used. |
+| `versions.lua-resty-upload`               | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) used. |
 | `versions.lua-resty-upstream-healthcheck` | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) used. |
 | `versions.lua-resty-websocket`            | The version of [lua-resty-websocket](https://github.com/openresty/lua-resty-websocket) used. |
-<<<<<<< HEAD
-| `versions.lua-resty-upload`               | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) used. |
-=======
-| `versions.lua-resty-string`               | The version of [lua-resty-string](https://github.com/openresty/lua-resty-string) used. |
->>>>>>> 70556cc (added lua-resty-string)
 | `versions.lua-upstream`                   | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) used. |
+| `versions.luajit2`                        | The version of [LuaJIT](https://github.com/openresty/luajit2) used. |
+| `versions.luarocks`                       | The version of [LuaRocks](https://luarocks.org/) to use. |
+| `versions.nginx`                          | The version of nginx used. |
 | `versions.nginx-lua-prometheus`           | The version of [nginx-lua-prometheus](https://github.com/knyar/nginx-lua-prometheus) used. |
+| `versions.ngx_devel_kit`                  | The version of [Nginx Development Kit](https://github.com/vision5/ngx_devel_kit) used. |
+| `versions.njs`                            | The version of [Njs](https://github.com/nginx/njs) used. |
+| `versions.os`                             | The Docker base image. |
 | `versions.set-misc-nginx`                 | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) used. |
 | `versions.stream-lua-nginx-module`        | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) used. |
 
