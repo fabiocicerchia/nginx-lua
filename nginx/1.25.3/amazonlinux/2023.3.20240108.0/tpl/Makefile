@@ -74,7 +74,7 @@ ifeq ($(EXTENDED_IMAGE), YES)
 		dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket \
 		dep-lua-upstream-nginx-module dep-nginx-lua-prometheus dep-stream-lua-nginx-module \
 		dep-lua-openresty-misc dep-lua-resty-limit-traffic dep-lua-resty-upload \
-		dep-lua-resty-lock dep-lua-resty-balancer
+		dep-lua-resty-lock dep-lua-resty-balancer dep-lua-resty-string
 endif
 
 # NGX Devel Kit
@@ -285,6 +285,15 @@ dep-lua-resty-balancer:
 	curl -sLo /lua-resty-balancer.zip https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.zip
 	unzip -d / /lua-resty-balancer.zip
 	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+	&& $(MAKE) \
+	&& $(MAKE) install
+
+# OpenResty String
+# ##############################################################################
+dep-lua-resty-string:
+	curl -sLo /lua-resty-string.zip https://github.com/openresty/lua-resty-string/archive/v${VER_OPENRESTY_STRING}.zip
+	unzip -d / /lua-resty-string.zip
+	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 	&& $(MAKE) \
 	&& $(MAKE) install
 
