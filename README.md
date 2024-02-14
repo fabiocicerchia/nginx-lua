@@ -48,7 +48,7 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 - [`almalinux`, `1-almalinux`, `1.25-almalinux`, `1.25.3-almalinux`, `1-almalinux9.3-20231124`, `1.25-almalinux9.3-20231124`, `1.25.3-almalinux9.3-20231124`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/almalinux/9.3-20231124/Dockerfile)
 - [`1`, `1.25`, `1.25.3`, `alpine`, `latest`, `1-alpine`, `1.25-alpine`, `1.25.3-alpine`, `1-alpine3.19.1`, `1.25-alpine3.19.1`, `1.25.3-alpine3.19.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/alpine/3.19.1/Dockerfile)
 - [`amazonlinux`, `1-amazonlinux`, `1.25-amazonlinux`, `1.25.3-amazonlinux`, `1-amazonlinux2023.3.20240131.0`, `1.25-amazonlinux2023.3.20240131.0`, `1.25.3-amazonlinux2023.3.20240131.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/amazonlinux/2023.3.20240131.0/Dockerfile)
-- [`debian`, `1-debian`, `1.25-debian`, `1-debian12.4`, `1.25.3-debian`, `1.25-debian12.4`, `1.25.3-debian12.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/debian/12.4/Dockerfile)
+- [`debian`, `1-debian`, `1.25-debian`, `1-debian12.5`, `1.25.3-debian`, `1.25-debian12.5`, `1.25.3-debian12.5`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/debian/12.5/Dockerfile)
 - [`fedora`, `1-fedora`, `1-fedora39`, `1.25-fedora`, `1.25-fedora39`, `1.25.3-fedora`, `1.25.3-fedora39`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/fedora/39/Dockerfile)
 - [`ubuntu`, `1-ubuntu`, `1.25-ubuntu`, `1-ubuntu22.04`, `1.25.3-ubuntu`, `1.25-ubuntu22.04`, `1.25.3-ubuntu22.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.25.3/ubuntu/22.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
