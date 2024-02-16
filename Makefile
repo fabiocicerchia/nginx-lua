@@ -320,11 +320,16 @@ generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
 
 pull-nginx-entrypoints: ## retrieves the official entrypoint files
-	curl -sLo src/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/10-listen-on-ipv6-by-default.sh
-	curl -sLo src/15-local-resolvers.envsh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/15-local-resolvers.envsh
-	curl -sLo src/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/20-envsubst-on-templates.sh
-	curl -sLo src/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/30-tune-worker-processes.sh
-	curl -sLo src/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$(SUPPORTED_NGINX_VER)/entrypoint/docker-entrypoint.sh
+	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null https://github.com/nginxinc/docker-nginx/releases/tag/$(SUPPORTED_NGINX_VER))" = "200" ]; then \
+		USE_VERSION=$(SUPPORTED_NGINX_VER); \
+	else \
+		USE_VERSION=master; \
+	fi; \
+	curl -sLo src/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
+	curl -sLo src/15-local-resolvers.envsh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
+	curl -sLo src/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
+	curl -sLo src/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
+	curl -sLo src/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
 	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
