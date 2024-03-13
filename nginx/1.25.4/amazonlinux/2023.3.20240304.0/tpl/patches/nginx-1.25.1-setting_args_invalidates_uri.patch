@@ -1,0 +1,37 @@
+diff --git a/src/http/ngx_http_variables.c b/src/http/ngx_http_variables.c
+--- a/src/http/ngx_http_variables.c
++++ b/src/http/ngx_http_variables.c
+@@ -20,6 +20,8 @@
+ static void ngx_http_variable_request_set(ngx_http_request_t *r,
+     ngx_http_variable_value_t *v, uintptr_t data);
+ #endif
++static void ngx_http_variable_request_args_set(ngx_http_request_t *r,
++    ngx_http_variable_value_t *v, uintptr_t data);
+ static ngx_int_t ngx_http_variable_request_get_size(ngx_http_request_t *r,
+     ngx_http_variable_value_t *v, uintptr_t data);
+ static ngx_int_t ngx_http_variable_header(ngx_http_request_t *r,
+@@ -255,7 +257,7 @@
+       NGX_HTTP_VAR_NOCACHEABLE, 0 },
+
+     { ngx_string("args"),
+-      ngx_http_variable_set_args,
++      ngx_http_variable_request_args_set,
+       ngx_http_variable_request,
+       offsetof(ngx_http_request_t, args),
+       NGX_HTTP_VAR_CHANGEABLE|NGX_HTTP_VAR_NOCACHEABLE, 0 },
+@@ -785,6 +787,15 @@
+ #endif
+
+
++static void
++ngx_http_variable_request_args_set(ngx_http_request_t *r,
++    ngx_http_variable_value_t *v, uintptr_t data)
++{
++    r->valid_unparsed_uri = 0;
++    ngx_http_variable_set_args(r, v, data);
++}
++
++
+ static ngx_int_t
+ ngx_http_variable_request_get_size(ngx_http_request_t *r,
+     ngx_http_variable_value_t *v, uintptr_t data)
