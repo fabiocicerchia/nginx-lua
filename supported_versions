@@ -1,7 +1,7 @@
 nginx=1.25.4
 almalinux=9.3-20231124
 alpine=3.19.1
-amazonlinux=2023.3.20240304.0
+amazonlinux=2023.3.20240312.0
 debian=12.5
 fedora=39
 ubuntu=22.04
