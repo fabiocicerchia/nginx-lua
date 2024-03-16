@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.8.2
+ARG VER_NJS=0.8.3
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -94,7 +94,7 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.9.2
+ARG VER_LUAROCKS=3.11.0
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # LUA ADDONS

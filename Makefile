@@ -274,7 +274,7 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions pull-nginx-entrypoints generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
 	git config --global user.name "fabiocicerchia"
@@ -318,6 +318,9 @@ generate-supported-versions: ## generate supported_versions file
 
 generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
+
+generate-deps-env: ## generate .env for dependencies
+	./bin/generate-deps-env.sh > ./src/.env.dist
 
 pull-nginx-entrypoints: ## retrieves the official entrypoint files
 	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null https://github.com/nginxinc/docker-nginx/releases/tag/$(SUPPORTED_NGINX_VER))" = "200" ]; then \
