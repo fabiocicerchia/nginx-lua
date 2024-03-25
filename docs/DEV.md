@@ -8,7 +8,7 @@ $ make
 |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
       |_____|
 
-Copyright (c) 2023 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+Copyright (c) 2024 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 Repo: https://github.com/fabiocicerchia/nginx-lua
 
 Use: make <target>
@@ -21,32 +21,32 @@ BUILD
   build-all                                           build all dockerfiles
   build-amd64                                         build all distros in amd64 arch
   build-arm64                                         build all distros in arm64/v8 arch
-  build-amd64-almalinux                               build one distro in amd64 arch
-  build-amd64-alpine                                  build one distro in amd64 arch
-  build-amd64-amazonlinux                             build one distro in amd64 arch
-  build-amd64-debian                                  build one distro in amd64 arch
-  build-amd64-fedora                                  build one distro in amd64 arch
+  build-amd64-almalinux                               build one distro in amd64 arch  
+  build-amd64-alpine                                  build one distro in amd64 arch  
+  build-amd64-amazonlinux                             build one distro in amd64 arch  
+  build-amd64-debian                                  build one distro in amd64 arch  
+  build-amd64-fedora                                  build one distro in amd64 arch  
   build-amd64-ubuntu                                  build one distro in amd64 arch
-  build-arm64-almalinux                               build one distro in arm64/v8 arch
-  build-arm64-alpine                                  build one distro in arm64/v8 arch
-  build-arm64-amazonlinux                             build one distro in arm64/v8 arch
-  build-arm64-debian                                  build one distro in arm64/v8 arch
-  build-arm64-fedora                                  build one distro in arm64/v8 arch
+  build-arm64-almalinux                               build one distro in arm64/v8 arch  
+  build-arm64-alpine                                  build one distro in arm64/v8 arch  
+  build-arm64-amazonlinux                             build one distro in arm64/v8 arch  
+  build-arm64-debian                                  build one distro in arm64/v8 arch  
+  build-arm64-fedora                                  build one distro in arm64/v8 arch  
   build-arm64-ubuntu                                  build one distro in arm64/v8 arch
 
 TESTING
   test-all                                            test all docker images
-  docker-test-amd64-almalinux                         test one docker image
-  docker-test-amd64-alpine                            test one docker image
-  docker-test-amd64-amazonlinux                       test one docker image
-  docker-test-amd64-debian                            test one docker image
-  docker-test-amd64-fedora                            test one docker image
-  docker-test-amd64-ubuntu                            test one docker image
-  docker-test-arm64-almalinux                         test one docker image
-  docker-test-arm64-alpine                            test one docker image
-  docker-test-arm64-amazonlinux                       test one docker image
-  docker-test-arm64-debian                            test one docker image
-  docker-test-arm64-fedora                            test one docker image
+  docker-test-amd64-almalinux                         test one docker image  
+  docker-test-amd64-alpine                            test one docker image  
+  docker-test-amd64-amazonlinux                       test one docker image  
+  docker-test-amd64-debian                            test one docker image  
+  docker-test-amd64-fedora                            test one docker image  
+  docker-test-amd64-ubuntu                            test one docker image  
+  docker-test-arm64-almalinux                         test one docker image  
+  docker-test-arm64-alpine                            test one docker image  
+  docker-test-arm64-amazonlinux                       test one docker image  
+  docker-test-arm64-debian                            test one docker image  
+  docker-test-arm64-fedora                            test one docker image  
   docker-test-arm64-ubuntu                            test one docker image
   test-security                                       test security all docker images
   test-security-almalinux                             test security one docker images  
@@ -77,30 +77,30 @@ DEPENDENCIES
 
 PACKAGE
   packages                                            creating the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-  package-amd64-almalinux                             creating the system package in amd64 arch
-  package-amd64-alpine                                creating the system package in amd64 arch
-  package-amd64-amazonlinux                           creating the system package in amd64 arch
-  package-amd64-debian                                creating the system package in amd64 arch
-  package-amd64-fedora                                creating the system package in amd64 arch
+  package-amd64-almalinux                             creating the system package in amd64 arch  
+  package-amd64-alpine                                creating the system package in amd64 arch  
+  package-amd64-amazonlinux                           creating the system package in amd64 arch  
+  package-amd64-debian                                creating the system package in amd64 arch  
+  package-amd64-fedora                                creating the system package in amd64 arch  
   package-amd64-ubuntu                                creating the system package in amd64 arch
-  package-arm64-almalinux                             creating the system package in arm64/v8 arch
-  package-arm64-alpine                                creating the system package in arm64/v8 arch
-  package-arm64-amazonlinux                           creating the system package in arm64/v8 arch
-  package-arm64-debian                                creating the system package in arm64/v8 arch
-  package-arm64-fedora                                creating the system package in arm64/v8 arch
+  package-arm64-almalinux                             creating the system package in arm64/v8 arch  
+  package-arm64-alpine                                creating the system package in arm64/v8 arch  
+  package-arm64-amazonlinux                           creating the system package in arm64/v8 arch  
+  package-arm64-debian                                creating the system package in arm64/v8 arch  
+  package-arm64-fedora                                creating the system package in arm64/v8 arch  
   package-arm64-ubuntu                                creating the system package in arm64/v8 arch
   package-test                                        testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
-  package-test-amd64-almalinux                        testing the system package in amd64 arch
-  package-test-amd64-alpine                           testing the system package in amd64 arch
-  package-test-amd64-amazonlinux                      testing the system package in amd64 arch
-  package-test-amd64-debian                           testing the system package in amd64 arch
-  package-test-amd64-fedora                           testing the system package in amd64 arch
+  package-test-amd64-almalinux                        testing the system package in amd64 arch  
+  package-test-amd64-alpine                           testing the system package in amd64 arch  
+  package-test-amd64-amazonlinux                      testing the system package in amd64 arch  
+  package-test-amd64-debian                           testing the system package in amd64 arch  
+  package-test-amd64-fedora                           testing the system package in amd64 arch  
   package-test-amd64-ubuntu                           testing the system package in amd64 arch
-  package-test-arm64-almalinux                        testing the system package in arm64/v8 arch
-  package-test-arm64-alpine                           testing the system package in arm64/v8 arch
-  package-test-arm64-amazonlinux                      testing the system package in arm64/v8 arch
-  package-test-arm64-debian                           testing the system package in arm64/v8 arch
-  package-test-arm64-fedora                           testing the system package in arm64/v8 arch
+  package-test-arm64-almalinux                        testing the system package in arm64/v8 arch  
+  package-test-arm64-alpine                           testing the system package in arm64/v8 arch  
+  package-test-arm64-amazonlinux                      testing the system package in arm64/v8 arch  
+  package-test-arm64-debian                           testing the system package in arm64/v8 arch  
+  package-test-arm64-fedora                           testing the system package in arm64/v8 arch  
   package-test-arm64-ubuntu                           testing the system package in arm64/v8 arch
 
 UTILITIES
@@ -108,6 +108,7 @@ UTILITIES
   release                                             create a github release
   generate-supported-versions                         generate supported_versions file
   generate-dockerfiles                                generate all dockerfiles
+  generate-deps-env                                   generate .env for dependencies
   pull-nginx-entrypoints                              retrieves the official entrypoint files
   generate-metadata                                   generate metadata for all OS docker images
   generate-metadata-all                               generate all metadata for all OS docker images
