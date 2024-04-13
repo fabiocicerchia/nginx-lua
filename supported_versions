@@ -1,5 +1,5 @@
 nginx=1.25.4
-almalinux=9.3-20231124
+almalinux=9.3-20240410
 alpine=3.19.1
 amazonlinux=2023.4.20240401.1
 debian=12.5
