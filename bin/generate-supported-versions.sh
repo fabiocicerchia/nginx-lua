@@ -11,6 +11,13 @@ fetch_latest() {
     if [ "$FILTER" == "" ]; then
         FILTER=".+"
     fi
+
+    TAG=$(curl -s "https://raw.githubusercontent.com/docker-library/official-images/master/library/$DISTRO" | grep latest | cut -d: -f2 | tr ',' '\n' | xargs -n1 | grep -E "$FILTER" | sort -VR | head -n1)
+    if [ $TAG != "" ]; then
+        echo $TAG;
+        return;
+    fi
+
     DIGEST=$(skopeo inspect --override-arch amd64 docker://$DISTRO:latest | jq -r '.Digest')
     TAGS=$(skopeo list-tags --override-arch amd64 docker://$DISTRO | jq -r '.Tags[]' | grep -E "$FILTER" | sort -Vr)
 
