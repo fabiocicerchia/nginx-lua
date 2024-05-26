@@ -168,7 +168,7 @@ ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus
-ARG VER_PROMETHEUS=0.20230607
+ARG VER_PROMETHEUS=0.20240525
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # set-misc-nginx-module
