@@ -2,7 +2,7 @@
 
 ```yaml
 web:
-  image: fabiocicerchia/ginx-lua
+  image: fabiocicerchia/nginx-lua
   volumes:
     - ./templates:/etc/nginx/templates
   ports:
