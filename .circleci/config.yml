@@ -154,8 +154,8 @@ commands:
             mkdir -p test/geoip
             cd test/geoip
             if test ! -f "GeoLite2-City.mmdb"; then
-              curl "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" > GeoLite2-City.tar.gz
-              curl "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" > GeoLite2-Country.tar.gz
+              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" > GeoLite2-City.tar.gz
+              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" > GeoLite2-Country.tar.gz
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
               mv GeoLite2-City_*/GeoLite2-City.mmdb ./
