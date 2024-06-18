@@ -114,8 +114,13 @@ echo "# https://github.com/openresty/set-misc-nginx-module/tags"
 echo "VER_MISC_NGINX="$(get_latest_tag "https://github.com/openresty/set-misc-nginx-module")
 echo ""
 echo "# stream-lua-nginx-module"
-echo "# https://github.com/openresty/stream-lua-nginx-module/tags"
-echo "VER_OPENRESTY_STREAMLUA="$(get_latest_tag "https://github.com/openresty/stream-lua-nginx-module")
+echo "# https://github.com/openresty/stream-lua-nginx-module/commits/master"
+echo "# NOTE:"
+echo "# The latest tag 0.0.14 is incompatible with nginx 1.25.5+:"
+echo "# error: unknown type name 'ngx_stream_ssl_conf_t'; did you mean 'ngx_stream_addr_conf_t'"
+echo "# The fix is released in master branch only without proper tag yet."
+echo "# So using the latest master commit available to date."
+echo "VER_OPENRESTY_STREAMLUA="$(get_latest_commit "https://github.com/openresty/stream-lua-nginx-module")
 echo ""
 echo "# lua-resty-limit-traffic"
 echo "# https://github.com/openresty/lua-resty-limit-traffic/tags"
