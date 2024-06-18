@@ -13,7 +13,7 @@ if __name__ == "__main__":
     dockerfiles = subprocess.check_output(['find', 'nginx', '-type', 'f', '-name', 'Dockerfile'])
     dockerfiles = list(
         filter(
-            lambda elem: re.search("nginx/.+/alpine/\d+\.\d+\.\d+/", elem),
+            lambda elem: re.search(r"nginx/.+/alpine/\d+\.\d+\.\d+/", elem),
             dockerfiles.decode("utf-8").split("\n")))
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile")

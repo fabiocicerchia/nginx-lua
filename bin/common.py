@@ -106,7 +106,7 @@ def get_tarball_file(nginx_ver, os_distro, os_ver, suffix=""):
 
 def get_tarball_file_from_dockerfile(dockerfile):
     tarball_file = (
-        "dist/multiarch-" + re.sub("[^0-9a-zA-Z]+", "-", "%s" % (dockerfile)) + ".tar"
+        "dist/multiarch-" + re.sub(r"[^0-9a-zA-Z]+", "-", "%s" % (dockerfile)) + ".tar"
     )
     return tarball_file
 
