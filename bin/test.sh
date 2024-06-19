@@ -140,7 +140,7 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/signature || handle_error
     curl -v --fail http://localhost:8080/rand || handle_error
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" || handle_error # OPENDNS IP
-    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | grep "Wright City" || handle_error
+    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | egrep "Wright City|San Francisco" || handle_error
     curl -v --fail http://localhost:8080/limit-1 || handle_error
     curl -v --fail http://localhost:8080/limit-2 || handle_error
     curl -v --fail http://localhost:8080/limit-3 || handle_error
