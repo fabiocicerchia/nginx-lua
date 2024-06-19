@@ -221,10 +221,11 @@ ENV PKG_RELEASE     1~$DISTRO_VER
 # -fstack-protector-strong  Stack smashing protector
 # -Wformat                  Check calls to make sure that the arguments supplied have types appropriate to the format string specified
 # -Werror=format-security   Reject potentially unsafe format string arguents
+# -U_FORTIFY_SOURCE         Unset _FORTIFY_SOURCE before defining it (turns out that some gcc builds, depends on the distro, set _FORTIFY_SOURCE internally)
 # -Wp,-D_FORTIFY_SOURCE=2   Run-time buffer overflow detection
 # -fPIC                     No text relocations
 # ORIGINAL VALUE: -g -O2 -ffile-prefix-map=/data/builder/debuild/nginx-1.23.3/debian/debuild-base/nginx-1.23.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC
-ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
+ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -U_FORTIFY_SOURCE -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
 # References
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
