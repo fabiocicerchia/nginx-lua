@@ -454,10 +454,10 @@ RUN set -eux \
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
     && groupadd --system --gid 101 nginx \
-    && useradd --system -g nginx --no-create-home --home /nonexistent --shell /bin/false --uid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/debian/Dockerfile
+# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.25.4/mainline/debian/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && \
 #     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
@@ -486,13 +486,13 @@ RUN set -x \
 #     && case "$dpkgArch" in \
 #         amd64|arm64) \
 # # arches officialy built by upstream
-#             echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+#             echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx" >> /etc/apt/sources.list.d/nginx.list \
 #             && apt-get update \
 #             ;; \
 #         *) \
 # # we're on an architecture upstream doesn't officially build for
 # # let's build binaries from the published source packages
-#             echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+#             echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx" >> /etc/apt/sources.list.d/nginx.list \
 #             \
 # # new directory for storing sources and .deb files
 #             && tempDir="$(mktemp -d)" \
@@ -536,14 +536,16 @@ RUN set -x \
                         curl \
     && apt-get remove --purge --auto-remove -y && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/nginx.list \
     \
-# if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
+# # if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
 #    && if [ -n "$tempDir" ]; then \
 #        apt-get purge -y --auto-remove \
 #        && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
 #    fi \
 # forward request and error logs to docker log collector
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# create a docker-entrypoint.d directory
+    && mkdir /docker-entrypoint.d
 
 # Upgrade software to latest version
 # ##############################################################################
