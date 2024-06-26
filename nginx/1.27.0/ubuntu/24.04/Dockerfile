@@ -543,9 +543,9 @@ RUN set -x \
 #    fi \
 # forward request and error logs to docker log collector
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create a docker-entrypoint.d directory
-    && mkdir /docker-entrypoint.d
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+# # create a docker-entrypoint.d directory
+#     && mkdir /docker-entrypoint.d
 
 # Upgrade software to latest version
 # ##############################################################################
