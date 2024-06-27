@@ -311,7 +311,8 @@ release: ## create a github release
 	tar xvzf ghr_v0.16.2_linux_amd64.tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
 		./ghr_v0.16.2_linux_amd64/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
-	fi
+	fi; \
+	rm -rf dist
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.sh
