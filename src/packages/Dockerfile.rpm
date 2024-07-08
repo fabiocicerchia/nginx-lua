@@ -9,7 +9,7 @@ ENV DISTRO=$DISTRO
 
 WORKDIR /
 
-RUN yum install -y ruby-devel binutils rpm-build
+RUN yum install -y ruby-devel binutils rpm-build gcc
 
 # https://rubygems.org/gems/fpm
 ARG FPM_VERSION=1.15.1
