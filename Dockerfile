@@ -78,7 +78,7 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.26
+ARG VER_LUA_NGINX_MODULE=0.10.27
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
@@ -118,7 +118,7 @@ ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 # lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.13
+ARG VER_LUA_RESTY_LRUCACHE=0.14
 ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # lua-resty-memcached
@@ -133,7 +133,7 @@ ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
 # https://github.com/openresty/lua-resty-redis
-ARG VER_OPENRESTY_REDIS=0.30
+ARG VER_OPENRESTY_REDIS=0.31
 ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
 
 # lua-resty-shell
@@ -143,7 +143,7 @@ ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
 # lua-resty-signal
 # https://github.com/openresty/lua-resty-signal
-ARG VER_OPENRESTY_SIGNAL=0.03
+ARG VER_OPENRESTY_SIGNAL=0.04
 ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-resty-upstream-healthcheck
@@ -153,7 +153,7 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket
-ARG VER_OPENRESTY_WEBSOCKET=0.11
+ARG VER_OPENRESTY_WEBSOCKET=0.12
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-tablepool
@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=9b4c301d2c7f0ebc8fa78a0ad7c18b8ae937bbe9
+ARG VER_OPENRESTY_STREAMLUA=982ce5283172fd5ac5cba21bfc55b579568a0994
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -203,7 +203,7 @@ ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
 
 # lua-resty-string
 # https://github.com/openresty/lua-resty-string/tags
-ARG VER_OPENRESTY_STRING=0.15
+ARG VER_OPENRESTY_STRING=0.16
 ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 
 ################################################################################
