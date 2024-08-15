@@ -84,7 +84,7 @@ ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.28
+ARG VER_LUA_RESTY_CORE=0.1.29
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
