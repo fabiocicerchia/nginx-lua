@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=bfff61e5596cd9d1ebfad41793a27da4e78e56dc
+ARG VER_OPENRESTY_STREAMLUA=69f0cd762112a6e0cddb07f2b5192e9a65034a93
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
