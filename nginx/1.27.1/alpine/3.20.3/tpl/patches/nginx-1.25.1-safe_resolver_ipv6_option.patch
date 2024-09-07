@@ -1,0 +1,39 @@
+diff --git a/src/core/ngx_resolver.c b/src/core/ngx_resolver.c
+--- a/src/core/ngx_resolver.c
++++ b/src/core/ngx_resolver.c
+@@ -425,7 +425,6 @@
+             continue;
+         }
+
+-#if (NGX_HAVE_INET6)
+         if (ngx_strncmp(names[i].data, "ipv4=", 5) == 0) {
+
+             if (ngx_strcmp(&names[i].data[5], "on") == 0) {
+@@ -446,10 +445,19 @@
+         if (ngx_strncmp(names[i].data, "ipv6=", 5) == 0) {
+
+             if (ngx_strcmp(&names[i].data[5], "on") == 0) {
++#if (NGX_HAVE_INET6)
+                 r->ipv6 = 1;
++#else
++                ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
++                                   "no ipv6 support but \"%V\" in resolver",
++                                   &names[i]);
++                return NULL;
++#endif
+
+             } else if (ngx_strcmp(&names[i].data[5], "off") == 0) {
++#if (NGX_HAVE_INET6)
+                 r->ipv6 = 0;
++#endif
+
+             } else {
+                 ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+@@ -459,7 +467,6 @@
+
+             continue;
+         }
+-#endif
+
+ #if !(NGX_WIN32)
+         if (ngx_strncmp(names[i].data, "local=", 6) == 0) {
