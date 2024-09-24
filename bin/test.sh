@@ -151,6 +151,7 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/tablepool || handle_error
     curl -v --fail http://localhost:8080/lock || handle_error
     curl -v --fail http://localhost:8080/string || handle_error
+    curl -v --fail http://localhost:8080/cjson || handle_error
 }
 
 function test_docker_image() {
