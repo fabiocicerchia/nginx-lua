@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=alpine
-ARG DISTRO_VER=3.20.3
+ARG DISTRO=amazonlinux
+ARG DISTRO_VER=2023.5.20240916.0
 
 #############################
 # Settings Common Variables #
@@ -211,7 +211,7 @@ ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 # Replicate same official env variable
 ENV NGINX_VERSION   $VER_NGINX
 ENV NJS_VERSION     $VER_NJS
-ENV PKG_RELEASE     1~$DISTRO_VER
+ENV PKG_RELEASE     1
 
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
@@ -295,43 +295,33 @@ ARG NGINX_BUILD_CONFIG="\
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
-        curl \
+        ca-certificates \
+        gcc-c++ \
         gzip \
-        libmaxminddb-dev \
+        libmaxminddb-devel \
+        libxml2-devel \
+        libxslt-devel \
         make \
-        openssl-dev \
+        openssl-devel \
         patch \
-        pcre-dev \
+        pcre-devel \
         tar \
-        zlib-dev \
+        unzip \
+        which \
+        zlib-devel \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
         ${BUILD_DEPS_BASE} \
-        g++ \
 "
 ENV BUILD_DEPS_AMD64=$BUILD_DEPS_AMD64
 ARG BUILD_DEPS_ARM64V8="\
         ${BUILD_DEPS_BASE} \
-        gcc-aarch64-none-elf \
 "
 ENV BUILD_DEPS_ARM64V8=$BUILD_DEPS_ARM64V8
 ENV BUILD_DEPS=
 
 ARG NGINX_BUILD_DEPS="\
-# NGINX
-        alpine-sdk \
-        bash \
-        findutils \
-        gcc \
-        libc-dev \
-        libxml2-dev \
-        libxslt-dev \
-        linux-headers \
-        make \
-        openssl-dev \
-        pcre-dev \
-        zlib-dev \
 # OPENRESTY PATCHES
         git \
 "
@@ -345,10 +335,12 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && apk update \
-    && apk add --no-cache \
+    && yum makecache \
+    && yum install -y \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS
+        $NGINX_BUILD_DEPS \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 COPY tpl/Makefile Makefile
 COPY tpl/patches patches
@@ -356,6 +348,15 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+RUN set -eux \
+# envsubst
+# ##############################################################################
+    && yum makecache \
+    && yum install -y \
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
@@ -365,18 +366,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.20.3." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.20.3" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on amazonlinux (${ARCH}) 2023.5.20240916.0." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-amazonlinux2023.5.20240916.0" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-alpine3.20.3" \
+    org.label-schema.version="${VER_NGINX}-amazonlinux2023.5.20240916.0" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="3.20.3" \
+    versions.os="2023.5.20240916.0" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -407,20 +408,19 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.set-misc-nginx=${VER_MISC_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
-# wget is required due to https://github.com/luarocks/luarocks/issues/952
 ARG PKG_DEPS="\
-        curl \
-        libmaxminddb-dev \
-        libxml2-dev \
-        openssl-dev \
-        pcre-dev \
+        ca-certificates \
+        libxml2-devel \
+        openssl-devel \
+        pcre-devel \
         unzip \
-        wget \
-        zlib-dev \
+        zlib-devel \
 "
 ENV PKG_DEPS=$PKG_DEPS
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
+COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
+COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
 COPY --from=builder --chown=101:101 /usr/local/lib /usr/local/lib
 COPY --from=builder --chown=101:101 /usr/local/share/lua /usr/local/share/lua
 COPY --from=builder --chown=101:101 /usr/sbin/nginx /usr/sbin/nginx
@@ -444,135 +444,43 @@ COPY --chown=101:101 tpl/docker-entrypoint.sh /
 COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/support.sh /
 
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && apk update \
-    && apk add --no-cache --virtual .pkg_deps \
+    && yum makecache \
+    && yum install -y \
         $PKG_DEPS \
-    && mkdir -p /var/log/nginx \
+        shadow-utils \
 # Fix LUA alias
-    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
-
-RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.25.4/mainline/alpine/Dockerfile
-# REASON: No need to use the existing distributed package as the binary is recompiled.
-#     && apkArch="$(cat /etc/apk/arch)" \
-#     && nginxPackages=" \
-#         nginx=${NGINX_VERSION}-r${PKG_RELEASE} \
-#         nginx-module-xslt=${NGINX_VERSION}-r${PKG_RELEASE} \
-#         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
-#         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
-#         nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
-#     " \
-# # install prerequisites for public key and pkg-oss checks
-#     && apk add --no-cache --virtual .checksum-deps \
-#         openssl \
-#     && case "$apkArch" in \
-#         x86_64|aarch64) \
-# # arches officially built by upstream
-#             set -x \
-#             && KEY_SHA512="e09fa32f0a0eab2b879ccbbc4d0e4fb9751486eedda75e35fac65802cc9faa266425edf83e261137a2f4d16281ce2c1a5f4502930fe75154723da014214f0655" \
-#             && wget -O /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub \
-#             && if echo "$KEY_SHA512 */tmp/nginx_signing.rsa.pub" | sha512sum -c -; then \
-#                 echo "key verification succeeded!"; \
-#                 mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/; \
-#             else \
-#                 echo "key verification failed!"; \
-#                 exit 1; \
-#             fi \
-#             && apk add -X "https://nginx.org/packages/mainline/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
-#             ;; \
-#         *) \
-# # we're on an architecture upstream doesn't officially build for
-# # let's build binaries from the published packaging sources
-#             set -x \
-#             && tempDir="$(mktemp -d)" \
-#             && chown nobody:nobody $tempDir \
-#             && apk add --no-cache --virtual .build-deps \
-#                 gcc \
-#                 libc-dev \
-#                 make \
-#                 openssl-dev \
-#                 pcre2-dev \
-#                 zlib-dev \
-#                 linux-headers \
-#                 libxslt-dev \
-#                 gd-dev \
-#                 geoip-dev \
-#                 libedit-dev \
-#                 bash \
-#                 alpine-sdk \
-#                 findutils \
-#             && su nobody -s /bin/sh -c " \
-#                 export HOME=${tempDir} \
-#                 && cd ${tempDir} \
-#                 && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-#                 && PKGOSSCHECKSUM=\"79bf214256bf55700c776a87abfc3cf542323a267d879e89110aa44b551d12f6df7d56676a68f255ebbb54275185980d1fa37075f000d98e0ecac28db9e89fe3 *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
-#                 && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
-#                     echo \"pkg-oss tarball checksum verification succeeded!\"; \
-#                 else \
-#                     echo \"pkg-oss tarball checksum verification failed!\"; \
-#                     exit 1; \
-#                 fi \
-#                 && tar xzvf ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-#                 && cd pkg-oss-${NGINX_VERSION}-${PKG_RELEASE} \
-#                 && cd alpine \
-#                 && make module-geoip module-image-filter module-njs module-xslt \
-#                 && apk index -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
-#                 && abuild-sign -k ${tempDir}/.abuild/abuild-key.rsa ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz \
-#                 " \
-#             && cp ${tempDir}/.abuild/abuild-key.rsa.pub /etc/apk/keys/ \
-#             && apk del --no-network .build-deps \
-#             && apk add -X ${tempDir}/packages/alpine/ --no-cache $nginxPackages \
-#             ;; \
-#     esac \
-# # remove checksum deps
-#     && apk del --no-network .checksum-deps \
-# # if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
-#     && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
-#     && if [ -f "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
-#     && if [ -f "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi \
-# Bring in curl and ca-certificates to make registering on DNS SD easier
-    && apk add --no-cache curl ca-certificates \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && apk add --no-cache tzdata \
+    && yum install -y tzdata \
+# Bring in curl and ca-certificates to make registering on DNS SD easier
+    && yum install -y --allowerasing curl ca-certificates \
 # forward request and error logs to docker log collector
+    && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
-
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+# create nginx user/group first, to be consistent throughout docker variants
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Upgrade software to latest version
 # ##############################################################################
-RUN apk upgrade
+    && yum upgrade -y \
+# Cleanup
+# ##############################################################################
+    && yum remove -y \
+        shadow-utils \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # smoke test
 # ##############################################################################
 RUN envsubst -V \
     && nginx -V \
     && nginx -t \
-    && luajit -v \
     && lua -v \
     && luarocks --version
 
