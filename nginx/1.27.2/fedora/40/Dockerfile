@@ -84,7 +84,7 @@ ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.29
+ARG VER_LUA_RESTY_CORE=0.1.30
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -118,7 +118,7 @@ ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 # lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE=0.14
+ARG VER_LUA_RESTY_LRUCACHE=0.15
 ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # lua-resty-memcached
