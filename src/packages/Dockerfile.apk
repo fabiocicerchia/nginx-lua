@@ -23,6 +23,7 @@ COPY *.sh /
 # depends from nginx 1.25.2
 RUN source /etc/os-release \
     && fpm \
+      --verbose \
       --name nginx-lua \
       --version $NGINX_VERSION \
       --architecture $ARCH \
