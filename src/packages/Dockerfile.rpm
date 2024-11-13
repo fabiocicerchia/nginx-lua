@@ -17,6 +17,10 @@ RUN gem install fpm --no-document -v $FPM_VERSION
 
 ARG FPM_OUTPUT_TYPE=rpm
 
+# WORKAROUND
+# REF: https://github.com/jordansissel/fpm/issues/2076
+RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--buildroot", "#{build_path}\/BUILD"\]/g' /usr/local/share/gems/gems/fpm-*/lib/fpm/package/rpm.rb
+
 COPY *.sh /
 
 # depends from nginx 1.25.2
