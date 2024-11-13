@@ -141,8 +141,8 @@ $(test_targets): ## test one docker image
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 else
-	ARCH=$(shell echo $$TASK | cut -d"-" -f2); \
-	DISTRO=$(subst test-,,$(@)); \
+	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-.*/\1/'); \
+	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-//'); \
 	echo "TESTING $$DISTRO"; \
 	$(TEST_CMD) "$$DISTRO" "$$ARCH" "" "docker"
 endif
@@ -230,7 +230,7 @@ $(package_targets_arm64): ## creating the system package in arm64/v8 arch
 		--build-arg OS_VERSION="$(OS_VER)" \
 		--build-arg FPM_OUTPUT_TYPE="$$PACKAGE_TYPE" \
 		src/packages; \
-	docker rm -f extract-$$PACKAGE_TYPE || true; \
+	docker inspect extract-$$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$$PACKAGE_TYPE; \
 	docker run -d --name extract-$$PACKAGE_TYPE package-nginx-$$PACKAGE_TYPE && \
 	docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE"; \
 	docker cp extract-$$PACKAGE_TYPE:$$(docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE") dist/; \
