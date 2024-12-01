@@ -415,6 +415,11 @@ ARG PKG_DEPS="\
 "
 ENV PKG_DEPS=$PKG_DEPS
 
+# hadolint ignore=SC2086
+RUN set -eux \
+    && yum install -y \
+        $PKG_DEPS
+
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
 COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
 COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
@@ -443,27 +448,23 @@ COPY --chown=101:101 tpl/support.sh /
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
-# hadolint ignore=SC2086
-RUN set -eux \
-    && yum install -y \
-        $PKG_DEPS \
 # Fix LUA alias
-    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
+RUN ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && yum install -y tzdata \
+    && yum install -y tzdata
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && yum install -y curl ca-certificates \
+RUN yum install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
     && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
 # Upgrade software to latest version
 # ##############################################################################
-    && yum upgrade -y \
+RUN yum upgrade -y \
 # Cleanup
 # ##############################################################################
     && yum clean all \
@@ -471,11 +472,11 @@ RUN set -eux \
 
 # smoke test
 # ##############################################################################
-RUN envsubst -V \
-    && nginx -V \
+RUN envsubst \
+    && nginx \
     && nginx -t \
-    && luajit -v \
-    && lua -v \
+    && luajit \
+    && lua \
     && luarocks --version
 
 EXPOSE 80 443
