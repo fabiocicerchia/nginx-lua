@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.8.7
+ARG VER_NJS=0.8.8
 ENV VER_NJS=$VER_NJS
 
 # geoip2
