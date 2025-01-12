@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=almalinux
-ARG DISTRO_VER=9.5-20241118
+ARG DISTRO=amazonlinux
+ARG DISTRO_VER=2023.6.20250107.0
 
 #############################
 # Settings Common Variables #
@@ -211,7 +211,7 @@ ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 # Replicate same official env variable
 ENV NGINX_VERSION   $VER_NGINX
 ENV NJS_VERSION     $VER_NJS
-ENV PKG_RELEASE     1~$DISTRO_VER
+ENV PKG_RELEASE     1
 
 # References:
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
@@ -240,9 +240,6 @@ ENV NGX_CFLAGS=$NGX_CFLAGS
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
 # Reference: http://nginx.org/en/docs/configure.html
-# NOTE: Almalinux is building with PCRE instead of PCRE2 mostly due to
-# https://github.com/openresty/lua-nginx-module/issues/1984.
-# More details on it: https://github.com/fabiocicerchia/nginx-lua/pull/40
 ARG NGINX_BUILD_CONFIG="\
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
@@ -286,7 +283,6 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             `# CUSTOM MODULES` \
-            --without-pcre2 \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
@@ -300,10 +296,8 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        findutils \
         gcc-c++ \
         gzip \
-        libmaxminddb \
         libmaxminddb-devel \
         libxml2-devel \
         libxslt-devel \
@@ -341,15 +335,12 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && update-crypto-policies --set DEFAULT:SHA1 \
-    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
-    && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled epel \
-    && dnf config-manager --set-enabled crb \
-    && dnf makecache \
-    && dnf install -y \
+    && yum makecache \
+    && yum install -y \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS
+        $NGINX_BUILD_DEPS \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 COPY tpl/Makefile Makefile
 COPY tpl/patches patches
@@ -361,9 +352,11 @@ RUN make deps \
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && dnf makecache \
-    && dnf install -y \
-        gettext
+    && yum makecache \
+    && yum install -y \
+        gettext \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 ##########################################
 # Combine everything with minimal layers #
@@ -373,18 +366,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on almalinux (${ARCH}) 9.5-20241118." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-almalinux9.5-20241118" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on amazonlinux (${ARCH}) 2023.6.20250107.0." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-amazonlinux2023.6.20250107.0" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-almalinux9.5-20241118" \
+    org.label-schema.version="${VER_NGINX}-amazonlinux2023.6.20250107.0" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="9.5-20241118" \
+    versions.os="2023.6.20250107.0" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -417,7 +410,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 
 ARG PKG_DEPS="\
         ca-certificates \
-        gcc-c++ \
         libxml2-devel \
         openssl-devel \
         pcre-devel \
@@ -456,21 +448,17 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && update-crypto-policies --set DEFAULT:SHA1 \
-    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
-    && dnf install -y 'dnf-command(config-manager)' epel-release \
-    && dnf config-manager --set-enabled epel \
-    && dnf config-manager --set-enabled crb \
-    && dnf makecache \
-    && dnf install -y \
+    && yum makecache \
+    && yum install -y \
         $PKG_DEPS \
+        shadow-utils \
 # Fix LUA alias
     && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && dnf install -y tzdata \
+    && yum install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-    && dnf install -y ca-certificates \
+    && yum install -y --allowerasing curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
@@ -480,18 +468,19 @@ RUN set -eux \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Upgrade software to latest version
 # ##############################################################################
-    && dnf upgrade -y \
+    && yum upgrade -y \
 # Cleanup
 # ##############################################################################
-    && dnf clean all \
-    && rm -rf /var/cache/dnf
+    && yum remove -y \
+        shadow-utils \
+    && yum clean all \
+    && rm -rf /var/cache/yum
 
 # smoke test
 # ##############################################################################
 RUN envsubst -V \
     && nginx -V \
     && nginx -t \
-    && luajit -v \
     && lua -v \
     && luarocks --version
 
