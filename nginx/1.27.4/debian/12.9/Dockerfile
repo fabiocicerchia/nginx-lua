@@ -133,7 +133,7 @@ ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
 # https://github.com/openresty/lua-resty-redis
-ARG VER_OPENRESTY_REDIS=0.31
+ARG VER_OPENRESTY_REDIS=0.32
 ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
 
 # lua-resty-shell
