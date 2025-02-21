@@ -42,7 +42,7 @@ ENV VER_NGINX=$VER_NGINX
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
-ARG VER_NGX_DEVEL_KIT=0.3.3
+ARG VER_NGX_DEVEL_KIT=0.3.4
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=92717427784535c2bd2a7aa5234fa91b34f5e95d
+ARG VER_OPENRESTY_STREAMLUA=35071d983042b6820427d2312c143a13a137b2ea
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
