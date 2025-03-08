@@ -19,8 +19,8 @@ ARG FPM_OUTPUT_TYPE=rpm
 
 # WORKAROUND
 # REF: https://github.com/jordansissel/fpm/issues/2076
-RUN find /usr/local/share/ruby*gems/gems -name "rpm.rb"
-RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--buildroot", "#{build_path}\/BUILD"\]/g' /usr/local/share/ruby*gems/gems/fpm-*/lib/fpm/package/rpm.rb
+RUN find /usr/local/share/*gems/gems -name "rpm.rb"
+RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--buildroot", "#{build_path}\/BUILD"\]/g' /usr/local/share/*gems/gems/fpm-*/lib/fpm/package/rpm.rb
 
 COPY *.sh /
 
