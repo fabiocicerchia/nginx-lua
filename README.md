@@ -49,7 +49,7 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 - [`1`, `1.27`, `1.27.4`, `alpine`, `latest`, `1-alpine`, `1.27-alpine`, `1.27.4-alpine`, `1-alpine3.21.3`, `1.27-alpine3.21.3`, `1.27.4-alpine3.21.3`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/alpine/3.21.3/Dockerfile)
 - [`amazonlinux`, `1-amazonlinux`, `1.27-amazonlinux`, `1.27.4-amazonlinux`, `1-amazonlinux2023.7.20250331.0`, `1.27-amazonlinux2023.7.20250331.0`, `1.27.4-amazonlinux2023.7.20250331.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/amazonlinux/2023.7.20250331.0/Dockerfile)
 - [`debian`, `1-debian`, `1.27-debian`, `1-debian12.10`, `1.27.4-debian`, `1.27-debian12.10`, `1.27.4-debian12.10`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/debian/12.10/Dockerfile)
-- [`fedora`, `1-fedora`, `1-fedora41`, `1.27-fedora`, `1.27-fedora41`, `1.27.4-fedora`, `1.27.4-fedora41`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/fedora/41/Dockerfile)
+- [`fedora`, `1-fedora`, `1-fedora42`, `1.27-fedora`, `1.27-fedora42`, `1.27.4-fedora`, `1.27.4-fedora42`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/fedora/42/Dockerfile)
 - [`ubuntu`, `1-ubuntu`, `1.27-ubuntu`, `1-ubuntu24.04`, `1.27.4-ubuntu`, `1.27-ubuntu24.04`, `1.27.4-ubuntu24.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.27.4/ubuntu/24.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
