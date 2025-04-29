@@ -223,9 +223,10 @@ ENV PKG_RELEASE     1~$DISTRO_VER
 # -Werror=format-security   Reject potentially unsafe format string arguents
 # -Wp,-D_FORTIFY_SOURCE=2   Run-time buffer overflow detection
 # -fPIC                     No text relocations
-# ORIGINAL VALUE: -g -O2 -ffile-prefix-map=/data/builder/debuild/nginx-1.23.3/debian/debuild-base/nginx-1.23.3=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC
-# Ref: https://www.mail-archive.com/nginx-devel@nginx.org/msg13233.html
-ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC -Wno-dangling-pointer"
+# ORIGINAL VALUE: -g -O2 -ffile-prefix-map=/home/builder/debuild/nginx-1.27.5/debian/debuild-base/nginx-1.27.5=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC
+# TODO: REMOVE -Wno-error=unterminated-string-initialization
+#   Ref: https://github.com/nginx/njs/pull/871 and https://github.com/nginx/njs/issues/857
+ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC -Wno-error=unterminated-string-initialization"
 ENV NGX_CFLAGS=$NGX_CFLAGS
 # References
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
@@ -248,8 +249,8 @@ ARG NGINX_BUILD_CONFIG="\
             --conf-path=/etc/nginx/nginx.conf \
             --error-log-path=/var/log/nginx/error.log \
             --http-log-path=/var/log/nginx/access.log \
-            --pid-path=/var/run/nginx.pid \
-            --lock-path=/var/run/nginx.lock \
+            --pid-path=/run/nginx.pid \
+            --lock-path=/run/nginx.lock \
             --http-client-body-temp-path=/var/cache/nginx/client_temp \
             --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
             --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
@@ -277,6 +278,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-http_stub_status_module \
             --with-http_sub_module \
             --with-http_v2_module \
+            --with-http_v3_module \
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
