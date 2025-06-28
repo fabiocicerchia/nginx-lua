@@ -94,7 +94,7 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.12.1
+ARG VER_LUAROCKS=3.12.2
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # LUA ADDONS
