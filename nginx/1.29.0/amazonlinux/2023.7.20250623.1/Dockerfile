@@ -102,7 +102,7 @@ ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS=0.38
+ARG VER_OPENRESTY_HEADERS=0.39
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
