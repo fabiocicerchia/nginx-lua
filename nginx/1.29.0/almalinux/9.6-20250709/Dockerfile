@@ -8,8 +8,8 @@
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
-ARG DISTRO=fedora
-ARG DISTRO_VER=42
+ARG DISTRO=almalinux
+ARG DISTRO_VER=9.6-20250709
 
 #############################
 # Settings Common Variables #
@@ -224,9 +224,7 @@ ENV PKG_RELEASE     1~$DISTRO_VER
 # -Wp,-D_FORTIFY_SOURCE=2   Run-time buffer overflow detection
 # -fPIC                     No text relocations
 # ORIGINAL VALUE: -g -O2 -ffile-prefix-map=/home/builder/debuild/nginx-1.27.5/debian/debuild-base/nginx-1.27.5=. -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC
-# TODO: REMOVE -Wno-error=unterminated-string-initialization
-#   Ref: https://github.com/nginx/njs/pull/871 and https://github.com/nginx/njs/issues/857
-ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC -Wno-error=unterminated-string-initialization"
+ARG NGX_CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fPIC"
 ENV NGX_CFLAGS=$NGX_CFLAGS
 # References
 #  - https://developers.redhat.com/blog/2018/03/21/compiler-and-linker-flags-gcc
@@ -242,6 +240,9 @@ ENV NGX_CFLAGS=$NGX_CFLAGS
 ARG NGX_LDOPT="-Wl,-rpath,/usr/local/lib -Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie"
 ENV NGX_LDOPT=$NGX_LDOPT
 # Reference: http://nginx.org/en/docs/configure.html
+# NOTE: Almalinux is building with PCRE instead of PCRE2 mostly due to
+# https://github.com/openresty/lua-nginx-module/issues/1984.
+# More details on it: https://github.com/fabiocicerchia/nginx-lua/pull/40
 ARG NGINX_BUILD_CONFIG="\
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
@@ -286,6 +287,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             `# CUSTOM MODULES` \
+            --without-pcre2 \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
@@ -299,8 +301,10 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
+        findutils \
         gcc-c++ \
         gzip \
+        libmaxminddb \
         libmaxminddb-devel \
         libxml2-devel \
         libxslt-devel \
@@ -338,8 +342,13 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(. /etc/os-release; echo $VERSION_ID)-primary \
-    && yum install -y \
+    && update-crypto-policies --set DEFAULT:SHA1 \
+    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
+    && dnf install -y 'dnf-command(config-manager)' epel-release \
+    && dnf config-manager --set-enabled epel \
+    && dnf config-manager --set-enabled crb \
+    && dnf makecache \
+    && dnf install -y \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS
 
@@ -353,7 +362,8 @@ RUN make deps \
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && yum install -y \
+    && dnf makecache \
+    && dnf install -y \
         gettext
 
 ##########################################
@@ -364,18 +374,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on fedora (${ARCH}) 42." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-fedora42" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on almalinux (${ARCH}) 9.6-20250709." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-almalinux9.6-20250709" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-fedora42" \
+    org.label-schema.version="${VER_NGINX}-almalinux9.6-20250709" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="42" \
+    versions.os="9.6-20250709" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -417,11 +427,6 @@ ARG PKG_DEPS="\
 "
 ENV PKG_DEPS=$PKG_DEPS
 
-# hadolint ignore=SC2086
-RUN set -eux \
-    && yum install -y \
-        $PKG_DEPS
-
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
 COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
 COPY --from=builder --chown=101:101 /usr/lib64 /usr/lib64
@@ -450,35 +455,45 @@ COPY --chown=101:101 tpl/support.sh /
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
+# hadolint ignore=SC2086
+RUN set -eux \
+    && update-crypto-policies --set DEFAULT:SHA1 \
+    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
+    && dnf install -y 'dnf-command(config-manager)' epel-release \
+    && dnf config-manager --set-enabled epel \
+    && dnf config-manager --set-enabled crb \
+    && dnf makecache \
+    && dnf install -y \
+        $PKG_DEPS \
 # Fix LUA alias
-RUN ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
+    && ln -sf /usr/local/bin/luajit /usr/local/bin/lua \
 # Bring in tzdata so users could set the timezones through the environment
 # variables
-    && yum install -y tzdata
+    && dnf install -y tzdata \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
-RUN yum install -y curl ca-certificates \
+    && dnf install -y ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
 # create nginx user/group first, to be consistent throughout docker variants
     && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
 # Upgrade software to latest version
 # ##############################################################################
-RUN yum upgrade -y \
+    && dnf upgrade -y \
 # Cleanup
 # ##############################################################################
-    && yum clean all \
+    && dnf clean all \
     && rm -rf /var/cache/dnf
 
 # smoke test
 # ##############################################################################
-RUN envsubst \
-    && nginx \
+RUN envsubst -V \
+    && nginx -V \
     && nginx -t \
-    && luajit \
-    && lua \
+    && luajit -v \
+    && lua -v \
     && luarocks --version
 
 EXPOSE 80 443
