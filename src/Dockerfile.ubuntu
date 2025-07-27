@@ -352,6 +352,19 @@ RUN make deps \
     && make core \
     && make luarocks
 
+RUN apt-get update && apt-get install -y cpanminus; \
+    git clone https://github.com/openresty/mockeagain.git; \
+    cd mockeagain; \
+    make; \
+    make install; \
+    cd ..; \
+    rm -rf mockeagain; \
+    cpanm install --force IPC::Run; \
+    cat /root/.cpanm/work/*/build.log; \
+    cpanm install Test::Nginx::Socket
+
+RUN make test
+
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
