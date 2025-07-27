@@ -329,3 +329,41 @@ luarocks:
 	./configure \
 	&& $(MAKE) \
 	&& $(MAKE) install
+
+
+#### TEST
+test:
+	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
+		&& $(MAKE) test; \
+	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
+		&& $(MAKE) test; \
+	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
+		&& $(MAKE) test; \
+	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
+		&& $(MAKE) test; \
+	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
+		&& $(MAKE) test; \
+	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+		&& $(MAKE) test; \
+	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+		&& $(MAKE) test; \
+	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+		&& $(MAKE) test; \
+	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
+		&& $(MAKE) test; \
+	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
+		&& $(MAKE) test; \
+	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
+		&& $(MAKE) test; \
+	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+		&& $(MAKE) test; \
+	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+		&& $(MAKE) test; \
+	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
+		&& $(MAKE) test; \
+	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
+		&& $(MAKE) test; \
+	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+		&& $(MAKE) test; \
+	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
+		&& $(MAKE) test;
