@@ -4,7 +4,7 @@
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
 #
-# Copyright (c) 2024 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Copyright (c) 2025 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 ARG ARCH=
