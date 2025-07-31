@@ -297,6 +297,7 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         curl \
+        cpanminus \
         gzip \
         libmaxminddb-dev \
         make \
@@ -357,6 +358,13 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
+RUN git clone https://github.com/openresty/mockeagain.git; \
+    cd mockeagain && make && make install; \
+    cpanm install --force IPC::Run; \
+    cpanm install Test::Nginx::Socket; \
+    make test
 
 ##########################################
 # Combine everything with minimal layers #
