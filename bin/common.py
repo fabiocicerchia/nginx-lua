@@ -321,6 +321,10 @@ def init_dockerfile(nginx_ver, os_distro, os_ver):
     for file in glob.glob(r"src/patches/*.patch"):
       shutil.copyfile(file, folder+"/"+file.replace("src/", "tpl/"))
 
+    os.makedirs(folder+"/tpl/licenses", exist_ok=True)
+    for file in glob.glob(r"src/licenses/*.LICENSE"):
+      shutil.copyfile(file, folder+"/"+file.replace("src/", "tpl/"))
+
     shutil.copyfile("src/default.conf", folder+"/tpl/default.conf")
     shutil.copyfile("src/Makefile", folder+"/tpl/Makefile")
     shutil.copyfile("src/nginx.conf", folder+"/tpl/nginx.conf")

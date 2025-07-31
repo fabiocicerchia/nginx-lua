@@ -77,23 +77,6 @@ Lua is a lightweight, high-level, multi-paradigm programming language designed p
 
 With this project you'll get a fresh nginx + lua version the day after (or even less than a day) of the release of a new nginx version!
 
-| | nginx-lua | [OpenResty](https://hub.docker.com/r/openresty/openresty/tags) |
-|--|--|--|
-| nginx latest version | `1.25.4` | `1.25.x` (last tested: `1.25.3.1`)¹ |
-| AlmaLinux supported | ✅ | ❌ |
-| Alpine supported | ✅ | ✅ |
-| Amazon supported | ✅ | ✅ |
-| CentOS supported | ❌ | ✅ |
-| Debian supported | ✅ | ✅ |
-| Fedora supported | ✅ | ❌ |
-| Ubuntu supported | ✅ | ✅ |
-| Windows supported | ❌ | ✅ |
-
-¹ Note:
-  * Between official nginx `1.25.3` (24 Oct 2023) and OpenResty compatibility for `1.25.3.1` (9 Jan 2024) have passed ~3 months, instead `fabiocicerchia/nginx-lua` took 2 days.
-  * On previous OpenResty version `1.21.x`: the whole mainline `1.23.x` has been skipped, while `fabiocicerchia/nginx-lua` was providing the version.
-  * On latest version `1.25.x`: between the first nginx release (23 May 2023) and the first OpenResty one (9 Jan 2024) have passed ~8 months.
-
 ## Features
 
 - Support for Lua.
@@ -695,6 +678,8 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [Lua License](https://www.lua.org/license.html)
 - [LuaJIT License](https://repo.or.cz/luajit-2.0.git/blob/HEAD:/COPYRIGHT)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
+
+All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [LICENSES](/LICENSES)
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
