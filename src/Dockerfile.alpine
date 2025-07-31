@@ -297,13 +297,13 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         curl \
-        cpanminus \
         gzip \
         libmaxminddb-dev \
         make \
         openssl-dev \
         patch \
         pcre-dev \
+        perl-app-cpanminus \
         tar \
         zlib-dev \
 "

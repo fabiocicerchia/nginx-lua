@@ -299,7 +299,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        cpanminus \
         gcc-c++ \
         gzip \
         libmaxminddb-devel \
@@ -309,6 +308,7 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
+        perl-App-cpanminus \
         tar \
         unzip \
         which \
