@@ -307,7 +307,9 @@ ARG BUILD_DEPS_BASE="\
         libxslt1-dev \
         make \
         patch \
+        python3 \
         unzip \
+        wget \
         zlib1g-dev \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
@@ -353,11 +355,7 @@ RUN make deps \
     && make luarocks
 
 # Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
-RUN git clone https://github.com/openresty/mockeagain.git; \
-    cd mockeagain && make && make install; \
-    cpanm install --force IPC::Run; \
-    cpanm install Test::Nginx::Socket; \
-    make test
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

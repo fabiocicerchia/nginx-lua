@@ -297,13 +297,13 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         curl \
-        cpanminus \
         gzip \
         libmaxminddb-dev \
         make \
         openssl-dev \
         patch \
         pcre-dev \
+        perl-app-cpanminus \
         tar \
         zlib-dev \
 "
@@ -360,11 +360,8 @@ RUN make deps \
     && make luarocks
 
 # Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
-RUN git clone https://github.com/openresty/mockeagain.git; \
-    cd mockeagain && make && make install; \
-    cpanm install --force IPC::Run; \
-    cpanm install Test::Nginx::Socket; \
-    make test
+# COPY --from=python:2.7.18-alpine /usr/local/bin/python /usr/local/bin/python
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

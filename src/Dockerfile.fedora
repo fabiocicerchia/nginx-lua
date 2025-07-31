@@ -299,7 +299,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        cpanminus \
         gcc-c++ \
         gzip \
         libmaxminddb-devel \
@@ -309,8 +308,10 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
+        perl-App-cpanminus \
         tar \
         unzip \
+        wget \
         which \
         zlib-devel \
 "
@@ -361,11 +362,7 @@ RUN set -eux \
     && rm -rf /var/cache/yum
 
 # Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
-RUN git clone https://github.com/openresty/mockeagain.git; \
-    cd mockeagain && make && make install; \
-    cpanm install --force IPC::Run; \
-    cpanm install Test::Nginx::Socket; \
-    make test
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
