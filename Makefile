@@ -30,7 +30,8 @@ PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | h
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell $(MAKE) changelog)
 
-SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
+SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
+SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64-, $(DISTROS))
@@ -209,6 +210,10 @@ $(package_targets_arm64): ## creating the system package in arm64/v8 arch
 	ARCH=arm64v8 DISTRO=$(subst package-arm64-,,$(@)) $(MAKE) .package-base
 
 .package-base:
+	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER_MAINLINE) make .package-base-nginx-specific-ver
+	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER_STABLE) make .package-base-nginx-specific-ver
+
+.package-base-nginx-specific-ver:
 	if [ "$(DISTRO)" = "alpine" ]; then \
 		PACKAGE_TYPE=apk; \
 	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
@@ -288,7 +293,8 @@ auto-update-and-commit: .setup_gitrepo auto-update
 		git commit -m "Automated updates"; \
 		git pull origin main || true; \
 		git push origin main; \
-	else \
+	else \	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER_MAINLINE) make .package-base-nginx-specific-ver
+
 		exit 1; \
 	fi
 
@@ -306,7 +312,7 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile*
 	cp Dockerfile dist/
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
+	tail -n -7 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
 	wget https://github.com/tcnksm/ghr/releases/download/v0.16.2/ghr_v0.16.2_linux_amd64.tar.gz
 	tar xvzf ghr_v0.16.2_linux_amd64.tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \

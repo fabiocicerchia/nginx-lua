@@ -297,6 +297,7 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
+        cpanminus \
         curl \
         g++ \
         libmaxminddb-dev \
@@ -306,6 +307,7 @@ ARG BUILD_DEPS_BASE="\
         libxslt1-dev \
         make \
         patch \
+        python3 \
         unzip \
         zlib1g-dev \
 "
@@ -350,6 +352,14 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
+RUN alias python=python3; \
+    git clone https://github.com/openresty/mockeagain.git; \
+    cd mockeagain && make && make install; \
+    cpanm install --force IPC::Run; \
+    cpanm install Test::Nginx::Socket; \
+    make test
 
 ##########################################
 # Combine everything with minimal layers #

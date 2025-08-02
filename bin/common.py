@@ -271,12 +271,16 @@ def get_dockerfile(nginx_ver, os_distro, os_ver):
 
 def get_supported_versions():
     versions = get_all_versions()
-    nginx_ver = versions["nginx"]
+    nginx_ver_mainline = versions["nginx_mainline"]
+    nginx_ver_stable = versions["nginx_stable"]
 
     supported_versions = []
     for os_distro in get_supported_os():
         supported_versions.append(
-            get_dockerfile(nginx_ver, os_distro, versions[os_distro])
+            get_dockerfile(nginx_ver_mainline, os_distro, versions[os_distro])
+        )
+        supported_versions.append(
+            get_dockerfile(nginx_ver_stable, os_distro, versions[os_distro])
         )
 
     return supported_versions
