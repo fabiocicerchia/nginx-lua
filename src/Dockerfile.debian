@@ -338,9 +338,9 @@ FROM base AS builder
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         apt-utils \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/*
@@ -450,7 +450,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # hadolint ignore=SC2086
 RUN set -eux \
     && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         $PKG_DEPS \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/log/nginx \
@@ -462,7 +462,7 @@ RUN set -x \
     && addgroup --system --gid 101 nginx \
     && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
     && apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/debian/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && \
@@ -536,7 +536,7 @@ RUN set -x \
 #             ;; \
 #     esac \
 #     \
-    && apt-get install --no-install-recommends --no-install-suggests -y \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y \
 #                         $nginxPackages \
                         gettext-base \
                         curl \
