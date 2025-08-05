@@ -293,8 +293,7 @@ auto-update-and-commit: .setup_gitrepo auto-update
 		git commit -m "Automated updates"; \
 		git pull origin main || true; \
 		git push origin main; \
-	else \	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER_MAINLINE) make .package-base-nginx-specific-ver
-
+	else \
 		exit 1; \
 	fi
 
@@ -321,7 +320,7 @@ release: ## create a github release
 	rm -rf dist
 
 generate-supported-versions: ## generate supported_versions file
-	./bin/generate-supported-versions.sh
+	./bin/generate-supported-versions.py
 
 generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
