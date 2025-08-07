@@ -326,7 +326,7 @@ generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
 
 generate-deps-env: ## generate .env for dependencies
-	./bin/generate-deps-env.sh > ./src/.env.dist
+	./bin/generate-deps-env.py > ./src/.env.dist
 
 pull-nginx-entrypoints: ## retrieves the official entrypoint files
 	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null https://github.com/nginxinc/docker-nginx/releases/tag/$(SUPPORTED_NGINX_VER))" = "200" ]; then \
@@ -355,7 +355,10 @@ update-tags: ## update docker tags file
 	./bin/generate_tags.py | tee docs/TAGS.md
 
 update-readme: ## update supported docker tags in readme
-	./bin/update-readme.sh
+	head -n "$$(grep -n START_SUPPORTED_TAGS README.md | cut -d: -f1)" README.md >README.md.tmp
+	./bin/readme-tags.py >>README.md.tmp
+	tail -n "$$(($$(wc -l <README.md) - $$(grep -n END_SUPPORTED_TAGS README.md | cut -d: -f1) + 1))" README.md >>README.md.tmp
+	mv README.md.tmp README.md
 
 benchmark: ## benchmark (wip)
 	./bin/benchmark.sh

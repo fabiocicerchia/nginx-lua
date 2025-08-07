@@ -73,88 +73,85 @@ function run_container_base() {
 }
 
 function inject_dependencies() {
+    trap 'handle_error' ERR
+
     DOCKER_TAG=$1
 
     if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
         # Ref: https://github.com/luarocks/luarocks/issues/952
-        docker exec nginx_lua_test apk add gcc musl-dev coreutils wget || handle_error
+        docker exec nginx_lua_test apk add gcc musl-dev coreutils wget
     elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
-        docker exec nginx_lua_test apt update || handle_error
-        docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip || handle_error
+        docker exec nginx_lua_test apt update
+        docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip
     elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc unzip || handle_error
+        docker exec nginx_lua_test yum install -y gcc unzip
     elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc musl-devel coreutils unzip || handle_error
+        docker exec nginx_lua_test yum install -y gcc musl-devel coreutils unzip
     elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc || handle_error
+        docker exec nginx_lua_test yum install -y gcc
     fi
     # cannot run on almalinux (which uses 5.1) :
     # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate
-    docker exec nginx_lua_test luarocks install lua-cjson || handle_error
+    docker exec nginx_lua_test luarocks install lua-cjson
 }
 
 function wait_for_nginx() {
     COUNT=0
-    until [ $COUNT -eq 20 ] || [ "$(
-        curl --output /dev/null --silent --head --fail http://localhost:8080
-        echo $?
-    )" == "0" ]; do
+    until [ $COUNT -eq 20 ] || [ "$(curl --output /dev/null --silent --head --fail http://localhost:8080; echo $?)" == "0" ]; do
         echo -n '.'
         sleep 1
         COUNT=$((COUNT + 1))
     done
 }
 
-function tear_down_container() {
-    docker rm -f nginx_lua_test
-}
-
 function exec_tests() {
-    curl -v http://localhost:8080 | grep "Welcome to nginx" || handle_error
-    curl -v http://localhost:8080/lua_content | grep "Hello world" || handle_error
-    docker exec nginx_lua_test curl -v --fail http://localhost:80/status | grep "Nginx Worker PID" || handle_error
-    docker exec nginx_lua_test curl -v --fail http://localhost:80/metrics || handle_error
-    curl -H'Connection: upgrade' -H'Upgrade: websocket' -H'Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==' -H'Sec-WebSocket-Version: 13' http://localhost:8080/socket | grep -a "Hello world" || handle_error
-    curl -v --fail http://localhost:8080/shell | grep "ok" | grep -v "not ok" || handle_error
-    curl -v --fail http://localhost:8080/dns | grep "www.google.com" || handle_error
-    curl -v --fail --cookie 'lang=en' http://localhost:8080/cookie 2>&1 | grep "Set-Cookie: Name=Bob" || handle_error
-    curl -v --fail http://localhost:8080/headers 2>&1 | grep "X-MyHeader: blah" || handle_error
-    curl -v --fail http://localhost:8080/type 2>&1 | grep "Content-Type: text/plain" || handle_error
+    trap 'handle_error' ERR
 
-    curl -v --fail http://localhost:8080/memcached || handle_error
+    curl -v http://localhost:8080 | grep "Welcome to nginx"
+    curl -v http://localhost:8080/lua_content | grep "Hello world"
+    docker exec nginx_lua_test curl -v --fail http://localhost:80/status | grep "Nginx Worker PID"
+    docker exec nginx_lua_test curl -v --fail http://localhost:80/metrics
+    curl -H'Connection: upgrade' -H'Upgrade: websocket' -H'Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQ==' -H'Sec-WebSocket-Version: 13' http://localhost:8080/socket | grep -a "Hello world"
+    curl -v --fail http://localhost:8080/shell | grep "ok" | grep -v "not ok"
+    curl -v --fail http://localhost:8080/dns | grep "www.google.com"
+    curl -v --fail --cookie 'lang=en' http://localhost:8080/cookie 2>&1 | grep "Set-Cookie: Name=Bob"
+    curl -v --fail http://localhost:8080/headers 2>&1 | grep "X-MyHeader: blah"
+    curl -v --fail http://localhost:8080/type 2>&1 | grep "Content-Type: text/plain"
+
+    curl -v --fail http://localhost:8080/memcached
     # TODO: missing https://github.com/openresty/lua-resty-string
-    # curl -v --fail http://localhost:8080/mysql || handle_error
-    curl -v --fail http://localhost:8080/redis || handle_error
-    curl -v --fail http://localhost:8080/foo || handle_error
-    curl -v --fail http://localhost:8080/bar-mysql || handle_error
-    curl -v --fail http://localhost:8080/bar-pgsql || handle_error
-    curl -v --fail http://localhost:8080/json || handle_error
-    curl -v --fail http://localhost:8080/baz || handle_error
-    curl -v --fail http://localhost:8080/foo-hash || handle_error
-    curl -v --fail http://localhost:8080/base32 || handle_error
-    curl -v --fail http://localhost:8080/base64 || handle_error
-    curl -v --fail http://localhost:8080/hex || handle_error
-    curl -v --fail http://localhost:8080/sha1 || handle_error
-    curl -v --fail http://localhost:8080/sha1-2 || handle_error
-    curl -v --fail http://localhost:8080/today || handle_error
-    curl -v --fail http://localhost:8080/signature || handle_error
-    curl -v --fail http://localhost:8080/rand || handle_error
-    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" || handle_error # OPENDNS IP
-    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | egrep "Wright City|San Francisco" || handle_error
-    curl -v --fail http://localhost:8080/limit-1 || handle_error
-    curl -v --fail http://localhost:8080/limit-2 || handle_error
-    curl -v --fail http://localhost:8080/limit-3 || handle_error
+    # curl -v --fail http://localhost:8080/mysql
+    curl -v --fail http://localhost:8080/redis
+    curl -v --fail http://localhost:8080/foo
+    curl -v --fail http://localhost:8080/bar-mysql
+    curl -v --fail http://localhost:8080/bar-pgsql
+    curl -v --fail http://localhost:8080/json
+    curl -v --fail http://localhost:8080/baz
+    curl -v --fail http://localhost:8080/foo-hash
+    curl -v --fail http://localhost:8080/base32
+    curl -v --fail http://localhost:8080/base64
+    curl -v --fail http://localhost:8080/hex
+    curl -v --fail http://localhost:8080/sha1
+    curl -v --fail http://localhost:8080/sha1-2
+    curl -v --fail http://localhost:8080/today
+    curl -v --fail http://localhost:8080/signature
+    curl -v --fail http://localhost:8080/rand
+    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" # OPENDNS IP
+    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | egrep "Wright City|San Francisco"
+    curl -v --fail http://localhost:8080/limit-1
+    curl -v --fail http://localhost:8080/limit-2
+    curl -v --fail http://localhost:8080/limit-3
     echo "hello world" > /tmp/a.txt
-    curl -v --fail -F "file1=@/tmp/a.txt" http://localhost:8080/upload || handle_error
-    curl -v --fail http://localhost:8080/lrucache || handle_error
-    curl -v --fail http://localhost:8080/signal || handle_error
-    curl -v --fail http://localhost:8080/tablepool || handle_error
-    curl -v --fail http://localhost:8080/lock || handle_error
-    curl -v --fail http://localhost:8080/string || handle_error
-    curl -v --fail http://localhost:8080/cjson || handle_error
+    curl -v --fail -F "file1=@/tmp/a.txt" http://localhost:8080/upload
+    curl -v --fail http://localhost:8080/lrucache
+    curl -v --fail http://localhost:8080/signal
+    curl -v --fail http://localhost:8080/tablepool
+    curl -v --fail http://localhost:8080/lock
+    curl -v --fail http://localhost:8080/string
+    curl -v --fail http://localhost:8080/cjson
 }
 
-function test_docker_image() {
+function do_test() {
     DOCKER_TAG=$1
 
     RET=$(run_container "$DOCKER_TAG")
@@ -164,20 +161,7 @@ function test_docker_image() {
     inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
-    tear_down_container
-}
-
-function test_system_package() {
-    DOCKER_TAG=$1
-
-    RET=$(run_container "$DOCKER_TAG")
-    if [ "$RET" = "0" ]; then
-        return;
-    fi
-    inject_dependencies "$DOCKER_TAG"
-    wait_for_nginx
-    exec_tests
-    tear_down_container
+    docker rm -f nginx_lua_test # tear_down_container
 }
 
 set -eux
@@ -193,10 +177,10 @@ for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | h
     TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
     if [ "$TYPE" = "docker" ]; then
-        echo "TESTING TAG: $TAG-$ARCH"
-        test_docker_image "$TAG-$ARCH"
-    elif [ "$TYPE" = "package" ]; then
-        echo "TESTING TAG: ${SAVED_TAG:-$TAG-$ARCH}"
-        test_system_package "${SAVED_TAG:-$TAG-$ARCH}"
+        SAVED_TAG=
     fi
+    TESTING_TAG="${SAVED_TAG:-$TAG-$ARCH}"
+
+    echo "TESTING TAG: ${TESTING_TAG}"
+    do_test "$TESTING_TAG"
 done

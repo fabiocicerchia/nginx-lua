@@ -12,9 +12,9 @@ docker run -it --net host --pid host --userns host --cap-add audit_control \
 
 source supported_versions
 
-for OS_FOLDER in $(find nginx/$nginx -mindepth 1 -maxdepth 1 -type d); do
-    OS=$(echo "$OS_FOLDER" | awk -F '/' '{print $NF}')
-    TAG=$(echo "$OS_FOLDER/${!OS}/Dockerfile" | awk -F '/' '{print $2"-"$3$4}')
+find nginx/{$nginx_mainline,$nginx_stable} -mindepth 1 -maxdepth 1 -type d | while read OS_FOLDER; do
+    OS=$(basename "$OS_FOLDER")
+    TAG="$nginx_mainline-$OS-${!OS}"
     docker scan fabiocicerchia/nginx-lua:"$TAG"
 done
 
