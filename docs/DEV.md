@@ -111,7 +111,6 @@ UTILITIES
   generate-deps-env                                   generate .env for dependencies
   pull-nginx-entrypoints                              retrieves the official entrypoint files
   generate-metadata                                   generate metadata for all OS docker images
-  generate-metadata-all                               generate all metadata for all OS docker images
   update-tags                                         update docker tags file
   update-readme                                       update supported docker tags in readme
   benchmark                                           benchmark (wip)

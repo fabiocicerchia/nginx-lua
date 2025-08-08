@@ -3,6 +3,74 @@
 
 set -e
 
+# Script variables
+OS=""
+ARCH=""
+MAX="1"
+TYPE="docker"
+SAVED_TAG=""
+
+# Help function
+show_help() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS] <os> <arch> [max] [type]
+
+Test nginx-lua docker images for different operating systems and architectures.
+
+ARGUMENTS:
+    os              Operating system (alpine, almalinux, amazonlinux, debian, fedora, ubuntu)
+    arch            Architecture (amd64, arm64)
+    max             Maximum number of Dockerfiles to test (default: 1)
+    type            Test type: docker or package (default: docker)
+
+OPTIONS:
+    -h, --help      Show this help message and exit
+EOF
+}
+
+# Input validation function
+validate_input() {
+    # Check if required arguments are provided
+    if [ -z "$OS" ] || [ -z "$ARCH" ]; then
+        echo "Error: Missing required arguments" >&2
+        echo "Use '$(basename "$0") --help' for usage information" >&2
+        exit 1
+    fi
+}
+
+# Parse command line arguments
+parse_arguments() {
+    # Check for help flag
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+        esac
+    done
+
+    # Check if we have the minimum required arguments
+    if [ $# -lt 2 ]; then
+        echo "Error: Expected at least 2 arguments, got $#" >&2
+        echo "Use '$(basename "$0") --help' for usage information" >&2
+        exit 1
+    fi
+
+    # Assign positional arguments
+    OS="$1"
+    ARCH="$2"
+    
+    # Optional arguments
+    if [ $# -ge 3 ]; then
+        MAX="$3"
+    fi
+    
+    if [ $# -ge 4 ]; then
+        TYPE="$4"
+    fi
+}
+
 function handle_error() {
     docker logs nginx_lua_test
     exit 1
@@ -25,53 +93,6 @@ function run_container() {
         fabiocicerchia/nginx-lua:"$DOCKER_TAG"
 }
 
-function run_container_base() {
-    DOCKER_TAG=$1
-    ARCH=$(dpkg --print-architecture)
-
-    if [[ "$DOCKER_TAG" == *"alpine"* ]]; then
-        IMAGE=alpine
-		INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"
-    elif [[ "$DOCKER_TAG" == *"ubuntu"* ]]; then
-        IMAGE=ubuntu
-		INSTALL_CMD="apt update && apt install -yf /app/*_$ARCH.deb"
-    elif [[ "$DOCKER_TAG" == *"debian"* ]]; then
-        IMAGE=debian
-		INSTALL_CMD="apt update && apt install -yf /app/*_$ARCH.deb"
-    elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
-        IMAGE=almalinux
-		INSTALL_CMD="yum localinstall -y /app/*.x86_64.rpm"
-		if [ "$ARCH" = "arm64" ]; then
-			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
-		fi
-    elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
-        IMAGE=fedora
-		INSTALL_CMD="yum localinstall -y /app/*.x86_64.rpm"
-		if [ "$ARCH" = "arm64" ]; then
-			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
-		fi
-    elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
-        IMAGE=amazonlinux
-		INSTALL_CMD="yum localinstall -y /app/*.x86_64.rpm"
-		if [ "$ARCH" = "arm64" ]; then
-			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
-		fi
-    fi
-
-    docker rm -f nginx_lua_test 2>/dev/null || true
-
-    docker run -d --name nginx_lua_test -p 8080:80 -e SKIP_TRACK=1 \
-        -v "$PWD"/test/nginx-lua.conf:/etc/nginx/nginx.conf.new \
-        -v "$PWD"/test/tests.conf.d:/etc/nginx/tests.conf.d \
-        -v "$PWD"/test/geoip:/etc/nginx/geoip \
-        -v "$PWD"/dist:/app \
-        "$IMAGE:latest" sleep infinity
-
-    docker exec nginx_lua_test /bin/sh -c "$INSTALL_CMD"
-    docker exec nginx_lua_test /bin/sh -c "cp /etc/nginx/nginx.conf.new /etc/nginx/nginx.conf"
-    docker exec nginx_lua_test /bin/sh -c "/usr/sbin/nginx"
-}
-
 function inject_dependencies() {
     trap 'handle_error' ERR
 
@@ -83,13 +104,10 @@ function inject_dependencies() {
     elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
         docker exec nginx_lua_test apt update
         docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip
-    elif [[ "$DOCKER_TAG" == *"almalinux"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc unzip
-    elif [[ "$DOCKER_TAG" == *"fedora"* ]]; then
+    elif [[ "$DOCKER_TAG" == *"almalinux"* ]] || [[ "$DOCKER_TAG" == *"fedora"* ]] || [[ "$DOCKER_TAG" == *"amazon"* ]]; then
         docker exec nginx_lua_test yum install -y gcc musl-devel coreutils unzip
-    elif [[ "$DOCKER_TAG" == *"amazon"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc
     fi
+
     # cannot run on almalinux (which uses 5.1) :
     # 	/usr/lib64/lua/5.3/cjson.so: undefined symbol: lua_rotate
     docker exec nginx_lua_test luarocks install lua-cjson
@@ -158,29 +176,37 @@ function do_test() {
     if [ "$RET" = "0" ]; then
         return;
     fi
+
     inject_dependencies "$DOCKER_TAG"
     wait_for_nginx
     exec_tests
     docker rm -f nginx_lua_test # tear_down_container
 }
 
-set -eux
+# Main execution
+main() {
+    # Parse arguments
+    parse_arguments "$@"
+    
+    # Validate inputs
+    validate_input
 
-OS=$1
-ARCH=$2
-MAX=${3:-1}
-TYPE=${4:-docker}
+    set -eux
 
-docker images
+    docker images
 
-for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
-    TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
+    for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
+        TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
-    if [ "$TYPE" = "docker" ]; then
-        SAVED_TAG=
-    fi
-    TESTING_TAG="${SAVED_TAG:-$TAG-$ARCH}"
+        if [ "$TYPE" = "docker" ]; then
+            SAVED_TAG=""
+        fi
+        TESTING_TAG="${SAVED_TAG:-$TAG-$ARCH}"
 
-    echo "TESTING TAG: ${TESTING_TAG}"
-    do_test "$TESTING_TAG"
-done
+        echo "TESTING TAG: ${TESTING_TAG}"
+        do_test "$TESTING_TAG"
+    done
+}
+
+# Run main function with all arguments
+main "$@"
