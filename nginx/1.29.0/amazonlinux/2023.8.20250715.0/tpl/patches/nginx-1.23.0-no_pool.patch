@@ -1,2 +1,0 @@
-# emptying the openresty patch because not compatible with nginx 1.25.1
-# also, this patch is only used when the flag --with-no-pool-patch is set
