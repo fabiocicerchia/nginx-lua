@@ -107,7 +107,7 @@ main() {
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
-        apktool d dist/*.apk
+        apktool d dist/*.apk || true # TODO: To be fixed in https://github.com/fabiocicerchia/nginx-lua/issues/152
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
         rpm2cpio dist/*.rpm | cpio -i --list
