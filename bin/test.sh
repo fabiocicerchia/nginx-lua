@@ -106,6 +106,8 @@ function wait_for_nginx() {
 }
 
 function tear_down_container() {
+    docker logs nginx_lua_test
+
     docker rm -f nginx_lua_test
 }
 
