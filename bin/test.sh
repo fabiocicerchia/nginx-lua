@@ -94,9 +94,11 @@ function inject_dependencies() {
 }
 
 function wait_for_nginx() {
+    PORT=${1:-8080}
+
     COUNT=0
     until [ $COUNT -eq 20 ] || [ "$(
-        curl --output /dev/null --silent --head --fail http://localhost:8080
+        curl --output /dev/null --silent --head --fail http://localhost:${PORT}
         echo $?
     )" == "0" ]; do
         echo -n '.'
@@ -107,8 +109,10 @@ function wait_for_nginx() {
 
 function tear_down_container() {
     docker logs nginx_lua_test
+    docker logs nginx_lua_test_issue_151
 
-    docker rm -f nginx_lua_test
+    docker rm -f nginx_lua_test 2>/dev/null || true
+    docker rm -f nginx_lua_test_issue_151 2>/dev/null || true
 }
 
 function exec_tests() {
@@ -154,6 +158,21 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/lock || handle_error
     curl -v --fail http://localhost:8080/string || handle_error
     curl -v --fail http://localhost:8080/cjson || handle_error
+
+    test_issue_151
+}
+
+function test_issue_151() {
+    docker rm -f nginx_lua_test_issue_151 2>/dev/null || true
+    docker run -d --name nginx_lua_test_issue_151 -p 8081:80 -e SKIP_TRACK=1 \
+        -v "$PWD"/test/tests.conf.d/regressions/issue-151.conf:/etc/nginx/nginx.conf \
+        fabiocicerchia/nginx-lua:"$DOCKER_TAG"
+    wait_for_nginx 8081
+
+    # Ref: https://github.com/fabiocicerchia/nginx-lua/issues/151
+    curl -v http://localhost:8081/metrics
+    docker logs nginx_lua_test_issue_151 | grep "ngx.sleep(0) called without delayed events patch, this will hurt performance" && handle_error || true
+
 }
 
 function test_docker_image() {
