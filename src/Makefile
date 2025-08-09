@@ -23,10 +23,10 @@ openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
 	git clone https://github.com/openresty/openresty.git; \
 	PATCH_VER=${VER_NGINX}; \
-	if [ "$(ls -1 openresty/patches/nginx/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
+	if [ "$(ls -1 openresty/patches/nginx/${VER_NGINX}/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
 		PATCH_VER=${FALLBACK_VER_NGINX}; \
 	fi; \
-	for patch_file in openresty/patches/nginx/nginx-$${PATCH_VER}-*.patch; do \
+	for patch_file in openresty/patches/nginx/$${PATCH_VER}/nginx-$${PATCH_VER}-*.patch; do \
 		echo "copying openresty patch $${patch_file}"; \
 		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
 	done; \
