@@ -25,6 +25,7 @@ DOCS_METADATA_DIR = "docs/metadata"
 SRC_DIR = "src"
 TPL_DIR = "tpl"
 PATCHES_DIR = "patches"
+LICENSES_DIR = "licenses"
 
 # Docker constants
 DOCKER_BUILD_COMMAND = "docker build"
@@ -342,6 +343,12 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     patches_folder.mkdir(exist_ok=True)
     for patch in glob.glob(f"{SRC_DIR}/{PATCHES_DIR}/*.patch"):
         shutil.copyfile(patch, patches_folder / Path(patch).name)
+    
+    # Copy licenses
+    licenses_folder = tpl_folder / LICENSES_DIR
+    licenses_folder.mkdir(exist_ok=True)
+    for license in glob.glob(f"{SRC_DIR}/{LICENSES_DIR}/*.LICENSE"):
+        shutil.copyfile(patch, patches_folder / Path(license).name)
     
     # Copy configuration files
     for config in CONFIG_FILES:

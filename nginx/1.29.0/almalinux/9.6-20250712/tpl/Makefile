@@ -4,7 +4,7 @@
 # |__|__|___  ||__||__|__|__.__|      |__||_____|___._|
 #       |_____|
 #
-# Copyright (c) 2024 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
+# Copyright (c) 2025 Fabio Cicerchia. https://fabiocicerchia.it. MIT License
 # Repo: https://github.com/fabiocicerchia/nginx-lua
 
 EXTENDED_IMAGE=YES
@@ -12,7 +12,8 @@ NPROC := $(shell nproc)
 
 # TODO: Find a better way to fallback when openresty is behind the nginx latest
 # version and no patch is available.
-FALLBACK_VER_NGINX=1.23.0
+# Ref: https://github.com/openresty/openresty/tree/master/patches/nginx
+FALLBACK_VER_NGINX=1.27.1
 
 # ##############################################################################
 # CORE
@@ -22,10 +23,10 @@ openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
 	git clone https://github.com/openresty/openresty.git; \
 	PATCH_VER=${VER_NGINX}; \
-	if [ "$(ls -1 openresty/patches/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
+	if [ "$(ls -1 openresty/patches/nginx/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
 		PATCH_VER=${FALLBACK_VER_NGINX}; \
 	fi; \
-	for patch_file in openresty/patches/nginx-$${PATCH_VER}-*.patch; do \
+	for patch_file in openresty/patches/nginx/nginx-$${PATCH_VER}-*.patch; do \
 		echo "copying openresty patch $${patch_file}"; \
 		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
 	done; \
