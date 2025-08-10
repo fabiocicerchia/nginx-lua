@@ -26,7 +26,8 @@ META_CMD:=./bin/docker-metadata.py
 DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 
 GH_USERNAME=fabiocicerchia
-GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/ghr_v0.16.2_linux_amd64.tar.gz
+GH_CLI_NAME=ghr_v0.16.2_linux_amd64
+GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/$(GH_CLI_NAME).tar.gz
 NGINX_UPSTREAM_URL=https://github.com/nginxinc/docker-nginx
 NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginxinc/docker-nginx
 
@@ -261,11 +262,15 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile*
 	cp Dockerfile dist/
-	tail -n -7 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
+	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
+		DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+		cp $$DOCKERFILE $$DEST; \
+	done
 	wget $(GH_CLI_TARBALL)
-	tar xvzf ghr_v0.16.2_linux_amd64.tar.gz
+	tar xvzf $(GH_CLI_NAME).tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
-		./ghr_v0.16.2_linux_amd64/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
+		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi; \
 	rm -rf dist
 
@@ -278,10 +283,10 @@ generate-dockerfiles: ## generate all dockerfiles
 generate-deps-env: ## generate .env for dependencies
 	./bin/generate-deps-env.py | tee ./src/.env.dist
 
-pull-nginx-entrypoints: ## retrieves the official entrypoint files
+pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainline)
 	USE_VERSION=master; \
-	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER))" = "200" ]; then \
-		USE_VERSION=$(SUPPORTED_NGINX_VER); \
+	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE))" = "200" ]; then \
+		USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
 	fi; \
 	curl -sLo src/10-listen-on-ipv6-by-default.sh $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
 	curl -sLo src/15-local-resolvers.envsh        $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
