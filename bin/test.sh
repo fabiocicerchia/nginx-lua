@@ -117,7 +117,7 @@ function wait_for_nginx() {
     PORT=${1:-8080}
 
     COUNT=0
-    until [ $COUNT -eq 20 ] || [ "$(curl --output /dev/null --silent --head --fail http://localhost:${PORT}; echo $?)" == "0" ]; do
+    until [ $COUNT -eq 20 ] || [ "$(curl --output /dev/null --silent --head --fail "http://localhost:${PORT}"; echo $?)" == "0" ]; do
         echo -n '.'
         sleep 1
         COUNT=$((COUNT + 1))
@@ -190,7 +190,10 @@ function test_issue_151() {
 
     # Ref: https://github.com/fabiocicerchia/nginx-lua/issues/151
     curl -v http://localhost:8081/metrics
-    docker logs nginx_lua_test_issue_151 | grep "ngx.sleep(0) called without delayed events patch, this will hurt performance" && handle_error || true
+    LOGS_FOUND=$(docker logs nginx_lua_test_issue_151 | grep "ngx.sleep(0) called without delayed events patch, this will hurt performance" || true)
+    if [ "$LOGS_FOUND" != "" ]; then
+        handle_error
+    fi
 }
 
 function do_test() {

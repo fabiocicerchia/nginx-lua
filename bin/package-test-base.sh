@@ -83,17 +83,17 @@ main() {
     fi
 
     # Test package installation
-    docker rm -f test-$$PACKAGE_TYPE || true
-    docker run --name test-$$PACKAGE_TYPE -v $$PWD/dist:/app -d ${DISTRO}:latest sleep infinity
-    docker exec test-$$PACKAGE_TYPE /bin/sh -c "ls -lah /app"
-    docker exec test-$$PACKAGE_TYPE /bin/sh -c "$$INSTALL_CMD"
-    docker exec test-$$PACKAGE_TYPE /bin/sh -c "envsubst -V
+    docker rm -f "test-${PACKAGE_TYPE}" || true
+    docker run --name "test-${PACKAGE_TYPE}" -v "$PWD/dist:/app" -d "${DISTRO}:latest" sleep infinity
+    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "ls -lah /app"
+    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "${INSTALL_CMD}"
+    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "envsubst -V
         && nginx -V
         && nginx -t
         && luajit -v
         && lua -v
         && luarocks --version"
-    docker rm -f test-$$PACKAGE_TYPE
+    docker rm -f "test-${PACKAGE_TYPE}"
 
     ./bin/test.sh "${DISTRO}" "${ARCH}" "" "package"
 }

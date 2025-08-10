@@ -28,7 +28,7 @@ def get_latest_tag(repo_url):
     """Get the latest tag from a Git repository."""
     cmd = f"git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' {repo_url}"
     output = run_command(cmd)
-    
+
     # Filter out rc, alpha, beta versions and get the latest
     lines = output.split('\n')
     for line in reversed(lines):
@@ -37,7 +37,7 @@ def get_latest_tag(repo_url):
             match = re.search(r'refs/tags/v?(.+)$', line)
             if match:
                 return match.group(1)
-    
+
     return ""
 
 
@@ -45,34 +45,34 @@ def get_latest_commit(repo_url):
     """Get the latest commit from a Git repository."""
     cmd = f"git -c 'versionsort.suffix=-' ls-remote --sort='v:refname' {repo_url} HEAD"
     output = run_command(cmd)
-    
+
     # Extract commit hash
     lines = output.split('\n')
     for line in lines:
         if line and '\t' in line:
             return line.split('\t')[0]
-    
+
     return ""
 
 
 def load_template():
     """Load the template file."""
     template_path = Path(__file__).parent / "templates" / "deps-env.template"
-    
+
     if not template_path.exists():
         print(f"Error: Template file not found: {template_path}")
         sys.exit(1)
-    
+
     with open(template_path, 'r') as f:
         return f.read()
 
 
 def main():
     """Main function to generate dependencies environment file."""
-    
+
     # Load template
     template = load_template()
-    
+
     # Fetch all versions
     versions = {
         'ver_ngx_devel_kit': get_latest_tag("https://github.com/vision5/ngx_devel_kit"),
@@ -104,10 +104,10 @@ def main():
         'ver_openresty_balancer': get_latest_tag("https://github.com/openresty/lua-resty-balancer"),
         'ver_openresty_string': get_latest_tag("https://github.com/openresty/lua-resty-string"),
     }
-    
+
     # Format template with versions
     output = template.format(**versions)
-    
+
     # Print the result
     print(output)
 

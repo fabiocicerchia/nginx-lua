@@ -58,7 +58,7 @@ def main():
             tags[f"{LATEST_TAG}{suffix}"] = file
 
     dockerfiles = {}
-    reversed = files
+    reversed_list = files
     for tag in tags:
         dockerfile = tags[tag]
         if dockerfile not in dockerfiles:
@@ -71,12 +71,12 @@ def main():
     print("# Tags\n")
     print("## Supported Tags\n")
     for file in supported:
-        reversed.remove(file)
+        reversed_list.remove(file)
         print(f"- [`{', '.join(dockerfiles[file])}`]({GITHUB_BASE_URL}{file})")
 
     print("\n## Unsupported Tags\n")
-    reversed = list(reversed)[::-1]
-    for file in reversed:
+    reversed_list = list(reversed_list)[::-1]
+    for file in reversed_list:
         print(f"- [`{', '.join(dockerfiles[file])}`]({GITHUB_BASE_URL}{file})")
 
 if __name__ == "__main__":

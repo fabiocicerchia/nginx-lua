@@ -69,9 +69,9 @@ CONFIG_FILES = ["default.conf", "Makefile", "nginx.conf"]
 def run_command(command, print_stdout=True):
     """Run a shell command and return exit code and output."""
     print(f"Running: {command}")
-    
+
     process = subprocess.Popen(
-        shlex.split(command), 
+        shlex.split(command),
         shell=False, 
         stdout=subprocess.PIPE
     )
@@ -84,7 +84,7 @@ def run_command(command, print_stdout=True):
         output_lines.append(line.decode("utf8"))
         if print_stdout:
             print(line.decode("utf8").strip())
-    
+
     return [process.poll(), "".join(output_lines)]
 
 
@@ -112,12 +112,12 @@ def get_version_parts(version):
 def generate_tags(nginx_version, os_distro, os_version, arch=""):
     """Generate Docker tags for the image."""
     arch_suffix = f"-{arch}" if arch else ""
-    
+
     major, minor, patch = get_version_parts(nginx_version)
     is_default = os_distro == DEFAULT_DISTRO
-    
+
     tags = []
-    
+
     # Add default tags for alpine (default distro)
     if is_default:
         tags.extend([
@@ -126,7 +126,7 @@ def generate_tags(nginx_version, os_distro, os_version, arch=""):
             f"{patch}{arch_suffix}",
             f"{LATEST_TAG}{arch_suffix}"
         ])
-    
+
     # Add OS-specific tags
     tags.extend([
         f"{os_distro}{arch_suffix}",
@@ -138,14 +138,14 @@ def generate_tags(nginx_version, os_distro, os_version, arch=""):
         f"{minor}-{os_distro}{os_version}{arch_suffix}",
         f"{major}-{os_distro}{os_version}{arch_suffix}"
     ])
-    
+
     # Add repository prefix and remove duplicates
     full_tags = [f"{IMAGE_REPO}:{tag}" for tag in tags]
     unique_tags = list(set(full_tags))
-    
+
     # Sort by length and then alphabetically
     unique_tags.sort(key=lambda x: (len(x), x))
-    
+
     return unique_tags
 
 
@@ -164,10 +164,10 @@ def build_docker_image(vcs_ref, tags, dockerfile_path, arch):
     """Build Docker image with given parameters."""
     tag_params = " ".join([f"-t {tag}" for tag in tags])
     build_date = datetime.now().strftime(BUILD_DATE_FORMAT)
-    
+
     tarball_path = get_tarball_path(dockerfile_path)
     os.makedirs(os.path.dirname(tarball_path), exist_ok=True)
-    
+
     build_command = f"""
         {DOCKER_BUILD_COMMAND}
         --progress=plain
@@ -177,7 +177,7 @@ def build_docker_image(vcs_ref, tags, dockerfile_path, arch):
         {tag_params}
         -f {dockerfile_path} {os.path.dirname(dockerfile_path)}
     """
-    
+
     return run_command(build_command, True)[0]
 
 
@@ -186,7 +186,7 @@ def build_image(nginx_version, os_distro, os_version, arch):
     dockerfile_path = get_dockerfile_path(nginx_version, os_distro, os_version)
     tags = generate_tags(nginx_version, os_distro, os_version, arch)
     vcs_ref = subprocess.getoutput(GIT_REV_PARSE_COMMAND).strip()
-    
+
     return build_docker_image(vcs_ref, tags, dockerfile_path, arch)
 
 
@@ -194,11 +194,11 @@ def push_docker_image(tag):
     """Push Docker image to registry with retry."""
     cmd = f"{DOCKER_PUSH_COMMAND} {tag}"
     exit_code = run_command(cmd, True)[0]
-    
+
     # Retry once if failed
     if exit_code != 0:
         exit_code = run_command(cmd, True)[0]
-    
+
     return exit_code
 
 
@@ -208,7 +208,7 @@ def push_images(nginx_version, os_distro, os_version):
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
         for tag in tags:
             push_docker_image(tag)
-    
+
     return 0
 
 
@@ -216,7 +216,7 @@ def create_manifest(tag):
     """Create and push multi-arch manifest."""
     tag_amd64 = f"{tag}-{AMD64_ARCH}"
     tag_arm64 = f"{tag}-{ARM64V8_ARCH}"
-    
+
     # Create manifest
     create_cmd = f"""
         {DOCKER_MANIFEST_CREATE}
@@ -227,7 +227,7 @@ def create_manifest(tag):
     exit_code = run_command(create_cmd, True)[0]
     if exit_code != 0:
         return exit_code
-    
+
     # Push manifest
     push_cmd = f"{DOCKER_MANIFEST_PUSH} {tag}"
     return run_command(push_cmd, True)[0]
@@ -236,12 +236,12 @@ def create_manifest(tag):
 def bundle_images(nginx_version, os_distro, os_version):
     """Create multi-arch manifests for all tags."""
     tags = generate_tags(nginx_version, os_distro, os_version, "")
-    
+
     for tag in tags:
         exit_code = create_manifest(tag)
         if exit_code != 0:
             return exit_code
-    
+
     return 0
 
 
@@ -249,15 +249,15 @@ def generate_metadata(tag):
     """Generate metadata documentation for image tag."""
     pull_cmd = f"{DOCKER_PULL_COMMAND} {IMAGE_REPO}:{tag}"
     pull_output = run_command(pull_cmd, False)[1]
-    
+
     if pull_output:
         inspect_cmd = f"{DOCKER_INSPECT_COMMAND} {IMAGE_REPO}:{tag}"
         exit_code, inspect_output = run_command(inspect_cmd, False)
-        
+
         if exit_code == 0:
             content = f"# {IMAGE_REPO}:{tag}\n```json\n{inspect_output}\n```"
             write_file(f"{DOCS_METADATA_DIR}/{tag}.md", content)
-    
+
     return 0
 
 
@@ -277,7 +277,7 @@ def get_supported_versions():
     versions = load_supported_versions()
     nginx_mainline = versions["nginx_mainline"]
     nginx_stable = versions["nginx_stable"]
-    
+
     dockerfiles = []
     for os_distro in SUPPORTED_OS:
         os_version = versions[os_distro]
@@ -285,14 +285,14 @@ def get_supported_versions():
             get_dockerfile_path(nginx_mainline, os_distro, os_version),
             get_dockerfile_path(nginx_stable, os_distro, os_version)
         ])
-    
+
     return dockerfiles
 
 
 def patch_dockerfile(dockerfile_path, nginx_version, os_distro, os_version):
     """Replace placeholders in Dockerfile template."""
     content = read_file(dockerfile_path)
-    
+
     # Replace basic placeholders
     replacements = {
         "{{DOCKER_IMAGE}}": IMAGE_REPO,
@@ -300,10 +300,10 @@ def patch_dockerfile(dockerfile_path, nginx_version, os_distro, os_version):
         "{{DOCKER_IMAGE_TAG}}": os_version,
         "{{VER_NGINX}}": nginx_version
     }
-    
+
     for placeholder, value in replacements.items():
         content = content.replace(placeholder, value)
-    
+
     # Replace environment variables
     env_file = Path(dockerfile_path).parent / TPL_DIR / ENV_DIST_FILE
     if env_file.exists():
@@ -312,7 +312,7 @@ def patch_dockerfile(dockerfile_path, nginx_version, os_distro, os_version):
             if line and not line.startswith("#") and "=" in line:
                 key, value = line.split("=", 1)
                 content = content.replace(f"{{{{{key}}}}}", value)
-    
+
     write_file(dockerfile_path, content)
 
 
@@ -321,35 +321,35 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     dockerfile_path = get_dockerfile_path(nginx_version, os_distro, os_version)
     folder = Path(dockerfile_path).parent
     tpl_folder = folder / TPL_DIR
-    
+
     # Create template directory
     tpl_folder.mkdir(parents=True, exist_ok=True)
-    
+
     # Copy environment file
     shutil.copyfile(f"{SRC_DIR}/{ENV_DIST_FILE}", tpl_folder / ENV_DIST_FILE)
-    
+
     # Copy Dockerfile template
     shutil.copyfile(f"{SRC_DIR}/Dockerfile.{os_distro}", dockerfile_path)
     patch_dockerfile(dockerfile_path, nginx_version, os_distro, os_version)
-    
+
     # Copy shell scripts
-    for script in glob.glob(f"{SRC_DIR}/*.sh"):
-        dest = tpl_folder / Path(script).name
-        shutil.copyfile(script, dest)
+    for script_file in glob.glob(f"{SRC_DIR}/*.sh"):
+        dest = tpl_folder / Path(script_file).name
+        shutil.copyfile(script_file, dest)
         os.chmod(dest, 0o755)
-    
+
     # Copy patches
     patches_folder = tpl_folder / PATCHES_DIR
     patches_folder.mkdir(exist_ok=True)
-    for patch in glob.glob(f"{SRC_DIR}/{PATCHES_DIR}/*.patch"):
-        shutil.copyfile(patch, patches_folder / Path(patch).name)
-    
+    for patch_file in glob.glob(f"{SRC_DIR}/{PATCHES_DIR}/*.patch"):
+        shutil.copyfile(patch_file, patches_folder / Path(patch_file).name)
+
     # Copy licenses
     licenses_folder = tpl_folder / LICENSES_DIR
     licenses_folder.mkdir(exist_ok=True)
-    for license in glob.glob(f"{SRC_DIR}/{LICENSES_DIR}/*.LICENSE"):
-        shutil.copyfile(patch, patches_folder / Path(license).name)
-    
+    for license_file in glob.glob(f"{SRC_DIR}/{LICENSES_DIR}/*.LICENSE"):
+        shutil.copyfile(license_file, patches_folder / Path(license_file).name)
+
     # Copy configuration files
     for config in CONFIG_FILES:
         shutil.copyfile(f"{SRC_DIR}/{config}", tpl_folder / config)
@@ -361,7 +361,7 @@ def print_tags(nginx_version, os_distro, os_version):
     tag_names = [tag.replace(f"{IMAGE_REPO}:", "") for tag in tags]
     tag_list = "`, `".join(tag_names)
     dockerfile_path = get_dockerfile_path(nginx_version, os_distro, os_version)
-    
+
     print(f"- [`{tag_list}`](https://github.com/fabiocicerchia/nginx-lua/blob/main/{dockerfile_path})")
 
 
