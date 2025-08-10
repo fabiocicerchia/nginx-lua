@@ -250,7 +250,7 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 		INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"; \
 	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
 		PACKAGE_TYPE=rpm; \
-		INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"; \
+		INSTALL_CMD="yum install -y gettext; yum localinstall -y /app/*_x86_64.rpm"; \
 		if [ "$(ARCH)" = "arm64" ]; then \
 			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"; \
 		fi; \
