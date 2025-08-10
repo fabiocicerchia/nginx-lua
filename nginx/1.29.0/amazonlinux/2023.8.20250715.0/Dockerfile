@@ -444,6 +444,7 @@ COPY --chown=101:101 tpl/default.conf /etc/nginx/conf.d/default.conf
 COPY --chown=101:101 tpl/docker-entrypoint.sh /
 COPY --chown=101:101 tpl/nginx.conf /etc/nginx/nginx.conf
 COPY --chown=101:101 tpl/support.sh /
+COPY --chown=101:101 tpl/licenses /licenses
 
 SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
