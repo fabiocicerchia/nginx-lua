@@ -1,0 +1,13 @@
+# Ref: https://github.com/fossas/fossa-cli/blob/master/docs/references/files/fossa-yml.md
+
+version: 3
+
+project:
+  id: git+github.com/fabiocicerchia/nginx-lua
+  name: nginx-lua
+  url: github.com/fabiocicerchia/nginx-lua
+
+vendoredDependencies:
+  licenseScanPathFilters:
+    only:
+      - "src/licenses"
