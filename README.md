@@ -678,8 +678,9 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [Lua License](https://www.lua.org/license.html)
 - [LuaJIT License](https://repo.or.cz/luajit-2.0.git/blob/HEAD:/COPYRIGHT)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
+- This product includes cryptographic software written by Eric Young (eay@cryptsoft.com).
 
-All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [LICENSES](/LICENSES)
+All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [licenses](/src/licenses).
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
@@ -687,7 +688,7 @@ All the `LICENSE` files of the dependencies used to build the nginx & lua (with 
 
 MIT License
 
-Copyright (c) 2020-2023 Fabio Cicerchia <info@fabiocicerchia.it>
+Copyright (c) 2020-2025 Fabio Cicerchia <info@fabiocicerchia.it>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
