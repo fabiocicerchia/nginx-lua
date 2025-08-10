@@ -1,0 +1,133 @@
+# NGINX MODULES
+################################################################################
+
+# ngx_devel_kit
+# https://github.com/vision5/ngx_devel_kit/releases
+# The NDK is now considered to be stable.
+VER_NGX_DEVEL_KIT={ver_ngx_devel_kit}
+
+# njs
+# https://github.com/nginx/njs/tags
+VER_NJS={ver_njs}
+
+# geoip2
+# https://github.com/leev/ngx_http_geoip2_module/releases
+VER_GEOIP={ver_geoip}
+
+# LUA
+################################################################################
+
+# luajit2
+# https://github.com/openresty/luajit2/tags
+# Note: LuaJIT2 is stuck on Lua 5.1 since 2009.
+VER_LUAJIT={ver_luajit}
+
+# lua-nginx-module
+# https://github.com/openresty/lua-nginx-module/tags
+# Production ready.
+VER_LUA_NGINX_MODULE={ver_lua_nginx_module}
+
+# lua-resty-core
+# https://github.com/openresty/lua-resty-core/tags
+# This library is production ready.
+VER_LUA_RESTY_CORE={ver_lua_resty_core}
+
+# LUAROCKS
+################################################################################
+
+# lua-rocks
+# https://github.com/luarocks/luarocks/tags
+VER_LUAROCKS={ver_luarocks}
+
+# LUA ADDONS
+################################################################################
+
+# lua-resty-lrucache
+# https://github.com/openresty/lua-resty-lrucache/tags
+# This library is considered production ready.
+VER_LUA_RESTY_LRUCACHE={ver_lua_resty_lrucache}
+
+# headers-more-nginx-module
+# https://github.com/openresty/headers-more-nginx-module/tags
+VER_OPENRESTY_HEADERS={ver_openresty_headers}
+
+# lua-resty-cookie
+# https://github.com/cloudflare/lua-resty-cookie/commits/master
+VER_CLOUDFLARE_COOKIE={ver_cloudflare_cookie}
+
+# lua-resty-dns
+# https://github.com/openresty/lua-resty-dns/tags
+VER_OPENRESTY_DNS={ver_openresty_dns}
+
+# lua-resty-memcached
+# https://github.com/openresty/lua-resty-memcached/tags
+VER_OPENRESTY_MEMCACHED={ver_openresty_memcached}
+
+# lua-resty-mysql
+# https://github.com/openresty/lua-resty-mysql/tags
+VER_OPENRESTY_MYSQL={ver_openresty_mysql}
+
+# lua-resty-redis
+# https://github.com/openresty/lua-resty-redis/tags
+VER_OPENRESTY_REDIS={ver_openresty_redis}
+
+# lua-resty-shell
+# https://github.com/openresty/lua-resty-shell/tags
+VER_OPENRESTY_SHELL={ver_openresty_shell}
+
+# lua-resty-signal
+# https://github.com/openresty/lua-resty-signal/tags
+VER_OPENRESTY_SIGNAL={ver_openresty_signal}
+
+# lua-tablepool
+# https://github.com/openresty/lua-tablepool/tags
+VER_OPENRESTY_TABLEPOOL={ver_openresty_tablepool}
+
+# lua-resty-upstream-healthcheck
+# https://github.com/openresty/lua-resty-upstream-healthcheck/tags
+VER_OPENRESTY_HEALTHCHECK={ver_openresty_healthcheck}
+
+# lua-resty-websocket
+# https://github.com/openresty/lua-resty-websocket/tags
+VER_OPENRESTY_WEBSOCKET={ver_openresty_websocket}
+
+# lua-upstream-nginx-module
+# https://github.com/openresty/lua-upstream-nginx-module/tags
+VER_LUA_UPSTREAM={ver_lua_upstream}
+
+# nginx-lua-prometheus
+# https://github.com/knyar/nginx-lua-prometheus/tags
+VER_PROMETHEUS={ver_prometheus}
+
+# set-misc-nginx-module
+# https://github.com/openresty/set-misc-nginx-module/tags
+VER_MISC_NGINX={ver_misc_nginx}
+
+# stream-lua-nginx-module
+# https://github.com/openresty/stream-lua-nginx-module/commits/master
+# NOTE:
+# The latest tag 0.0.14 is incompatible with nginx 1.25.5+:
+# error: unknown type name 'ngx_stream_ssl_conf_t'; did you mean 'ngx_stream_addr_conf_t'
+# The fix is released in master branch only without proper tag yet.
+# So using the latest master commit available to date.
+VER_OPENRESTY_STREAMLUA={ver_openresty_streamlua}
+
+# lua-resty-limit-traffic
+# https://github.com/openresty/lua-resty-limit-traffic/tags
+VER_OPENRESTY_LIMITTRAFFIC={ver_openresty_limittraffic}
+
+# lua-resty-upload
+# https://github.com/openresty/lua-resty-upload/tags
+VER_OPENRESTY_UPLOAD={ver_openresty_upload}
+
+# lua-resty-lock
+# https://github.com/openresty/lua-resty-lock/tags
+VER_OPENRESTY_LOCK={ver_openresty_lock}
+
+# lua-resty-balancer
+# https://github.com/openresty/lua-resty-balancer/tags
+VER_OPENRESTY_BALANCER={ver_openresty_balancer}
+
+# lua-resty-string
+# https://github.com/openresty/lua-resty-string/tags
+VER_OPENRESTY_STRING={ver_openresty_string} 

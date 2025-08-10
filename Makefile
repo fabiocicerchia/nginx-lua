@@ -9,28 +9,34 @@
 
 PAGER:=
 DOCKERFILE_CHANGES=$(shell (git fetch origin main > /dev/null; git diff-tree --no-commit-id --name-only -r origin/main) | egrep "(nginx|src)/" | wc -l | tr -d ' ')
+SKIP=NO
 ifeq ($(DOCKERFILE_CHANGES), 0)
 	SKIP=YES
-else
-	SKIP=NO
 endif
 ifeq ($(FORCE), YES)
 	SKIP=NO
 endif
+
 BUILD_CMD:=./bin/docker-build.py
 PUSH_CMD:=./bin/docker-push.py
 BUNDLE_CMD:=./bin/docker-bundle.py
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
 META_CMD:=./bin/docker-metadata.py
-META_ALL_CMD:=./bin/docker-metadata-all.py
 DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
+
+GH_USERNAME=fabiocicerchia
+GH_CLI_NAME=ghr_v0.16.2_linux_amd64
+GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/$(GH_CLI_NAME).tar.gz
+NGINX_UPSTREAM_URL=https://github.com/nginxinc/docker-nginx
+NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginxinc/docker-nginx
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 CHANGELOG=$(shell $(MAKE) changelog)
 
-SUPPORTED_NGINX_VER=$(shell cat supported_versions | grep nginx | cut -d= -f2)
+SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
+SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64-, $(DISTROS))
@@ -73,7 +79,7 @@ help: ## prints this help
 	echo "      |_____|"
 	echo ""
 	echo "Copyright (c) 2025 Fabio Cicerchia. https://fabiocicerchia.it. MIT License"
-	echo "Repo: https://github.com/fabiocicerchia/nginx-lua"
+	echo "Repo: https://github.com/$(GH_USERNAME)/nginx-lua"
 	echo ""
 	@gawk 'function fix_value(value, str) { \
 		padding=sprintf("%50s",""); \
@@ -122,14 +128,13 @@ $(build_targets_arm64): ## build one distro in arm64/v8 arch
 build-single: generate-dockerfiles
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-else
+	return
+endif
 	ARCH=$(shell echo $$TASK | cut -d"-" -f2); \
 	DISTRO=$(shell echo $$TASK | cut -d"-" -f3); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$ARCH" \
-	&& $(META_CMD) "$$DISTRO"
-endif
+	$(BUILD_CMD) "$$DISTRO" "$$ARCH" && $(META_CMD) "$$DISTRO"
 
 ################################################################################
 ##@ TESTING
@@ -140,23 +145,23 @@ test-all: $(test_targets) ## test all docker images
 $(test_targets): ## test one docker image
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-else
+	return
+endif
 	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-.*/\1/'); \
 	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-//'); \
 	echo "TESTING $$DISTRO"; \
 	$(TEST_CMD) "$$DISTRO" "$$ARCH" "" "docker"
-endif
 
 test-security: $(security_targets) ## test security all docker images
 
 $(security_targets): ## test security one docker images
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-else
+	return
+endif
 	DISTRO=$(subst test-security-,,$(@)); \
 	echo "SECURITY $$DISTRO"; \
 	$(SEC_CMD) "$$DISTRO"
-endif
 
 ################################################################################
 ##@ PUSH
@@ -167,11 +172,11 @@ push-all: $(push_targets) ## push all docker images to docker hub
 $(push_targets): ## push one docker images to docker hub
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-else
+	return
+endif
 	DISTRO=$(subst push-,,$(@)); \
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
-endif
 
 ################################################################################
 ##@ BUNDLE
@@ -180,11 +185,11 @@ endif
 $(bundle_targets): ## bundle multiple docker images into one
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-else
+	return
+endif
 	DISTRO=$(subst bundle-,,$(@)); \
 	echo "BUNDLING $$DISTRO"; \
 	$(BUNDLE_CMD) "$$DISTRO"
-endif
 
 ################################################################################
 ##@ DEPENDENCIES
@@ -209,32 +214,8 @@ $(package_targets_arm64): ## creating the system package in arm64/v8 arch
 	ARCH=arm64v8 DISTRO=$(subst package-arm64-,,$(@)) $(MAKE) .package-base
 
 .package-base:
-	if [ "$(DISTRO)" = "alpine" ]; then \
-		PACKAGE_TYPE=apk; \
-	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
-		PACKAGE_TYPE=rpm; \
-	elif [ "$(DISTRO)" = "debian" -o "$(DISTRO)" = "ubuntu" ]; then \
-		PACKAGE_TYPE=deb; \
-	fi; \
-	SUPPORTED_NGINX_VER=$(SUPPORTED_NGINX_VER); \
-	if [ "$${IMAGE_ID}" != "" ]; then \
-		SUPPORTED_NGINX_VER=1; \
-	fi; \
-	mkdir dist; \
-	docker build \
-		-f src/packages/Dockerfile.$$PACKAGE_TYPE \
-		-t package-nginx-$$PACKAGE_TYPE \
-		--build-arg ARCH="$(ARCH)" \
-		--build-arg NGINX_VERSION="$${SUPPORTED_NGINX_VER}" \
-		--build-arg DISTRO="$(DISTRO)" \
-		--build-arg OS_VERSION="$(OS_VER)" \
-		--build-arg FPM_OUTPUT_TYPE="$$PACKAGE_TYPE" \
-		src/packages; \
-	docker inspect extract-$$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$$PACKAGE_TYPE; \
-	docker run -d --name extract-$$PACKAGE_TYPE package-nginx-$$PACKAGE_TYPE && \
-	docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE"; \
-	docker cp extract-$$PACKAGE_TYPE:$$(docker exec extract-$$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$$PACKAGE_TYPE") dist/; \
-	docker rm -f extract-$$PACKAGE_TYPE
+	./bin/package-base-nginx.sh "$(DISTRO)" "$(SUPPORTED_NGINX_VER_MAINLINE)" "$(ARCH)"
+	./bin/package-base-nginx.sh "$(DISTRO)" "$(SUPPORTED_NGINX_VER_STABLE)" "$(ARCH)"
 
 package-test: $(packagetest_targets_amd64) $(packagetest_targets_arm64) ## testing installation of the system package .apk (Alpine), .deb (Debian-like), .rpm (RHEL-like)
 
@@ -245,31 +226,8 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 	ARCH=arm64v8 DISTRO=$(subst package-test-arm64-,,$(@)) $(MAKE) .package-test-base
 
 .package-test-base:
-	if [ "$(DISTRO)" = "alpine" ]; then \
-		PACKAGE_TYPE=apk; \
-		INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"; \
-	elif [ "$(DISTRO)" = "almalinux" -o "$(DISTRO)" = "amazonlinux" -o "$(DISTRO)" = "fedora" ]; then \
-		PACKAGE_TYPE=rpm; \
-		INSTALL_CMD="yum install -y gettext; yum localinstall -y /app/*_x86_64.rpm"; \
-		if [ "$(ARCH)" = "arm64" ]; then \
-			INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"; \
-		fi; \
-	elif [ "$(DISTRO)" = "debian" -o "$(DISTRO)" = "ubuntu" ]; then \
-		PACKAGE_TYPE=deb; \
-		INSTALL_CMD="apt update && apt install -yf /app/*_$(ARCH).deb"; \
-	fi; \
-	docker rm -f test-$$PACKAGE_TYPE || true; \
-	docker run --name test-$$PACKAGE_TYPE -v $$PWD/dist:/app -d $(DISTRO):latest sleep infinity; \
-	docker exec test-$$PACKAGE_TYPE /bin/sh -c "ls -lah /app"; \
-	docker exec test-$$PACKAGE_TYPE /bin/sh -c "$$INSTALL_CMD"; \
-	docker exec test-$$PACKAGE_TYPE /bin/sh -c "envsubst -V \
-		&& nginx -V \
-		&& nginx -t \
-		&& luajit -v \
-		&& lua -v \
-		&& luarocks --version"; \
-	docker rm -f test-$$PACKAGE_TYPE
-	$(TEST_CMD) "$(DISTRO)" "$(ARCH)" "" "package"
+	./bin/package-test-base.sh "$(DISTRO)" "$(SUPPORTED_NGINX_VER_MAINLINE)" "$(ARCH)"
+	./bin/package-test-base.sh "$(DISTRO)" "$(SUPPORTED_NGINX_VER_STABLE)" "$(ARCH)"
 
 ################################################################################
 ##@ UTILITIES
@@ -277,74 +235,68 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
-	git config --global user.name "fabiocicerchia"
-	git config --global user.email "fabiocicerchia@users.noreply.github.com"
-	git remote set-url --push origin "https://fabiocicerchia:${GITHUB_TOKEN}@github.com/fabiocicerchia/nginx-lua.git"
+	git config --global user.name "$(GH_USERNAME)"
+	git config --global user.email "$(GH_USERNAME)@users.noreply.github.com"
+	git remote set-url --push origin "https://$(GH_USERNAME):${GITHUB_TOKEN}@github.com/$(GH_USERNAME)/nginx-lua.git"
 
 auto-update-and-commit: .setup_gitrepo auto-update
 	git add -A || true; \
 	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
-	if [ "$$CHANGES" != "0" ]; then \
-		git commit -m "Automated updates"; \
-		git pull origin main || true; \
-		git push origin main; \
-	else \
+	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
-	fi
+	fi; \
+	git commit -m "Automated updates"; \
+	git pull origin main || true; \
+	git push origin main
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add -A || true; \
 	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" != "0" ]; then \
-		git commit -m "[ci skip] Automated metadata"; \
-		git pull origin main || true; \
-		git push origin main; \
-	else \
 		exit 1; \
-	fi
+	fi; \
+	git commit -m "[ci skip] Automated metadata"; \
+	git pull origin main || true; \
+	git push origin main
 
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile*
 	cp Dockerfile dist/
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER)/_' | xargs find | grep Dockerfile | while read file; do cp $$file dist/$$(echo $$file | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_'); done
-	wget https://github.com/tcnksm/ghr/releases/download/v0.16.2/ghr_v0.16.2_linux_amd64.tar.gz
-	tar xvzf ghr_v0.16.2_linux_amd64.tar.gz
+	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
+		DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+		cp $$DOCKERFILE $$DEST; \
+	done
+	wget $(GH_CLI_TARBALL)
+	tar xvzf $(GH_CLI_NAME).tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
-		./ghr_v0.16.2_linux_amd64/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
+		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi; \
 	rm -rf dist
 
 generate-supported-versions: ## generate supported_versions file
-	./bin/generate-supported-versions.sh
+	./bin/generate-supported-versions.py
 
 generate-dockerfiles: ## generate all dockerfiles
 	./bin/generate-dockerfiles.py
 
 generate-deps-env: ## generate .env for dependencies
-	./bin/generate-deps-env.sh > ./src/.env.dist
+	./bin/generate-deps-env.py | tee ./src/.env.dist
 
-pull-nginx-entrypoints: ## retrieves the official entrypoint files
-	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null https://github.com/nginxinc/docker-nginx/releases/tag/$(SUPPORTED_NGINX_VER))" = "200" ]; then \
-		USE_VERSION=$(SUPPORTED_NGINX_VER); \
-	else \
-		USE_VERSION=master; \
+pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainline)
+	USE_VERSION=master; \
+	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE))" = "200" ]; then \
+		USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
 	fi; \
-	curl -sLo src/10-listen-on-ipv6-by-default.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
-	curl -sLo src/15-local-resolvers.envsh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
-	curl -sLo src/20-envsubst-on-templates.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
-	curl -sLo src/30-tune-worker-processes.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
-	curl -sLo src/docker-entrypoint.sh https://raw.githubusercontent.com/nginxinc/docker-nginx/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
+	curl -sLo src/10-listen-on-ipv6-by-default.sh $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
+	curl -sLo src/15-local-resolvers.envsh        $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
+	curl -sLo src/20-envsubst-on-templates.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
+	curl -sLo src/30-tune-worker-processes.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
+	curl -sLo src/docker-entrypoint.sh            $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
 	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
-	for DISTRO in $(DISTROS); do \
-		$(META_CMD) $$DISTRO 0; \
-	done
-
-generate-metadata-all: ## generate all metadata for all OS docker images
-	for DISTRO in $(DISTROS); do \
-		$(META_ALL_CMD) $$DISTRO; \
-	done
+	echo $(DISTROS) | xargs -n1 $(META_CMD)
 
 update-tags: ## update docker tags file
 	./bin/generate_tags.py | tee docs/TAGS.md
@@ -356,12 +308,4 @@ benchmark: ## benchmark (wip)
 	./bin/benchmark.sh
 
 changelog: ## generate a changelog since previous tag
-	git fetch --all --tags > /dev/null
-	echo "## What's Changed"
-	git log --pretty=format:"- %B" $(PREVIOUS_TAG)..HEAD | tr '\r' '\n' | tr 'A-Z' 'a-z' | grep -Ev '^$$' | sed 's/ *[-*]/ -/' | uniq | tee CHANGELOG
-	cat CHANGELOG | egrep -v "Automated (metadata|updates)" | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | awk '!x[$$0]++' | tee CHANGELOG
-	echo ""
-	echo "**Full Changelog**: https://github.com/fabiocicerchia/nginx-lua/compare/$(PREVIOUS_TAG)...$(TAG_VER)"
-	echo ""
-	echo "## Supported Versions"
-	cat supported_versions | sed 's/[()"]//g' | tr 'A-Z' 'a-z' | sed 's/^/ - /'
+	./bin/generate-changelog.sh "$(GH_USERNAME)" "$(PREVIOUS_TAG)" "$(TAG_VER)"
