@@ -226,7 +226,7 @@ def create_manifest(tag):
     """
     exit_code = run_command(create_cmd, True)[0]
     if exit_code != 0:
-        return exit_code
+        return 1
 
     # Push manifest
     push_cmd = f"{DOCKER_MANIFEST_PUSH} {tag}"
@@ -240,7 +240,7 @@ def bundle_images(nginx_version, os_distro, os_version):
     for tag in tags:
         exit_code = create_manifest(tag)
         if exit_code != 0:
-            return exit_code
+            return 1
 
     return 0
 
