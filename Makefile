@@ -252,7 +252,7 @@ auto-update-and-commit: .setup_gitrepo auto-update
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add -A || true; \
 	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
-	if [ "$$CHANGES" != "0" ]; then \
+	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
 	fi; \
 	git commit -m "[ci skip] Automated metadata"; \
