@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Optional, List
 import json
-import requests
+import request
 
 
 def run_command(cmd: List[str], capture_output: bool = True) -> subprocess.CompletedProcess:
@@ -41,7 +41,7 @@ def fetch_specific(distro: str, filter_pattern: str = ".+", specific_tag: str = 
     # First try to get tag from official-images library
     try:
         url = f"https://raw.githubusercontent.com/docker-library/official-images/master/library/{distro}"
-        response = requests.get(url, timeout=30)
+        response = request.get(url, timeout=30)
         response.raise_for_status()
 
         # Parse the content to find the specific tag
