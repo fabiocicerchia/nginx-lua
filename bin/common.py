@@ -76,16 +76,12 @@ def run_command(command, print_stdout=True):
         stdout=subprocess.PIPE
     )
 
-    output_lines = []
-    while True:
-        line = process.stdout.readline()
-        if not line:
-            break
-        output_lines.append(line.decode("utf8"))
-        if print_stdout:
-            print(line.decode("utf8").strip())
+    streamdata = process.communicate()[0]
+    output_lines = streamdata.decode("utf-8")
+    if print_stdout:
+        print(output_lines)
 
-    return [process.poll(), "".join(output_lines)]
+    return [process.returncode, output_lines]
 
 
 def read_file(file_path):
