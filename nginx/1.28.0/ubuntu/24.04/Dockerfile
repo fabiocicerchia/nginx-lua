@@ -42,17 +42,17 @@ ENV VER_NGINX=$VER_NGINX
 # ngx_devel_kit
 # https://github.com/vision5/ngx_devel_kit
 # The NDK is now considered to be stable.
-ARG VER_NGX_DEVEL_KIT={{VER_NGX_DEVEL_KIT}}
+ARG VER_NGX_DEVEL_KIT=0.3.4
 ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS={{VER_NJS}}
+ARG VER_NJS=0.9.1
 ENV VER_NJS=$VER_NJS
 
 # geoip2
 # https://github.com/leev/ngx_http_geoip2_module
-ARG VER_GEOIP={{VER_GEOIP}}
+ARG VER_GEOIP=3.4
 ENV VER_GEOIP=$VER_GEOIP
 
 # LUA
@@ -66,7 +66,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT={{VER_LUAJIT}}
+ARG VER_LUAJIT=2.1-20250529
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -78,13 +78,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE={{VER_LUA_NGINX_MODULE}}
+ARG VER_LUA_NGINX_MODULE=0.10.28
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE={{VER_LUA_RESTY_CORE}}
+ARG VER_LUA_RESTY_CORE=0.1.31
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -94,7 +94,7 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS={{VER_LUAROCKS}}
+ARG VER_LUAROCKS=3.12.2
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # LUA ADDONS
@@ -102,108 +102,108 @@ ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS={{VER_OPENRESTY_HEADERS}}
+ARG VER_OPENRESTY_HEADERS=0.39
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
 # https://github.com/cloudflare/lua-resty-cookie
-ARG VER_CLOUDFLARE_COOKIE={{VER_CLOUDFLARE_COOKIE}}
+ARG VER_CLOUDFLARE_COOKIE=f418d77082eaef48331302e84330488fdc810ef4
 ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 
 # lua-resty-dns
 # https://github.com/openresty/lua-resty-dns
-ARG VER_OPENRESTY_DNS={{VER_OPENRESTY_DNS}}
+ARG VER_OPENRESTY_DNS=0.23
 ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 
 # lua-resty-lrucache
 # https://github.com/openresty/lua-resty-lrucache
 # This library is considered production ready.
-ARG VER_LUA_RESTY_LRUCACHE={{VER_LUA_RESTY_LRUCACHE}}
+ARG VER_LUA_RESTY_LRUCACHE=0.15
 ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # lua-resty-memcached
 # https://github.com/openresty/lua-resty-memcached
-ARG VER_OPENRESTY_MEMCACHED={{VER_OPENRESTY_MEMCACHED}}
+ARG VER_OPENRESTY_MEMCACHED=0.17
 ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql
-ARG VER_OPENRESTY_MYSQL={{VER_OPENRESTY_MYSQL}}
+ARG VER_OPENRESTY_MYSQL=0.28
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
 # https://github.com/openresty/lua-resty-redis
-ARG VER_OPENRESTY_REDIS={{VER_OPENRESTY_REDIS}}
+ARG VER_OPENRESTY_REDIS=0.33
 ENV VER_OPENRESTY_REDIS=$VER_OPENRESTY_REDIS
 
 # lua-resty-shell
 # https://github.com/openresty/lua-resty-shell
-ARG VER_OPENRESTY_SHELL={{VER_OPENRESTY_SHELL}}
+ARG VER_OPENRESTY_SHELL=0.03
 ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
 # lua-resty-signal
 # https://github.com/openresty/lua-resty-signal
-ARG VER_OPENRESTY_SIGNAL={{VER_OPENRESTY_SIGNAL}}
+ARG VER_OPENRESTY_SIGNAL=0.04
 ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck
-ARG VER_OPENRESTY_HEALTHCHECK={{VER_OPENRESTY_HEALTHCHECK}}
+ARG VER_OPENRESTY_HEALTHCHECK=0.08
 ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket
-ARG VER_OPENRESTY_WEBSOCKET={{VER_OPENRESTY_WEBSOCKET}}
+ARG VER_OPENRESTY_WEBSOCKET=0.13
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-tablepool
 # https://github.com/openresty/lua-tablepool
-ARG VER_OPENRESTY_TABLEPOOL={{VER_OPENRESTY_TABLEPOOL}}
+ARG VER_OPENRESTY_TABLEPOOL=0.03
 ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module
-ARG VER_LUA_UPSTREAM={{VER_LUA_UPSTREAM}}
+ARG VER_LUA_UPSTREAM=0.07
 ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
 # https://github.com/knyar/nginx-lua-prometheus
-ARG VER_PROMETHEUS={{VER_PROMETHEUS}}
+ARG VER_PROMETHEUS=0.20240525
 ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # set-misc-nginx-module
 # https://github.com/openresty/set-misc-nginx-module
-ARG VER_MISC_NGINX={{VER_MISC_NGINX}}
+ARG VER_MISC_NGINX=0.33
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA={{VER_OPENRESTY_STREAMLUA}}
+ARG VER_OPENRESTY_STREAMLUA=a9addfabbf277eb3d1ec77d45e40a324d67022af
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
 # https://github.com/openresty/lua-resty-limit-traffic/tags
-ARG VER_OPENRESTY_LIMITTRAFFIC={{VER_OPENRESTY_LIMITTRAFFIC}}
+ARG VER_OPENRESTY_LIMITTRAFFIC=0.09
 ENV VER_OPENRESTY_LIMITTRAFFIC=$VER_OPENRESTY_LIMITTRAFFIC
 
 # lua-resty-upload
 # https://github.com/openresty/lua-resty-upload/tags
-ARG VER_OPENRESTY_UPLOAD={{VER_OPENRESTY_UPLOAD}}
+ARG VER_OPENRESTY_UPLOAD=0.11
 ENV VER_OPENRESTY_UPLOAD=$VER_OPENRESTY_UPLOAD
 
 # lua-resty-lock
 # https://github.com/openresty/lua-resty-lock/tags
-ARG VER_OPENRESTY_LOCK={{VER_OPENRESTY_LOCK}}
+ARG VER_OPENRESTY_LOCK=0.09
 ENV VER_OPENRESTY_LOCK=$VER_OPENRESTY_LOCK
 
 # lua-resty-balancer
 # https://github.com/openresty/lua-resty-balancer/tags
-ARG VER_OPENRESTY_BALANCER={{VER_OPENRESTY_BALANCER}}
+ARG VER_OPENRESTY_BALANCER=0.05
 ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
 
 # lua-resty-string
 # https://github.com/openresty/lua-resty-string/tags
-ARG VER_OPENRESTY_STRING={{VER_OPENRESTY_STRING}}
+ARG VER_OPENRESTY_STRING=0.16
 ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 
 ################################################################################
