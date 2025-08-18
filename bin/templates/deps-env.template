@@ -130,4 +130,4 @@ VER_OPENRESTY_BALANCER={ver_openresty_balancer}
 
 # lua-resty-string
 # https://github.com/openresty/lua-resty-string/tags
-VER_OPENRESTY_STRING={ver_openresty_string} 
+VER_OPENRESTY_STRING={ver_openresty_string}
