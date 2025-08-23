@@ -300,7 +300,7 @@ ARG BUILD_DEPS_BASE="\
         curl \
         g++ \
         libmaxminddb-dev \
-        libpcre3-dev \
+        libpcre2-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
@@ -404,7 +404,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         ca-certificates \
         libmaxminddb-dev \
-        libpcre3-dev \
+        libpcre2-dev \
         libssl-dev \
         libxml2-dev \
         unzip \
@@ -451,8 +451,8 @@ RUN set -eux \
 
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
-    && addgroup --system --gid 101 nginx \
-    && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false --uid 101 nginx \
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/debian/Dockerfile
