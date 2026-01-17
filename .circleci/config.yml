@@ -410,8 +410,7 @@ jobs:
       - run:
           name: Install Skopeo
           command: |
-            echo 'docker run quay.io/skopeo/stable:latest $@' | sudo tee /usr/local/bin/skopeo
-            sudo chmod +x /usr/local/bin/skopeo
+            sudo apt-get -y install skopeo
 
       - run:
           name: Generate Supported Versions
