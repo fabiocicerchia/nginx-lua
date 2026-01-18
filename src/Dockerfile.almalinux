@@ -287,7 +287,6 @@ ARG NGINX_BUILD_CONFIG="\
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             `# CUSTOM MODULES` \
-            --without-pcre2 \
             --add-module=/headers-more-nginx-module-${VER_OPENRESTY_HEADERS} \
             --add-module=/lua-nginx-module-${VER_LUA_NGINX_MODULE} \
             --add-module=/lua-upstream-nginx-module-${VER_LUA_UPSTREAM} \
