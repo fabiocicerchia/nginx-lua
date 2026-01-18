@@ -140,7 +140,7 @@ def main():
         print("Wrong version count in NGINX (stable).")
         sys.exit(1)
 
-    ver_almalinux = fetch_latest("almalinux", r"^[0-9]\.[0-9]{1,2}-[0-9]{8}$")
+    ver_almalinux = fetch_latest("almalinux", r"^[0-9]{1,2}\.[0-9]{1,2}-[0-9]{8}$")
     if not ver_almalinux:
         print("Wrong version count in ALMALINUX.")
         sys.exit(1)
