@@ -311,7 +311,7 @@ ARG BUILD_DEPS_BASE="\
         make \
         openssl-devel \
         patch \
-        pcre-devel \
+        pcre2-devel \
         tar \
         unzip \
         which \
@@ -342,8 +342,6 @@ FROM base AS builder
 # hadolint ignore=SC2086
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
-    && update-crypto-policies --set DEFAULT:SHA1 \
-    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
     && dnf config-manager --set-enabled epel \
     && dnf config-manager --set-enabled crb \
@@ -421,7 +419,7 @@ ARG PKG_DEPS="\
         gcc-c++ \
         libxml2-devel \
         openssl-devel \
-        pcre-devel \
+        pcre2-devel \
         unzip \
         zlib-devel \
 "
@@ -458,8 +456,6 @@ SHELL ["/bin/sh", "-o", "pipefail", "-c"]
 
 # hadolint ignore=SC2086
 RUN set -eux \
-    && update-crypto-policies --set DEFAULT:SHA1 \
-    && rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux \
     && dnf install -y 'dnf-command(config-manager)' epel-release \
     && dnf config-manager --set-enabled epel \
     && dnf config-manager --set-enabled crb \
