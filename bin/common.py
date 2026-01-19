@@ -344,7 +344,7 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     licenses_folder = tpl_folder / LICENSES_DIR
     licenses_folder.mkdir(exist_ok=True)
     for license_file in glob.glob(f"{SRC_DIR}/{LICENSES_DIR}/*.LICENSE"):
-        shutil.copyfile(license_file, patches_folder / Path(license_file).name)
+        shutil.copyfile(license_file, licenses_folder / Path(license_file).name)
 
     # Copy configuration files
     for config in CONFIG_FILES:

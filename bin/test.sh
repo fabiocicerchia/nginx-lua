@@ -8,7 +8,6 @@ OS=""
 ARCH=""
 MAX="1"
 TYPE="docker"
-SAVED_TAG=""
 
 # Help function
 show_help() {
@@ -225,10 +224,7 @@ main() {
     for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
         TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
 
-        if [ "$TYPE" = "docker" ]; then
-            SAVED_TAG=""
-        fi
-        TESTING_TAG="${SAVED_TAG:-$TAG-$ARCH}"
+        TESTING_TAG="$TAG-$ARCH"
 
         echo "TESTING TAG: ${TESTING_TAG}"
         do_test "$TESTING_TAG"

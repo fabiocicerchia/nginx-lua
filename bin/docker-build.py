@@ -25,7 +25,7 @@ def main():
     )
     parser.add_argument(
         "arch",
-        help=""
+        help="Architecture (amd64 or arm64)"
     )
     args = parser.parse_args()
 
