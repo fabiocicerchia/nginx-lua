@@ -2,23 +2,29 @@
 
 ## Supported Tags
 
-- [`1-almalinux, 1-almalinux10.1-20260129, 1.29.5-almalinux10.1-20260129, 1.29.5-almalinux, almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/almalinux/10.1-20260129/Dockerfile)
+- [`1-almalinux, 1-almalinux10.1-20260129, 1.29.6-almalinux10.1-20260129, 1.29.6-almalinux, almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/almalinux/10.1-20260129/Dockerfile)
 - [`1.28.2-almalinux10.1-20260129, 1.28.2-almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/almalinux/10.1-20260129/Dockerfile)
-- [`1-alpine, 1, 1-alpine3.23.3, 1.29, 1.29.5-alpine3.23.3, 1.29.5-alpine, 1.29.5-, alpine, latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/alpine/3.23.3/Dockerfile)
+- [`1-alpine, 1, 1-alpine3.23.3, 1.29, 1.29.6-alpine3.23.3, 1.29.6-alpine, 1.29.6-, alpine, latest`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/alpine/3.23.3/Dockerfile)
 - [`1.28, 1.28.2-alpine3.23.3, 1.28.2-alpine, 1.28.2-`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/alpine/3.23.3/Dockerfile)
-- [`1-amazonlinux, 1-amazonlinux2023.10.20260216.1, 1.29.5-amazonlinux, 1.29.5-amazonlinux2023.10.20260216.1, amazonlinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/amazonlinux/2023.10.20260216.1/Dockerfile)
+- [`1-amazonlinux, 1-amazonlinux2023.10.20260216.1, 1.29.6-amazonlinux2023.10.20260216.1, 1.29.6-amazonlinux, amazonlinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/amazonlinux/2023.10.20260216.1/Dockerfile)
 - [`1.28.2-amazonlinux, 1.28.2-amazonlinux2023.10.20260216.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/amazonlinux/2023.10.20260216.1/Dockerfile)
-- [`1-debian, 1-debian13.3, 1.29.5-debian13.3, 1.29.5-debian, debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/debian/13.3/Dockerfile)
+- [`1-debian, 1-debian13.3, 1.29.6-debian13.3, 1.29.6-debian, debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/debian/13.3/Dockerfile)
 - [`1.28.2-debian13.3, 1.28.2-debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/debian/13.3/Dockerfile)
-- [`1-fedora, 1-fedora43, 1.29.5-fedora43, 1.29.5-fedora, fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/fedora/43/Dockerfile)
+- [`1-fedora, 1-fedora43, 1.29.6-fedora43, 1.29.6-fedora, fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/fedora/43/Dockerfile)
 - [`1.28.2-fedora43, 1.28.2-fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/fedora/43/Dockerfile)
-- [`1-ubuntu, 1-ubuntu24.04, 1.29.5-ubuntu24.04, 1.29.5-ubuntu, ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/ubuntu/24.04/Dockerfile)
+- [`1-ubuntu, 1-ubuntu24.04, 1.29.6-ubuntu24.04, 1.29.6-ubuntu, ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.6/ubuntu/24.04/Dockerfile)
 - [`1.28.2-ubuntu24.04, 1.28.2-ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.28.2/ubuntu/24.04/Dockerfile)
 
 ## Unsupported Tags
 
+- [`1.29.5-ubuntu24.04, 1.29.5-ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/ubuntu/24.04/Dockerfile)
+- [`1.29.5-fedora43, 1.29.5-fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/fedora/43/Dockerfile)
+- [`1.29.5-debian13.3, 1.29.5-debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/debian/13.3/Dockerfile)
+- [`1.29.5-amazonlinux, 1.29.5-amazonlinux2023.10.20260216.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/amazonlinux/2023.10.20260216.1/Dockerfile)
 - [`1-amazonlinux2023.10.20260202.2, 1.29.5-amazonlinux2023.10.20260202.2`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/amazonlinux/2023.10.20260202.2/Dockerfile)
 - [`1-amazonlinux2023.10.20260120.4, 1.29.5-amazonlinux2023.10.20260120.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/amazonlinux/2023.10.20260120.4/Dockerfile)
+- [`1.29.5-alpine3.23.3, 1.29.5-alpine, 1.29.5-`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/alpine/3.23.3/Dockerfile)
+- [`1.29.5-almalinux10.1-20260129, 1.29.5-almalinux`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.5/almalinux/10.1-20260129/Dockerfile)
 - [`1.29.4-ubuntu24.04, 1.29.4-ubuntu`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.4/ubuntu/24.04/Dockerfile)
 - [`1.29.4-fedora43, 1.29.4-fedora`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.4/fedora/43/Dockerfile)
 - [`1.29.4-debian13.3, 1.29.4-debian`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.4/debian/13.3/Dockerfile)

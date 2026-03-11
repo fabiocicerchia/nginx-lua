@@ -1,4 +1,4 @@
-nginx_mainline=1.29.5
+nginx_mainline=1.29.6
 nginx_stable=1.28.2
 almalinux=10.1-20260129
 alpine=3.23.3
