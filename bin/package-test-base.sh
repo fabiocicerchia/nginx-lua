@@ -73,9 +73,9 @@ main() {
         INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         PACKAGE_TYPE=rpm
-        INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"
+        INSTALL_CMD="yum install -y /app/*_x86_64.rpm"
         if [ "${ARCH}" = "arm64" ]; then
-            INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
+            INSTALL_CMD="yum install -y /app/*.aarch64.rpm"
         fi
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
         PACKAGE_TYPE=deb
