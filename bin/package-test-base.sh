@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euox pipefail
 
 # Script variables
 DISTRO=""
@@ -78,10 +78,10 @@ main() {
     # Determine package type and install command based on distribution
     if [ "${DISTRO}" = "alpine" ]; then
         PACKAGE_TYPE=apk
-        INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"
+        INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         PACKAGE_TYPE=rpm
-        INSTALL_CMD="yum install -y /app/*_x86_64.rpm"
+        INSTALL_CMD="yum install -y /app/*.x86_64.rpm"
         if [ "${ARCH}" = "arm64" ]; then
             INSTALL_CMD="yum install -y /app/*.aarch64.rpm"
         fi
@@ -95,13 +95,12 @@ main() {
     docker run --name "test-${PACKAGE_TYPE}" -v "$PWD/dist:/app" -d "${DISTRO}:latest" sleep infinity
     docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "ls -lah /app"
     docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "${INSTALL_CMD}"
-    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "envsubst -V
-        && nginx -V
-        && nginx -t
-        && luajit -v
-        && lua -v
+    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "envsubst -V \
+        && nginx -V \
+        && nginx -t \
+        && luajit -v \
+        && lua -v \
         && luarocks --version"
-    docker rm -f "test-${PACKAGE_TYPE}"
 
     ./bin/test.sh "${DISTRO}" "${ARCH}" "" "package"
 }
