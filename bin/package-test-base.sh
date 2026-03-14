@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Script variables
 DISTRO=""
 SUPPORTED_NGINX_VER=""
@@ -22,6 +24,10 @@ ARGUMENTS:
 OPTIONS:
     -h, --help      Show this help message and exit
 EOF
+}
+
+cleanup() {
+    docker rm -f "test-${PACKAGE_TYPE}" >/dev/null 2>&1 || true
 }
 
 # Input validation function
@@ -63,9 +69,11 @@ parse_arguments() {
 main() {
     # Parse arguments
     parse_arguments "$@"
-    
+
     # Validate inputs
     validate_input
+
+    trap cleanup EXIT
 
     # Determine package type and install command based on distribution
     if [ "${DISTRO}" = "alpine" ]; then
