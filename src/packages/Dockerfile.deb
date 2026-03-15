@@ -20,6 +20,8 @@ ARG FPM_OUTPUT_TYPE=deb
 COPY *.sh /
 
 # depends from nginx 1.25.2
+# libpcre3 -> ubuntu
+# libpcre2 -> debian
 RUN source /etc/os-release \
     && fpm \
       --verbose \

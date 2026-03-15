@@ -25,6 +25,8 @@ RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--bui
 COPY *.sh /
 
 # depends from nginx 1.25.2
+# pcre  -> fedora & amazonlinux
+# pcre2 -> almalinux
 RUN source /etc/os-release \
     && fpm \
       --verbose \
@@ -51,7 +53,7 @@ RUN source /etc/os-release \
       --replaces openresty \
       --depends "gettext >= 0.21" \
       --depends "libmaxminddb >= 1.5.2" \
-      --depends "pcre >= 8.44" \
+      --depends "pcre >= 8.44 | pcre2 >= 10" \
       --depends "shadow-utils >= 2:4.9" \
       --chdir / \
       after-install.sh \
