@@ -51,7 +51,7 @@ RUN source /etc/os-release \
       --replaces openresty \
       --depends "gettext >= 0.21" \
       --depends "libmaxminddb >= 1.5.2" \
-      --depends "pcre2 >= 10" \
+      --depends "pcre >= 8.45" \
       --depends "shadow-utils >= 2:4.9" \
       --chdir / \
       after-install.sh \
