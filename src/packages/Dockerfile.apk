@@ -47,7 +47,7 @@ RUN source /etc/os-release \
       --depends "libgcc>=12.2.1" \
       --depends "libmaxminddb>=1.7.1" \
       --depends "libxml2>=2.11.4" \
-      --depends "pcre>=8.45" \
+      --depends "pcre>=8.44" \
       --chdir / \
       after-install.sh \
       etc/nginx \

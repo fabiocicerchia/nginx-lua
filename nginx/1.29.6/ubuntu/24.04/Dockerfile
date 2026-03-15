@@ -301,7 +301,7 @@ ARG BUILD_DEPS_BASE="\
         curl \
         g++ \
         libmaxminddb-dev \
-        libpcre3-dev \
+        libpcre2-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
@@ -405,7 +405,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
 ARG PKG_DEPS="\
         ca-certificates \
         libmaxminddb-dev \
-        libpcre3-dev \
+        libpcre2-dev \
         libssl-dev \
         libxml2-dev \
         unzip \

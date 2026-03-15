@@ -98,6 +98,7 @@ main() {
         src/packages
 
     # Extract package from container
+    rm dist/nginx-lua*.$PACKAGE_TYPE
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
