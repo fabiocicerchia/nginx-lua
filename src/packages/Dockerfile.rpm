@@ -27,7 +27,11 @@ COPY *.sh /
 # depends from nginx 1.25.2
 # pcre  -> fedora & amazonlinux
 # pcre2 -> almalinux
-RUN source /etc/os-release \
+RUN PCRE_VER="pcre >= 8.44"; \
+    if [ "${DISTRO}" == "almalinux" ]; then \
+      PCRE_VER="pcre2 >= 10"; \
+    fi; \
+    source /etc/os-release \
     && fpm \
       --verbose \
       --name nginx-lua \
@@ -53,7 +57,7 @@ RUN source /etc/os-release \
       --replaces openresty \
       --depends "gettext >= 0.21" \
       --depends "libmaxminddb >= 1.5.2" \
-      --depends "pcre >= 8.44 | pcre2 >= 10" \
+      --depends "${PCRE_VER}" \
       --depends "shadow-utils >= 2:4.9" \
       --chdir / \
       after-install.sh \
