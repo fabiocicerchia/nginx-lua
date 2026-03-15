@@ -85,6 +85,9 @@ main() {
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
         PACKAGE_TYPE=deb
         INSTALL_CMD="apt update && apt install -yf /app/*.deb"
+
+        ls -lah $PWD/dist/
+        dpkg-deb -c $PWD/dist/*.deb
     fi
 
     # Test package installation
