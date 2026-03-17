@@ -3,6 +3,6 @@ nginx_stable=1.28.2
 almalinux=10.1-20260129
 alpine=3.23.3
 amazonlinux=2023.10.20260302.1
-debian=13.3
+debian=13.4
 fedora=43
 ubuntu=24.04
