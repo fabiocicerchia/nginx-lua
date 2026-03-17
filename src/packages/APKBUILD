@@ -34,22 +34,30 @@ package() {
     install -Dm755 /usr/sbin/nginx-debug "$pkgdir/usr/sbin/nginx-debug"
 
     # Lua binaries
-    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/local/bin/lua"
-    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/local/bin/luajit"
-    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/local/bin/luarocks"
+    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/bin/lua"
+    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/bin/luajit"
+    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/bin/luarocks"
 
     # LuaJIT libraries
-    mkdir -p "$pkgdir/usr/local/lib"
-    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/local/lib/"
+    install -Dm755 /usr/local/lib/libluajit-5.1.so "$pkgdir/usr/lib/libluajit-5.1.so"
+    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/lib/"
 
-    # Lua directories
-    cp -a /usr/local/share "$pkgdir/usr/local/"
-    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/local/include/"
-    cp -a /usr/local/etc/luarocks "$pkgdir/usr/local/etc/"
+    # Lua share
+    mkdir -p "$pkgdir/usr/share"
+    cp -a /usr/local/share/lua "$pkgdir/usr/share/" 2>/dev/null || true
+    cp -a /usr/local/share/luajit* "$pkgdir/usr/share/" 2>/dev/null || true
+
+    # Includes
+    mkdir -p "$pkgdir/usr/include"
+    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/include/"
+
+    # Luarocks config
+    mkdir -p "$pkgdir/etc/luarocks"
+    cp -a /usr/local/etc/luarocks/* "$pkgdir/etc/luarocks/"
 
     # Man pages
     install -Dm644 /usr/local/share/man/man1/luajit.1 \
-        "$pkgdir/usr/local/share/man/man1/luajit.1"
+        "$pkgdir/usr/share/man/man1/luajit.1"
 
     # Runtime directories
     mkdir -p "$pkgdir/var/cache/nginx"
