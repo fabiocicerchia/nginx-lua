@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+
+sh /after-install.sh || true

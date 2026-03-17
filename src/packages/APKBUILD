@@ -1,0 +1,61 @@
+# File: /home/builder/packages/nginx-lua/APKBUILD
+
+maintainer="Fabio Cicerchia <info@fabiocicerchia.it>"
+
+pkgname=nginx-lua
+pkgver=${NGINX_VERSION}
+pkgrel=0
+pkgdesc="Nginx ${NGINX_VERSION} with LUA support."
+url="https://github.com/fabiocicerchia/nginx-lua"
+arch="$ARCH"
+license="custom"
+
+depends="
+gettext-envsubst>=0.21
+libgcc>=12.2.1
+libmaxminddb>=1.7.1
+libxml2>=2.11.4
+pcre>=8.45
+!nginx
+!luajit
+!openresty
+"
+
+options="!strip !check !scanelf"
+post_install="after-install.sh"
+
+package() {
+    # Config
+    mkdir -p "$pkgdir/etc"
+    cp -a /etc/nginx "$pkgdir/etc/"
+
+    # Nginx binaries
+    install -Dm755 /usr/sbin/nginx "$pkgdir/usr/sbin/nginx"
+    install -Dm755 /usr/sbin/nginx-debug "$pkgdir/usr/sbin/nginx-debug"
+
+    # Lua binaries
+    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/local/bin/lua"
+    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/local/bin/luajit"
+    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/local/bin/luarocks"
+
+    # LuaJIT libraries
+    mkdir -p "$pkgdir/usr/local/lib"
+    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/local/lib/"
+
+    # Lua directories
+    cp -a /usr/local/share "$pkgdir/usr/local/"
+    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/local/include/"
+    cp -a /usr/local/etc/luarocks "$pkgdir/usr/local/etc/"
+
+    # Man pages
+    install -Dm644 /usr/local/share/man/man1/luajit.1 \
+        "$pkgdir/usr/local/share/man/man1/luajit.1"
+
+    # Runtime directories
+    mkdir -p "$pkgdir/var/cache/nginx"
+    mkdir -p "$pkgdir/var/log/nginx"
+
+    # Post-install script
+    install -Dm755 after-install.sh \
+        "$pkgdir/etc/apk/scripts/post-install"
+}
