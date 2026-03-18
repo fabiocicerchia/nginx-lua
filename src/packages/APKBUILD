@@ -55,9 +55,10 @@ package() {
     mkdir -p "$pkgdir/etc/luarocks"
     cp -a /usr/local/etc/luarocks/* "$pkgdir/etc/luarocks/"
 
-    # Man pages
-    install -Dm644 /usr/local/share/man/man1/luajit.1 \
-        "$pkgdir/usr/share/man/man1/luajit.1"
+    # Man pages (must be compressed for Alpine packages)
+    mkdir -p "$pkgdir/usr/share/man/man1"
+    gzip -9nc /usr/local/share/man/man1/luajit.1 \
+        > "$pkgdir/usr/share/man/man1/luajit.1.gz"
 
     # Runtime directories
     mkdir -p "$pkgdir/var/cache/nginx"
