@@ -99,14 +99,15 @@ main() {
 
     # Extract package from container
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
-    docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE
+    docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
     docker cp extract-$PACKAGE_TYPE:$(docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE") dist/
     docker rm -f extract-$PACKAGE_TYPE
 
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
-        tar -ztf dist/*.apk
+        sudo apt install -y apktool
+        # apktool d dist/*.apk || true
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
         rpm2cpio dist/*.rpm | cpio -i --list
