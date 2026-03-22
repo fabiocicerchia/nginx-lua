@@ -107,7 +107,7 @@ main() {
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
-        # apktool d dist/*.apk || true
+        apktool d dist/*.apk || true
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
         rpm2cpio dist/*.rpm | cpio -i --list
