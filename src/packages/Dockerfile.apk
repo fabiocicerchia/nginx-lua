@@ -47,4 +47,4 @@ RUN export NGINX_VERSION=$NGINX_VERSION \
     && export OS_VERSION=$OS_VERSION \
     && abuild-keygen -ain \
     && abuild -r \
-    && sudo mv /home/builder/packages/packages/x86_64/nginx-lua-*.apk /
+    && sudo mv /home/builder/packages/packages/*/nginx-lua-*.apk /
