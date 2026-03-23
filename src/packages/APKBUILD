@@ -21,7 +21,7 @@ pcre>=8.45
 !openresty
 "
 
-options="!strip !check !scanelf"
+options="!strip !check !scanelf !fhs"
 install="$pkgname.post-install"
 
 package() {
@@ -34,34 +34,26 @@ package() {
     install -Dm755 /usr/sbin/nginx-debug "$pkgdir/usr/sbin/nginx-debug"
 
     # Lua binaries
-    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/bin/lua"
-    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/bin/luajit"
-    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/bin/luarocks"
-
-    # Keep legacy /usr/local/bin paths for scripts with hardcoded shebangs
-    mkdir -p "$pkgdir/usr/local/bin"
-    ln -sf /usr/bin/lua "$pkgdir/usr/local/bin/lua"
-    ln -sf /usr/bin/luajit "$pkgdir/usr/local/bin/luajit"
-    ln -sf /usr/bin/luarocks "$pkgdir/usr/local/bin/luarocks"
-    ln -sf /usr/bin/lua "$pkgdir/usr/bin/lua5.1"
-    ln -sf /usr/bin/lua "$pkgdir/usr/local/bin/lua5.1"
+    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/local/bin/lua"
+    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/local/bin/luajit"
+    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/local/bin/luarocks"
 
     # LuaJIT libraries
-    install -Dm755 /usr/local/lib/libluajit-5.1.so "$pkgdir/usr/lib/libluajit-5.1.so"
-    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/lib/"
+    install -Dm755 /usr/local/lib/libluajit-5.1.so "$pkgdir/usr/local/lib/libluajit-5.1.so"
+    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/local/lib/"
 
     # Lua share
     mkdir -p "$pkgdir/usr/share"
-    cp -a /usr/local/share/lua "$pkgdir/usr/share/" 2>/dev/null || true
-    cp -a /usr/local/share/luajit* "$pkgdir/usr/share/" 2>/dev/null || true
+    cp -a /usr/local/share/lua "$pkgdir/usr/local/share/" 2>/dev/null || true
+    cp -a /usr/local/share/luajit* "$pkgdir/usr/local/share/" 2>/dev/null || true
 
     # Includes
     mkdir -p "$pkgdir/usr/include"
-    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/include/"
+    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/local/include/"
 
     # Luarocks config
-    mkdir -p "$pkgdir/etc/luarocks"
-    cp -a /usr/local/etc/luarocks/* "$pkgdir/etc/luarocks/"
+    mkdir -p "$pkgdir/usr/local/etc/luarocks"
+    cp -a /usr/local/etc/luarocks/* "$pkgdir/usr/local/etc/luarocks/"
 
     # Man pages (must be compressed for Alpine packages)
     mkdir -p "$pkgdir/usr/share/man/man1"
