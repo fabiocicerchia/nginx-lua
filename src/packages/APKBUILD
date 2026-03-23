@@ -22,7 +22,7 @@ pcre>=8.45
 "
 
 options="!strip !check !scanelf"
-post_install="after-install.sh"
+install="$pkgname.post-install"
 
 package() {
     # Config
@@ -63,8 +63,4 @@ package() {
     # Runtime directories
     mkdir -p "$pkgdir/var/cache/nginx"
     mkdir -p "$pkgdir/var/log/nginx"
-
-    # Post-install script
-    install -Dm755 after-install.sh \
-        "$pkgdir/etc/apk/scripts/post-install"
 }
