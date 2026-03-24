@@ -43,12 +43,12 @@ package() {
     cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/local/lib/"
 
     # Lua share
-    mkdir -p "$pkgdir/usr/share"
+    mkdir -p "$pkgdir/usr/local/share"
     cp -a /usr/local/share/lua "$pkgdir/usr/local/share/" 2>/dev/null || true
     cp -a /usr/local/share/luajit* "$pkgdir/usr/local/share/" 2>/dev/null || true
 
     # Includes
-    mkdir -p "$pkgdir/usr/include"
+    mkdir -p "$pkgdir/usr/local/include"
     cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/local/include/"
 
     # Luarocks config
