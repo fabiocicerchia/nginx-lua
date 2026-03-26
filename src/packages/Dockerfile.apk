@@ -1,65 +1,50 @@
 ARG NGINX_VERSION
-ARG DISTRO
+ARG DISTRO=alpine
 ARG OS_VERSION
 ARG ARCH
+
+# Stage 0: Base image with prebuilt binaries
 FROM fabiocicerchia/nginx-lua:$NGINX_VERSION-$DISTRO$OS_VERSION-$ARCH AS base
 
-ARG DISTRO
-ENV DISTRO=$DISTRO
+# Stage 1: Builder
+FROM alpine:3.18 AS build
 
-WORKDIR /
+ARG NGINX_VERSION
+ARG ARCH
+ENV NGINX_VERSION=$NGINX_VERSION
+ENV ARCH=$ARCH
 
-# https://github.com/jordansissel/fpm/issues/1375
-RUN apk add ruby binutils tar
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/v3.18/main" > /etc/apk/repositories \
+    && echo "https://dl-cdn.alpinelinux.org/alpine/v3.18/community" >> /etc/apk/repositories \
+    && apk update \
+    && apk add --no-cache alpine-sdk abuild sudo bash gettext-dev libgcc libmaxminddb-dev libxml2-dev pcre-dev
 
-# https://rubygems.org/gems/fpm
-ARG FPM_VERSION=1.15.1
-RUN gem install fpm --no-document -v $FPM_VERSION
+# Add non-root builder
+RUN adduser -D builder \
+    && addgroup builder abuild \
+    && echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-ARG FPM_OUTPUT_TYPE=apk
+USER builder
+WORKDIR /home/builder/packages/nginx-lua
 
-COPY *.sh /
+# Copy APKBUILD and scripts
+COPY --chown=builder:builder APKBUILD after-install.sh nginx-lua.post-install /home/builder/packages/nginx-lua/
 
-# depends from nginx 1.25.2
-RUN source /etc/os-release \
-    && fpm \
-      --verbose \
-      --name nginx-lua \
-      --version $NGINX_VERSION \
-      --architecture $ARCH \
-      --url https://github.com/fabiocicerchia/nginx-lua \
-      --description "Nginx $NGINX_VERSION with LUA support." \
-      --vendor "fabiocicerchia" \
-      --input-type dir \
-      --output-type $FPM_OUTPUT_TYPE \
-      --iteration 1~${UBUNTU_CODENAME:-$ID} \
-      --after-install after-install.sh \
-      --conflicts luajit \
-      --conflicts nginx \
-      --conflicts openresty \
-      --provides luajit \
-      --provides nginx \
-      --provides openresty \
-      --replaces luajit \
-      --replaces nginx \
-      --replaces openresty \
-      --depends "gettext-envsubst>=0.21" \
-      --depends "libgcc>=12.2.1" \
-      --depends "libmaxminddb>=1.7.1" \
-      --depends "libxml2>=2.11.4" \
-      --depends "pcre>=8.44" \
-      --chdir / \
-      after-install.sh \
-      etc/nginx \
-      usr/local/bin/lua \
-      usr/local/bin/luajit \
-      usr/local/bin/luarocks \
-      usr/local/etc/luarocks \
-      usr/local/include/luajit-2.1 \
-      usr/local/lib \
-      usr/local/share/lua \
-      usr/local/share/man/man1/luajit.1 \
-      usr/sbin/nginx \
-      usr/sbin/nginx-debug \
-      var/cache/nginx \
-      var/log/nginx
+# Copy files from the base image
+COPY --from=base /etc/nginx /etc/nginx
+COPY --from=base /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=base /usr/sbin/nginx-debug /usr/sbin/nginx-debug
+COPY --from=base /usr/local/bin /usr/local/bin
+COPY --from=base /usr/local/lib /usr/local/lib
+COPY --from=base /usr/local/include /usr/local/include
+COPY --from=base /usr/local/etc /usr/local/etc
+COPY --from=base /usr/local/share /usr/local/share
+
+# Generate signing key and build
+RUN export NGINX_VERSION=$NGINX_VERSION \
+    && export ARCH=$(apk --print-arch) \
+    && export DISTRO=$DISTRO \
+    && export OS_VERSION=$OS_VERSION \
+    && abuild-keygen -ain \
+    && abuild -r \
+    && sudo mv /home/builder/packages/packages/*/nginx-lua-*.apk /
