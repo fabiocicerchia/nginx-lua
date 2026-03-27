@@ -147,7 +147,7 @@ commands:
 
       - run:
           name: Install Python Dependencies
-          command: pip3 install --require-hashes -r bin/requirements.txt || pip3 install -r bin/requirements.txt
+          command: pip3 install -r bin/requirements.txt
 
       - run:
           name: Install Security Tools (Trivy, Cosign, Syft)
@@ -263,7 +263,7 @@ commands:
                 command: |
                   ARCH=$(dpkg --print-architecture)
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
-                    ./bin/sign-and-sbom.sh "${TAG}" || echo "WARN: Signing failed for ${TAG} - set COSIGN_KEY or COSIGN_EXPERIMENTAL=1"
+                    ./bin/sign-and-sbom.sh "${TAG}" || { echo "ERROR: Signing failed for ${TAG}"; exit 1; }
                   done
                 environment:
                   COSIGN_EXPERIMENTAL: "1"

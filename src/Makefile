@@ -14,6 +14,14 @@ NPROC := $(shell nproc)
 # These are populated by bin/generate-deps-env.py and verified at download time
 -include .env.dist
 
+# Build-time guard: fail early if any SHA256 checksums are missing.
+# All checksums must be computed before building production images.
+CHECK_UNPINNED := $(shell grep -c 'RECOMPUTE_REQUIRED' .env.dist 2>/dev/null || echo 0)
+ifneq ($(CHECK_UNPINNED), 0)
+$(warning WARNING: $(CHECK_UNPINNED) SHA256 checksum(s) marked RECOMPUTE_REQUIRED in .env.dist)
+$(warning Run bin/generate-deps-env.py to compute missing hashes before production builds.)
+endif
+
 # Secure download function: downloads a file and verifies its SHA256 checksum.
 # Usage: $(call secure_download,<url>,<output_file>,<expected_sha256>)
 # If the expected SHA256 is empty, the download proceeds with a warning.

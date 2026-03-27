@@ -11,8 +11,8 @@ source supported_versions
 # Main execution
 main() {
     # Docker Bench Security
-    docker run -it --net host --pid host --userns host --cap-add audit_control \
-        -v /etc:/etc \
+    docker run --rm -t --net host --pid host --userns host --cap-add audit_control \
+        -v /etc:/etc:ro \
         -v /var/lib:/var/lib:ro \
         -v /var/run/docker.sock:/var/run/docker.sock:ro \
         --label docker_bench_security \
@@ -20,7 +20,15 @@ main() {
 
     # Vulnerability scanning with Trivy (replaces deprecated 'docker scan')
     if ! command -v trivy &> /dev/null; then
-        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+        TRIVY_VERSION="v0.58.2"
+        ARCH=$(uname -m | sed 's/x86_64/64bit/' | sed 's/aarch64/ARM64/')
+        TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-${ARCH}.tar.gz"
+        curl -sLO "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_ARCHIVE}"
+        curl -sLO "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION#v}_checksums.txt"
+        grep "${TRIVY_ARCHIVE}" "trivy_${TRIVY_VERSION#v}_checksums.txt" | sha256sum -c - || { echo "FATAL: Trivy checksum verification failed"; exit 1; }
+        tar xzf "${TRIVY_ARCHIVE}" trivy
+        sudo mv trivy /usr/local/bin/trivy
+        rm -f "${TRIVY_ARCHIVE}" "trivy_${TRIVY_VERSION#v}_checksums.txt"
     fi
 
     find "nginx/{$nginx_mainline,$nginx_stable}" -mindepth 1 -maxdepth 1 -type d | while read -r OS_FOLDER; do
