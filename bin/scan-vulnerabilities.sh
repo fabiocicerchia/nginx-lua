@@ -15,16 +15,8 @@ if [ -z "$IMAGE_REF" ]; then
 fi
 
 if ! command -v trivy &> /dev/null; then
-    echo "Installing Trivy (pinned release with checksum verification)..."
-    TRIVY_VERSION="v0.58.2"
-    ARCH=$(uname -m | sed 's/x86_64/64bit/' | sed 's/aarch64/ARM64/')
-    TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-${ARCH}.tar.gz"
-    curl -sLO "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_ARCHIVE}"
-    curl -sLO "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION#v}_checksums.txt"
-    grep "${TRIVY_ARCHIVE}" "trivy_${TRIVY_VERSION#v}_checksums.txt" | sha256sum -c - || { echo "FATAL: Trivy checksum verification failed"; exit 1; }
-    tar xzf "${TRIVY_ARCHIVE}" trivy
-    sudo mv trivy /usr/local/bin/trivy
-    rm -f "${TRIVY_ARCHIVE}" "trivy_${TRIVY_VERSION#v}_checksums.txt"
+    echo "FATAL: trivy is not installed. Install it before running this script."
+    exit 1
 fi
 
 echo "=== Scanning image: ${IMAGE_REF} ==="

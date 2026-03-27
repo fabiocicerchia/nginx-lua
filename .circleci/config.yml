@@ -150,9 +150,8 @@ commands:
           command: pip3 install -r bin/requirements.txt
 
       - run:
-          name: Install Security Tools (Trivy, Cosign, Syft)
+          name: Install Trivy (vulnerability scanner)
           command: |
-            # Trivy - vulnerability scanner (pinned to tagged release, not main branch)
             TRIVY_VERSION="v0.58.2"
             TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-$(dpkg --print-architecture | sed 's/amd64/64bit/' | sed 's/arm64/ARM64/').tar.gz"
             curl -sLO "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_ARCHIVE}"
@@ -162,17 +161,22 @@ commands:
             sudo mv trivy /usr/local/bin/trivy
             rm -f "${TRIVY_ARCHIVE}" "trivy_${TRIVY_VERSION#v}_checksums.txt"
             trivy --version
-            # Cosign - image signing (Sigstore, pinned to tagged release)
+
+      - run:
+          name: Install Cosign (image signing)
+          command: |
             COSIGN_VERSION="v2.4.1"
             curl -sLO "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-$(dpkg --print-architecture)"
             curl -sLO "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt"
-            # Verify cosign checksum before install
             grep "cosign-linux-$(dpkg --print-architecture)" cosign_checksums.txt | sha256sum -c -
             chmod +x "cosign-linux-$(dpkg --print-architecture)"
             sudo mv "cosign-linux-$(dpkg --print-architecture)" /usr/local/bin/cosign
             rm -f cosign_checksums.txt
             cosign version
-            # Syft - SBOM generator (pinned to tagged release, not main branch)
+
+      - run:
+          name: Install Syft (SBOM generator)
+          command: |
             SYFT_VERSION="v1.18.1"
             SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
             curl -sLO "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}"
@@ -189,8 +193,12 @@ commands:
             mkdir -p test/geoip
             cd test/geoip
             if test ! -f "GeoLite2-City.mmdb"; then
-              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" > GeoLite2-City.tar.gz
-              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" > GeoLite2-Country.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o GeoLite2-City.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz.sha256" -o GeoLite2-City.tar.gz.sha256
+              sha256sum -c GeoLite2-City.tar.gz.sha256
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o GeoLite2-Country.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz.sha256" -o GeoLite2-Country.tar.gz.sha256
+              sha256sum -c GeoLite2-Country.tar.gz.sha256
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
               mv GeoLite2-City_*/GeoLite2-City.mmdb ./
