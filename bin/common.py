@@ -203,7 +203,10 @@ def push_images(nginx_version, os_distro, os_version):
     for arch in ARCHITECTURES:
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
         for tag in tags:
-            push_docker_image(tag)
+            exit_code = push_docker_image(tag)
+            if exit_code != 0:
+                print(f"FATAL: Failed to push image {tag}")
+                return exit_code
 
     return 0
 
