@@ -245,9 +245,15 @@ auto-update-and-commit: .setup_gitrepo auto-update
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
 	fi; \
+	BRANCH_NAME="auto-update/$$(date +%Y%m%d-%H%M%S)"; \
+	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "Automated updates"; \
-	git pull --ff-only origin main || true; \
-	git push origin main
+	git push -u origin "$$BRANCH_NAME"; \
+	curl -s -X POST \
+		-H "Authorization: token $${GITHUB_TOKEN}" \
+		-H "Accept: application/vnd.github.v3+json" \
+		"https://api.github.com/repos/$(GH_USERNAME)/nginx-lua/pulls" \
+		-d "{\"title\":\"Automated dependency updates\",\"head\":\"$$BRANCH_NAME\",\"base\":\"main\",\"body\":\"Automated PR created by CI pipeline.\\n\\nThis PR contains updated supported versions, Dockerfiles, tags, and README.\"}"
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add docs/metadata/ || true; \
@@ -255,9 +261,15 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
 	fi; \
+	BRANCH_NAME="auto-metadata/$$(date +%Y%m%d-%H%M%S)"; \
+	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "[ci skip] Automated metadata"; \
-	git pull --ff-only origin main || true; \
-	git push origin main
+	git push -u origin "$$BRANCH_NAME"; \
+	curl -s -X POST \
+		-H "Authorization: token $${GITHUB_TOKEN}" \
+		-H "Accept: application/vnd.github.v3+json" \
+		"https://api.github.com/repos/$(GH_USERNAME)/nginx-lua/pulls" \
+		-d "{\"title\":\"[ci skip] Automated metadata update\",\"head\":\"$$BRANCH_NAME\",\"base\":\"main\",\"body\":\"Automated PR created by CI pipeline.\\n\\nThis PR contains updated Docker image metadata.\"}"
 
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile*
@@ -267,6 +279,8 @@ release: ## create a github release
 		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
 		cp $$DOCKERFILE $$DEST; \
 	done
+	# Generate SHA256 checksums for all release artifacts
+	cd dist && sha256sum * > SHA256SUMS && cd ..
 	wget -q $(GH_CLI_TARBALL)
 	wget -q $(GH_CLI_TARBALL).sha256 || true
 	if [ -f "$(GH_CLI_NAME).tar.gz.sha256" ]; then \

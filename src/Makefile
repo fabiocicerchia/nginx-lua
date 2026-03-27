@@ -10,14 +10,35 @@
 EXTENDED_IMAGE=YES
 NPROC := $(shell nproc)
 
-# Secure download helper: downloads and verifies SHA256 checksum post-download.
-# Usage: $(call secure_download,<url>,<output_file>)
-# All downloads are logged with their SHA256 for audit trail (CRA Article 47).
+# Load SHA256 checksums and version variables from .env.dist
+# These are populated by bin/generate-deps-env.py and verified at download time
+-include .env.dist
+
+# Secure download function: downloads a file and verifies its SHA256 checksum.
+# Usage: $(call secure_download,<url>,<output_file>,<expected_sha256>)
+# If the expected SHA256 is empty, the download proceeds with a warning.
+# If the SHA256 does not match, the build FAILS immediately.
+# Ref: SLSA Level 2 - verified source integrity
+# Ref: Cyber Resilience Act Article 47 - supply chain integrity
 define secure_download
-	@echo "=== Downloading: $(1) ===" && \
+	@echo "=== Secure Download: $(1) ===" && \
 	curl -sfLo $(2) "$(1)" && \
-	echo "  SHA256: $$(sha256sum $(2) | awk '{print $$1}')" && \
-	echo "$(1) $$(sha256sum $(2) | awk '{print $$1}')" >> /tmp/download-audit-log.txt
+	ACTUAL_SHA256=$$(sha256sum $(2) | awk '{print $$1}') && \
+	if [ -n "$(3)" ] && [ "$(3)" != "RECOMPUTE_REQUIRED" ]; then \
+		if [ "$$ACTUAL_SHA256" != "$(3)" ]; then \
+			echo "FATAL: SHA256 checksum mismatch for $(2)!" && \
+			echo "  Expected: $(3)" && \
+			echo "  Actual:   $$ACTUAL_SHA256" && \
+			echo "  This may indicate a supply chain attack or version drift." && \
+			echo "  Update the SHA256 in src/.env.dist if this is a legitimate version change." && \
+			rm -f $(2) && exit 1; \
+		else \
+			echo "  SHA256 verified OK: $$ACTUAL_SHA256"; \
+		fi; \
+	else \
+		echo "  WARNING: No checksum pinned - SHA256: $$ACTUAL_SHA256"; \
+		echo "  Pin this hash in src/.env.dist to prevent supply chain attacks."; \
+	fi
 endef
 
 # TODO: Find a better way to fallback when openresty is behind the nginx latest
@@ -73,11 +94,7 @@ openresty-patches:
 core:
 # NGINX
 # ##############################################################################
-# we're on an architecture upstream doesn't officially build for
-# let's build binaries from the published packaging sources
-	curl -sfLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
-	curl -sfLo /nginx.tar.gz.asc https://nginx.org/download/nginx-${VER_NGINX}.tar.gz.asc || true
-	@echo "NGINX tarball SHA256: $$(sha256sum /nginx.tar.gz | awk '{print $$1}')"
+	$(call secure_download,https://nginx.org/download/nginx-${VER_NGINX}.tar.gz,/nginx.tar.gz,${SHA256_NGINX})
 	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
 		/var/cache/nginx/proxy_temp \
@@ -113,26 +130,26 @@ endif
 # NGX Devel Kit
 # ##############################################################################
 dep-ngx_devel_kit:
-	curl -sfLo /ngx_devel_kit.tar.gz https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz
+	$(call secure_download,https://github.com/vision5/ngx_devel_kit/archive/v${VER_NGX_DEVEL_KIT}.tar.gz,/ngx_devel_kit.tar.gz,${SHA256_NGX_DEVEL_KIT})
 	tar -C / -xvzf /ngx_devel_kit.tar.gz
 
 # njs
 # ##############################################################################
 dep-njs:
-	curl -sfLo /njs.tar.gz https://github.com/nginx/njs/archive/refs/tags/${VER_NJS}.tar.gz
+	$(call secure_download,https://github.com/nginx/njs/archive/refs/tags/${VER_NJS}.tar.gz,/njs.tar.gz,${SHA256_NJS})
 	tar -C / -xvzf /njs.tar.gz
 
 # geoip2
 # ##############################################################################
 dep-geoip2:
 	mkdir -p /usr/lib64
-	curl -sfLo /geoip2.tar.gz https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz
+	$(call secure_download,https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/${VER_GEOIP}.tar.gz,/geoip2.tar.gz,${SHA256_GEOIP})
 	tar -C / -xvzf /geoip2.tar.gz
 
 # OpenResty LUAJIT2
 # ##############################################################################
 dep-luajit:
-	curl -sfLo /luajit.tar.gz https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz
+	$(call secure_download,https://github.com/openresty/luajit2/archive/v${VER_LUAJIT}.tar.gz,/luajit.tar.gz,${SHA256_LUAJIT})
 	tar -C / -xvzf /luajit.tar.gz
 	cd /luajit2-${VER_LUAJIT} \
 	&& $(MAKE) \
@@ -141,13 +158,13 @@ dep-luajit:
 # Lua Nginx Module
 # ##############################################################################
 dep-lua-nginx:
-	curl -sfLo /lua-nginx.tar.gz https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-nginx-module/archive/v${VER_LUA_NGINX_MODULE}.tar.gz,/lua-nginx.tar.gz,${SHA256_LUA_NGINX_MODULE})
 	tar -C / -xvzf /lua-nginx.tar.gz
 
 # LUA Resty Core
 # ##############################################################################
 dep-lua-resty-core:
-	curl -sfLo /lua-resty-core.tar.gz https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-core/archive/v${VER_LUA_RESTY_CORE}.tar.gz,/lua-resty-core.tar.gz,${SHA256_LUA_RESTY_CORE})
 	tar -C / -xvzf /lua-resty-core.tar.gz
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 	&& $(MAKE) \
@@ -156,7 +173,7 @@ dep-lua-resty-core:
 # LUA Resty LRUCache
 # ##############################################################################
 dep-lua-resty-lrucache:
-	curl -sfLo /lua-resty-lrucache.tar.gz https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-lrucache/archive/v${VER_LUA_RESTY_LRUCACHE}.tar.gz,/lua-resty-lrucache.tar.gz,${SHA256_LUA_RESTY_LRUCACHE})
 	tar -C / -xvzf /lua-resty-lrucache.tar.gz
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 	&& $(MAKE) \
@@ -165,13 +182,13 @@ dep-lua-resty-lrucache:
 # OpenResty Headers
 # ##############################################################################
 dep-headers-more-nginx-module:
-	curl -sfLo /headers-more-nginx-module.zip https://github.com/openresty/headers-more-nginx-module/archive/v${VER_OPENRESTY_HEADERS}.zip
+	$(call secure_download,https://github.com/openresty/headers-more-nginx-module/archive/v${VER_OPENRESTY_HEADERS}.zip,/headers-more-nginx-module.zip,${SHA256_OPENRESTY_HEADERS})
 	unzip -d / /headers-more-nginx-module.zip
 
 # Cloudflare Cookie
 # ##############################################################################
 dep-lua-resty-cookie:
-	curl -sfLo /lua-resty-cookie.tar.gz https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz
+	$(call secure_download,https://github.com/cloudflare/lua-resty-cookie/archive/${VER_CLOUDFLARE_COOKIE}.tar.gz,/lua-resty-cookie.tar.gz,${SHA256_CLOUDFLARE_COOKIE})
 	tar -C / -xvzf /lua-resty-cookie.tar.gz
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
 	&& $(MAKE) \
@@ -180,7 +197,7 @@ dep-lua-resty-cookie:
 # OpenResty Dns
 # ##############################################################################
 dep-lua-openresty-dns:
-	curl -sfLo /lua-openresty-dns.tar.gz https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-dns/archive/v${VER_OPENRESTY_DNS}.tar.gz,/lua-openresty-dns.tar.gz,${SHA256_OPENRESTY_DNS})
 	tar -C / -xvzf /lua-openresty-dns.tar.gz
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
 	&& $(MAKE) \
@@ -189,7 +206,7 @@ dep-lua-openresty-dns:
 # OpenResty Memcached
 # ##############################################################################
 dep-lua-openresty-memcached:
-	curl -sfLo /lua-openresty-memcached.tar.gz https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-memcached/archive/v${VER_OPENRESTY_MEMCACHED}.tar.gz,/lua-openresty-memcached.tar.gz,${SHA256_OPENRESTY_MEMCACHED})
 	tar -C / -xvzf /lua-openresty-memcached.tar.gz
 	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
 	&& $(MAKE) \
@@ -198,7 +215,7 @@ dep-lua-openresty-memcached:
 # OpenResty Mysql
 # ##############################################################################
 dep-lua-openresty-mysql:
-	curl -sfLo /lua-openresty-mysql.tar.gz https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-mysql/archive/v${VER_OPENRESTY_MYSQL}.tar.gz,/lua-openresty-mysql.tar.gz,${SHA256_OPENRESTY_MYSQL})
 	tar -C / -xvzf /lua-openresty-mysql.tar.gz
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 	&& $(MAKE) \
@@ -207,7 +224,7 @@ dep-lua-openresty-mysql:
 # OpenResty Redis
 # ##############################################################################
 dep-lua-openresty-redis:
-	curl -sfLo /lua-openresty-redis.tar.gz https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-redis/archive/v${VER_OPENRESTY_REDIS}.tar.gz,/lua-openresty-redis.tar.gz,${SHA256_OPENRESTY_REDIS})
 	tar -C / -xvzf /lua-openresty-redis.tar.gz
 	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
 	&& $(MAKE) \
@@ -216,7 +233,7 @@ dep-lua-openresty-redis:
 # OpenResty Shell
 # ##############################################################################
 dep-lua-openresty-shell:
-	curl -sfLo /lua-openresty-shell.tar.gz https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-shell/archive/v${VER_OPENRESTY_SHELL}.tar.gz,/lua-openresty-shell.tar.gz,${SHA256_OPENRESTY_SHELL})
 	tar -C / -xvzf /lua-openresty-shell.tar.gz
 	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
 	&& $(MAKE) \
@@ -225,7 +242,7 @@ dep-lua-openresty-shell:
 # OpenResty Tablepool
 # ##############################################################################
 dep-lua-openresty-tablepool:
-	curl -sfLo /lua-tablepool.tar.gz https://github.com/openresty/lua-tablepool/archive/refs/tags/v${VER_OPENRESTY_TABLEPOOL}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-tablepool/archive/refs/tags/v${VER_OPENRESTY_TABLEPOOL}.tar.gz,/lua-tablepool.tar.gz,${SHA256_OPENRESTY_TABLEPOOL})
 	tar -C / -xvzf /lua-tablepool.tar.gz
 	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
 	&& $(MAKE) \
@@ -234,7 +251,7 @@ dep-lua-openresty-tablepool:
 # OpenResty Signal
 # ##############################################################################
 dep-lua-openresty-signal:
-	curl -sfLo /lua-openresty-signal.tar.gz https://github.com/openresty/lua-resty-signal/archive/refs/tags/v${VER_OPENRESTY_SIGNAL}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-signal/archive/refs/tags/v${VER_OPENRESTY_SIGNAL}.tar.gz,/lua-openresty-signal.tar.gz,${SHA256_OPENRESTY_SIGNAL})
 	tar -C / -xvzf /lua-openresty-signal.tar.gz
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
 	&& $(MAKE) \
@@ -245,7 +262,7 @@ dep-lua-openresty-signal:
 # OpenResty Upstream Healthcheck
 # ##############################################################################
 dep-lua-resty-upstream-healthcheck:
-	curl -sfLo /lua-resty-upstream-healthcheck.tar.gz https://github.com/openresty/lua-resty-upstream-healthcheck/archive/refs/tags/v${VER_OPENRESTY_HEALTHCHECK}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-upstream-healthcheck/archive/refs/tags/v${VER_OPENRESTY_HEALTHCHECK}.tar.gz,/lua-resty-upstream-healthcheck.tar.gz,${SHA256_OPENRESTY_HEALTHCHECK})
 	tar -C / -xvzf /lua-resty-upstream-healthcheck.tar.gz
 	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
 	&& $(MAKE) \
@@ -254,7 +271,7 @@ dep-lua-resty-upstream-healthcheck:
 # OpenResty Websocket
 # ##############################################################################
 dep-lua-openresty-websocket:
-	curl -sfLo /lua-openresty-websocket.tar.gz https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-resty-websocket/archive/v${VER_OPENRESTY_WEBSOCKET}.tar.gz,/lua-openresty-websocket.tar.gz,${SHA256_OPENRESTY_WEBSOCKET})
 	tar -C / -xvzf /lua-openresty-websocket.tar.gz
 	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
 	&& $(MAKE) \
@@ -263,32 +280,32 @@ dep-lua-openresty-websocket:
 # OpenResty Nginx Misc
 # ##############################################################################
 dep-lua-openresty-misc:
-	curl -sfLo /lua-openresty-misc.tar.gz https://github.com/openresty/set-misc-nginx-module/archive/v${VER_MISC_NGINX}.tar.gz
+	$(call secure_download,https://github.com/openresty/set-misc-nginx-module/archive/v${VER_MISC_NGINX}.tar.gz,/lua-openresty-misc.tar.gz,${SHA256_MISC_NGINX})
 	tar -C / -xvzf /lua-openresty-misc.tar.gz
 
 # LUA Upstream
 # ##############################################################################
 dep-lua-upstream-nginx-module:
-	curl -sfLo /lua-upstream-nginx-module.tar.gz https://github.com/openresty/lua-upstream-nginx-module/archive/v${VER_LUA_UPSTREAM}.tar.gz
+	$(call secure_download,https://github.com/openresty/lua-upstream-nginx-module/archive/v${VER_LUA_UPSTREAM}.tar.gz,/lua-upstream-nginx-module.tar.gz,${SHA256_LUA_UPSTREAM})
 	tar -C / -xvzf /lua-upstream-nginx-module.tar.gz
 
 # Prometheus
 # ##############################################################################
 dep-nginx-lua-prometheus:
-	curl -sfLo /nginx-lua-prometheus.tar.gz https://github.com/knyar/nginx-lua-prometheus/archive/${VER_PROMETHEUS}.tar.gz
+	$(call secure_download,https://github.com/knyar/nginx-lua-prometheus/archive/${VER_PROMETHEUS}.tar.gz,/nginx-lua-prometheus.tar.gz,${SHA256_PROMETHEUS})
 	tar -C / -xvzf /nginx-lua-prometheus.tar.gz
 	mv /nginx-lua-prometheus-${VER_PROMETHEUS}/*.lua ${LUA_LIB_DIR}/
 
 # OpenResty Stream Lua
 # ##############################################################################
 dep-stream-lua-nginx-module:
-	curl -sfLo /stream-lua-nginx-module.zip https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.zip
+	$(call secure_download,https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.zip,/stream-lua-nginx-module.zip,${SHA256_OPENRESTY_STREAMLUA})
 	unzip -d / /stream-lua-nginx-module.zip
 
 # OpenResty Limit Traffic
 # ##############################################################################
 dep-lua-resty-limit-traffic:
-	curl -sfLo /lua-resty-limit-traffic.zip https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip,/lua-resty-limit-traffic.zip,${SHA256_OPENRESTY_LIMITTRAFFIC})
 	unzip -d / /lua-resty-limit-traffic.zip
 	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 	&& $(MAKE) \
@@ -297,7 +314,7 @@ dep-lua-resty-limit-traffic:
 # OpenResty Upload
 # ##############################################################################
 dep-lua-resty-upload:
-	curl -sfLo /lua-resty-upload.zip https://github.com/openresty/lua-resty-upload/archive/v${VER_OPENRESTY_UPLOAD}.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-upload/archive/v${VER_OPENRESTY_UPLOAD}.zip,/lua-resty-upload.zip,${SHA256_OPENRESTY_UPLOAD})
 	unzip -d / /lua-resty-upload.zip
 	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
 	&& $(MAKE) \
@@ -306,7 +323,7 @@ dep-lua-resty-upload:
 # OpenResty Lock
 # ##############################################################################
 dep-lua-resty-lock:
-	curl -sfLo /lua-resty-lock.zip https://github.com/openresty/lua-resty-lock/archive/v${VER_OPENRESTY_LOCK}.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-lock/archive/v${VER_OPENRESTY_LOCK}.zip,/lua-resty-lock.zip,${SHA256_OPENRESTY_LOCK})
 	unzip -d / /lua-resty-lock.zip
 	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
 	&& $(MAKE) \
@@ -315,7 +332,7 @@ dep-lua-resty-lock:
 # OpenResty Balancer
 # ##############################################################################
 dep-lua-resty-balancer:
-	curl -sfLo /lua-resty-balancer.zip https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.zip,/lua-resty-balancer.zip,${SHA256_OPENRESTY_BALANCER})
 	unzip -d / /lua-resty-balancer.zip
 	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
 	&& $(MAKE) \
@@ -324,7 +341,7 @@ dep-lua-resty-balancer:
 # OpenResty String
 # ##############################################################################
 dep-lua-resty-string:
-	curl -sfLo /lua-resty-string.zip https://github.com/openresty/lua-resty-string/archive/v${VER_OPENRESTY_STRING}.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-string/archive/v${VER_OPENRESTY_STRING}.zip,/lua-resty-string.zip,${SHA256_OPENRESTY_STRING})
 	unzip -d / /lua-resty-string.zip
 	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 	&& $(MAKE) \
@@ -335,17 +352,9 @@ dep-lua-resty-string:
 # ##############################################################################
 
 luarocks:
-	curl -sfLo /luarocks.tar.gz https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz
+	$(call secure_download,https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz,/luarocks.tar.gz,${SHA256_LUAROCKS})
 	tar -C / -xzvf /luarocks.tar.gz
 	cd /luarocks-${VER_LUAROCKS}; \
 	./configure \
 	&& $(MAKE) \
 	&& $(MAKE) install
-
-# ##############################################################################
-# SUPPLY CHAIN AUDIT
-# ##############################################################################
-# Log all downloaded dependency checksums for audit trail (CRA Article 47)
-audit-downloads:
-	@echo "=== Download Audit Log ===" && \
-	cat /tmp/download-audit-log.txt 2>/dev/null || echo "No downloads recorded yet"
