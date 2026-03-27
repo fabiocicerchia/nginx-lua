@@ -262,10 +262,12 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile*
 	cp Dockerfile dist/
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
-		DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-		cp $$DOCKERFILE $$DEST; \
+	for NGINX_VER in $(SUPPORTED_NGINX_VER_MAINLINE) $(SUPPORTED_NGINX_VER_STABLE); do \
+		tail -n -6 supported_versions | tr '=' '/' | sed "s_^_nginx/$$NGINX_VER/_" | while read FOLDER; do \
+			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+			cp $$DOCKERFILE $$DEST; \
+		done; \
 	done
 	wget $(GH_CLI_TARBALL)
 	tar xvzf $(GH_CLI_NAME).tar.gz
