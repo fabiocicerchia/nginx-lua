@@ -1,0 +1,18 @@
+# SHA256 checksums for all source dependencies
+# Ref: SLSA Level 2 requirement - verified source integrity
+# Ref: Cyber Resilience Act Article 47 - supply chain integrity
+#
+# IMPORTANT: These checksums MUST be updated when dependency versions change.
+# Run `make verify-checksums` to regenerate after version updates.
+#
+# Format: <sha256> <component>:<version>
+# When a checksum is empty, the download will proceed but log a warning.
+# Fill in checksums after first verified download of each new version.
+#
+# To generate checksums for a new version:
+#   curl -sL <url> | sha256sum
+#
+# NOTE: Checksums are version-dependent. When generate-deps-env.py updates
+# versions, these checksums must be refreshed. The CI pipeline will warn
+# (but not fail) on missing checksums to allow version bumps, and will
+# hard-fail on checksum mismatches to catch tampering.

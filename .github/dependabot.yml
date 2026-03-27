@@ -5,7 +5,17 @@
 
 version: 2
 updates:
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "docker"
+    directory: "/"
     schedule:
       interval: "daily"
+    # NIS2 Article 21(2)(d) - supply chain security
+    reviewers:
+      - "fabiocicerchia"
+
+  - package-ecosystem: "pip"
+    directory: "/bin"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "fabiocicerchia"

@@ -1,0 +1,19 @@
+# Supply chain security: require review on all critical paths
+# Ref: NIS2 Article 21 - supply chain security measures
+
+# Default owner for everything
+* @fabiocicerchia
+
+# CI/CD pipeline changes require explicit owner review
+.circleci/ @fabiocicerchia
+Makefile @fabiocicerchia
+
+# Dockerfile and build system changes (supply chain critical)
+Dockerfile @fabiocicerchia
+src/Dockerfile.* @fabiocicerchia
+src/Makefile @fabiocicerchia
+bin/ @fabiocicerchia
+
+# Security-sensitive files
+SECURITY.md @fabiocicerchia
+.github/CODEOWNERS @fabiocicerchia

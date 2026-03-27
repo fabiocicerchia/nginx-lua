@@ -1,0 +1,7 @@
+# Security Contact (RFC 9116)
+# Ref: Cyber Resilience Act Article 13 - Vulnerability handling requirements
+Contact: https://github.com/fabiocicerchia
+Expires: 2027-03-27T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://github.com/fabiocicerchia/nginx-lua/.github/security.txt
+Policy: https://github.com/fabiocicerchia/nginx-lua/blob/main/SECURITY.md

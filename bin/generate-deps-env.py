@@ -14,19 +14,19 @@ from pathlib import Path
 
 
 def run_command(cmd):
-    """Run a shell command and return the output."""
+    """Run a command as a list of arguments (no shell injection)."""
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+        result = subprocess.run(cmd, shell=False, capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        print(f"Command failed: {cmd}")
+        print(f"Command failed: {' '.join(cmd)}")
         print(f"Error: {e}")
         sys.exit(1)
 
 
 def get_latest_tag(repo_url):
     """Get the latest tag from a Git repository."""
-    cmd = f"git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' {repo_url}"
+    cmd = ["git", "-c", "versionsort.suffix=-", "ls-remote", "--tags", "--sort=v:refname", repo_url]
     output = run_command(cmd)
 
     # Filter out rc, alpha, beta versions and get the latest
@@ -43,7 +43,7 @@ def get_latest_tag(repo_url):
 
 def get_latest_commit(repo_url):
     """Get the latest commit from a Git repository."""
-    cmd = f"git -c 'versionsort.suffix=-' ls-remote --sort='v:refname' {repo_url} HEAD"
+    cmd = ["git", "-c", "versionsort.suffix=-", "ls-remote", "--sort=v:refname", repo_url, "HEAD"]
     output = run_command(cmd)
 
     # Extract commit hash

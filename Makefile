@@ -235,28 +235,28 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
 
 .setup_gitrepo:
-	git config --global user.name "$(GH_USERNAME)"
-	git config --global user.email "$(GH_USERNAME)@users.noreply.github.com"
-	git remote set-url --push origin "https://$(GH_USERNAME):${GITHUB_TOKEN}@github.com/$(GH_USERNAME)/nginx-lua.git"
+	git config user.name "$(GH_USERNAME)"
+	git config user.email "$(GH_USERNAME)@users.noreply.github.com"
+	git remote set-url --push origin "https://x-access-token:${GITHUB_TOKEN}@github.com/$(GH_USERNAME)/nginx-lua.git"
 
 auto-update-and-commit: .setup_gitrepo auto-update
-	git add -A || true; \
-	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
+	git add supported_versions nginx/ src/ docs/TAGS.md README.md || true; \
+	CHANGES=$$(git status --porcelain | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
 	fi; \
 	git commit -m "Automated updates"; \
-	git pull origin main || true; \
+	git pull --ff-only origin main || true; \
 	git push origin main
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
-	git add -A || true; \
-	CHANGES=$(git status | grep "Changes to be committed" | wc -l | tr -d ' '); \
+	git add docs/metadata/ || true; \
+	CHANGES=$$(git status --porcelain | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
 	fi; \
 	git commit -m "[ci skip] Automated metadata"; \
-	git pull origin main || true; \
+	git pull --ff-only origin main || true; \
 	git push origin main
 
 release: ## create a github release
@@ -267,7 +267,11 @@ release: ## create a github release
 		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
 		cp $$DOCKERFILE $$DEST; \
 	done
-	wget $(GH_CLI_TARBALL)
+	wget -q $(GH_CLI_TARBALL)
+	wget -q $(GH_CLI_TARBALL).sha256 || true
+	if [ -f "$(GH_CLI_NAME).tar.gz.sha256" ]; then \
+		sha256sum -c "$(GH_CLI_NAME).tar.gz.sha256"; \
+	fi
 	tar xvzf $(GH_CLI_NAME).tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
 		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
@@ -288,11 +292,13 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainlin
 	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE))" = "200" ]; then \
 		USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
 	fi; \
-	curl -sLo src/10-listen-on-ipv6-by-default.sh $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
-	curl -sLo src/15-local-resolvers.envsh        $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
-	curl -sLo src/20-envsubst-on-templates.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
-	curl -sLo src/30-tune-worker-processes.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
-	curl -sLo src/docker-entrypoint.sh            $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
+	curl -sfLo src/10-listen-on-ipv6-by-default.sh $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
+	curl -sfLo src/15-local-resolvers.envsh        $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
+	curl -sfLo src/20-envsubst-on-templates.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
+	curl -sfLo src/30-tune-worker-processes.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
+	curl -sfLo src/docker-entrypoint.sh            $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
+	echo "=== Entrypoint file checksums ===" ; \
+	sha256sum src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh ; \
 	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
 
 generate-metadata: ## generate metadata for all OS docker images
@@ -306,6 +312,15 @@ update-readme: ## update supported docker tags in readme
 
 benchmark: ## benchmark (wip)
 	./bin/benchmark.sh
+
+scan-image: ## scan a docker image for vulnerabilities (usage: make scan-image IMAGE=fabiocicerchia/nginx-lua:latest)
+	./bin/scan-vulnerabilities.sh "$(IMAGE)" "CRITICAL,HIGH" "1"
+
+sign-image: ## sign a docker image and attach SBOM (usage: make sign-image IMAGE=fabiocicerchia/nginx-lua:latest)
+	./bin/sign-and-sbom.sh "$(IMAGE)"
+
+verify-image: ## verify a docker image signature and SBOM (usage: make verify-image IMAGE=fabiocicerchia/nginx-lua:latest)
+	./bin/verify-image.sh "$(IMAGE)"
 
 changelog: ## generate a changelog since previous tag
 	./bin/generate-changelog.sh "$(GH_USERNAME)" "$(PREVIOUS_TAG)" "$(TAG_VER)"

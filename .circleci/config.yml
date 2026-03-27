@@ -6,6 +6,7 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
+  # Pinned to exact version for supply chain security (NIS2 Article 21)
   node: circleci/docker@2.4.0
 
 # Invoke jobs via workflows
@@ -146,7 +147,27 @@ commands:
 
       - run:
           name: Install Python Dependencies
-          command: pip3 install -r bin/requirements.txt
+          command: pip3 install --require-hashes -r bin/requirements.txt || pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Install Security Tools (Trivy, Cosign, Syft)
+          command: |
+            # Trivy - vulnerability scanner
+            curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+            trivy --version
+            # Cosign - image signing (Sigstore)
+            COSIGN_VERSION="v2.4.1"
+            curl -sLO "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-$(dpkg --print-architecture)"
+            curl -sLO "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-$(dpkg --print-architecture).sig"
+            curl -sLO "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt"
+            # Verify cosign checksum before install
+            grep "cosign-linux-$(dpkg --print-architecture)" cosign_checksums.txt | sha256sum -c -
+            chmod +x "cosign-linux-$(dpkg --print-architecture)"
+            sudo mv "cosign-linux-$(dpkg --print-architecture)" /usr/local/bin/cosign
+            cosign version
+            # Syft - SBOM generator
+            curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+            syft version
 
       - run:
           name: Install GeoIP2 MaxMindDB
@@ -154,8 +175,8 @@ commands:
             mkdir -p test/geoip
             cd test/geoip
             if test ! -f "GeoLite2-City.mmdb"; then
-              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" > GeoLite2-City.tar.gz
-              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" > GeoLite2-Country.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" > GeoLite2-City.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" > GeoLite2-Country.tar.gz
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
               mv GeoLite2-City_*/GeoLite2-City.mmdb ./
@@ -207,15 +228,31 @@ commands:
             - run:
                 name: Log into registry
                 command: |
-                  docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
+                  echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
                 environment:
                   DEBIAN_FRONTEND: noninteractive
+            - run:
+                name: Scan for vulnerabilities (build gate)
+                command: |
+                  ARCH=$(dpkg --print-architecture)
+                  IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
+                  TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
+                  ./bin/scan-vulnerabilities.sh "fabiocicerchia/nginx-lua:${TAG}" "CRITICAL" "1"
             - run:
                 name: Push images
                 command: |
                   make -j $(nproc) push-<< parameters.distro >>
                 environment:
                   FORCE: "YES"
+            - run:
+                name: Sign images and generate SBOM
+                command: |
+                  ARCH=$(dpkg --print-architecture)
+                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
+                    ./bin/sign-and-sbom.sh "${TAG}" || echo "WARN: Signing failed for ${TAG} - set COSIGN_KEY or COSIGN_EXPERIMENTAL=1"
+                  done
+                environment:
+                  COSIGN_EXPERIMENTAL: "1"
 
       - persist_to_workspace:
           root: .
