@@ -472,11 +472,19 @@ jobs:
             sudo apt-get -y install skopeo
 
       - run:
-          name: Generate Supported Versions
+          name: Collect packages from previous jobs
+          command: |
+            mkdir -p dist
+            cp -r /tmp/previous-jobs/dist/* ./dist/ 2>/dev/null || true
+            echo "=== Release artifacts from build pipeline ==="
+            ls -lah dist/ || true
+
+      - run:
+          name: Generate Supported Versions and create PR
           command: |
             git pull --ff-only origin main || true
-            find /tmp/previous-jobs && cp -r /tmp/previous-jobs/dist ./dist || true
-            make auto-update-and-commit
+            make auto-update-and-commit || echo "No updates to commit (already up to date)"
+            git checkout main
 
       - run:
           name: Create Release

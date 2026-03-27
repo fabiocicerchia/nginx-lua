@@ -272,14 +272,26 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 		-d "{\"title\":\"[ci skip] Automated metadata update\",\"head\":\"$$BRANCH_NAME\",\"base\":\"main\",\"body\":\"Automated PR created by CI pipeline.\\n\\nThis PR contains updated Docker image metadata.\"}"
 
 release: ## create a github release
-	mkdir -p dist && rm -rf dist/Dockerfile*
+	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
 	cp Dockerfile dist/
+	# Copy Dockerfiles for mainline version
 	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
 		DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
 		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
 		cp $$DOCKERFILE $$DEST; \
 	done
-	# Generate SHA256 checksums for all release artifacts
+	# Copy Dockerfiles for stable version
+	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_STABLE)/_' | while read FOLDER; do \
+		if [ -d "$$FOLDER" ]; then \
+			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+			cp $$DOCKERFILE $$DEST; \
+		fi; \
+	done
+	# List all release artifacts
+	@echo "=== Release artifacts ==="
+	@ls -lah dist/
+	# Generate SHA256 checksums for all release artifacts (Dockerfiles + packages)
 	cd dist && sha256sum * > SHA256SUMS && cd ..
 	wget -q $(GH_CLI_TARBALL)
 	wget -q $(GH_CLI_TARBALL).sha256 || true
