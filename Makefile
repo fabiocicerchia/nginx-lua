@@ -197,7 +197,7 @@ endif
 	$(PROMOTE_CMD) "$$DISTRO"
 
 cleanup-docker-images: ## delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
-	./bin/cleanup-docker-images.sh
+	./bin/cleanup-docker-images.py
 
 ################################################################################
 ##@ BUNDLE
