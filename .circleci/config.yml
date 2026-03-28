@@ -6,6 +6,7 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
   # https://circleci.com/developer/orbs/orb/circleci/docker
+  # Pinned to exact version for supply chain security (NIS2 Article 21)
   node: circleci/docker@2.4.0
 
 # Invoke jobs via workflows
@@ -142,20 +143,73 @@ commands:
             docker --version
             # seccomp
             # https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.14.0#faccessat2
-            sudo apt-get install -y libseccomp2
+            sudo apt-get install -y --no-install-recommends libseccomp2
+            echo "libseccomp2 version: $(dpkg -s libseccomp2 | grep '^Version:')"
 
       - run:
           name: Install Python Dependencies
           command: pip3 install -r bin/requirements.txt
 
       - run:
+          name: Install Trivy (vulnerability scanner)
+          command: |
+            set -euo pipefail
+            TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-$(dpkg --print-architecture | sed 's/amd64/64bit/' | sed 's/arm64/ARM64/').tar.gz"
+            TRIVY_CHECKSUMS="trivy_${TRIVY_VERSION#v}_checksums.txt"
+            ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_CHECKSUMS}" "/tmp/${TRIVY_CHECKSUMS}"
+            EXPECTED_SHA256=$(grep "${TRIVY_ARCHIVE}" "/tmp/${TRIVY_CHECKSUMS}" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_ARCHIVE}" "/tmp/${TRIVY_ARCHIVE}" "${EXPECTED_SHA256}"
+            tar xzf "/tmp/${TRIVY_ARCHIVE}" trivy
+            sudo mv trivy /usr/local/bin/trivy
+            rm -f "/tmp/${TRIVY_ARCHIVE}" "/tmp/${TRIVY_CHECKSUMS}"
+            trivy --version
+          environment:
+            TRIVY_VERSION: "v0.69.3"
+
+      - run:
+          name: Install Cosign (image signing)
+          command: |
+            set -euo pipefail
+            COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
+            EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
+            chmod +x "/tmp/${COSIGN_BINARY}"
+            sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
+            rm -f /tmp/cosign_checksums.txt
+            cosign version
+          environment:
+            COSIGN_VERSION: "v3.0.5"
+
+      - run:
+          name: Install Syft (SBOM generator)
+          command: |
+            set -euo pipefail
+            SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
+            SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
+            EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
+            tar xzf "/tmp/${SYFT_ARCHIVE}" syft
+            sudo mv syft /usr/local/bin/syft
+            rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
+            syft version
+          environment:
+            SYFT_VERSION: "v1.42.3"
+
+      - run:
           name: Install GeoIP2 MaxMindDB
           command: |
+            set -euo pipefail
             mkdir -p test/geoip
             cd test/geoip
             if test ! -f "GeoLite2-City.mmdb"; then
-              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" > GeoLite2-City.tar.gz
-              curl -Lu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" > GeoLite2-Country.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o GeoLite2-City.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz.sha256" -o GeoLite2-City.tar.gz.sha256
+              sha256sum -c GeoLite2-City.tar.gz.sha256
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o GeoLite2-Country.tar.gz
+              curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz.sha256" -o GeoLite2-Country.tar.gz.sha256
+              sha256sum -c GeoLite2-Country.tar.gz.sha256
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
               mv GeoLite2-City_*/GeoLite2-City.mmdb ./
@@ -190,12 +244,12 @@ commands:
       - run:
           name: Save image as tar
           command: |
-            set -x
-            mkdir -p images || true
+            set -euxo pipefail
+            mkdir -p images
             ARCH=$(dpkg --print-architecture)
             IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
             TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
-            TAGS=$(docker images | grep ${IMAGE_ID} | awk '{ print $2 }' | sort)
+            TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
             echo "${TAGS}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
 
@@ -207,16 +261,34 @@ commands:
             - run:
                 name: Log into registry
                 command: |
-                  docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
-                environment:
-                  DEBIAN_FRONTEND: noninteractive
+                  echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
             - run:
-                name: Push images
+                name: Scan for vulnerabilities (build gate)
+                command: |
+                  set -euo pipefail
+                  ARCH=$(dpkg --print-architecture)
+                  IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
+                  TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
+                  make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
+            - run:
+                name: Push images (unsigned tags)
                 command: |
                   make -j $(nproc) push-<< parameters.distro >>
                 environment:
                   FORCE: "YES"
-
+            - run:
+                name: Sign images and generate SBOM
+                command: |
+                  set -euo pipefail
+                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
+                    make sign-image IMAGE="${TAG}"
+                  done
+            - run:
+                name: Promote signed images to final tags
+                command: |
+                  make -j $(nproc) promote-<< parameters.distro >>
+                environment:
+                  FORCE: "YES"
       - persist_to_workspace:
           root: .
           paths:
@@ -239,15 +311,16 @@ commands:
       - run:
           name: Load image
           command: |
+            set -euo pipefail
             ARCH=$(dpkg --print-architecture)
             docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
             cat loading.txt
-            IMAGE_ID=$(cat loading.txt | grep "Loaded image:" | cut -d: -f3)
+            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
             echo $IMAGE_ID
             echo "export IMAGE_ID=$IMAGE_ID" >> $BASH_ENV
-            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
-              docker image tag fabiocicerchia/nginx-lua:$IMAGE_ID fabiocicerchia/nginx-lua:$TAG;
-            done
+            while read -r TAG; do
+              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
 
             docker images
 
@@ -277,7 +350,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     resource_class: large
     steps:
       - docker:
@@ -291,7 +364,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     resource_class: arm.large
     steps:
       - docker:
@@ -305,7 +378,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     resource_class: large
     steps:
       - package:
@@ -319,7 +392,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     resource_class: arm.medium
     steps:
       - package:
@@ -333,7 +406,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     steps:
       - checkout
 
@@ -343,21 +416,22 @@ jobs:
       - run:
           name: Load image
           command: |
+            set -euo pipefail
             ARCH=amd64
             docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(cat loading.txt | grep "Loaded image:" | cut -d: -f3)
-            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
-              docker image tag fabiocicerchia/nginx-lua:$IMAGE_ID fabiocicerchia/nginx-lua:$TAG;
-            done
+            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
+            while read -r TAG; do
+              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
 
             ARCH=arm64
             docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(cat loading.txt | grep "Loaded image:" | cut -d: -f3)
-            cat /tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt | while read TAG; do
-              docker image tag fabiocicerchia/nginx-lua:$IMAGE_ID fabiocicerchia/nginx-lua:$TAG;
-            done
+            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
+            while read -r TAG; do
+              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
 
-            echo "export IMAGE_ID=$IMAGE_ID" >> $BASH_ENV
+            echo "export IMAGE_ID=$IMAGE_ID" >> "$BASH_ENV"
             docker images
 
       - run:
@@ -367,9 +441,7 @@ jobs:
       - run:
           name: Log into registry
           command: |
-            docker login --username "${DOCKER_HUB_USER}" --password "${DOCKER_HUB_TOKEN}"
-          environment:
-            DEBIAN_FRONTEND: noninteractive
+            echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
 
       - run:
           name: Bundle manifest
@@ -383,7 +455,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     steps:
       - checkout
 
@@ -396,7 +468,7 @@ jobs:
       # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
       # https://circleci.com/developer/machine/image/ubuntu-2204
       image: ubuntu-2404:2025.09.1
-      docker_layer_caching: true
+      docker_layer_caching: false
     steps:
       - checkout
 
@@ -410,14 +482,23 @@ jobs:
       - run:
           name: Install Skopeo
           command: |
-            sudo apt-get -y install skopeo
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends skopeo
+            echo "skopeo version: $(skopeo --version)"
 
       - run:
-          name: Generate Supported Versions
+          name: Collect packages from previous jobs
           command: |
-            git pull
-            find /tmp/previous-jobs && cp -r /tmp/previous-jobs/dist ./dist || true
-            make auto-update-and-commit
+            mkdir -p dist
+            cp -r /tmp/previous-jobs/dist/* ./dist/ 2>/dev/null || true
+            echo "=== Release artifacts from build pipeline ==="
+            ls -lah dist/ || true
+
+      - run:
+          name: Generate Supported Versions and create PR
+          command: |
+            git pull --ff-only origin main || true
+            make auto-update-and-commit || echo "No updates to commit (already up to date)"
 
       - run:
           name: Create Release

@@ -58,12 +58,22 @@ TESTING
 
 PUSH
   push-all                                            push all docker images to docker hub
-  push-almalinux                                      push one docker images to docker hub  
-  push-alpine                                         push one docker images to docker hub  
-  push-amazonlinux                                    push one docker images to docker hub  
-  push-debian                                         push one docker images to docker hub  
-  push-fedora                                         push one docker images to docker hub  
+  push-almalinux                                      push one docker images to docker hub
+  push-alpine                                         push one docker images to docker hub
+  push-amazonlinux                                    push one docker images to docker hub
+  push-debian                                         push one docker images to docker hub
+  push-fedora                                         push one docker images to docker hub
   push-ubuntu                                         push one docker images to docker hub
+
+PROMOTE
+  promote-all                                         promote all unsigned images to final tags
+  promote-almalinux                                   promote one distro's unsigned images to final tags
+  promote-alpine                                      promote one distro's unsigned images to final tags
+  promote-amazonlinux                                 promote one distro's unsigned images to final tags
+  promote-debian                                      promote one distro's unsigned images to final tags
+  promote-fedora                                      promote one distro's unsigned images to final tags
+  promote-ubuntu                                      promote one distro's unsigned images to final tags
+  cleanup-docker-images                               delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
 
 BUNDLE
   bundle-almalinux                                    bundle multiple docker images into one  
@@ -113,6 +123,9 @@ UTILITIES
   generate-metadata                                   generate metadata for all OS docker images
   update-tags                                         update docker tags file
   update-readme                                       update supported docker tags in readme
+  scan-image                                          scan a docker image for vulnerabilities
+  sign-image                                          sign a docker image and attach SBOM
+  verify-image                                        verify a docker image signature and SBOM
   benchmark                                           benchmark (wip)
   changelog                                           generate a changelog since previous tag
 ```
@@ -129,7 +142,7 @@ Customise the shell script to use the new distro:
 - Add in the top-level `Makefile` the new distro name in the variable `DISTROS`
 - Add a case in the `get_versions` function in `bin/_common.sh`
 - Add the distro in the `loop_over_nginx` function in `bin/_common.sh`
-- Add the distro in the `docker_build.strategy.matrix` in `.github/workflows/main.yml`
+- Add the distro in the matrix parameters in `.circleci/config.yml` (Docker AMD, Docker ARM, Package AMD, Package ARM, Docker Bundle, and builds-force workflows)
 
 Once added those two files generates the static Dockerfiles in the `nginx` folder by running the command `make generate-dockerfiles`.
 

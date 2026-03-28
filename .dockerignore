@@ -1,2 +1,30 @@
-#*
-#!/src
+# CI/CD configuration
+.circleci/
+.github/
+
+# Git metadata
+.git/
+.gitignore
+
+# Documentation
+docs/
+*.md
+
+# Test files
+test/
+
+# Build tooling (not needed inside image)
+Makefile
+bin/
+
+# Environment and secrets
+.env
+.env.*
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
