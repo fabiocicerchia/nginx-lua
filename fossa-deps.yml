@@ -1,0 +1,144 @@
+remote-dependencies:
+# https://github.com/vision5/ngx_devel_kit/releases
+- name: ngx_devel_kit
+  url: "https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.4.zip"
+  version: "0.3.4"
+
+# https://github.com/nginx/njs/tags
+- name: njs
+  url: "https://github.com/nginx/njs/archive/refs/tags/0.9.1.zip"
+  version: "0.9.1"
+
+# https://github.com/leev/ngx_http_geoip2_module/releases
+- name: geoip2
+  url: "https://github.com/leev/ngx_http_geoip2_module/archive/refs/tags/3.4.zip"
+  version: "3.4"
+
+# https://github.com/openresty/luajit2/tags
+- name: luajit2
+  url: "https://github.com/leev/ngx_http_geoip2_module/releases"
+  version: "2.1-20250529"
+
+# https://github.com/openresty/lua-nginx-module/tags
+- name: lua-nginx-module
+  url: "https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.28.zip"
+  version: "0.10.28"
+
+# https://github.com/openresty/lua-resty-core/tags
+- name: lua-resty-core
+  url: "https://github.com/openresty/lua-nginx-module/tags"
+  version: "0.1.31"
+
+# https://github.com/luarocks/luarocks/tags
+- name: lua-rocks
+  url: "https://github.com/luarocks/luarocks/archive/refs/tags/v3.12.2.zip"
+  version: "3.12.2"
+
+# https://github.com/openresty/lua-resty-lrucache/tags
+- name: lua-resty-lrucache
+  url: "https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.15.zip"
+  version: "0.15"
+
+# https://github.com/openresty/headers-more-nginx-module/tags
+- name: headers-more-nginx-module
+  url: "https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v0.39.zip"
+  version: "0.39"
+
+# https://github.com/cloudflare/lua-resty-cookie/commits/master
+- name: lua-resty-cookie
+  url: "https://github.com/cloudflare/lua-resty-cookie/archive/refs/heads/master.zip"
+  version: "f418d77082eaef48331302e84330488fdc810ef4"
+
+# https://github.com/openresty/lua-resty-dns/tags
+- name: lua-resty-dns
+  url: "https://github.com/openresty/lua-resty-dns/archive/refs/tags/v0.23.zip"
+  version: "0.23"
+
+# https://github.com/openresty/lua-resty-memcached/tags
+- name: lua-resty-memcached
+  url: "https://github.com/openresty/lua-resty-memcached/archive/refs/tags/v0.17.zip"
+  version: "0.17"
+
+# https://github.com/openresty/lua-resty-mysql/tags
+- name: lua-resty-mysql
+  url: "https://github.com/openresty/lua-resty-mysql/archive/refs/tags/v0.28.zip"
+  version: "0.28"
+
+- name: SSL implementation by Eric Young
+  url: "https://raw.githubusercontent.com/vision5/ngx_devel_kit/refs/heads/master/src/hash/sha.h"
+  version: "0.0.0"
+
+# https://github.com/openresty/lua-resty-redis/tags
+- name: lua-resty-redis
+  url: "https://github.com/openresty/lua-resty-redis/archive/refs/tags/v0.33.zip"
+  version: "0.33"
+
+# https://github.com/openresty/lua-resty-shell/tags
+- name: lua-resty-shell
+  url: "https://github.com/openresty/lua-resty-shell/archive/refs/tags/v0.03.zip"
+  version: "0.03"
+
+# https://github.com/openresty/lua-resty-signal/tags
+- name: lua-resty-signal
+  url: "https://github.com/openresty/lua-resty-signal/archive/refs/tags/v0.04.zip"
+  version: "0.04"
+
+# https://github.com/openresty/lua-tablepool/tags
+- name: lua-tablepool
+  url: "https://github.com/openresty/lua-tablepool/archive/refs/tags/v0.03.zip"
+  version: "0.03"
+
+# https://github.com/openresty/lua-resty-upstream-healthcheck/tags
+- name: lua-resty-upstream-healthcheck
+  url: "https://github.com/openresty/lua-resty-upstream-healthcheck/archive/refs/tags/v0.08.zip"
+  version: "0.08"
+
+# https://github.com/openresty/lua-resty-websocket/tags
+- name: lua-resty-websocket
+  url: "https://github.com/openresty/lua-resty-websocket/archive/refs/tags/v0.13.zip"
+  version: "0.13"
+
+# https://github.com/openresty/lua-upstream-nginx-module/tags
+- name: lua-upstream-nginx-module
+  url: "https://github.com/openresty/lua-upstream-nginx-module/archive/refs/tags/v0.07.zip"
+  version: "0.07"
+
+# https://github.com/knyar/nginx-lua-prometheus/tags
+- name: nginx-lua-prometheus
+  url: "https://github.com/knyar/nginx-lua-prometheus/archive/refs/tags/0.20240525.zip"
+  version: "0.20240525"
+
+# https://github.com/openresty/set-misc-nginx-module/tags
+- name: set-misc-nginx-module
+  url: "https://github.com/openresty/set-misc-nginx-module/archive/refs/tags/v0.33.zip"
+  version: "0.33"
+
+# https://github.com/openresty/stream-lua-nginx-module/commits/master
+- name: stream-lua-nginx-module
+  url: "https://github.com/openresty/stream-lua-nginx-module/archive/refs/heads/master.zip"
+  version: "a9addfabbf277eb3d1ec77d45e40a324d67022af"
+
+# https://github.com/openresty/lua-resty-limit-traffic/tags
+- name: lua-resty-limit-traffic
+  url: "https://github.com/openresty/lua-resty-limit-traffic/archive/refs/tags/v0.09.zip"
+  version: "0.09"
+
+# https://github.com/openresty/lua-resty-upload/tags
+- name: lua-resty-upload
+  url: "https://github.com/openresty/lua-resty-upload/archive/refs/tags/v0.11.zip"
+  version: "0.11"
+
+# https://github.com/openresty/lua-resty-lock/tags
+- name: lua-resty-lock
+  url: "https://github.com/openresty/lua-resty-lock/archive/refs/tags/v0.09.zip"
+  version: "0.09"
+
+# https://github.com/openresty/lua-resty-balancer/tags
+- name: lua-resty-balancer
+  url: "https://github.com/openresty/lua-resty-balancer/archive/refs/tags/v0.05.zip"
+  version: "0.05"
+
+# https://github.com/openresty/lua-resty-string/tags
+- name: lua-resty-string
+  url: "https://github.com/openresty/lua-resty-string/archive/refs/tags/v0.16.zip"
+  version: "0.16"

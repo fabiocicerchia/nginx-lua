@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.22.1
+ARG DISTRO_VER=3.23.3
 
 #############################
 # Settings Common Variables #
@@ -33,7 +33,7 @@ ENV VCS_REF=$VCS_REF
 
 # nginx
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.29.0
+ARG VER_NGINX=1.29.7
 ENV VER_NGINX=$VER_NGINX
 
 # NGINX MODULES
@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.9.1
+ARG VER_NJS=0.9.6
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -66,7 +66,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT=2.1-20250529
+ARG VER_LUAJIT=2.1-20260311
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -78,13 +78,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.28
+ARG VER_LUA_NGINX_MODULE=0.10.30RC1
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.31
+ARG VER_LUA_RESTY_CORE=0.1.33RC1
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -94,7 +94,7 @@ ENV LUA_LIB_DIR=$LUA_LIB_DIR
 
 # lua-rocks
 # https://luarocks.github.io/luarocks/releases/
-ARG VER_LUAROCKS=3.12.2
+ARG VER_LUAROCKS=3.13.0
 ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # LUA ADDONS
@@ -128,7 +128,7 @@ ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql
-ARG VER_OPENRESTY_MYSQL=0.28
+ARG VER_OPENRESTY_MYSQL=0.29
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=a9addfabbf277eb3d1ec77d45e40a324d67022af
+ARG VER_OPENRESTY_STREAMLUA=c5b3410939478069b2af6552205173fb8b6a43fd
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -371,18 +371,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.22.1." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.22.1" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.23.3." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.23.3" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-alpine3.22.1" \
+    org.label-schema.version="${VER_NGINX}-alpine3.23.3" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="3.22.1" \
+    versions.os="3.23.3" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \

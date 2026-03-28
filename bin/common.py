@@ -76,16 +76,12 @@ def run_command(command, print_stdout=True):
         stdout=subprocess.PIPE
     )
 
-    output_lines = []
-    while True:
-        line = process.stdout.readline()
-        if not line:
-            break
-        output_lines.append(line.decode("utf8"))
-        if print_stdout:
-            print(line.decode("utf8").strip())
+    streamdata = process.communicate()[0]
+    output_lines = streamdata.decode("utf-8")
+    if print_stdout:
+        print(output_lines)
 
-    return [process.poll(), "".join(output_lines)]
+    return [process.returncode, output_lines]
 
 
 def read_file(file_path):
@@ -226,7 +222,7 @@ def create_manifest(tag):
     """
     exit_code = run_command(create_cmd, True)[0]
     if exit_code != 0:
-        return exit_code
+        return 1
 
     # Push manifest
     push_cmd = f"{DOCKER_MANIFEST_PUSH} {tag}"
@@ -240,7 +236,7 @@ def bundle_images(nginx_version, os_distro, os_version):
     for tag in tags:
         exit_code = create_manifest(tag)
         if exit_code != 0:
-            return exit_code
+            return 1
 
     return 0
 
@@ -348,7 +344,7 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     licenses_folder = tpl_folder / LICENSES_DIR
     licenses_folder.mkdir(exist_ok=True)
     for license_file in glob.glob(f"{SRC_DIR}/{LICENSES_DIR}/*.LICENSE"):
-        shutil.copyfile(license_file, patches_folder / Path(license_file).name)
+        shutil.copyfile(license_file, licenses_folder / Path(license_file).name)
 
     # Copy configuration files
     for config in CONFIG_FILES:

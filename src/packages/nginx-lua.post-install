@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+if getent group nginx >/dev/null 2>&1; then
+    :
+elif [ -x /sbin/addgroup ] || [ -x /usr/sbin/addgroup ]; then
+    addgroup -S -g 101 nginx
+elif [ -x /usr/sbin/groupadd ]; then
+    groupadd --system --gid 101 nginx
+fi
+
+if getent passwd nginx >/dev/null 2>&1; then
+    :
+elif [ -x /sbin/adduser ] || [ -x /usr/sbin/adduser ]; then
+    adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx nginx
+elif [ -x /usr/sbin/useradd ]; then
+    useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
+fi

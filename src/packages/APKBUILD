@@ -1,0 +1,66 @@
+# File: /home/builder/packages/nginx-lua/APKBUILD
+
+maintainer="Fabio Cicerchia <info@fabiocicerchia.it>"
+
+pkgname=nginx-lua
+pkgver=${NGINX_VERSION}
+pkgrel=0
+pkgdesc="Nginx ${NGINX_VERSION} with LUA support."
+url="https://github.com/fabiocicerchia/nginx-lua"
+arch="$ARCH"
+license="custom"
+
+depends="
+gettext-envsubst>=0.21
+libgcc>=12.2.1
+libmaxminddb>=1.7.1
+libxml2>=2.11.4
+pcre>=8.45
+!nginx
+!luajit
+!openresty
+"
+
+options="!strip !check !scanelf !fhs"
+install="$pkgname.post-install"
+
+package() {
+    # Config
+    mkdir -p "$pkgdir/etc"
+    cp -a /etc/nginx "$pkgdir/etc/"
+
+    # Nginx binaries
+    install -Dm755 /usr/sbin/nginx "$pkgdir/usr/sbin/nginx"
+    install -Dm755 /usr/sbin/nginx-debug "$pkgdir/usr/sbin/nginx-debug"
+
+    # Lua binaries
+    install -Dm755 /usr/local/bin/lua "$pkgdir/usr/local/bin/lua"
+    install -Dm755 /usr/local/bin/luajit "$pkgdir/usr/local/bin/luajit"
+    install -Dm755 /usr/local/bin/luarocks "$pkgdir/usr/local/bin/luarocks"
+
+    # LuaJIT libraries
+    install -Dm755 /usr/local/lib/libluajit-5.1.so "$pkgdir/usr/local/lib/libluajit-5.1.so"
+    cp -a /usr/local/lib/libluajit-5.1.so* "$pkgdir/usr/local/lib/"
+
+    # Lua share
+    mkdir -p "$pkgdir/usr/local/share"
+    cp -a /usr/local/share/lua "$pkgdir/usr/local/share/" 2>/dev/null || true
+    cp -a /usr/local/share/luajit* "$pkgdir/usr/local/share/" 2>/dev/null || true
+
+    # Includes
+    mkdir -p "$pkgdir/usr/local/include"
+    cp -a /usr/local/include/luajit-2.1 "$pkgdir/usr/local/include/"
+
+    # Luarocks config
+    mkdir -p "$pkgdir/usr/local/etc/luarocks"
+    cp -a /usr/local/etc/luarocks/* "$pkgdir/usr/local/etc/luarocks/"
+
+    # Man pages (must be compressed for Alpine packages)
+    mkdir -p "$pkgdir/usr/share/man/man1"
+    gzip -9nc /usr/local/share/man/man1/luajit.1 \
+        > "$pkgdir/usr/share/man/man1/luajit.1.gz"
+
+    # Runtime directories
+    mkdir -p "$pkgdir/var/cache/nginx"
+    mkdir -p "$pkgdir/var/log/nginx"
+}

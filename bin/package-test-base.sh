@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euox pipefail
+
 # Script variables
 DISTRO=""
 SUPPORTED_NGINX_VER=""
@@ -22,6 +24,10 @@ ARGUMENTS:
 OPTIONS:
     -h, --help      Show this help message and exit
 EOF
+}
+
+cleanup() {
+    docker rm -f "test-${PACKAGE_TYPE}" >/dev/null 2>&1 || true
 }
 
 # Input validation function
@@ -63,23 +69,22 @@ parse_arguments() {
 main() {
     # Parse arguments
     parse_arguments "$@"
-    
+
     # Validate inputs
     validate_input
+
+    trap cleanup EXIT
 
     # Determine package type and install command based on distribution
     if [ "${DISTRO}" = "alpine" ]; then
         PACKAGE_TYPE=apk
-        INSTALL_CMD="apk add -v --allow-untrusted /app/*_noarch.apk"
+        INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         PACKAGE_TYPE=rpm
-        INSTALL_CMD="yum localinstall -y /app/*_x86_64.rpm"
-        if [ "${ARCH}" = "arm64" ]; then
-            INSTALL_CMD="yum localinstall -y /app/*.aarch64.rpm"
-        fi
+        INSTALL_CMD="yum install -y /app/*.rpm"
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
         PACKAGE_TYPE=deb
-        INSTALL_CMD="apt update && apt install -yf /app/*_${ARCH}.deb"
+        INSTALL_CMD="apt update && apt install -yf /app/*.deb"
     fi
 
     # Test package installation
@@ -87,13 +92,12 @@ main() {
     docker run --name "test-${PACKAGE_TYPE}" -v "$PWD/dist:/app" -d "${DISTRO}:latest" sleep infinity
     docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "ls -lah /app"
     docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "${INSTALL_CMD}"
-    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "envsubst -V
-        && nginx -V
-        && nginx -t
-        && luajit -v
-        && lua -v
+    docker exec "test-${PACKAGE_TYPE}" /bin/sh -c "envsubst -V \
+        && nginx -V \
+        && nginx -t \
+        && luajit -v \
+        && lua -v \
         && luarocks --version"
-    docker rm -f "test-${PACKAGE_TYPE}"
 
     ./bin/test.sh "${DISTRO}" "${ARCH}" "" "package"
 }

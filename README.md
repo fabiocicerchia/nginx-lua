@@ -45,12 +45,12 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`almalinux`, `1-almalinux`, `1.29-almalinux`, `1.29.0-almalinux`, `1-almalinux9.6-20250803`, `1.29-almalinux9.6-20250803`, `1.29.0-almalinux9.6-20250803`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/almalinux/9.6-20250803/Dockerfile)
-- [`1`, `1.29`, `1.29.0`, `alpine`, `latest`, `1-alpine`, `1.29-alpine`, `1.29.0-alpine`, `1-alpine3.22.1`, `1.29-alpine3.22.1`, `1.29.0-alpine3.22.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/alpine/3.22.1/Dockerfile)
-- [`amazonlinux`, `1-amazonlinux`, `1.29-amazonlinux`, `1.29.0-amazonlinux`, `1-amazonlinux2023.8.20250715.0`, `1.29-amazonlinux2023.8.20250715.0`, `1.29.0-amazonlinux2023.8.20250715.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/amazonlinux/2023.8.20250715.0/Dockerfile)
-- [`debian`, `1-debian`, `1.29-debian`, `1-debian12.11`, `1.29.0-debian`, `1.29-debian12.11`, `1.29.0-debian12.11`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/debian/12.11/Dockerfile)
-- [`fedora`, `1-fedora`, `1-fedora42`, `1.29-fedora`, `1.29-fedora42`, `1.29.0-fedora`, `1.29.0-fedora42`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/fedora/42/Dockerfile)
-- [`ubuntu`, `1-ubuntu`, `1.29-ubuntu`, `1-ubuntu24.04`, `1.29.0-ubuntu`, `1.29-ubuntu24.04`, `1.29.0-ubuntu24.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.0/ubuntu/24.04/Dockerfile)
+- [`almalinux`, `1-almalinux`, `1.29-almalinux`, `1.29.7-almalinux`, `1-almalinux10.1-20260129`, `1.29-almalinux10.1-20260129`, `1.29.7-almalinux10.1-20260129`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/almalinux/10.1-20260129/Dockerfile)
+- [`1`, `1.29`, `1.29.7`, `alpine`, `latest`, `1-alpine`, `1.29-alpine`, `1.29.7-alpine`, `1-alpine3.23.3`, `1.29-alpine3.23.3`, `1.29.7-alpine3.23.3`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/alpine/3.23.3/Dockerfile)
+- [`amazonlinux`, `1-amazonlinux`, `1.29-amazonlinux`, `1.29.7-amazonlinux`, `1-amazonlinux2023.10.20260302.1`, `1.29-amazonlinux2023.10.20260302.1`, `1.29.7-amazonlinux2023.10.20260302.1`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/amazonlinux/2023.10.20260302.1/Dockerfile)
+- [`debian`, `1-debian`, `1.29-debian`, `1-debian13.4`, `1.29.7-debian`, `1.29-debian13.4`, `1.29.7-debian13.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/debian/13.4/Dockerfile)
+- [`fedora`, `1-fedora`, `1-fedora43`, `1.29-fedora`, `1.29-fedora43`, `1.29.7-fedora`, `1.29.7-fedora43`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/fedora/43/Dockerfile)
+- [`ubuntu`, `1-ubuntu`, `1.29-ubuntu`, `1-ubuntu24.04`, `1.29.7-ubuntu`, `1.29-ubuntu24.04`, `1.29.7-ubuntu24.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.29.7/ubuntu/24.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
@@ -678,8 +678,9 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - [Lua License](https://www.lua.org/license.html)
 - [LuaJIT License](https://repo.or.cz/luajit-2.0.git/blob/HEAD:/COPYRIGHT)
 - [OpenResty License](https://github.com/openresty/openresty#copyright--license)
+- This product includes cryptographic software written by Eric Young (eay@cryptsoft.com).
 
-All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [LICENSES](/LICENSES)
+All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [licenses](/src/licenses).
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
@@ -687,7 +688,7 @@ All the `LICENSE` files of the dependencies used to build the nginx & lua (with 
 
 MIT License
 
-Copyright (c) 2020-2023 Fabio Cicerchia <info@fabiocicerchia.it>
+Copyright (c) 2020-2025 Fabio Cicerchia <info@fabiocicerchia.it>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
