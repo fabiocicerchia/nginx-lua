@@ -16,4 +16,7 @@ bin/ @fabiocicerchia
 
 # Security-sensitive files
 SECURITY.md @fabiocicerchia
+SUPPLY_CHAIN_SECURITY.md @fabiocicerchia
+cosign.pub @fabiocicerchia
 .github/CODEOWNERS @fabiocicerchia
+.github/dependabot.yml @fabiocicerchia
