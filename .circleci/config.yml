@@ -223,15 +223,11 @@ commands:
           name: Build docker image
           no_output_timeout: 60m
           command: |
-            make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
-          environment:
-            FORCE: "YES"
+            FORCE=YES make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
 
       - run:
           name: Test image
-          command: make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
-          environment:
-            FORCE: "YES"
+          command: FORCE=YES make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
 
       # passing docker images to another job
       - run:
@@ -255,8 +251,6 @@ commands:
                 name: Log into registry
                 command: |
                   echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
-                environment:
-                  DEBIAN_FRONTEND: noninteractive
             - run:
                 name: Scan for vulnerabilities (build gate)
                 command: |
@@ -267,18 +261,15 @@ commands:
             - run:
                 name: Push images
                 command: |
-                  make -j $(nproc) push-<< parameters.distro >>
-                environment:
-                  FORCE: "YES"
+                  FORCE=YES make -j $(nproc) push-<< parameters.distro >>
             - run:
                 name: Sign images and generate SBOM
                 command: |
+                  export COSIGN_EXPERIMENTAL=1
                   ARCH=$(dpkg --print-architecture)
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
                     ./bin/sign-and-sbom.sh "${TAG}" || { echo "ERROR: Signing failed for ${TAG}"; exit 1; }
                   done
-                environment:
-                  COSIGN_EXPERIMENTAL: "1"
 
       - persist_to_workspace:
           root: .
@@ -431,15 +422,11 @@ jobs:
           name: Log into registry
           command: |
             echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
-          environment:
-            DEBIAN_FRONTEND: noninteractive
 
       - run:
           name: Bundle manifest
           command: |
-            make -j $(nproc) bundle-<< parameters.distro >>
-          environment:
-            FORCE: "YES"
+            FORCE=YES make -j $(nproc) bundle-<< parameters.distro >>
 
   Metadata:
     machine:
