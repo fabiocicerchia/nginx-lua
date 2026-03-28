@@ -256,7 +256,7 @@ commands:
                   ARCH=$(dpkg --print-architecture)
                   IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
                   TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
-                  ./bin/scan-vulnerabilities.sh "fabiocicerchia/nginx-lua:${TAG}" "CRITICAL" "1"
+                  make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
             - run:
                 name: Push images
                 command: |
@@ -265,9 +265,8 @@ commands:
                 name: Sign images and generate SBOM
                 command: |
                   export COSIGN_EXPERIMENTAL=1
-                  ARCH=$(dpkg --print-architecture)
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
-                    ./bin/sign-and-sbom.sh "${TAG}" || { echo "ERROR: Signing failed for ${TAG}"; exit 1; }
+                    make sign-image IMAGE="${TAG}"
                   done
 
       - persist_to_workspace:
