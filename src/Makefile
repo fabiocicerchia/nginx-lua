@@ -190,8 +190,8 @@ dep-lua-resty-lrucache:
 # OpenResty Headers
 # ##############################################################################
 dep-headers-more-nginx-module:
-	$(call secure_download,https://github.com/openresty/headers-more-nginx-module/archive/v${VER_OPENRESTY_HEADERS}.zip,/headers-more-nginx-module.zip,${SHA256_OPENRESTY_HEADERS})
-	unzip -d / /headers-more-nginx-module.zip
+	$(call secure_download,https://github.com/openresty/headers-more-nginx-module/archive/v${VER_OPENRESTY_HEADERS}.tar.gz,/headers-more-nginx-module.tar.gz,${SHA256_OPENRESTY_HEADERS})
+	tar -C / -xvzf /headers-more-nginx-module.tar.gz
 
 # Cloudflare Cookie
 # ##############################################################################
@@ -307,14 +307,14 @@ dep-nginx-lua-prometheus:
 # OpenResty Stream Lua
 # ##############################################################################
 dep-stream-lua-nginx-module:
-	$(call secure_download,https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.zip,/stream-lua-nginx-module.zip,${SHA256_OPENRESTY_STREAMLUA})
-	unzip -d / /stream-lua-nginx-module.zip
+	$(call secure_download,https://github.com/openresty/stream-lua-nginx-module/archive/${VER_OPENRESTY_STREAMLUA}.tar.gz,/stream-lua-nginx-module.tar.gz,${SHA256_OPENRESTY_STREAMLUA})
+	tar -C / -xvzf /stream-lua-nginx-module.tar.gz
 
 # OpenResty Limit Traffic
 # ##############################################################################
 dep-lua-resty-limit-traffic:
-	$(call secure_download,https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.zip,/lua-resty-limit-traffic.zip,${SHA256_OPENRESTY_LIMITTRAFFIC})
-	unzip -d / /lua-resty-limit-traffic.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-limit-traffic/archive/v${VER_OPENRESTY_LIMITTRAFFIC}.tar.gz,/lua-resty-limit-traffic.tar.gz,${SHA256_OPENRESTY_LIMITTRAFFIC})
+	tar -C / -xvzf /lua-resty-limit-traffic.tar.gz
 	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 	&& $(MAKE) \
 	&& $(MAKE) install
@@ -322,8 +322,8 @@ dep-lua-resty-limit-traffic:
 # OpenResty Upload
 # ##############################################################################
 dep-lua-resty-upload:
-	$(call secure_download,https://github.com/openresty/lua-resty-upload/archive/v${VER_OPENRESTY_UPLOAD}.zip,/lua-resty-upload.zip,${SHA256_OPENRESTY_UPLOAD})
-	unzip -d / /lua-resty-upload.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-upload/archive/v${VER_OPENRESTY_UPLOAD}.tar.gz,/lua-resty-upload.tar.gz,${SHA256_OPENRESTY_UPLOAD})
+	tar -C / -xvzf /lua-resty-upload.tar.gz
 	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
 	&& $(MAKE) \
 	&& $(MAKE) install
@@ -331,8 +331,8 @@ dep-lua-resty-upload:
 # OpenResty Lock
 # ##############################################################################
 dep-lua-resty-lock:
-	$(call secure_download,https://github.com/openresty/lua-resty-lock/archive/v${VER_OPENRESTY_LOCK}.zip,/lua-resty-lock.zip,${SHA256_OPENRESTY_LOCK})
-	unzip -d / /lua-resty-lock.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-lock/archive/v${VER_OPENRESTY_LOCK}.tar.gz,/lua-resty-lock.tar.gz,${SHA256_OPENRESTY_LOCK})
+	tar -C / -xvzf /lua-resty-lock.tar.gz
 	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
 	&& $(MAKE) \
 	&& $(MAKE) install
@@ -340,8 +340,8 @@ dep-lua-resty-lock:
 # OpenResty Balancer
 # ##############################################################################
 dep-lua-resty-balancer:
-	$(call secure_download,https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.zip,/lua-resty-balancer.zip,${SHA256_OPENRESTY_BALANCER})
-	unzip -d / /lua-resty-balancer.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-balancer/archive/v${VER_OPENRESTY_BALANCER}.tar.gz,/lua-resty-balancer.tar.gz,${SHA256_OPENRESTY_BALANCER})
+	tar -C / -xvzf /lua-resty-balancer.tar.gz
 	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
 	&& $(MAKE) \
 	&& $(MAKE) install
@@ -349,8 +349,8 @@ dep-lua-resty-balancer:
 # OpenResty String
 # ##############################################################################
 dep-lua-resty-string:
-	$(call secure_download,https://github.com/openresty/lua-resty-string/archive/v${VER_OPENRESTY_STRING}.zip,/lua-resty-string.zip,${SHA256_OPENRESTY_STRING})
-	unzip -d / /lua-resty-string.zip
+	$(call secure_download,https://github.com/openresty/lua-resty-string/archive/v${VER_OPENRESTY_STRING}.tar.gz,/lua-resty-string.tar.gz,${SHA256_OPENRESTY_STRING})
+	tar -C / -xvzf /lua-resty-string.tar.gz
 	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 	&& $(MAKE) \
 	&& $(MAKE) install
