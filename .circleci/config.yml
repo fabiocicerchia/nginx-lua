@@ -132,7 +132,7 @@ workflows:
             branches:
               only: main
 
-  # Full pipeline triggered from any branch via API parameter
+  # Full build + package from any branch via API parameter (no bundle/release)
   # curl -X POST https://circleci.com/api/v2/project/gh/fabiocicerchia/nginx-lua/pipeline \
   #   -H "Circle-Token: $CIRCLECI_TOKEN" -H "Content-Type: application/json" \
   #   -d '{"branch": "your-branch", "parameters": {"force_full_pipeline": true}}'
@@ -195,28 +195,6 @@ workflows:
                   "fedora",
                   "ubuntu",
                 ]
-      - Docker Bundle:
-          name: Docker Bundle << matrix.distro >>
-          requires:
-            - Package AMD << matrix.distro >>
-            - Package ARM << matrix.distro >>
-          matrix:
-            parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-      - Metadata:
-          requires:
-            - Docker Bundle
-      - Release:
-          requires:
-            - Metadata
 
 commands:
   docker:
