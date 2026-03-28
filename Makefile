@@ -332,7 +332,19 @@ generate-dockerfiles: ## generate all dockerfiles
 generate-deps-env: ## generate .env for dependencies
 	./bin/generate-deps-env.py | tee ./src/.env.dist
 
+ENTRYPOINT_FILES=src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh
+ENTRYPOINT_CHECKSUMS=src/entrypoint-checksums.sha256
+
 pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainline)
+	@# Verify existing entrypoint integrity before replacing (detect tampering)
+	@if [ -f "$(ENTRYPOINT_CHECKSUMS)" ]; then \
+		echo "=== Verifying existing entrypoint checksums ===" ; \
+		if ! sha256sum -c "$(ENTRYPOINT_CHECKSUMS)"; then \
+			echo "ERROR: Entrypoint files have been tampered with since last update"; \
+			exit 1; \
+		fi; \
+		echo "=== Existing checksums OK ===" ; \
+	fi
 	@# Require a tagged release - never fall back to master/main to prevent supply chain attacks
 	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE)); \
 	if [ "$$HTTP_CODE" != "200" ]; then \
@@ -346,9 +358,10 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainlin
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/20-envsubst-on-templates.sh"     src/20-envsubst-on-templates.sh; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/30-tune-worker-processes.sh"     src/30-tune-worker-processes.sh; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/docker-entrypoint.sh"            src/docker-entrypoint.sh; \
-	echo "=== Entrypoint file checksums ===" ; \
-	sha256sum src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh ; \
 	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
+	@# Generate checksums of final (post-patch) entrypoint files
+	sha256sum $(ENTRYPOINT_FILES) > $(ENTRYPOINT_CHECKSUMS)
+	@echo "=== Entrypoint checksums written to $(ENTRYPOINT_CHECKSUMS) ==="
 
 generate-metadata: ## generate metadata for all OS docker images
 	echo $(DISTROS) | xargs -n1 $(META_CMD)
