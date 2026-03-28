@@ -28,6 +28,7 @@ DISTROS=almalinux alpine amazonlinux debian fedora ubuntu
 GH_USERNAME=fabiocicerchia
 GH_CLI_NAME=ghr_v0.16.2_linux_amd64
 GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/$(GH_CLI_NAME).tar.gz
+GH_CLI_SHA256=084ed9819dff71ea77f77a3071a643b6d1cbe5d2ab57bb5f56bb23de17189cd0
 NGINX_UPSTREAM_URL=https://github.com/nginxinc/docker-nginx
 NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginxinc/docker-nginx
 
@@ -315,7 +316,7 @@ release: ## create a github release
 	# Generate SHA256 checksums for all release artifacts (Dockerfiles + packages)
 	cd dist && sha256sum * > SHA256SUMS && cd ..
 	# Download ghr with verified checksum (pinned to v0.16.2)
-	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "084ed9819dff71ea77f77a3071a643b6d1cbe5d2ab57bb5f56bb23de17189cd0"
+	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "$(GH_CLI_SHA256)"
 	tar xvzf $(GH_CLI_NAME).tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
 		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
