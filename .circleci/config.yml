@@ -343,11 +343,6 @@ commands:
                 name: Promote signed images to final tags
                 command: |
                   FORCE=YES make -j $(nproc) promote-<< parameters.distro >>
-            - run:
-                name: Cleanup unsigned tags
-                command: |
-                  make cleanup-docker-images
-
       - persist_to_workspace:
           root: .
           paths:
