@@ -6,8 +6,8 @@ The following versions of nginx-lua are currently being supported with security 
 
 | Version   | Supported          |
 | --------- | ------------------ |
-| 1.25.x+   | :white_check_mark: |
-| < 1.23.x  | :x:                |
+| 1.29.7+   | :white_check_mark: |
+| < 1.29.7  | :x:                |
 
 ## Reporting a Vulnerability
 
