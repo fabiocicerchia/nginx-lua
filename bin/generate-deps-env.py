@@ -4,27 +4,16 @@ Generate dependencies environment file for nginx-lua.
 
 This script fetches the latest versions of all dependencies used in the nginx-lua
 project and generates an environment file with version variables. It queries
-GitHub repositories to get the latest tags and commits.
+the GitHub API to get the latest tags and commits.
 """
 
 import hashlib
 import re
-import subprocess  # noqa: S603 - commands use fixed args, no untrusted input
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 import requests
-
-
-def run_command(cmd):
-    """Run a command as a list of arguments (no shell injection)."""
-    try:
-        result = subprocess.run(cmd, shell=False, capture_output=True, text=True, check=True)
-        return result.stdout.strip()
-    except subprocess.CalledProcessError as e:
-        print(f"Command failed: {' '.join(cmd)}", file=sys.stderr)
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
 
 
 def compute_sha256(url):
@@ -41,33 +30,40 @@ def compute_sha256(url):
         return "RECOMPUTE_REQUIRED"
 
 
-def get_latest_tag(repo_url):
-    """Get the latest tag from a Git repository."""
-    cmd = ["git", "-c", "versionsort.suffix=-", "ls-remote", "--tags", "--sort=v:refname", repo_url]
-    output = run_command(cmd)
+def github_owner_repo(repo_url):
+    """Extract owner/repo from a GitHub URL."""
+    parsed = urlparse(repo_url)
+    parts = parsed.path.strip("/").split("/")
+    return f"{parts[0]}/{parts[1]}"
 
-    # Filter out rc, alpha, beta versions and get the latest
-    lines = output.split('\n')
-    for line in reversed(lines):
-        if line and not any(x in line for x in ['rc', 'alpha', 'beta', '{}']):
-            # Extract tag name from refs/tags/v? format
-            match = re.search(r'refs/tags/v?(.+)$', line)
-            if match:
-                return match.group(1)
+
+def get_latest_tag(repo_url):
+    """Get the latest non-prerelease tag from a GitHub repository via API."""
+    owner_repo = github_owner_repo(repo_url)
+    url = f"https://api.github.com/repos/{owner_repo}/tags"
+    resp = requests.get(url, params={"per_page": 100}, timeout=30)
+    resp.raise_for_status()
+
+    for tag in resp.json():
+        name = tag["name"]
+        if any(x in name.lower() for x in ["rc", "alpha", "beta"]):
+            continue
+        # Strip leading 'v' if present
+        return name.lstrip("v")
 
     return ""
 
 
 def get_latest_commit(repo_url):
-    """Get the latest commit from a Git repository."""
-    cmd = ["git", "-c", "versionsort.suffix=-", "ls-remote", "--sort=v:refname", repo_url, "HEAD"]
-    output = run_command(cmd)
+    """Get the latest commit SHA from a GitHub repository's default branch via API."""
+    owner_repo = github_owner_repo(repo_url)
+    url = f"https://api.github.com/repos/{owner_repo}/commits"
+    resp = requests.get(url, params={"per_page": 1}, timeout=30)
+    resp.raise_for_status()
 
-    # Extract commit hash
-    lines = output.split('\n')
-    for line in lines:
-        if line and '\t' in line:
-            return line.split('\t')[0]
+    commits = resp.json()
+    if commits:
+        return commits[0]["sha"]
 
     return ""
 
@@ -176,4 +172,4 @@ def main():
     print(output)
 
 if __name__ == "__main__":
-    main() 
+    main()
