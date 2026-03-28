@@ -314,11 +314,8 @@ release: ## create a github release
 	@ls -lah dist/
 	# Generate SHA256 checksums for all release artifacts (Dockerfiles + packages)
 	cd dist && sha256sum * > SHA256SUMS && cd ..
-	wget -q $(GH_CLI_TARBALL)
-	wget -q $(GH_CLI_TARBALL).sha256 || true
-	if [ -f "$(GH_CLI_NAME).tar.gz.sha256" ]; then \
-		sha256sum -c "$(GH_CLI_NAME).tar.gz.sha256"; \
-	fi
+	# Download ghr with verified checksum (pinned to v0.16.2)
+	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "084ed9819dff71ea77f77a3071a643b6d1cbe5d2ab57bb5f56bb23de17189cd0"
 	tar xvzf $(GH_CLI_NAME).tar.gz
 	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
 		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
@@ -335,15 +332,19 @@ generate-deps-env: ## generate .env for dependencies
 	./bin/generate-deps-env.py | tee ./src/.env.dist
 
 pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainline)
-	USE_VERSION=master; \
-	if [ "$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE))" = "200" ]; then \
-		USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
+	@# Require a tagged release - never fall back to master/main to prevent supply chain attacks
+	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE)); \
+	if [ "$$HTTP_CODE" != "200" ]; then \
+		echo "ERROR: Upstream tag $(SUPPORTED_NGINX_VER_MAINLINE) not found (HTTP $$HTTP_CODE). Refusing to fall back to master."; \
+		exit 1; \
 	fi; \
-	curl -sfLo src/10-listen-on-ipv6-by-default.sh $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/10-listen-on-ipv6-by-default.sh; \
-	curl -sfLo src/15-local-resolvers.envsh        $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/15-local-resolvers.envsh; \
-	curl -sfLo src/20-envsubst-on-templates.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/20-envsubst-on-templates.sh; \
-	curl -sfLo src/30-tune-worker-processes.sh     $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/30-tune-worker-processes.sh; \
-	curl -sfLo src/docker-entrypoint.sh            $(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint/docker-entrypoint.sh; \
+	USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
+	ENTRYPOINT_BASE="$(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint"; \
+	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/10-listen-on-ipv6-by-default.sh" src/10-listen-on-ipv6-by-default.sh; \
+	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/15-local-resolvers.envsh"        src/15-local-resolvers.envsh; \
+	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/20-envsubst-on-templates.sh"     src/20-envsubst-on-templates.sh; \
+	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/30-tune-worker-processes.sh"     src/30-tune-worker-processes.sh; \
+	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/docker-entrypoint.sh"            src/docker-entrypoint.sh; \
 	echo "=== Entrypoint file checksums ===" ; \
 	sha256sum src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh ; \
 	patch src/docker-entrypoint.sh src/docker-entrypoint.sh.patch
