@@ -17,25 +17,29 @@ if ! command -v cosign &> /dev/null; then
     exit 1
 fi
 
-echo "=== Verifying image signature: ${IMAGE_REF} ==="
+# Locate cosign.pub relative to script or allow override
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+COSIGN_PUB="${COSIGN_PUBLIC_KEY:-${SCRIPT_DIR}/../cosign.pub}"
 
-# Verify with keyless (Sigstore transparency log)
-if COSIGN_EXPERIMENTAL=1 cosign verify "$IMAGE_REF" 2>/dev/null; then
-    echo "PASS: Image signature verified via Sigstore"
-elif [ -n "${COSIGN_PUBLIC_KEY:-}" ]; then
-    cosign verify --key "$COSIGN_PUBLIC_KEY" "$IMAGE_REF"
-    echo "PASS: Image signature verified with public key"
-else
-    echo "FAIL: Could not verify image signature"
+if [ ! -f "$COSIGN_PUB" ]; then
+    echo "ERROR: Public key not found at ${COSIGN_PUB}"
+    echo "Download it from: https://github.com/fabiocicerchia/nginx-lua/blob/main/cosign.pub"
     exit 1
 fi
+
+echo "=== Verifying image signature: ${IMAGE_REF} ==="
+echo "Using public key: ${COSIGN_PUB}"
+
+cosign verify --key "$COSIGN_PUB" "$IMAGE_REF"
+echo "PASS: Image signature verified"
 
 echo ""
 echo "=== Verifying SBOM attestation ==="
 
-if COSIGN_EXPERIMENTAL=1 cosign verify-attestation \
+if cosign verify-attestation \
+    --key "$COSIGN_PUB" \
     --type cyclonedx \
-    "$IMAGE_REF" 2>/dev/null; then
+    "$IMAGE_REF"; then
     echo "PASS: CycloneDX SBOM attestation verified"
 else
     echo "WARN: No CycloneDX SBOM attestation found"

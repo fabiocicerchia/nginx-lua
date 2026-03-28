@@ -19,9 +19,11 @@ for tool in cosign syft; do
     fi
 done
 
-# Verify required environment variables for keyless signing
-if [ -z "${COSIGN_EXPERIMENTAL:-}" ] && [ -z "${COSIGN_KEY:-}" ]; then
-    echo "ERROR: Either COSIGN_EXPERIMENTAL=1 (keyless) or COSIGN_KEY must be set"
+# Require key-based signing
+if [ -z "${COSIGN_KEY:-}" ]; then
+    echo "ERROR: COSIGN_KEY environment variable must be set"
+    echo "  Set COSIGN_KEY to the private key content or path"
+    echo "  Set COSIGN_PASSWORD to the key passphrase"
     exit 1
 fi
 
@@ -32,26 +34,14 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
     docker inspect --format='{{.Id}}' "$IMAGE_REF")
 echo "Image digest: ${DIGEST}"
 
-# Sign the image
-if [ -n "${COSIGN_KEY:-}" ]; then
-    # Key-based signing
-    cosign sign --key "$COSIGN_KEY" \
-        -a "repo=fabiocicerchia/nginx-lua" \
-        -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-        -a "vcs_ref=${VCS_REF:-$(git rev-parse --short HEAD)}" \
-        -a "pipeline=circleci" \
-        --yes \
-        "$IMAGE_REF"
-else
-    # Keyless signing (Sigstore/Fulcio) - requires OIDC
-    COSIGN_EXPERIMENTAL=1 cosign sign \
-        -a "repo=fabiocicerchia/nginx-lua" \
-        -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-        -a "vcs_ref=${VCS_REF:-$(git rev-parse --short HEAD)}" \
-        -a "pipeline=circleci" \
-        --yes \
-        "$IMAGE_REF"
-fi
+# Sign the image with key
+cosign sign --key env://COSIGN_KEY \
+    -a "repo=fabiocicerchia/nginx-lua" \
+    -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    -a "vcs_ref=${VCS_REF:-$(git rev-parse --short HEAD)}" \
+    -a "pipeline=circleci" \
+    --yes \
+    "$IMAGE_REF"
 
 echo "=== Image signed successfully ==="
 
@@ -69,19 +59,11 @@ echo "=== SBOM generated ==="
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-if [ -n "${COSIGN_KEY:-}" ]; then
-    cosign attest --key "$COSIGN_KEY" \
-        --predicate "$SBOM_FILE" \
-        --type cyclonedx \
-        --yes \
-        "$IMAGE_REF"
-else
-    COSIGN_EXPERIMENTAL=1 cosign attest \
-        --predicate "$SBOM_FILE" \
-        --type cyclonedx \
-        --yes \
-        "$IMAGE_REF"
-fi
+cosign attest --key env://COSIGN_KEY \
+    --predicate "$SBOM_FILE" \
+    --type cyclonedx \
+    --yes \
+    "$IMAGE_REF"
 
 echo "=== Signed SBOM attestation attached ==="
 
@@ -94,13 +76,12 @@ syft "$IMAGE_REF" \
 
 echo "=== SPDX SBOM also generated at ${SPDX_FILE} ==="
 
-# Verify the signature we just created
-echo "=== Verifying signature ==="
-if [ -n "${COSIGN_KEY:-}" ]; then
-    cosign verify --key "${COSIGN_PUBLIC_KEY:-${COSIGN_KEY%.key}.pub}" "$IMAGE_REF"
-else
-    COSIGN_EXPERIMENTAL=1 cosign verify "$IMAGE_REF"
-fi
+# Verify the signature we just created using the public key in the repo
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
+
+echo "=== Verifying signature with ${COSIGN_PUB} ==="
+cosign verify --key "$COSIGN_PUB" "$IMAGE_REF"
 
 echo "=== Verification successful ==="
 echo "Image ${IMAGE_REF} is signed, SBOM attached and verified."

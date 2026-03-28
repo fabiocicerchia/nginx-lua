@@ -264,7 +264,6 @@ commands:
             - run:
                 name: Sign images and generate SBOM
                 command: |
-                  export COSIGN_EXPERIMENTAL=1
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
                     make sign-image IMAGE="${TAG}"
                   done
