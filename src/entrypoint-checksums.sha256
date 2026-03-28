@@ -2,4 +2,4 @@
 329a1e89cc898599338874f679e22711c4c2d69f65f98b64a72d8b708e69ee44  src/15-local-resolvers.envsh
 253c8724acff9f5c0d0e8938e71fe7c33097d40031a5bc9c7f59dfd2ba5f1377  src/20-envsubst-on-templates.sh
 1f068aa49da8df46bfd5a917debf110af9b115370739e3be34af83ebf583fbce  src/30-tune-worker-processes.sh
-4f9bfb0008ac82f66930c725ad177ac367bbec1cc1d957cd9019ae37b4c6349f  src/docker-entrypoint.sh
+3372fd90162da30d09f62c245e9c6bfd620fb0bb5b48ab54b16e804c2b9e8aae  src/docker-entrypoint.sh
