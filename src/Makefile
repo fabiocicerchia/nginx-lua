@@ -360,7 +360,7 @@ dep-lua-resty-string:
 # ##############################################################################
 
 luarocks:
-	$(call secure_download,https://luarocks.org/releases/luarocks-${VER_LUAROCKS}.tar.gz,/luarocks.tar.gz,${SHA256_LUAROCKS})
+	$(call secure_download,https://github.com/luarocks/luarocks/archive/refs/tags/v${VER_LUAROCKS}.tar.gz,/luarocks.tar.gz,${SHA256_LUAROCKS})
 	tar -C / -xzvf /luarocks.tar.gz
 	cd /luarocks-${VER_LUAROCKS}; \
 	./configure \

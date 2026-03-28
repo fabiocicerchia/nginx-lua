@@ -107,7 +107,7 @@ def main():
         ('lua_resty_core', "https://github.com/openresty/lua-resty-core", False,
          "https://github.com/openresty/lua-resty-core/archive/v{ver}.tar.gz"),
         ('luarocks', "https://github.com/luarocks/luarocks", False,
-         "https://luarocks.org/releases/luarocks-{ver}.tar.gz"),
+         "https://github.com/luarocks/luarocks/archive/refs/tags/v{ver}.tar.gz"),
         ('lua_resty_lrucache', "https://github.com/openresty/lua-resty-lrucache", False,
          "https://github.com/openresty/lua-resty-lrucache/archive/v{ver}.tar.gz"),
         ('openresty_headers', "https://github.com/openresty/headers-more-nginx-module", False,
