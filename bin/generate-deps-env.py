@@ -7,11 +7,10 @@ project and generates an environment file with version variables. It queries
 GitHub repositories to get the latest tags and commits.
 """
 
-import subprocess
 import hashlib
 import re
+import subprocess  # noqa: S603 - commands use fixed args, no untrusted input
 import sys
-import tempfile
 from pathlib import Path
 
 import requests
