@@ -53,6 +53,7 @@ packagetest_targets_arm64=$(addprefix package-test-, $(arm64_distros))
 
 test_targets=${dockertest_targets_amd64} ${dockertest_targets_arm64}
 push_targets=$(addprefix push-, $(DISTROS))
+promote_targets=$(addprefix promote-, $(DISTROS))
 bundle_targets=$(addprefix bundle-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
 minimal_targets=$(addprefix build-minimal-, $(DISTROS))
@@ -177,6 +178,26 @@ endif
 	DISTRO=$(subst push-,,$(@)); \
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
+
+################################################################################
+##@ PROMOTE
+################################################################################
+
+PROMOTE_CMD:=./bin/docker-promote.py
+
+promote-all: $(promote_targets) ## promote all unsigned images to final tags
+
+$(promote_targets): ## promote one distro's unsigned images to final tags
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
+	return
+endif
+	DISTRO=$(subst promote-,,$(@)); \
+	echo "PROMOTING $$DISTRO"; \
+	$(PROMOTE_CMD) "$$DISTRO"
+
+cleanup-unsigned: ## delete all lingering -unsigned tags from Docker Hub
+	./bin/cleanup-unsigned-tags.sh
 
 ################################################################################
 ##@ BUNDLE

@@ -352,15 +352,23 @@ commands:
                   TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
                   make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
             - run:
-                name: Push images
+                name: Push images (unsigned tags)
                 command: |
                   FORCE=YES make -j $(nproc) push-<< parameters.distro >>
             - run:
                 name: Sign images and generate SBOM
                 command: |
-                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>"); do
+                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
                     make sign-image IMAGE="${TAG}"
                   done
+            - run:
+                name: Promote signed images to final tags
+                command: |
+                  FORCE=YES make -j $(nproc) promote-<< parameters.distro >>
+            - run:
+                name: Cleanup unsigned tags
+                command: |
+                  make cleanup-unsigned
 
       - persist_to_workspace:
           root: .

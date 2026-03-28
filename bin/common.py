@@ -34,7 +34,12 @@ DOCKER_PULL_COMMAND = "docker pull"
 DOCKER_INSPECT_COMMAND = "docker image inspect"
 DOCKER_MANIFEST_CREATE = "docker manifest create"
 DOCKER_MANIFEST_PUSH = "docker manifest push"
+DOCKER_TAG_COMMAND = "docker tag"
 DOCKER_IMAGES_COMMAND = "docker images"
+
+# Unsigned image suffix - images are pushed with this suffix first,
+# then signed, then promoted to the final tag.
+UNSIGNED_SUFFIX = "-unsigned"
 
 # Git constants
 GIT_REV_PARSE_COMMAND = "git rev-parse --short HEAD"
@@ -199,13 +204,50 @@ def push_docker_image(tag):
 
 
 def push_images(nginx_version, os_distro, os_version):
-    """Push images for all architectures."""
+    """Push images as unsigned tags for all architectures.
+
+    Images are pushed with an '-unsigned' suffix. After signing,
+    use promote_images() to copy them to the final tag.
+    """
     for arch in ARCHITECTURES:
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
         for tag in tags:
+            unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
+            # Tag the local image with the unsigned name
+            tag_cmd = f"{DOCKER_TAG_COMMAND} {tag} {unsigned_tag}"
+            exit_code = run_command(tag_cmd, True)[0]
+            if exit_code != 0:
+                print(f"FATAL: Failed to tag image {tag} as {unsigned_tag}")
+                return exit_code
+            # Push the unsigned tag
+            exit_code = push_docker_image(unsigned_tag)
+            if exit_code != 0:
+                print(f"FATAL: Failed to push image {unsigned_tag}")
+                return exit_code
+
+    return 0
+
+
+def promote_images(nginx_version, os_distro, os_version):
+    """Promote unsigned images to final tags after signing.
+
+    Copies the signed -unsigned image to the final tag using
+    docker tag + push, then cleans up the local unsigned tags.
+    """
+    for arch in ARCHITECTURES:
+        tags = generate_tags(nginx_version, os_distro, os_version, arch)
+        for tag in tags:
+            unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
+            # The unsigned image in the registry is now signed.
+            # Re-tag locally and push to the final tag name.
+            tag_cmd = f"{DOCKER_TAG_COMMAND} {unsigned_tag} {tag}"
+            exit_code = run_command(tag_cmd, True)[0]
+            if exit_code != 0:
+                print(f"FATAL: Failed to tag {unsigned_tag} as {tag}")
+                return exit_code
             exit_code = push_docker_image(tag)
             if exit_code != 0:
-                print(f"FATAL: Failed to push image {tag}")
+                print(f"FATAL: Failed to push promoted image {tag}")
                 return exit_code
 
     return 0
