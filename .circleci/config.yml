@@ -2,13 +2,6 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Pipeline parameters - can be set via API to override default behavior
-# Example: curl -X POST .../pipeline -d '{"branch":"my-branch","parameters":{"force_full_pipeline":true}}'
-parameters:
-  force_full_pipeline:
-    type: boolean
-    default: false
-
 # Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
@@ -132,70 +125,6 @@ workflows:
             branches:
               only: main
 
-  # Full build + package from any branch via API parameter (no bundle/release)
-  # curl -X POST https://circleci.com/api/v2/project/gh/fabiocicerchia/nginx-lua/pipeline \
-  #   -H "Circle-Token: $CIRCLECI_TOKEN" -H "Content-Type: application/json" \
-  #   -d '{"branch": "your-branch", "parameters": {"force_full_pipeline": true}}'
-  builds-force:
-    when: << pipeline.parameters.force_full_pipeline >>
-    jobs:
-      - Docker AMD:
-          name: Docker AMD << matrix.distro >>
-          matrix:
-            parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-      - Docker ARM:
-          name: Docker ARM << matrix.distro >>
-          matrix:
-            parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-      - Package AMD:
-          name: Package AMD << matrix.distro >>
-          requires:
-            - Docker AMD << matrix.distro >>
-          matrix:
-            parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-      - Package ARM:
-          name: Package ARM << matrix.distro >>
-          requires:
-            - Docker ARM << matrix.distro >>
-          matrix:
-            parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-
 commands:
   docker:
     parameters:
@@ -225,7 +154,6 @@ commands:
           name: Install Trivy (vulnerability scanner)
           command: |
             set -euo pipefail
-            TRIVY_VERSION="v0.69.3"
             TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-$(dpkg --print-architecture | sed 's/amd64/64bit/' | sed 's/arm64/ARM64/').tar.gz"
             TRIVY_CHECKSUMS="trivy_${TRIVY_VERSION#v}_checksums.txt"
             ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_CHECKSUMS}" "/tmp/${TRIVY_CHECKSUMS}"
@@ -235,12 +163,13 @@ commands:
             sudo mv trivy /usr/local/bin/trivy
             rm -f "/tmp/${TRIVY_ARCHIVE}" "/tmp/${TRIVY_CHECKSUMS}"
             trivy --version
+          environment:
+            TRIVY_VERSION: "v0.69.3"
 
       - run:
           name: Install Cosign (image signing)
           command: |
             set -euo pipefail
-            COSIGN_VERSION="v3.0.5"
             COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
             ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
             EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
@@ -249,12 +178,13 @@ commands:
             sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
             rm -f /tmp/cosign_checksums.txt
             cosign version
+          environment:
+            COSIGN_VERSION: "v3.0.5"
 
       - run:
           name: Install Syft (SBOM generator)
           command: |
             set -euo pipefail
-            SYFT_VERSION="v1.42.3"
             SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
             SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
             ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
@@ -264,6 +194,8 @@ commands:
             sudo mv syft /usr/local/bin/syft
             rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
             syft version
+          environment:
+            SYFT_VERSION: "v1.42.3"
 
       - run:
           name: Install GeoIP2 MaxMindDB
@@ -298,18 +230,21 @@ commands:
           name: Build docker image
           no_output_timeout: 60m
           command: |
-            FORCE=YES make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
+            make -j $(nproc) build-$(dpkg --print-architecture)-<< parameters.distro >>
+          environment:
+            FORCE: "YES"
 
       - run:
           name: Test image
-          command: FORCE=YES make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
+          command: make -j $(nproc) docker-test-$(dpkg --print-architecture)-<< parameters.distro >>
+          environment:
+            FORCE: "YES"
 
       # passing docker images to another job
       - run:
           name: Save image as tar
           command: |
-            set -euo pipefail
-            set -x
+            set -euxo pipefail
             mkdir -p images
             ARCH=$(dpkg --print-architecture)
             IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
@@ -320,9 +255,8 @@ commands:
 
       - when:
           condition:
-            or:
+            and:
               - equal: [main, << pipeline.git.branch >>]
-              - << pipeline.parameters.force_full_pipeline >>
           steps:
             - run:
                 name: Log into registry
@@ -339,7 +273,9 @@ commands:
             - run:
                 name: Push images (unsigned tags)
                 command: |
-                  FORCE=YES make -j $(nproc) push-<< parameters.distro >>
+                  make -j $(nproc) push-<< parameters.distro >>
+                environment:
+                  FORCE: "YES"
             - run:
                 name: Sign images and generate SBOM
                 command: |
@@ -350,7 +286,9 @@ commands:
             - run:
                 name: Promote signed images to final tags
                 command: |
-                  FORCE=YES make -j $(nproc) promote-<< parameters.distro >>
+                  make -j $(nproc) promote-<< parameters.distro >>
+                environment:
+                  FORCE: "YES"
       - persist_to_workspace:
           root: .
           paths:
@@ -508,7 +446,9 @@ jobs:
       - run:
           name: Bundle manifest
           command: |
-            FORCE=YES make -j $(nproc) bundle-<< parameters.distro >>
+            make -j $(nproc) bundle-<< parameters.distro >>
+          environment:
+            FORCE: "YES"
 
   Metadata:
     machine:
@@ -559,7 +499,6 @@ jobs:
           command: |
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
-            git checkout main
 
       - run:
           name: Create Release
