@@ -2,6 +2,13 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+# Pipeline parameters - can be set via API to override default behavior
+# Example: curl -X POST .../pipeline -d '{"branch":"my-branch","parameters":{"force_full_pipeline":true}}'
+parameters:
+  force_full_pipeline:
+    type: boolean
+    default: false
+
 # Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
@@ -125,6 +132,92 @@ workflows:
             branches:
               only: main
 
+  # Full pipeline triggered from any branch via API parameter
+  # curl -X POST https://circleci.com/api/v2/project/gh/fabiocicerchia/nginx-lua/pipeline \
+  #   -H "Circle-Token: $CIRCLECI_TOKEN" -H "Content-Type: application/json" \
+  #   -d '{"branch": "your-branch", "parameters": {"force_full_pipeline": true}}'
+  builds-force:
+    when: << pipeline.parameters.force_full_pipeline >>
+    jobs:
+      - Docker AMD:
+          name: Docker AMD << matrix.distro >>
+          matrix:
+            parameters:
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
+      - Docker ARM:
+          name: Docker ARM << matrix.distro >>
+          matrix:
+            parameters:
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
+      - Package AMD:
+          name: Package AMD << matrix.distro >>
+          requires:
+            - Docker AMD << matrix.distro >>
+          matrix:
+            parameters:
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
+      - Package ARM:
+          name: Package ARM << matrix.distro >>
+          requires:
+            - Docker ARM << matrix.distro >>
+          matrix:
+            parameters:
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
+      - Docker Bundle:
+          name: Docker Bundle << matrix.distro >>
+          requires:
+            - Package AMD << matrix.distro >>
+            - Package ARM << matrix.distro >>
+          matrix:
+            parameters:
+              distro:
+                [
+                  "almalinux",
+                  "alpine",
+                  "amazonlinux",
+                  "debian",
+                  "fedora",
+                  "ubuntu",
+                ]
+      - Metadata:
+          requires:
+            - Docker Bundle
+      - Release:
+          requires:
+            - Metadata
+
 commands:
   docker:
     parameters:
@@ -243,8 +336,9 @@ commands:
 
       - when:
           condition:
-            and:
+            or:
               - equal: [main, << pipeline.git.branch >>]
+              - << pipeline.parameters.force_full_pipeline >>
           steps:
             - run:
                 name: Log into registry
