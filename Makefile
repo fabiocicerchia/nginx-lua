@@ -270,11 +270,11 @@ auto-update-and-commit: .setup_gitrepo auto-update
 	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "Automated updates"; \
 	git push -u origin "$$BRANCH_NAME"; \
-	curl -s -X POST \
-		-H "Authorization: token $${GITHUB_TOKEN}" \
-		-H "Accept: application/vnd.github.v3+json" \
-		"https://api.github.com/repos/$(GH_USERNAME)/nginx-lua/pulls" \
-		-d "{\"title\":\"Automated dependency updates\",\"head\":\"$$BRANCH_NAME\",\"base\":\"main\",\"body\":\"Automated PR created by CI pipeline.\\n\\nThis PR contains updated supported versions, Dockerfiles, tags, and README.\"}"
+	gh pr create \
+		--title "Automated dependency updates" \
+		--body "Automated PR created by CI pipeline.$$'\n\n'This PR contains updated supported versions, Dockerfiles, tags, and README." \
+		--base main \
+		--head "$$BRANCH_NAME"
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add docs/metadata/ || true; \
@@ -286,11 +286,11 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "[ci skip] Automated metadata"; \
 	git push -u origin "$$BRANCH_NAME"; \
-	curl -s -X POST \
-		-H "Authorization: token $${GITHUB_TOKEN}" \
-		-H "Accept: application/vnd.github.v3+json" \
-		"https://api.github.com/repos/$(GH_USERNAME)/nginx-lua/pulls" \
-		-d "{\"title\":\"[ci skip] Automated metadata update\",\"head\":\"$$BRANCH_NAME\",\"base\":\"main\",\"body\":\"Automated PR created by CI pipeline.\\n\\nThis PR contains updated Docker image metadata.\"}"
+	gh pr create \
+		--title "[ci skip] Automated metadata update" \
+		--body "Automated PR created by CI pipeline.$$'\n\n'This PR contains updated Docker image metadata." \
+		--base main \
+		--head "$$BRANCH_NAME"
 
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
