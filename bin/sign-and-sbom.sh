@@ -5,6 +5,8 @@
 set -euo pipefail
 
 IMAGE_REF="$1"
+VCS_REF=${VCS_REF:-$(git rev-parse --short HEAD)}
+IMAGE_REF_PATH=$(echo "$IMAGE_REF" | tr '/:' '-')
 
 if [ -z "$IMAGE_REF" ]; then
     echo "Usage: $0 <image-reference>"
@@ -38,7 +40,7 @@ echo "Image digest: ${DIGEST}"
 cosign sign --key env://COSIGN_KEY \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    -a "vcs_ref=${VCS_REF:-$(git rev-parse --short HEAD)}" \
+    -a "vcs_ref=${VCS_REF}" \
     -a "pipeline=circleci" \
     --yes \
     "$IMAGE_REF"
@@ -46,13 +48,13 @@ cosign sign --key env://COSIGN_KEY \
 echo "=== Image signed successfully ==="
 
 # Generate SBOM in CycloneDX format (CRA-compliant)
-SBOM_FILE="/tmp/sbom-$(echo "$IMAGE_REF" | tr '/:' '-').cdx.json"
+SBOM_FILE="/tmp/sbom-${IMAGE_REF_PATH}.cdx.json"
 echo "=== Generating SBOM: ${SBOM_FILE} ==="
 
 syft "$IMAGE_REF" \
     --output cyclonedx-json="$SBOM_FILE" \
     --source-name "fabiocicerchia/nginx-lua" \
-    --source-version "${VCS_REF:-$(git rev-parse --short HEAD)}"
+    --source-version "${VCS_REF}"
 
 echo "=== SBOM generated ==="
 
@@ -68,11 +70,11 @@ cosign attest --key env://COSIGN_KEY \
 echo "=== Signed SBOM attestation attached ==="
 
 # Also generate SPDX format for broader compatibility
-SPDX_FILE="/tmp/sbom-$(echo "$IMAGE_REF" | tr '/:' '-').spdx.json"
+SPDX_FILE="/tmp/sbom-${IMAGE_REF_PATH}.spdx.json"
 syft "$IMAGE_REF" \
     --output spdx-json="$SPDX_FILE" \
     --source-name "fabiocicerchia/nginx-lua" \
-    --source-version "${VCS_REF:-$(git rev-parse --short HEAD)}"
+    --source-version "${VCS_REF}"
 
 echo "=== SPDX SBOM also generated at ${SPDX_FILE} ==="
 
