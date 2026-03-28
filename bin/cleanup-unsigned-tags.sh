@@ -1,11 +1,12 @@
 #!/bin/bash
-# Delete all lingering -unsigned tags from Docker Hub
+# Delete temporary tags from Docker Hub:
+#   - -unsigned tags (pre-signing staging tags)
+#   - -amd64 / -arm64v8 tags (single-arch, superseded by manifest lists)
 # Usage: ./bin/cleanup-unsigned-tags.sh
 # Requires: DOCKER_HUB_USER and DOCKER_HUB_TOKEN environment variables
 set -euo pipefail
 
 REPO="fabiocicerchia/nginx-lua"
-UNSIGNED_SUFFIX="-unsigned"
 
 if [ -z "${DOCKER_HUB_USER:-}" ] || [ -z "${DOCKER_HUB_TOKEN:-}" ]; then
     echo "ERROR: DOCKER_HUB_USER and DOCKER_HUB_TOKEN must be set"
@@ -38,7 +39,17 @@ for tag in data.get('results', []):
     fi
 
     echo "$TAGS" | while read -r TAG; do
-        if [[ "$TAG" == *"${UNSIGNED_SUFFIX}" ]]; then
+        DELETE=false
+        # Match -unsigned tags (staging tags before signing)
+        if [[ "$TAG" == *"-unsigned" ]]; then
+            DELETE=true
+        fi
+        # Match single-arch tags (superseded by manifest lists after bundle)
+        if [[ "$TAG" == *"-amd64" ]] || [[ "$TAG" == *"-arm64v8" ]]; then
+            DELETE=true
+        fi
+
+        if [ "$DELETE" = true ]; then
             echo "  Deleting: ${REPO}:${TAG}"
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
                 -X DELETE -H "Authorization: JWT ${TOKEN}" \
@@ -60,4 +71,4 @@ for tag in data.get('results', []):
     PAGE=$((PAGE + 1))
 done
 
-echo "=== Done. Cleaned up unsigned tags. ==="
+echo "=== Done. Cleaned up unsigned and single-arch tags. ==="
