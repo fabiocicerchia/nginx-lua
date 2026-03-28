@@ -130,6 +130,10 @@ commands:
     parameters:
       distro:
         type: string
+    environment:
+      TRIVY_VERSION: "v0.69.3"
+      COSIGN_VERSION: "v3.0.5"
+      SYFT_VERSION: "v1.42.3"
     steps:
       - checkout
 
@@ -152,7 +156,6 @@ commands:
       - run:
           name: Install Trivy (vulnerability scanner)
           command: |
-            TRIVY_VERSION="v0.58.2"
             TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-$(dpkg --print-architecture | sed 's/amd64/64bit/' | sed 's/arm64/ARM64/').tar.gz"
             TRIVY_CHECKSUMS="trivy_${TRIVY_VERSION#v}_checksums.txt"
             ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_CHECKSUMS}" "/tmp/${TRIVY_CHECKSUMS}"
@@ -166,7 +169,6 @@ commands:
       - run:
           name: Install Cosign (image signing)
           command: |
-            COSIGN_VERSION="v2.4.1"
             COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
             ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
             EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
@@ -179,7 +181,6 @@ commands:
       - run:
           name: Install Syft (SBOM generator)
           command: |
-            SYFT_VERSION="v1.18.1"
             SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
             SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
             ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
