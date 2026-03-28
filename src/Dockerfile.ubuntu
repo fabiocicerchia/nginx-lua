@@ -298,6 +298,7 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
+        cpanminus \
         curl \
         g++ \
         libmaxminddb-dev \
@@ -307,7 +308,9 @@ ARG BUILD_DEPS_BASE="\
         libxslt1-dev \
         make \
         patch \
+        python3 \
         unzip \
+        wget \
         zlib1g-dev \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
@@ -338,9 +341,9 @@ FROM base AS builder
 RUN set -eux \
     && eval BUILD_DEPS="\$$(echo BUILD_DEPS_${ARCH} | tr '[:lower:]' '[:upper:]')" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         apt-utils \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         $BUILD_DEPS \
         $NGINX_BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/*
@@ -351,6 +354,9 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
@@ -446,7 +452,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # hadolint ignore=SC2086
 RUN set -eux \
     && apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests \
+    && apt-get install -qq -y --no-install-recommends --no-install-suggests \
         $PKG_DEPS \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/log/nginx \
@@ -458,7 +464,7 @@ RUN set -x \
     && groupadd --system --gid 101 nginx \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
     && apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.25.4/mainline/debian/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && \
@@ -532,7 +538,7 @@ RUN set -x \
 #             ;; \
 #     esac \
 #     \
-    && apt-get install --no-install-recommends --no-install-suggests -y \
+    && apt-get install -qq --no-install-recommends --no-install-suggests -y \
 #                         $nginxPackages \
                         gettext-base \
                         curl \

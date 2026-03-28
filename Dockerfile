@@ -303,6 +303,7 @@ ARG BUILD_DEPS_BASE="\
         openssl-dev \
         patch \
         pcre-dev \
+        perl-app-cpanminus \
         tar \
         zlib-dev \
 "
@@ -357,6 +358,10 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
+# COPY --from=python:2.7.18-alpine /usr/local/bin/python /usr/local/bin/python
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
