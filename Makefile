@@ -196,8 +196,8 @@ endif
 	echo "PROMOTING $$DISTRO"; \
 	$(PROMOTE_CMD) "$$DISTRO"
 
-cleanup-unsigned: ## delete all lingering -unsigned tags from Docker Hub
-	./bin/cleanup-unsigned-tags.sh
+cleanup-docker-images: ## delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
+	./bin/cleanup-docker-images.sh
 
 ################################################################################
 ##@ BUNDLE

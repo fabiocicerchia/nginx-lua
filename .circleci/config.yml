@@ -368,7 +368,7 @@ commands:
             - run:
                 name: Cleanup unsigned tags
                 command: |
-                  make cleanup-unsigned
+                  make cleanup-docker-images
 
       - persist_to_workspace:
           root: .
