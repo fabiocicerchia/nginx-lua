@@ -283,8 +283,6 @@ commands:
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
                     make sign-image IMAGE="${TAG}"
                   done
-                environment:
-                  PIPELINE_DEFINITION_ID: << pipeline.definition_id >>
             - run:
                 name: Promote signed images to final tags
                 command: |
