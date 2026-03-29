@@ -117,11 +117,19 @@ echo "=== Verifying signature ==="
 if [ -z "${COSIGN_KEY:-}" ]; then
     # Keyless: verify via certificate identity
     OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
-    CERT_IDENTITY="https://circleci.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/${PIPELINE_DEFINITION_ID}"
-    cosign verify \
-        --certificate-oidc-issuer "$OIDC_ISSUER" \
-        --certificate-identity "$CERT_IDENTITY" \
-        "$DIGEST"
+    if [ -n "${PIPELINE_DEFINITION_ID:-}" ]; then
+        CERT_IDENTITY="https://circleci.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/${PIPELINE_DEFINITION_ID}"
+        cosign verify \
+            --certificate-oidc-issuer "$OIDC_ISSUER" \
+            --certificate-identity "$CERT_IDENTITY" \
+            "$DIGEST"
+    else
+        CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/.*"
+        cosign verify \
+            --certificate-oidc-issuer "$OIDC_ISSUER" \
+            --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
+            "$DIGEST"
+    fi
 else
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
     COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
