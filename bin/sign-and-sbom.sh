@@ -29,6 +29,8 @@ if [ -z "${COSIGN_KEY:-}" ]; then
     exit 1
 fi
 
+export COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
+
 echo "=== Signing image: ${IMAGE_REF} ==="
 
 # Get the image digest for immutable reference
