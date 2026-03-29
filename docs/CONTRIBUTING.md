@@ -108,7 +108,7 @@ included in the project:
     ```
 
 4. Make sure to update, or add to the tests when appropriate. Patches and
-    features will not be accepted without tests. Run `npm test` to check that
+    features will not be accepted without tests. Run `FORCE=YES make test-all` to check that
     all tests pass after you've made changes.
 
 5. Commit your changes in logical chunks. Please adhere to these [git commit
@@ -170,10 +170,15 @@ If you have commit access, please follow this process for merging patches and cu
 
 ### Releasing a new version
 
+Releases are automated via the CI pipeline. On every merge to `main`:
+
+1. The pipeline builds, tests, scans, signs, and pushes all Docker images.
+2. The `Release` job creates a GitHub release with Dockerfiles, packages, and SHA256SUMS.
+3. Release tags follow the `v1.YYYYMMDD.HHMMSS` format.
+
+For manual releases:
+
 1. Include all new functional changes in the CHANGELOG.
-2. Use a dedicated commit to increment the version. The version needs to be
-    added to the `CHANGELOG.md` (inc. date) and the `package.json`.
-3. The commit message must be of `v0.0.0` format.
-4. Create an annotated tag for the version: `git tag -m "v0.0.0" v0.0.0`.
-5. Push the changes and tags to GitHub: `git push --tags origin main`.
-6. Publish the new version to npm: `npm publish`.
+2. Create an annotated tag for the version: `git tag -m "v0.0.0" v0.0.0`.
+3. Push the changes and tags to GitHub: `git push --tags origin main`.
+4. Run `make release` to create the GitHub release with artifacts.
