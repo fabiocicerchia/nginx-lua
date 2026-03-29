@@ -1,7 +1,8 @@
 #!/bin/bash
-# Sign Docker images with cosign and generate signed SBOM
+# Sign Docker images with cosign (keyless OIDC) and generate signed SBOM
 # Ref: Cyber Resilience Act Article 47 - SBOM requirement
 # Ref: NIS2 Article 21(2)(d) - supply chain security
+# Ref: https://github.com/CircleCI-Public/sign-and-publish-examples
 set -euo pipefail
 
 IMAGE_REF="$1"
@@ -21,16 +22,6 @@ for tool in cosign syft; do
     fi
 done
 
-# Require key-based signing
-if [ -z "${COSIGN_KEY:-}" ]; then
-    echo "ERROR: COSIGN_KEY environment variable must be set"
-    echo "  Set COSIGN_KEY to the private key content or path"
-    echo "  Set COSIGN_PASSWORD to the key passphrase"
-    exit 1
-fi
-
-export COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
-
 echo "=== Signing image: ${IMAGE_REF} ==="
 
 # Get the image digest for immutable reference
@@ -38,23 +29,53 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
     docker inspect --format='{{.Id}}' "$IMAGE_REF")
 echo "Image digest: ${DIGEST}"
 
-# Materialise the inline PEM key into a temporary file so cosign can read it
-# reliably (the env:// protocol fails to parse certain PEM blocks).
-# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
-# of real newlines — bash parameter expansion converts only those sequences.
-COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key-XXXXXX.pem)
-trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
-chmod 600 "$COSIGN_KEY_FILE"
-printf '%s\n' "${COSIGN_KEY//\\n/$'\n'}" > "$COSIGN_KEY_FILE"
-COSIGN_KEY_ARG="$COSIGN_KEY_FILE"
+# --- Signing key selection ---
+# Prefer keyless OIDC signing (official CircleCI approach).  Fall back to
+# key-based signing when COSIGN_KEY is explicitly provided (local / non-OIDC
+# environments).
+if [ -z "${COSIGN_KEY:-}" ]; then
+    # Keyless: obtain an OIDC token from CircleCI and let Sigstore Fulcio
+    # issue a short-lived signing certificate.
+    if ! command -v circleci &> /dev/null; then
+        echo "ERROR: circleci CLI is not installed (required for OIDC keyless signing)"
+        echo "  Alternatively, set COSIGN_KEY to a PEM-encoded private key"
+        exit 1
+    fi
+    echo "Using keyless OIDC signing via CircleCI"
+    export SIGSTORE_ID_TOKEN
+    SIGSTORE_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "sigstore"}')
+    COSIGN_SIGN_ARGS=(--yes)
+    COSIGN_ATTEST_ARGS=(--yes)
+else
+    echo "Using key-based signing"
+    # Materialise the inline PEM key into a temporary file so cosign can read
+    # it reliably.  CI secrets often store multi-line values with literal \n.
+    COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key-XXXXXX.pem)
+    trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
+    chmod 600 "$COSIGN_KEY_FILE"
+    printf '%s' "$COSIGN_KEY" | sed -e 's/\\n/\n/g' -e 's/\\r//g' > "$COSIGN_KEY_FILE"
+
+    if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
+        printf '%s' "$COSIGN_KEY" | base64 -d > "$COSIGN_KEY_FILE" 2>/dev/null || true
+    fi
+    if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
+        echo "ERROR: COSIGN_KEY does not contain a valid PEM block"
+        echo "  Expected a PEM-encoded private key (-----BEGIN ... PRIVATE KEY-----)"
+        exit 1
+    fi
+
+    export COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
+    COSIGN_SIGN_ARGS=(--key "$COSIGN_KEY_FILE" --yes)
+    COSIGN_ATTEST_ARGS=(--key "$COSIGN_KEY_FILE" --yes)
+fi
 
 # Sign the image by digest for an immutable, deterministic reference.
-cosign sign --key "$COSIGN_KEY_ARG" \
+cosign sign \
+    "${COSIGN_SIGN_ARGS[@]}" \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
     -a "pipeline=circleci" \
-    --yes \
     "$DIGEST"
 
 echo "=== Image signed successfully ==="
@@ -73,10 +94,10 @@ echo "=== SBOM generated ==="
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-cosign attest --key "$COSIGN_KEY_ARG" \
+cosign attest \
+    "${COSIGN_ATTEST_ARGS[@]}" \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
-    --yes \
     "$DIGEST"
 
 echo "=== Signed SBOM attestation attached ==="
@@ -90,12 +111,22 @@ syft "$IMAGE_REF" \
 
 echo "=== SPDX SBOM also generated at ${SPDX_FILE} ==="
 
-# Verify the signature we just created using the public key in the repo
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
+# Verify the signature we just created
+echo "=== Verifying signature ==="
 
-echo "=== Verifying signature with ${COSIGN_PUB} ==="
-cosign verify --key "$COSIGN_PUB" "$DIGEST"
+if [ -z "${COSIGN_KEY:-}" ]; then
+    # Keyless: verify via certificate identity
+    OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
+    CERT_IDENTITY="https://circleci.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/${PIPELINE_DEFINITION_ID}"
+    cosign verify \
+        --certificate-oidc-issuer "$OIDC_ISSUER" \
+        --certificate-identity "$CERT_IDENTITY" \
+        "$DIGEST"
+else
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
+    cosign verify --key "$COSIGN_PUB" "$DIGEST"
+fi
 
 echo "=== Verification successful ==="
 echo "Image ${DIGEST} is signed, SBOM attached and verified."
