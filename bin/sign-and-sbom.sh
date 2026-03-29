@@ -32,7 +32,7 @@ if [ -z "${COSIGN_KEY:-}" ]; then
     echo "  Commit cosign.pub to the repository"
     exit 1
 fi
-export COSIGN_PASSWORD=""
+export COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
 
 echo "=== Signing image: ${IMAGE_REF} ==="
 
