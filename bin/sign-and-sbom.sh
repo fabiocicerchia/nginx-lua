@@ -38,19 +38,27 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
     docker inspect --format='{{.Id}}' "$IMAGE_REF")
 echo "Image digest: ${DIGEST}"
 
-# Sign the image with key
-# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
-# of real newlines. printf '%b' normalises these into a child-process-scoped env
-# var consumed via cosign's native env:// protocol — no disk I/O, no temp files,
-# no /proc/self/fd entries; the normalised key exists only in cosign's memory.
-COSIGN_KEY_NORMALIZED=$(printf '%b' "$COSIGN_KEY") \
-cosign sign --key env://COSIGN_KEY_NORMALIZED \
+# Determine signing key argument: if COSIGN_KEY points to an existing file use
+# it directly; otherwise treat the value as inline PEM content (CI systems like
+# CircleCI store multi-line secrets with literal \n instead of real newlines).
+if [ -f "$COSIGN_KEY" ]; then
+    COSIGN_KEY_ARG="$COSIGN_KEY"
+else
+    # Normalise literal \n sequences into real newlines and export so that
+    # every subsequent cosign invocation can read it via env:// protocol.
+    export COSIGN_KEY_NORMALIZED
+    COSIGN_KEY_NORMALIZED=$(printf '%b' "$COSIGN_KEY")
+    COSIGN_KEY_ARG="env://COSIGN_KEY_NORMALIZED"
+fi
+
+# Sign the image by digest for an immutable, deterministic reference.
+cosign sign --key "$COSIGN_KEY_ARG" \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
     -a "pipeline=circleci" \
     --yes \
-    "$IMAGE_REF"
+    "$DIGEST"
 
 echo "=== Image signed successfully ==="
 
@@ -68,11 +76,11 @@ echo "=== SBOM generated ==="
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-cosign attest --key env://COSIGN_KEY_NORMALIZED \
+cosign attest --key "$COSIGN_KEY_ARG" \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
     --yes \
-    "$IMAGE_REF"
+    "$DIGEST"
 
 echo "=== Signed SBOM attestation attached ==="
 
@@ -90,7 +98,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
 
 echo "=== Verifying signature with ${COSIGN_PUB} ==="
-cosign verify --key "$COSIGN_PUB" "$IMAGE_REF"
+cosign verify --key "$COSIGN_PUB" "$DIGEST"
 
 echo "=== Verification successful ==="
-echo "Image ${IMAGE_REF} is signed, SBOM attached and verified."
+echo "Image ${DIGEST} is signed, SBOM attached and verified."
