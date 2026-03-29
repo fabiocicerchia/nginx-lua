@@ -39,7 +39,12 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
 echo "Image digest: ${DIGEST}"
 
 # Sign the image with key
-cosign sign --key env://COSIGN_KEY \
+# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
+# of real newlines. printf '%b' normalises these into a child-process-scoped env
+# var consumed via cosign's native env:// protocol — no disk I/O, no temp files,
+# no /proc/self/fd entries; the normalised key exists only in cosign's memory.
+COSIGN_KEY_NORMALIZED=$(printf '%b' "$COSIGN_KEY") \
+cosign sign --key env://COSIGN_KEY_NORMALIZED \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
@@ -63,7 +68,7 @@ echo "=== SBOM generated ==="
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-cosign attest --key env://COSIGN_KEY \
+cosign attest --key env://COSIGN_KEY_NORMALIZED \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
     --yes \
