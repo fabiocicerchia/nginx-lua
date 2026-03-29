@@ -24,7 +24,7 @@ done
 # Require key-based signing
 if [ -z "${COSIGN_KEY:-}" ]; then
     echo "ERROR: COSIGN_KEY environment variable must be set"
-    echo "  Set COSIGN_KEY to the private key content or path"
+    echo "  Set COSIGN_KEY to the PEM-encoded private key content"
     echo "  Set COSIGN_PASSWORD to the key passphrase"
     exit 1
 fi
@@ -40,12 +40,26 @@ echo "Image digest: ${DIGEST}"
 
 # Materialise the inline PEM key into a temporary file so cosign can read it
 # reliably (the env:// protocol fails to parse certain PEM blocks).
-# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
-# of real newlines — bash parameter expansion converts only those sequences.
 COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key-XXXXXX.pem)
 trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
 chmod 600 "$COSIGN_KEY_FILE"
-printf '%s\n' "${COSIGN_KEY//\\n/$'\n'}" > "$COSIGN_KEY_FILE"
+
+# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
+# of real newlines.  Use sed to convert them; strip \r from Windows pastes.
+printf '%s' "$COSIGN_KEY" | sed -e 's/\\n/\n/g' -e 's/\\r//g' > "$COSIGN_KEY_FILE"
+
+# If it doesn't look like PEM, try base64-decoding the original value
+if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
+    printf '%s' "$COSIGN_KEY" | base64 -d > "$COSIGN_KEY_FILE" 2>/dev/null || true
+fi
+
+# Validate before calling cosign so the error message is actionable
+if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
+    echo "ERROR: COSIGN_KEY does not contain a valid PEM block"
+    echo "  Expected a PEM-encoded private key (-----BEGIN ... PRIVATE KEY-----)"
+    exit 1
+fi
+
 COSIGN_KEY_ARG="$COSIGN_KEY_FILE"
 
 # Sign the image by digest for an immutable, deterministic reference.
