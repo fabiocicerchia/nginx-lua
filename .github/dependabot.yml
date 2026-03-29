@@ -1,11 +1,41 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Dependabot dependency update configuration
+# Ref: NIS2 Article 21(2)(d) - supply chain security
+# Ref: Cyber Resilience Act Article 47 - SBOM and dependency tracking
 
 version: 2
 updates:
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "docker"
+    directory: "/"
     schedule:
       interval: "daily"
+    reviewers:
+      - "fabiocicerchia"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/src"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "fabiocicerchia"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "pip"
+    directory: "/bin"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "fabiocicerchia"
+    commit-message:
+      prefix: "pip"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "fabiocicerchia"
+    commit-message:
+      prefix: "ci"
