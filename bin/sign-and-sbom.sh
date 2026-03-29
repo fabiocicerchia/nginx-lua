@@ -29,6 +29,14 @@ if [ -z "${COSIGN_KEY:-}" ]; then
     exit 1
 fi
 
+# Write key to a temp file, normalising escaped \n to real newlines.
+# CI systems (e.g. CircleCI) often store multi-line secrets with literal \n
+# instead of actual newlines, which causes cosign to fail with "invalid pem block".
+COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key.XXXXXX.pem)
+chmod 600 "$COSIGN_KEY_FILE"
+printf '%b' "$COSIGN_KEY" > "$COSIGN_KEY_FILE"
+trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
+
 echo "=== Signing image: ${IMAGE_REF} ==="
 
 # Get the image digest for immutable reference
@@ -37,7 +45,7 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
 echo "Image digest: ${DIGEST}"
 
 # Sign the image with key
-cosign sign --key env://COSIGN_KEY \
+cosign sign --key "$COSIGN_KEY_FILE" \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
@@ -61,7 +69,7 @@ echo "=== SBOM generated ==="
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-cosign attest --key env://COSIGN_KEY \
+cosign attest --key "$COSIGN_KEY_FILE" \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
     --yes \
