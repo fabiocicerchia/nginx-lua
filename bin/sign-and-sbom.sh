@@ -38,18 +38,15 @@ DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/
     docker inspect --format='{{.Id}}' "$IMAGE_REF")
 echo "Image digest: ${DIGEST}"
 
-# Determine signing key argument: if COSIGN_KEY points to an existing file use
-# it directly; otherwise treat the value as inline PEM content (CI systems like
-# CircleCI store multi-line secrets with literal \n instead of real newlines).
-if [ -f "$COSIGN_KEY" ]; then
-    COSIGN_KEY_ARG="$COSIGN_KEY"
-else
-    # Normalise literal \n sequences into real newlines and export so that
-    # every subsequent cosign invocation can read it via env:// protocol.
-    export COSIGN_KEY_NORMALIZED
-    COSIGN_KEY_NORMALIZED=$(printf '%b' "$COSIGN_KEY")
-    COSIGN_KEY_ARG="env://COSIGN_KEY_NORMALIZED"
-fi
+# Materialise the inline PEM key into a temporary file so cosign can read it
+# reliably (the env:// protocol fails to parse certain PEM blocks).
+# CI systems (e.g. CircleCI) store multi-line secrets with literal \n instead
+# of real newlines — bash parameter expansion converts only those sequences.
+COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key-XXXXXX.pem)
+trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
+chmod 600 "$COSIGN_KEY_FILE"
+printf '%s\n' "${COSIGN_KEY//\\n/$'\n'}" > "$COSIGN_KEY_FILE"
+COSIGN_KEY_ARG="$COSIGN_KEY_FILE"
 
 # Sign the image by digest for an immutable, deterministic reference.
 cosign sign --key "$COSIGN_KEY_ARG" \
