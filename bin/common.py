@@ -203,14 +203,19 @@ def push_docker_image(tag):
     return exit_code
 
 
-def push_images(nginx_version, os_distro, os_version):
-    """Push images as unsigned tags for all architectures.
+def push_images(nginx_version, os_distro, os_version, arch=None):
+    """Push images as unsigned tags for the specified (or all) architectures.
 
     Images are pushed with an '-unsigned' suffix. After signing,
     use promote_images() to copy them to the final tag.
+
+    If arch is provided, only images for that architecture are pushed.
+    This is the expected behaviour in CI where each runner builds and
+    pushes only for its own architecture.
     """
-    for arch in ARCHITECTURES:
-        tags = generate_tags(nginx_version, os_distro, os_version, arch)
+    arches = [arch] if arch else ARCHITECTURES
+    for current_arch in arches:
+        tags = generate_tags(nginx_version, os_distro, os_version, current_arch)
         for tag in tags:
             unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
             # Tag the local image with the unsigned name
