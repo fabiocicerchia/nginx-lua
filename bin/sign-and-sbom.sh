@@ -21,13 +21,18 @@ for tool in cosign syft; do
     fi
 done
 
-# Require key-based signing
+# Require key-based signing.
+# The keypair must be generated without a passphrase (COSIGN_PASSWORD="") so
+# that signing works non-interactively in CI. Setting COSIGN_PASSWORD="" here
+# ensures cosign never prompts even if the variable was unset in the environment.
 if [ -z "${COSIGN_KEY:-}" ]; then
-    echo "ERROR: COSIGN_KEY environment variable must be set"
-    echo "  Set COSIGN_KEY to the private key content or path"
-    echo "  Set COSIGN_PASSWORD to the key passphrase"
+    echo "ERROR: COSIGN_KEY environment variable must be set to the private key content"
+    echo "  Generate a passwordless keypair with: COSIGN_PASSWORD='' cosign generate-key-pair"
+    echo "  Store the cosign.key content in the COSIGN_KEY CI secret"
+    echo "  Commit cosign.pub to the repository"
     exit 1
 fi
+export COSIGN_PASSWORD=""
 
 echo "=== Signing image: ${IMAGE_REF} ==="
 
