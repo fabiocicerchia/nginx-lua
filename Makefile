@@ -136,7 +136,7 @@ endif
 	DISTRO=$(shell echo $$TASK | cut -d"-" -f3); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
-	$(BUILD_CMD) "$$DISTRO" "$$ARCH" && $(META_CMD) "$$DISTRO"
+	$(BUILD_CMD) "$$DISTRO" "$$ARCH"
 
 ################################################################################
 ##@ TESTING

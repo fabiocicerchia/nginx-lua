@@ -5,6 +5,33 @@
 # Ref: https://github.com/CircleCI-Public/sign-and-publish-examples
 set -euo pipefail
 
+# Retry a command with exponential backoff on Docker rate-limit errors (HTTP 429 / TOOMANYREQUESTS).
+retry_on_rate_limit() {
+    local max_retries="${SIGN_MAX_RETRIES:-4}"
+    local delay=2
+    local attempt=0
+    local output_file
+    output_file=$(mktemp /tmp/retry-output-XXXXXX)
+    while true; do
+        if "$@" > "$output_file" 2>&1; then
+            cat "$output_file"
+            rm -f "$output_file"
+            return 0
+        fi
+        local rc=$?
+        if grep -qi "TOOMANYREQUESTS\|rate limit\|429" "$output_file" && [ $attempt -lt "$max_retries" ]; then
+            attempt=$((attempt + 1))
+            echo "Rate limited – retrying in ${delay}s (attempt ${attempt}/${max_retries})…"
+            sleep $delay
+            delay=$((delay * 2))
+        else
+            cat "$output_file"
+            rm -f "$output_file"
+            return $rc
+        fi
+    done
+}
+
 IMAGE_REF="$1"
 VCS_REF=${VCS_REF:-$(git rev-parse --short HEAD)}
 IMAGE_REF_PATH=$(echo "$IMAGE_REF" | tr '/:' '-')
@@ -70,7 +97,7 @@ else
 fi
 
 # Sign the image by digest for an immutable, deterministic reference.
-cosign sign \
+retry_on_rate_limit cosign sign \
     "${COSIGN_SIGN_ARGS[@]}" \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -80,36 +107,30 @@ cosign sign \
 
 echo "=== Image signed successfully ==="
 
-# Generate SBOM in CycloneDX format (CRA-compliant)
+# Generate SBOM in both CycloneDX and SPDX formats in a single syft run
+# to avoid pulling image layers from the registry twice.
 SBOM_FILE="/tmp/sbom-${IMAGE_REF_PATH}.cdx.json"
-echo "=== Generating SBOM: ${SBOM_FILE} ==="
+SPDX_FILE="/tmp/sbom-${IMAGE_REF_PATH}.spdx.json"
+echo "=== Generating SBOMs: ${SBOM_FILE} + ${SPDX_FILE} ==="
 
-syft "$IMAGE_REF" \
+retry_on_rate_limit syft "$IMAGE_REF" \
     --output cyclonedx-json="$SBOM_FILE" \
+    --output spdx-json="$SPDX_FILE" \
     --source-name "fabiocicerchia/nginx-lua" \
     --source-version "${VCS_REF}"
 
-echo "=== SBOM generated ==="
+echo "=== SBOMs generated ==="
 
 # Attach SBOM to the image as an attestation (signed)
 echo "=== Attaching signed SBOM attestation ==="
 
-cosign attest \
+retry_on_rate_limit cosign attest \
     "${COSIGN_ATTEST_ARGS[@]}" \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
     "$DIGEST"
 
 echo "=== Signed SBOM attestation attached ==="
-
-# Also generate SPDX format for broader compatibility
-SPDX_FILE="/tmp/sbom-${IMAGE_REF_PATH}.spdx.json"
-syft "$IMAGE_REF" \
-    --output spdx-json="$SPDX_FILE" \
-    --source-name "fabiocicerchia/nginx-lua" \
-    --source-version "${VCS_REF}"
-
-echo "=== SPDX SBOM also generated at ${SPDX_FILE} ==="
 
 # Verify the signature we just created
 echo "=== Verifying signature ==="
@@ -119,13 +140,13 @@ if [ -z "${COSIGN_KEY:-}" ]; then
     OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
     if [ -n "${PIPELINE_DEFINITION_ID:-}" ]; then
         CERT_IDENTITY="https://circleci.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/${PIPELINE_DEFINITION_ID}"
-        cosign verify \
+        retry_on_rate_limit cosign verify \
             --certificate-oidc-issuer "$OIDC_ISSUER" \
             --certificate-identity "$CERT_IDENTITY" \
             "$DIGEST"
     else
         CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/.*"
-        cosign verify \
+        retry_on_rate_limit cosign verify \
             --certificate-oidc-issuer "$OIDC_ISSUER" \
             --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
             "$DIGEST"
@@ -133,7 +154,7 @@ if [ -z "${COSIGN_KEY:-}" ]; then
 else
     SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
     COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
-    cosign verify --key "$COSIGN_PUB" "$DIGEST"
+    retry_on_rate_limit cosign verify --key "$COSIGN_PUB" "$DIGEST"
 fi
 
 echo "=== Verification successful ==="

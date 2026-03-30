@@ -292,17 +292,29 @@ def bundle_images(nginx_version, os_distro, os_version):
 
 
 def generate_metadata(tag):
-    """Generate metadata documentation for image tag."""
-    pull_cmd = f"{DOCKER_PULL_COMMAND} {IMAGE_REPO}:{tag}"
-    pull_output = run_command(pull_cmd, False)[1]
+    """Generate metadata documentation for image tag.
 
-    if pull_output:
-        inspect_cmd = f"{DOCKER_INSPECT_COMMAND} {IMAGE_REPO}:{tag}"
+    Tries to inspect the image locally first to avoid unnecessary Docker Hub
+    pulls (and the associated rate-limit pressure).  Falls back to pulling only
+    when the image is not available in the local daemon.
+    """
+    image_ref = f"{IMAGE_REPO}:{tag}"
+    inspect_cmd = f"{DOCKER_INSPECT_COMMAND} {image_ref}"
+
+    # Try inspecting the local image first (no registry pull required).
+    exit_code, inspect_output = run_command(inspect_cmd, False)
+
+    if exit_code != 0:
+        # Image not available locally – pull it.
+        pull_cmd = f"{DOCKER_PULL_COMMAND} {image_ref}"
+        pull_output = run_command(pull_cmd, False)[1]
+        if not pull_output:
+            return 0
         exit_code, inspect_output = run_command(inspect_cmd, False)
 
-        if exit_code == 0:
-            content = f"# {IMAGE_REPO}:{tag}\n```json\n{inspect_output}\n```"
-            write_file(f"{DOCS_METADATA_DIR}/{tag}.md", content)
+    if exit_code == 0:
+        content = f"# {image_ref}\n```json\n{inspect_output}\n```"
+        write_file(f"{DOCS_METADATA_DIR}/{tag}.md", content)
 
     return 0
 
