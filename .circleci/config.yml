@@ -280,8 +280,15 @@ commands:
                 name: Sign images and generate SBOM
                 command: |
                   set -euo pipefail
+                  declare -A SIGNED_IDS
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
-                    make sign-image IMAGE="${TAG}"
+                    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$TAG")
+                    if [[ -z "${SIGNED_IDS[$IMAGE_ID]+_}" ]]; then
+                      SIGNED_IDS[$IMAGE_ID]=1
+                      make sign-image IMAGE="${TAG}"
+                    else
+                      echo "Skipping ${TAG} – digest already signed"
+                    fi
                   done
             - run:
                 name: Promote signed images to final tags
