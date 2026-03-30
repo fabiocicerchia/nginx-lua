@@ -13,12 +13,13 @@ retry_on_rate_limit() {
     local output_file
     output_file=$(mktemp /tmp/retry-output-XXXXXX)
     while true; do
-        if "$@" > "$output_file" 2>&1; then
+        local rc=0
+        "$@" > "$output_file" 2>&1 || rc=$?
+        if [ $rc -eq 0 ]; then
             cat "$output_file"
             rm -f "$output_file"
             return 0
         fi
-        local rc=$?
         if grep -qi "TOOMANYREQUESTS\|rate limit\|429" "$output_file" && [ $attempt -lt "$max_retries" ]; then
             attempt=$((attempt + 1))
             echo "Rate limited – retrying in ${delay}s (attempt ${attempt}/${max_retries})…"
