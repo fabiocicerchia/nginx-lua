@@ -243,7 +243,12 @@ def promote_images(nginx_version, os_distro, os_version):
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
         for tag in tags:
             unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # The unsigned image in the registry is now signed.
+            # Pull the unsigned image from the registry (it may not exist locally).
+            pull_cmd = f"{DOCKER_PULL_COMMAND} {unsigned_tag}"
+            exit_code = run_command(pull_cmd, True)[0]
+            if exit_code != 0:
+                print(f"FATAL: Failed to pull {unsigned_tag}")
+                return exit_code
             # Re-tag locally and push to the final tag name.
             tag_cmd = f"{DOCKER_TAG_COMMAND} {unsigned_tag} {tag}"
             exit_code = run_command(tag_cmd, True)[0]
