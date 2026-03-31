@@ -52,9 +52,17 @@ done
 
 echo "=== Signing image: ${IMAGE_REF} ==="
 
-# Get the image digest for immutable reference
-DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null || \
-    docker inspect --format='{{.Id}}' "$IMAGE_REF")
+# Get the image digest for immutable reference.
+# RepoDigests returns "image@sha256:…" which cosign needs.  When RepoDigests is
+# empty (locally-built image not yet pushed), fall back to constructing the
+# reference from the image name and its ID.
+DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null)
+if [ -z "$DIGEST" ]; then
+    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$IMAGE_REF")
+    # Strip tag (or :latest) from IMAGE_REF to get the repository name
+    IMAGE_NAME="${IMAGE_REF%%:*}"
+    DIGEST="${IMAGE_NAME}@${IMAGE_ID}"
+fi
 echo "Image digest: ${DIGEST}"
 
 # --- Signing key selection ---
