@@ -204,47 +204,42 @@ def push_docker_image(tag):
 
 
 def push_images(nginx_version, os_distro, os_version, arch=None):
-    """Push images as unsigned tags for the specified (or all) architectures.
+    """Tag images locally with an unsigned suffix for signing.
 
-    Images are pushed with an '-unsigned' suffix. After signing,
-    use promote_images() to copy them to the final tag.
+    Images are tagged with an '-unsigned' suffix so the signing process
+    can operate on them. They are NOT pushed to the registry; only the
+    final (signed) tags are pushed during promote_images().
 
-    If arch is provided, only images for that architecture are pushed.
-    This is the expected behaviour in CI where each runner builds and
-    pushes only for its own architecture.
+    If arch is provided, only images for that architecture are tagged.
+    This is the expected behaviour in CI where each runner builds only
+    for its own architecture.
     """
     arches = [arch] if arch else ARCHITECTURES
     for current_arch in arches:
         tags = generate_tags(nginx_version, os_distro, os_version, current_arch)
         for tag in tags:
             unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # Tag the local image with the unsigned name
+            # Tag the local image with the unsigned name for signing
             tag_cmd = f"{DOCKER_TAG_COMMAND} {tag} {unsigned_tag}"
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
                 print(f"FATAL: Failed to tag image {tag} as {unsigned_tag}")
-                return exit_code
-            # Push the unsigned tag
-            exit_code = push_docker_image(unsigned_tag)
-            if exit_code != 0:
-                print(f"FATAL: Failed to push image {unsigned_tag}")
                 return exit_code
 
     return 0
 
 
 def promote_images(nginx_version, os_distro, os_version):
-    """Promote unsigned images to final tags after signing.
+    """Promote locally signed images to final tags and push.
 
-    Copies the signed -unsigned image to the final tag using
-    docker tag + push, then cleans up the local unsigned tags.
+    Re-tags the local -unsigned images (which have been signed) to
+    their final tag names and pushes them to the registry.
     """
     for arch in ARCHITECTURES:
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
         for tag in tags:
             unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # The unsigned image in the registry is now signed.
-            # Re-tag locally and push to the final tag name.
+            # Re-tag the locally signed image to the final tag name.
             tag_cmd = f"{DOCKER_TAG_COMMAND} {unsigned_tag} {tag}"
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
