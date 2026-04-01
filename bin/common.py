@@ -204,13 +204,13 @@ def push_docker_image(tag):
 
 
 def push_images(nginx_version, os_distro, os_version, arch=None):
-    """Tag images locally with an unsigned suffix for signing.
+    """Tag images with an unsigned suffix, then push to the registry.
 
-    Images are tagged with an '-unsigned' suffix so the signing process
-    can operate on them. They are NOT pushed to the registry; only the
-    final (signed) tags are pushed during promote_images().
+    Images are tagged with an '-unsigned' suffix and pushed so that
+    cosign can sign them in the registry (cosign attaches signatures as
+    OCI artifacts and therefore needs the image to exist in a registry).
 
-    If arch is provided, only images for that architecture are tagged.
+    If arch is provided, only images for that architecture are processed.
     This is the expected behaviour in CI where each runner builds only
     for its own architecture.
     """
@@ -224,6 +224,11 @@ def push_images(nginx_version, os_distro, os_version, arch=None):
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
                 print(f"FATAL: Failed to tag image {tag} as {unsigned_tag}")
+                return exit_code
+            # Push the unsigned tag so cosign can sign it in the registry
+            exit_code = push_docker_image(unsigned_tag)
+            if exit_code != 0:
+                print(f"FATAL: Failed to push unsigned image {unsigned_tag}")
                 return exit_code
 
     return 0

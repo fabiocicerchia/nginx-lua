@@ -53,15 +53,15 @@ done
 echo "=== Signing image: ${IMAGE_REF} ==="
 
 # Get the image digest for immutable reference.
-# RepoDigests returns "image@sha256:…" which cosign needs.  When RepoDigests is
-# empty (locally-built image not yet pushed), fall back to constructing the
-# reference from the image name and its ID.
-DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null)
+# RepoDigests returns "image@sha256:…" which cosign needs.  The image MUST
+# exist in a registry before signing because cosign attaches signatures as
+# OCI artifacts alongside the image.
+DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null || true)
 if [ -z "$DIGEST" ]; then
-    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$IMAGE_REF")
-    # Strip tag (or :latest) from IMAGE_REF to get the repository name
-    IMAGE_NAME="${IMAGE_REF%%:*}"
-    DIGEST="${IMAGE_NAME}@${IMAGE_ID}"
+    echo "ERROR: No RepoDigests found for ${IMAGE_REF}"
+    echo "  The image must be pushed to a registry before signing."
+    echo "  cosign attaches signatures as OCI artifacts and cannot sign local-only images."
+    exit 1
 fi
 echo "Image digest: ${DIGEST}"
 
