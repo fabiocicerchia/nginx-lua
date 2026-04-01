@@ -56,7 +56,7 @@ echo "=== Signing image: ${IMAGE_REF} ==="
 # RepoDigests returns "image@sha256:…" which cosign needs.  When RepoDigests is
 # empty (locally-built image not yet pushed), fall back to constructing the
 # reference from the image name and its ID.
-DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null)
+DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' "$IMAGE_REF" 2>/dev/null || true)
 if [ -z "$DIGEST" ]; then
     IMAGE_ID=$(docker inspect --format='{{.Id}}' "$IMAGE_REF")
     # Strip tag (or :latest) from IMAGE_REF to get the repository name
