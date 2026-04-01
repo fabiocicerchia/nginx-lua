@@ -246,14 +246,8 @@ def promote_images(nginx_version, os_distro, os_version):
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
 
         # All generated tags for the same arch/version refer to the same
-        # image, so pull once and resolve the sha256 digest.
+        # image, so resolve the sha256 digest once and use it for all tags.
         first_unsigned = f"{tags[0]}{UNSIGNED_SUFFIX}"
-        pull_cmd = f"{DOCKER_PULL_COMMAND} {first_unsigned}"
-        exit_code = run_command(pull_cmd, True)[0]
-        if exit_code != 0:
-            print(f"FATAL: Failed to pull {first_unsigned}")
-            return exit_code
-
         inspect_cmd = f"{DOCKER_INSPECT_COMMAND} --format={{{{.Id}}}} {first_unsigned}"
         exit_code, digest_output = run_command(inspect_cmd, False)
         if exit_code != 0:
