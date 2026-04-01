@@ -235,20 +235,32 @@ def push_images(nginx_version, os_distro, os_version, arch=None):
 
 
 def promote_images(nginx_version, os_distro, os_version):
-    """Promote locally signed images to final tags and push.
+    """Promote signed images to final tags and push.
 
-    Re-tags the local -unsigned images (which have been signed) to
-    their final tag names and pushes them to the registry.
+    Pulls the -unsigned images from the registry, resolves their sha256
+    digest, and uses the digest as the source for tagging.  This is more
+    reliable than referencing the unsigned tag name which may not exist
+    in the local daemon (e.g. arm64 images built on a different runner).
     """
     for arch in ARCHITECTURES:
         tags = generate_tags(nginx_version, os_distro, os_version, arch)
+
+        # All generated tags for the same arch/version refer to the same
+        # image, so resolve the sha256 digest once and use it for all tags.
+        first_unsigned = f"{tags[0]}{UNSIGNED_SUFFIX}"
+        inspect_cmd = f"{DOCKER_INSPECT_COMMAND} --format={{{{.Id}}}} {first_unsigned}"
+        exit_code, digest_output = run_command(inspect_cmd, False)
+        if exit_code != 0:
+            print(f"FATAL: Failed to get digest for {first_unsigned}")
+            return exit_code
+        image_id = digest_output.strip()
+        print(f"Resolved {first_unsigned} to {image_id}")
+
         for tag in tags:
-            unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # Re-tag the locally signed image to the final tag name.
-            tag_cmd = f"{DOCKER_TAG_COMMAND} {unsigned_tag} {tag}"
+            tag_cmd = f"{DOCKER_TAG_COMMAND} {image_id} {tag}"
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
-                print(f"FATAL: Failed to tag {unsigned_tag} as {tag}")
+                print(f"FATAL: Failed to tag {image_id} as {tag}")
                 return exit_code
             exit_code = push_docker_image(tag)
             if exit_code != 0:
