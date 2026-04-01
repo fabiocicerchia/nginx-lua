@@ -105,6 +105,19 @@ main() {
     docker cp extract-$PACKAGE_TYPE:$(docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE") dist/
     docker rm -f extract-$PACKAGE_TYPE
 
+    # Rename APK files to include architecture, preventing filename collisions
+    # when AMD and ARM package jobs persist to the same CircleCI workspace.
+    # (deb/rpm already include architecture in their filenames via fpm)
+    if [ "${PACKAGE_TYPE}" = "apk" ]; then
+        for f in dist/nginx-lua-*-r*.apk; do
+            [ -f "$f" ] || continue
+            NEWNAME=$(echo "$f" | sed "s/\.apk/_${ARCH}.apk/")
+            if [ "$f" != "$NEWNAME" ]; then
+                mv "$f" "$NEWNAME"
+            fi
+        done
+    fi
+
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
