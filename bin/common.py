@@ -234,16 +234,20 @@ def push_images(nginx_version, os_distro, os_version, arch=None):
     return 0
 
 
-def promote_images(nginx_version, os_distro, os_version):
+def promote_images(nginx_version, os_distro, os_version, arch=None):
     """Promote signed images to final tags and push.
 
-    Pulls the -unsigned images from the registry, resolves their sha256
-    digest, and uses the digest as the source for tagging.  This is more
-    reliable than referencing the unsigned tag name which may not exist
-    in the local daemon (e.g. arm64 images built on a different runner).
+    Resolves the sha256 digest of the local -unsigned image and uses it
+    as the source for tagging.  This is more reliable than referencing
+    the unsigned tag name directly.
+
+    If arch is provided, only images for that architecture are processed.
+    This is the expected behaviour in CI where each runner builds only
+    for its own architecture.
     """
-    for arch in ARCHITECTURES:
-        tags = generate_tags(nginx_version, os_distro, os_version, arch)
+    arches = [arch] if arch else ARCHITECTURES
+    for current_arch in arches:
+        tags = generate_tags(nginx_version, os_distro, os_version, current_arch)
 
         # All generated tags for the same arch/version refer to the same
         # image, so resolve the sha256 digest once and use it for all tags.
