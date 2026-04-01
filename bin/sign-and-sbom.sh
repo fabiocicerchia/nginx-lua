@@ -65,49 +65,19 @@ if [ -z "$DIGEST" ]; then
 fi
 echo "Image digest: ${DIGEST}"
 
-# --- Signing key selection ---
-# Prefer keyless OIDC signing (official CircleCI approach).  Fall back to
-# key-based signing when COSIGN_KEY is explicitly provided (local / non-OIDC
-# environments).
-if [ -z "${COSIGN_KEY:-}" ]; then
-    # Keyless: obtain an OIDC token from CircleCI and let Sigstore Fulcio
-    # issue a short-lived signing certificate.
-    if ! command -v circleci &> /dev/null; then
-        echo "ERROR: circleci CLI is not installed (required for OIDC keyless signing)"
-        echo "  Alternatively, set COSIGN_KEY to a PEM-encoded private key"
-        exit 1
-    fi
-    echo "Using keyless OIDC signing via CircleCI"
-    export SIGSTORE_ID_TOKEN
-    SIGSTORE_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "sigstore"}')
-    COSIGN_SIGN_ARGS=(--yes)
-    COSIGN_ATTEST_ARGS=(--yes)
-else
-    echo "Using key-based signing"
-    # Materialise the inline PEM key into a temporary file so cosign can read
-    # it reliably.  CI secrets often store multi-line values with literal \n.
-    COSIGN_KEY_FILE=$(mktemp /tmp/cosign-key-XXXXXX.pem)
-    trap 'rm -f "$COSIGN_KEY_FILE"' EXIT
-    chmod 600 "$COSIGN_KEY_FILE"
-    printf '%s' "$COSIGN_KEY" | sed -e 's/\\n/\n/g' -e 's/\\r//g' > "$COSIGN_KEY_FILE"
-
-    if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
-        printf '%s' "$COSIGN_KEY" | base64 -d > "$COSIGN_KEY_FILE" 2>/dev/null || true
-    fi
-    if ! grep -q -- '-----BEGIN' "$COSIGN_KEY_FILE"; then
-        echo "ERROR: COSIGN_KEY does not contain a valid PEM block"
-        echo "  Expected a PEM-encoded private key (-----BEGIN ... PRIVATE KEY-----)"
-        exit 1
-    fi
-
-    export COSIGN_PASSWORD="${COSIGN_PASSWORD:-}"
-    COSIGN_SIGN_ARGS=(--key "$COSIGN_KEY_FILE" --yes)
-    COSIGN_ATTEST_ARGS=(--key "$COSIGN_KEY_FILE" --yes)
+# Keyless OIDC signing: obtain an OIDC token from CircleCI and let Sigstore
+# Fulcio issue a short-lived signing certificate.
+if ! command -v circleci &> /dev/null; then
+    echo "ERROR: circleci CLI is not installed (required for OIDC keyless signing)"
+    exit 1
 fi
+echo "Using keyless OIDC signing via CircleCI"
+export SIGSTORE_ID_TOKEN
+SIGSTORE_ID_TOKEN=$(circleci run oidc get --claims '{"aud": "sigstore"}')
 
 # Sign the image by digest for an immutable, deterministic reference.
 retry_on_rate_limit cosign sign \
-    "${COSIGN_SIGN_ARGS[@]}" \
+    --yes \
     -a "repo=fabiocicerchia/nginx-lua" \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
@@ -134,7 +104,7 @@ echo "=== SBOMs generated ==="
 echo "=== Attaching signed SBOM attestation ==="
 
 retry_on_rate_limit cosign attest \
-    "${COSIGN_ATTEST_ARGS[@]}" \
+    --yes \
     --predicate "$SBOM_FILE" \
     --type cyclonedx \
     "$DIGEST"
@@ -144,25 +114,12 @@ echo "=== Signed SBOM attestation attached ==="
 # Verify the signature we just created
 echo "=== Verifying signature ==="
 
-if [ -z "${COSIGN_KEY:-}" ]; then
-    # Keyless: verify via certificate identity
-    OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
-    if [ -n "${PIPELINE_DEFINITION_ID:-}" ]; then
-        CERT_IDENTITY="https://circleci.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/${PIPELINE_DEFINITION_ID}"
-        retry_on_rate_limit cosign verify \
-            --certificate-oidc-issuer "$OIDC_ISSUER" \
-            --certificate-identity "$CERT_IDENTITY" \
-            "$DIGEST"
-    else
-        CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/.*"
-        retry_on_rate_limit cosign verify \
-            --certificate-oidc-issuer "$OIDC_ISSUER" \
-            --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
-            "$DIGEST"
-    fi
-else
-    retry_on_rate_limit cosign verify --key "$COSIGN_KEY_FILE" "$DIGEST"
-fi
+OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
+CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/.*"
+retry_on_rate_limit cosign verify \
+    --certificate-oidc-issuer "$OIDC_ISSUER" \
+    --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
+    "$DIGEST"
 
 echo "=== Verification successful ==="
 echo "Image ${DIGEST} is signed, SBOM attached and verified."
