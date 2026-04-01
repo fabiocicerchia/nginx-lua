@@ -161,9 +161,7 @@ if [ -z "${COSIGN_KEY:-}" ]; then
             "$DIGEST"
     fi
 else
-    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-    COSIGN_PUB="${SCRIPT_DIR}/../cosign.pub"
-    retry_on_rate_limit cosign verify --key "$COSIGN_PUB" "$DIGEST"
+    retry_on_rate_limit cosign verify --key "$COSIGN_KEY_FILE" "$DIGEST"
 fi
 
 echo "=== Verification successful ==="
