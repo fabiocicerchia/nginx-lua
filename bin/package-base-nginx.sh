@@ -98,12 +98,24 @@ main() {
         src/packages
 
     # Extract package from container
-    rm dist/nginx-lua*.$PACKAGE_TYPE
+    rm -f dist/nginx-lua*.$PACKAGE_TYPE
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
     docker cp extract-$PACKAGE_TYPE:$(docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE") dist/
     docker rm -f extract-$PACKAGE_TYPE
+
+    # Rename apk packages to include architecture, since abuild does not embed
+    # the architecture in the filename (unlike deb/rpm). Without this, concurrent
+    # AMD and ARM package jobs would both produce dist/nginx-lua-*.apk and conflict
+    # when persisting to the CircleCI workspace.
+    if [ "${PACKAGE_TYPE}" = "apk" ]; then
+        for f in dist/nginx-lua*.$PACKAGE_TYPE; do
+            [ -f "$f" ] || continue
+            base="${f%.$PACKAGE_TYPE}"
+            mv "$f" "${base}-${ARCH}.${PACKAGE_TYPE}"
+        done
+    fi
 
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
