@@ -467,6 +467,16 @@ jobs:
       - checkout
 
       - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
+      - run:
           name: Push metadata
           command: make auto-commit-metadata
 
@@ -487,9 +497,18 @@ jobs:
           command: pip3 install -r bin/requirements.txt
 
       - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
+      - run:
           name: Install Skopeo
           command: |
-            sudo apt-get update -qq
             sudo apt-get install -y --no-install-recommends skopeo
             echo "skopeo version: $(skopeo --version)"
 
