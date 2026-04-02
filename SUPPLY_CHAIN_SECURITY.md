@@ -173,15 +173,6 @@ Scanning covers:
 - Build arguments include VCS_REF and BUILD_DATE for traceability
 - Docker layer caching is disabled in CI to prevent cache poisoning attacks
 
-## CI/CD Pipeline Security
-
-- **CircleCI** is used as the CI/CD platform
-- Docker Hub credentials are stored as CircleCI environment variables (never in code)
-- Authentication uses `--password-stdin` (not command-line arguments)
-- Git operations use `x-access-token` format for GITHUB_TOKEN
-- Auto-commit operations use explicit file paths (not `git add -A`)
-- Pipeline merges use `--ff-only` to prevent unreviewed merge commits
-
 ## Code Review
 
 - All changes require review via GitHub CODEOWNERS
