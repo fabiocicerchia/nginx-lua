@@ -1,0 +1,352 @@
+# Converted from .circleci/config.yml
+# See: https://docs.github.com/en/actions/reference
+name: Builds
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+jobs:
+  docker:
+    name: Docker ${{ matrix.platform }} ${{ matrix.distro }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [almalinux, alpine, amazonlinux, debian, fedora, ubuntu]
+        platform: [amd64, arm64]
+        include:
+          - platform: amd64
+            runner: ubuntu-24.04
+          - platform: arm64
+            runner: ubuntu-24.04-arm
+    env:
+      FORCE: "YES"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore GeoIP MaxMind DB cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            test/geoip/GeoLite2-City.mmdb
+            test/geoip/GeoLite2-Country.mmdb
+          key: mmdb-geoip2
+
+      - name: Check Docker
+        run: |
+          docker --version
+          # seccomp
+          # https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.14.0#faccessat2
+          sudo apt-get install -y --no-install-recommends libseccomp2
+          echo "libseccomp2 version: $(dpkg -s libseccomp2 | grep '^Version:')"
+
+      - name: Install Python Dependencies
+        run: pip3 install -r bin/requirements.txt
+
+      - name: Install Trivy (vulnerability scanner)
+        env:
+          TRIVY_VERSION: "v0.69.3"
+        run: |
+          set -euo pipefail
+          TRIVY_ARCHIVE="trivy_${TRIVY_VERSION#v}_Linux-$(dpkg --print-architecture | sed 's/amd64/64bit/' | sed 's/arm64/ARM64/').tar.gz"
+          TRIVY_CHECKSUMS="trivy_${TRIVY_VERSION#v}_checksums.txt"
+          ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_CHECKSUMS}" "/tmp/${TRIVY_CHECKSUMS}"
+          EXPECTED_SHA256=$(grep "${TRIVY_ARCHIVE}" "/tmp/${TRIVY_CHECKSUMS}" | awk '{print $1}')
+          ./bin/download-and-verify.sh "https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${TRIVY_ARCHIVE}" "/tmp/${TRIVY_ARCHIVE}" "${EXPECTED_SHA256}"
+          tar xzf "/tmp/${TRIVY_ARCHIVE}" trivy
+          sudo mv trivy /usr/local/bin/trivy
+          rm -f "/tmp/${TRIVY_ARCHIVE}" "/tmp/${TRIVY_CHECKSUMS}"
+          trivy --version
+
+      - name: Install Cosign (image signing)
+        env:
+          COSIGN_VERSION: "v3.0.5"
+        run: |
+          set -euo pipefail
+          COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
+          ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
+          EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
+          ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
+          chmod +x "/tmp/${COSIGN_BINARY}"
+          sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
+          rm -f /tmp/cosign_checksums.txt
+          cosign version
+
+      - name: Install Syft (SBOM generator)
+        env:
+          SYFT_VERSION: "v1.42.3"
+        run: |
+          set -euo pipefail
+          SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
+          SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
+          ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
+          EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
+          ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
+          tar xzf "/tmp/${SYFT_ARCHIVE}" syft
+          sudo mv syft /usr/local/bin/syft
+          rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
+          syft version
+
+      - name: Install GeoIP2 MaxMindDB
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p test/geoip
+          cd test/geoip
+          if test ! -f "GeoLite2-City.mmdb"; then
+            curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o GeoLite2-City.tar.gz
+            curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz.sha256" -o GeoLite2-City.tar.gz.sha256
+            sha256sum -c GeoLite2-City.tar.gz.sha256
+            curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o GeoLite2-Country.tar.gz
+            curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz.sha256" -o GeoLite2-Country.tar.gz.sha256
+            sha256sum -c GeoLite2-Country.tar.gz.sha256
+            tar xvzf GeoLite2-City.tar.gz
+            tar xvzf GeoLite2-Country.tar.gz
+            mv GeoLite2-City_*/GeoLite2-City.mmdb ./
+            mv GeoLite2-Country_*/GeoLite2-Country.mmdb ./
+          fi
+
+      - name: Cleanup metadata artifacts
+        run: rm -rf docs/metadata/* || true
+
+      - name: Build docker image
+        timeout-minutes: 60
+        run: make -j $(nproc) build-$(dpkg --print-architecture)-${{ matrix.distro }}
+
+      - name: Test image
+        run: make -j $(nproc) docker-test-$(dpkg --print-architecture)-${{ matrix.distro }}
+
+      - name: Save image as tar
+        run: |
+          set -euxo pipefail
+          mkdir -p images
+          ARCH=$(dpkg --print-architecture)
+          IMAGE_ID=$(docker images | grep nginx-lua | grep "${{ matrix.distro }}-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
+          TAG=$(docker images | grep nginx-lua | grep "${{ matrix.distro }}-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
+          TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
+          echo "${TAGS}" > images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}.txt
+          docker image save -o "images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}" "fabiocicerchia/nginx-lua:${TAG}"
+
+      - name: Log into registry
+        if: github.ref == 'refs/heads/main'
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
+
+      - name: Scan for vulnerabilities (build gate)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          ARCH=$(dpkg --print-architecture)
+          IMAGE_ID=$(docker images | grep nginx-lua | grep "${{ matrix.distro }}-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
+          TAG=$(docker images | grep nginx-lua | grep "${{ matrix.distro }}-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
+          make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
+
+      - name: Push images (unsigned tags)
+        if: github.ref == 'refs/heads/main'
+        run: make -j $(nproc) push-${{ matrix.distro }}
+
+      - name: Sign images and generate SBOM
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          declare -A SIGNED_IDS
+          for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "${{ matrix.distro }}" | grep "\-unsigned"); do
+            IMAGE_ID=$(docker inspect --format='{{.Id}}' "$TAG")
+            if [[ -z "${SIGNED_IDS[$IMAGE_ID]+_}" ]]; then
+              SIGNED_IDS[$IMAGE_ID]=1
+              make sign-image IMAGE="${TAG}"
+            else
+              echo "Skipping ${TAG} – digest already signed"
+            fi
+          done
+
+      - name: Promote signed images to final tags
+        if: github.ref == 'refs/heads/main'
+        run: make -j $(nproc) promote-${{ matrix.distro }}
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ matrix.platform }}-${{ matrix.distro }}
+          path: images/
+          retention-days: 1
+
+  package:
+    name: Package ${{ matrix.platform }} ${{ matrix.distro }}
+    needs: docker
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [almalinux, alpine, amazonlinux, debian, fedora, ubuntu]
+        platform: [amd64, arm64]
+        include:
+          - platform: amd64
+            runner: ubuntu-24.04
+          - platform: arm64
+            runner: ubuntu-24.04-arm
+    env:
+      FORCE: "YES"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-${{ matrix.platform }}-${{ matrix.distro }}
+          path: /tmp/previous-jobs/images/
+
+      - name: Restore GeoIP MaxMind DB cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            test/geoip/GeoLite2-City.mmdb
+            test/geoip/GeoLite2-Country.mmdb
+          key: mmdb-geoip2
+
+      - name: Load image
+        run: |
+          set -euo pipefail
+          ARCH=$(dpkg --print-architecture)
+          docker image load < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}" > loading.txt
+          cat loading.txt
+          IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
+          echo $IMAGE_ID
+          echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_ENV"
+          while read -r TAG; do
+            docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+          done < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}.txt"
+
+          docker images
+
+      - name: Build packages
+        run: |
+          make -j $(nproc) package-$(dpkg --print-architecture)-${{ matrix.distro }}
+          ls -lah dist/nginx-lua*.*
+
+      - name: Test packages
+        run: |
+          ls -lah dist/nginx-lua*.*
+          make -j $(nproc) package-test-$(dpkg --print-architecture)-${{ matrix.distro }}
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.platform }}-${{ matrix.distro }}
+          path: dist/
+          retention-days: 1
+
+  docker-bundle:
+    name: Docker Bundle ${{ matrix.distro }}
+    needs: package
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [almalinux, alpine, amazonlinux, debian, fedora, ubuntu]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download AMD image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-amd64-${{ matrix.distro }}
+          path: /tmp/previous-jobs/images/
+
+      - name: Download ARM image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-arm64-${{ matrix.distro }}
+          path: /tmp/previous-jobs/images/
+
+      - name: Load images
+        run: |
+          set -euo pipefail
+          ARCH=amd64
+          docker image load < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}" > loading.txt
+          IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
+          while read -r TAG; do
+            docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+          done < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}.txt"
+
+          ARCH=arm64
+          docker image load < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}" > loading.txt
+          IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
+          while read -r TAG; do
+            docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+          done < "/tmp/previous-jobs/images/${ARCH}-${{ matrix.distro }}_${{ github.sha }}.txt"
+
+          echo "IMAGE_ID=$IMAGE_ID" >> "$GITHUB_ENV"
+          docker images
+
+      - name: Install Python Dependencies
+        run: pip3 install -vvv -r bin/requirements.txt
+
+      - name: Log into registry
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username "${{ secrets.DOCKER_HUB_USER }}" --password-stdin
+
+      - name: Bundle manifest
+        env:
+          FORCE: "YES"
+        run: make -j $(nproc) bundle-${{ matrix.distro }}
+
+  metadata:
+    name: Metadata
+    needs: docker-bundle
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push metadata
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make auto-commit-metadata
+
+  release:
+    name: Release
+    needs: metadata
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: /tmp/previous-jobs/
+          merge-multiple: false
+
+      - name: Install Python Dependencies
+        run: pip3 install -r bin/requirements.txt
+
+      - name: Install Skopeo
+        run: |
+          sudo apt-get install -y --no-install-recommends skopeo
+          echo "skopeo version: $(skopeo --version)"
+
+      - name: Collect packages from previous jobs
+        run: |
+          mkdir -p dist
+          cp -r /tmp/previous-jobs/packages-*/. ./dist/ 2>/dev/null || true
+          echo "=== Release artifacts from build pipeline ==="
+          ls -lah dist/ || true
+
+      - name: Generate Supported Versions and create PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git pull --ff-only origin main || true
+          make auto-update-and-commit || echo "No updates to commit (already up to date)"
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: make release
