@@ -296,11 +296,12 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
 	cp Dockerfile dist/
-	# Copy Dockerfiles for mainline version
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
-		DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-		DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-		cp $$DOCKERFILE $$DEST; \
+	for NGINX_VER in $(SUPPORTED_NGINX_VER_MAINLINE) $(SUPPORTED_NGINX_VER_STABLE); do \
+		tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
+			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+			cp $$DOCKERFILE $$DEST; \
+		done; \
 	done
 	# Copy Dockerfiles for stable version
 	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_STABLE)/_' | while read FOLDER; do \

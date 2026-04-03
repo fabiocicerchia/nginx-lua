@@ -206,9 +206,13 @@ commands:
             if test ! -f "GeoLite2-City.mmdb"; then
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o GeoLite2-City.tar.gz
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz.sha256" -o GeoLite2-City.tar.gz.sha256
+              # MaxMind's .sha256 file references the dated archive name (e.g. GeoLite2-City_20260331.tar.gz)
+              # but we save as GeoLite2-City.tar.gz, so rewrite the filename before verifying
+              sed -i 's/  .*/  GeoLite2-City.tar.gz/' GeoLite2-City.tar.gz.sha256
               sha256sum -c GeoLite2-City.tar.gz.sha256
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o GeoLite2-Country.tar.gz
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz.sha256" -o GeoLite2-Country.tar.gz.sha256
+              sed -i 's/  .*/  GeoLite2-Country.tar.gz/' GeoLite2-Country.tar.gz.sha256
               sha256sum -c GeoLite2-Country.tar.gz.sha256
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
