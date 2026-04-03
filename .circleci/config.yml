@@ -483,6 +483,8 @@ jobs:
       - run:
           name: Push metadata
           command: make auto-commit-metadata
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}
 
   Release:
     machine:
@@ -529,7 +531,11 @@ jobs:
           command: |
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}
 
       - run:
           name: Create Release
           command: make release
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}
