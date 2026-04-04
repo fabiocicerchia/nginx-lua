@@ -1,8 +1,7 @@
 #!/bin/bash
 # Sign multi-arch manifest lists with cosign (keyless OIDC) and attach SBOM
 # This script is used after `docker manifest push` to sign index images.
-# Unlike sign-and-sbom.sh (which uses `docker inspect`), this resolves
-# the digest from the registry via `skopeo` or `docker manifest inspect`.
+# Resolves the digest from the registry via `docker manifest inspect`.
 # Ref: Cyber Resilience Act Article 47 - SBOM requirement
 # Ref: NIS2 Article 21(2)(d) - supply chain security
 set -euo pipefail

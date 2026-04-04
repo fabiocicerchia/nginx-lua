@@ -271,16 +271,7 @@ else
                 "$IMAGE_REF" >/dev/null 2>&1; then
                 pass "Signature verified: $IMAGE_REF"
             else
-                # Try without OS version (short tag)
-                SHORT_REF="fabiocicerchia/nginx-lua:${NGINX_VER}-${DISTRO}"
-                if cosign verify \
-                    --certificate-oidc-issuer "$OIDC_ISSUER" \
-                    --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
-                    "$SHORT_REF" >/dev/null 2>&1; then
-                    pass "Signature verified (short tag): $SHORT_REF"
-                else
-                    fail "Signature verification failed: $IMAGE_REF"
-                fi
+                fail "Signature verification failed: $IMAGE_REF"
             fi
         done
     done

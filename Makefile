@@ -180,7 +180,7 @@ endif
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
 
-cleanup-docker-images: ## delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
+cleanup-docker-images: ## delete temporary per-arch tags (-amd64, -arm64v8) from Docker Hub
 	./bin/cleanup-docker-images.py
 
 ################################################################################
@@ -360,10 +360,7 @@ benchmark: ## benchmark (wip)
 scan-image: ## scan a docker image for vulnerabilities (usage: make scan-image IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/scan-vulnerabilities.sh "$(IMAGE)" "CRITICAL,HIGH" "1"
 
-sign-image: ## sign a docker image and attach SBOM (usage: make sign-image IMAGE=fabiocicerchia/nginx-lua:latest)
-	./bin/sign-and-sbom.sh "$(IMAGE)"
-
-sign-manifest: ## sign a multi-arch manifest list (usage: make sign-manifest IMAGE=fabiocicerchia/nginx-lua:latest)
+sign-manifest: ## sign a multi-arch manifest list and attach per-platform SBOMs (usage: make sign-manifest IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/sign-manifest.sh "$(IMAGE)"
 
 verify-image: ## verify a docker image signature and SBOM (usage: make verify-image IMAGE=fabiocicerchia/nginx-lua:latest)
