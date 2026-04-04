@@ -29,8 +29,8 @@ GH_USERNAME=fabiocicerchia
 GH_CLI_NAME=ghr_v0.16.2_linux_amd64
 GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/$(GH_CLI_NAME).tar.gz
 GH_CLI_SHA256=084ed9819dff71ea77f77a3071a643b6d1cbe5d2ab57bb5f56bb23de17189cd0
-NGINX_UPSTREAM_URL=https://github.com/nginxinc/docker-nginx
-NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginxinc/docker-nginx
+NGINX_UPSTREAM_URL=https://github.com/nginx/docker-nginx
+NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginx/docker-nginx
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
@@ -38,6 +38,7 @@ CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
 SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
+UPSTREAM_NGINX_VER_MAINLINE=$(shell curl -s https://api.github.com/repos/nginx/docker-nginx/tags | grep '"name"' | head -n 1 | cut -d '"' -f 4)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64-, $(DISTROS))
@@ -347,12 +348,12 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainlin
 		echo "=== Existing checksums OK ===" ; \
 	fi
 	@# Require a tagged release - never fall back to master/main to prevent supply chain attacks
-	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE)); \
+	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(UPSTREAM_NGINX_VER_MAINLINE)); \
 	if [ "$$HTTP_CODE" != "200" ]; then \
-		echo "ERROR: Upstream tag $(SUPPORTED_NGINX_VER_MAINLINE) not found (HTTP $$HTTP_CODE). Refusing to fall back to master."; \
+		echo "ERROR: Upstream tag $(UPSTREAM_NGINX_VER_MAINLINE) not found (HTTP $$HTTP_CODE). Refusing to fall back to master."; \
 		exit 1; \
 	fi; \
-	USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
+	USE_VERSION=$(UPSTREAM_NGINX_VER_MAINLINE); \
 	ENTRYPOINT_BASE="$(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint"; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/10-listen-on-ipv6-by-default.sh" src/10-listen-on-ipv6-by-default.sh; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/15-local-resolvers.envsh"        src/15-local-resolvers.envsh; \
