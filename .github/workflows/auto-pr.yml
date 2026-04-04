@@ -1,0 +1,48 @@
+name: Auto PR Creation
+
+on:
+  push:
+    branches:
+      - 'auto-metadata/**'
+      - 'auto-update/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$BRANCH_NAME" == auto-metadata/* ]]; then
+            TITLE="[ci skip] Automated metadata update"
+            BODY="Automated PR created by CI pipeline.
+
+          This PR contains updated Docker image metadata."
+          elif [[ "$BRANCH_NAME" == auto-update/* ]]; then
+            TITLE="Automated dependency updates"
+            BODY="Automated PR created by CI pipeline.
+
+          This PR contains updated supported versions, Dockerfiles, tags, and README."
+          fi
+
+          # Check if a PR already exists for this branch
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #$EXISTING_PR already exists for branch $BRANCH_NAME"
+            exit 0
+          fi
+
+          gh pr create \
+            --title "$TITLE" \
+            --body "$BODY" \
+            --base main \
+            --head "$BRANCH_NAME"

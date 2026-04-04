@@ -270,12 +270,7 @@ auto-update-and-commit: .setup_gitrepo auto-update
 	BRANCH_NAME="auto-update/$$(date +%Y%m%d-%H%M%S)"; \
 	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "Automated updates"; \
-	git push -u origin "$$BRANCH_NAME"; \
-	gh pr create \
-		--title "Automated dependency updates" \
-		--body "Automated PR created by CI pipeline.$$'\n\n'This PR contains updated supported versions, Dockerfiles, tags, and README." \
-		--base main \
-		--head "$$BRANCH_NAME"
+	git push -u origin "$$BRANCH_NAME"
 
 auto-commit-metadata: .setup_gitrepo generate-metadata
 	git add docs/metadata/ || true; \
@@ -286,12 +281,7 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 	BRANCH_NAME="auto-metadata/$$(date +%Y%m%d-%H%M%S)"; \
 	git checkout -b "$$BRANCH_NAME"; \
 	git commit -m "[ci skip] Automated metadata"; \
-	git push -u origin "$$BRANCH_NAME"; \
-	gh pr create \
-		--title "[ci skip] Automated metadata update" \
-		--body "Automated PR created by CI pipeline.$$'\n\n'This PR contains updated Docker image metadata." \
-		--base main \
-		--head "$$BRANCH_NAME"
+	git push -u origin "$$BRANCH_NAME"
 
 release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
