@@ -98,7 +98,7 @@ main() {
         src/packages
 
     # Extract package from container
-    rm dist/nginx-lua*.$PACKAGE_TYPE
+    rm -f dist/nginx-lua*."$PACKAGE_TYPE"
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
@@ -111,7 +111,7 @@ main() {
     if [ "${PACKAGE_TYPE}" = "apk" ]; then
         for f in dist/nginx-lua-*-r*.apk; do
             [ -f "$f" ] || continue
-            NEWNAME=$(echo "$f" | sed "s/\.apk/_${ARCH}.apk/")
+            NEWNAME="${f%.apk}_${ARCH}.apk"
             if [ "$f" != "$NEWNAME" ]; then
                 mv "$f" "$NEWNAME"
             fi
@@ -121,7 +121,7 @@ main() {
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
-        apktool d dist/*.apk || true
+        apktool d dist/*."$PACKAGE_TYPE" || true
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
         rpm2cpio dist/*.rpm | cpio -i --list

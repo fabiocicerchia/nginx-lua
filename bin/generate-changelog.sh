@@ -68,12 +68,12 @@ main() {
     git fetch --all --tags > /dev/null
     echo "## What's Changed"
     git log --pretty=format:"- %B" "${PREVIOUS_TAG}..HEAD" | tr '\r' '\n' | tr 'A-Z' 'a-z' | grep -Ev '^$$' | sed 's/ *[-*]/ -/' | uniq | tee CHANGELOG
-    cat CHANGELOG | egrep -v "Automated (metadata|updates)" | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | awk '!x[$$0]++' | tee CHANGELOG
+    egrep -v "Automated (metadata|updates)" < CHANGELOG | sed -e 's/^*/-/' -e 's/"/\\"/g' -e 's/^[ \t]*//' -e 's/^-[ \t]*//' -e 's/^-[ \t]*//' -e 's/^/ - /' | awk '!x[$$0]++' | tee CHANGELOG
     echo ""
     echo "**Full Changelog**: https://github.com/${GH_USERNAME}/nginx-lua/compare/${PREVIOUS_TAG}...${TAG_VER}"
     echo ""
     echo "## Supported Versions"
-    cat supported_versions | sed 's/[()"]//g' | tr 'A-Z' 'a-z' | sed 's/^/ - /'
+    sed 's/[()"]//g' < supported_versions | tr 'A-Z' 'a-z' | sed 's/^/ - /'
 }
 
 # Run main function with all arguments
