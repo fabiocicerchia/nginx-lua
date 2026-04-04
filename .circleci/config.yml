@@ -167,37 +167,6 @@ commands:
             TRIVY_VERSION: "v0.69.3"
 
       - run:
-          name: Install Cosign (image signing)
-          command: |
-            set -euo pipefail
-            COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
-            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
-            EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
-            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
-            chmod +x "/tmp/${COSIGN_BINARY}"
-            sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
-            rm -f /tmp/cosign_checksums.txt
-            cosign version
-          environment:
-            COSIGN_VERSION: "v3.0.5"
-
-      - run:
-          name: Install Syft (SBOM generator)
-          command: |
-            set -euo pipefail
-            SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
-            SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
-            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
-            EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
-            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
-            tar xzf "/tmp/${SYFT_ARCHIVE}" syft
-            sudo mv syft /usr/local/bin/syft
-            rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
-            syft version
-          environment:
-            SYFT_VERSION: "v1.42.3"
-
-      - run:
           name: Install GeoIP2 MaxMindDB
           command: |
             set -euo pipefail
@@ -253,15 +222,13 @@ commands:
             ARCH=$(dpkg --print-architecture)
             # Collect all unique image IDs for this distro+arch
             ALL_IDS=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort -u)
-            ALL_TAGS=""
             SAVE_REFS=""
-            for IMG_ID in $ALL_IDS; do
-              TAGS=$(docker images | grep "${IMG_ID}" | awk '{ print $2 }' | sort)
-              ALL_TAGS="${ALL_TAGS}${TAGS}"$'\n'
+            for IMAGE_ID in $ALL_IDS; do
+              TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
+              echo "${TAGS}" >> images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
               FIRST_TAG=$(echo "$TAGS" | head -n1)
               SAVE_REFS="${SAVE_REFS} fabiocicerchia/nginx-lua:${FIRST_TAG}"
             done
-            echo "$ALL_TAGS" | sed '/^$/d' > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" $SAVE_REFS
 
       - when:
@@ -450,13 +417,6 @@ jobs:
             cosign version
           environment:
             COSIGN_VERSION: "v3.0.5"
-
-      - run:
-          name: Install Skopeo
-          command: |
-            sudo apt-get update -qq
-            sudo apt-get install -y --no-install-recommends skopeo
-            echo "skopeo version: $(skopeo --version)"
 
       - run:
           name: Install Syft (SBOM generator)

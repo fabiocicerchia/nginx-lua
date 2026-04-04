@@ -56,31 +56,16 @@ done
 echo "=== Signing manifest list: ${IMAGE_REF} ==="
 
 # Resolve the manifest list digest from the registry.
-# docker inspect won't work for manifest lists (they aren't local images).
+# docker inspect won't work for manifest lists (they aren't local images),
+# so we use docker manifest inspect and compute the digest.
 REPO="${IMAGE_REF%%:*}"
-DIGEST=""
-
-if command -v skopeo &> /dev/null; then
-    DIGEST=$(skopeo inspect --no-tags "docker://${IMAGE_REF}" 2>/dev/null \
-        | python3 -c "import sys,json; print(json.load(sys.stdin).get('Digest',''))" || true)
-    if [ -n "$DIGEST" ]; then
-        DIGEST="${REPO}@${DIGEST}"
-    fi
-fi
-
-if [ -z "$DIGEST" ]; then
-    # Fallback: compute digest from the raw manifest
-    RAW_DIGEST=$(docker manifest inspect "$IMAGE_REF" 2>/dev/null | sha256sum | awk '{print $1}')
-    if [ -n "$RAW_DIGEST" ]; then
-        DIGEST="${REPO}@sha256:${RAW_DIGEST}"
-    fi
-fi
-
-if [ -z "$DIGEST" ]; then
+RAW_DIGEST=$(docker manifest inspect "$IMAGE_REF" 2>/dev/null | sha256sum | awk '{print $1}')
+if [ -z "$RAW_DIGEST" ]; then
     echo "ERROR: Cannot resolve digest for manifest list ${IMAGE_REF}"
-    echo "  Ensure skopeo or docker CLI is available and the image exists in the registry."
+    echo "  Ensure docker CLI is available and the image exists in the registry."
     exit 1
 fi
+DIGEST="${REPO}@sha256:${RAW_DIGEST}"
 
 echo "Manifest list digest: ${DIGEST}"
 
@@ -105,25 +90,30 @@ retry_on_rate_limit cosign sign \
 
 echo "=== Manifest list signed successfully ==="
 
-# Generate and attach SBOM if syft is available
+# Generate and attach per-architecture SBOMs if syft is available
+# SBOMs differ between ARM and AMD due to platform-specific packages.
 if command -v syft &> /dev/null; then
-    SBOM_FILE="/tmp/sbom-${IMAGE_REF_PATH}.cdx.json"
-    echo "=== Generating SBOM: ${SBOM_FILE} ==="
+    for PLATFORM in linux/amd64 linux/arm64; do
+        PLAT_LABEL=$(echo "$PLATFORM" | tr '/' '-')
+        SBOM_FILE="/tmp/sbom-${IMAGE_REF_PATH}-${PLAT_LABEL}.cdx.json"
+        echo "=== Generating SBOM for ${PLATFORM}: ${SBOM_FILE} ==="
 
-    retry_on_rate_limit syft "$IMAGE_REF" \
-        --output cyclonedx-json="$SBOM_FILE" \
-        --source-name "fabiocicerchia/nginx-lua" \
-        --source-version "${VCS_REF}"
+        retry_on_rate_limit syft "$IMAGE_REF" \
+            --platform "$PLATFORM" \
+            --output cyclonedx-json="$SBOM_FILE" \
+            --source-name "fabiocicerchia/nginx-lua" \
+            --source-version "${VCS_REF}"
 
-    echo "=== Attaching signed SBOM attestation ==="
-    retry_on_rate_limit cosign attest \
-        --yes \
-        --predicate "$SBOM_FILE" \
-        --type cyclonedx \
-        "$DIGEST"
+        echo "=== Attaching signed SBOM attestation (${PLATFORM}) ==="
+        retry_on_rate_limit cosign attest \
+            --yes \
+            --predicate "$SBOM_FILE" \
+            --type cyclonedx \
+            "$DIGEST"
 
-    echo "=== Signed SBOM attestation attached ==="
-    rm -f "$SBOM_FILE"
+        echo "=== Signed SBOM attestation attached for ${PLATFORM} ==="
+        rm -f "$SBOM_FILE"
+    done
 else
     echo "WARN: syft not installed, skipping SBOM generation"
 fi

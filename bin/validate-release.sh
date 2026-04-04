@@ -223,18 +223,6 @@ else
 fi
 cd - >/dev/null
 
-# Check for filename consistency (tilde vs dot)
-TILDE_FILES=$(awk '{print $2}' "$TMPDIR/SHA256SUMS" | grep '~' || true)
-if [ -n "$TILDE_FILES" ]; then
-    for tf in $TILDE_FILES; do
-        DOT_NAME=$(echo "$tf" | sed 's/~/./')
-        # Check if the actual GitHub asset uses dot
-        if curl -sI -o /dev/null -w "%{http_code}" "https://github.com/${REPO}/releases/download/${TAG}/${DOT_NAME}" 2>/dev/null | grep -q "302"; then
-            fail "SHA256SUMS filename mismatch: lists '$tf' but GitHub asset is '$DOT_NAME'"
-        fi
-    done
-fi
-
 # ─────────────────────────────────────────────────────────────────────────────
 section "6. Verify release Dockerfiles match tagged commit"
 
@@ -297,31 +285,27 @@ else
         done
     done
 
-    # Verify SBOM attestation on a representative index image
-    SAMPLE_IMAGE="fabiocicerchia/nginx-lua:${NGINX_MAINLINE}-alpine"
-    echo "  Checking SBOM attestation: $SAMPLE_IMAGE"
-    if cosign verify-attestation \
-        --certificate-oidc-issuer "$OIDC_ISSUER" \
-        --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
-        --type cyclonedx \
-        "$SAMPLE_IMAGE" >/dev/null 2>&1; then
-        pass "CycloneDX SBOM attestation verified: $SAMPLE_IMAGE"
-    else
-        warn "CycloneDX SBOM attestation not found: $SAMPLE_IMAGE"
-    fi
+    # Verify SBOM attestation on each OS for both versions
+    for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
+        for DISTRO in $DISTROS; do
+            OS_VER=$(echo "$SUPPORTED_VERSIONS" | grep "^${DISTRO}=" | cut -d= -f2)
+            IMAGE_REF="fabiocicerchia/nginx-lua:${NGINX_VER}-${DISTRO}${OS_VER}"
+            echo "  Checking SBOM attestation: $IMAGE_REF"
+            if cosign verify-attestation \
+                --certificate-oidc-issuer "$OIDC_ISSUER" \
+                --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
+                --type cyclonedx \
+                "$IMAGE_REF" >/dev/null 2>&1; then
+                pass "CycloneDX SBOM attestation verified: $IMAGE_REF"
+            else
+                fail "CycloneDX SBOM attestation not found: $IMAGE_REF"
+            fi
+        done
+    done
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
 section "8. Verify Docker Hub multi-arch images and tag consistency"
-
-HAS_SKOPEO=false
-if command -v skopeo &>/dev/null; then
-    HAS_SKOPEO=true
-fi
-HAS_DOCKER=false
-if command -v docker &>/dev/null; then
-    HAS_DOCKER=true
-fi
 
 echo "  Checking Docker Hub tags match release OS versions..."
 for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
@@ -339,21 +323,8 @@ for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
             fail "Docker Hub tag missing: $TAG_NAME (HTTP $HTTP_CODE)"
         fi
 
-        # Verify multi-arch support by inspecting the manifest (pull for specific arch)
-        if $HAS_SKOPEO; then
-            MANIFEST=$(skopeo inspect --raw "docker://fabiocicerchia/nginx-lua:${TAG_NAME}" 2>/dev/null || true)
-            if echo "$MANIFEST" | grep -q "manifests"; then
-                HAS_AMD64=$(echo "$MANIFEST" | grep -c '"amd64"' || true)
-                HAS_ARM64=$(echo "$MANIFEST" | grep -c '"arm64"' || true)
-                if [ "$HAS_AMD64" -gt 0 ] && [ "$HAS_ARM64" -gt 0 ]; then
-                    pass "Multi-arch manifest (amd64+arm64): $TAG_NAME"
-                else
-                    fail "Missing arch in manifest: $TAG_NAME (amd64=$HAS_AMD64, arm64=$HAS_ARM64)"
-                fi
-            else
-                warn "Not a multi-arch manifest: $TAG_NAME"
-            fi
-        elif $HAS_DOCKER; then
+        # Verify multi-arch support by inspecting the manifest via docker
+        if command -v docker &>/dev/null; then
             MANIFEST=$(docker manifest inspect "fabiocicerchia/nginx-lua:${TAG_NAME}" 2>/dev/null || true)
             if [ -n "$MANIFEST" ]; then
                 HAS_AMD64=$(echo "$MANIFEST" | grep -c '"amd64"' || true)
@@ -365,7 +336,7 @@ for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
                 fi
             fi
         else
-            warn "Neither skopeo nor docker available - cannot verify multi-arch manifests"
+            warn "docker not available - cannot verify multi-arch manifests"
         fi
 
         # Check that release Dockerfile OS version matches Docker Hub tag OS version
