@@ -282,29 +282,9 @@ commands:
                   TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
                   make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
             - run:
-                name: Push images (unsigned tags)
+                name: Push images
                 command: |
                   make -j $(nproc) push-<< parameters.distro >>
-                environment:
-                  FORCE: "YES"
-            - run:
-                name: Sign images and generate SBOM
-                command: |
-                  set -euo pipefail
-                  declare -A SIGNED_IDS
-                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
-                    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$TAG")
-                    if [[ -z "${SIGNED_IDS[$IMAGE_ID]+_}" ]]; then
-                      SIGNED_IDS[$IMAGE_ID]=1
-                      make sign-image IMAGE="${TAG}"
-                    else
-                      echo "Skipping ${TAG} – digest already signed"
-                    fi
-                  done
-            - run:
-                name: Promote signed images to final tags
-                command: |
-                  make -j $(nproc) promote-<< parameters.distro >>
                 environment:
                   FORCE: "YES"
       - persist_to_workspace:
@@ -457,6 +437,44 @@ jobs:
           command: pip3 install -vvv -r bin/requirements.txt
 
       - run:
+          name: Install Cosign (image signing)
+          command: |
+            set -euo pipefail
+            COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
+            EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
+            chmod +x "/tmp/${COSIGN_BINARY}"
+            sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
+            rm -f /tmp/cosign_checksums.txt
+            cosign version
+          environment:
+            COSIGN_VERSION: "v3.0.5"
+
+      - run:
+          name: Install Skopeo
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends skopeo
+            echo "skopeo version: $(skopeo --version)"
+
+      - run:
+          name: Install Syft (SBOM generator)
+          command: |
+            set -euo pipefail
+            SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
+            SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
+            EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
+            tar xzf "/tmp/${SYFT_ARCHIVE}" syft
+            sudo mv syft /usr/local/bin/syft
+            rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
+            syft version
+          environment:
+            SYFT_VERSION: "v1.42.3"
+
+      - run:
           name: Log into registry
           command: |
             echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
@@ -467,6 +485,25 @@ jobs:
             make -j $(nproc) bundle-<< parameters.distro >>
           environment:
             FORCE: "YES"
+
+      - run:
+          name: Sign manifest lists and attach SBOMs
+          command: |
+            set -euo pipefail
+            source supported_versions
+            NGINX_MAINLINE=$(grep nginx_mainline supported_versions | cut -d= -f2)
+            NGINX_STABLE=$(grep nginx_stable supported_versions | cut -d= -f2)
+            OS_VER=${<< parameters.distro >>}
+            for NGINX_VER in $NGINX_MAINLINE $NGINX_STABLE; do
+              IMAGE="fabiocicerchia/nginx-lua:${NGINX_VER}-<< parameters.distro >>${OS_VER}"
+              make sign-manifest IMAGE="${IMAGE}"
+            done
+
+      - run:
+          name: Cleanup per-arch suffix tags from Docker Hub
+          command: |
+            pip3 install requests
+            make cleanup-docker-images
 
   Metadata:
     machine:
