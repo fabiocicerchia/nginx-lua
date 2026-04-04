@@ -68,20 +68,26 @@ REPO="${IMAGE_REF%%:*}"
 # ─────────────────────────────────────────────────────────────────────────────
 echo "=== Resolving manifest list digest: ${IMAGE_REF} ==="
 
-MANIFEST_JSON=$(docker manifest inspect "$IMAGE_REF" 2>/dev/null)
-if [ -z "$MANIFEST_JSON" ]; then
+# Use --raw to get the exact bytes stored in the registry so the digest
+# matches what the registry returns (docker manifest inspect reformats JSON,
+# producing a different hash).
+MANIFEST_RAW_FILE=$(mktemp /tmp/manifest-raw-XXXXXX)
+trap 'rm -f "$MANIFEST_RAW_FILE"' EXIT
+
+if ! docker buildx imagetools inspect "$IMAGE_REF" --raw > "$MANIFEST_RAW_FILE" 2>/dev/null; then
     echo "ERROR: Cannot resolve manifest for ${IMAGE_REF}"
-    echo "  Ensure docker CLI is available and the image exists in the registry."
+    echo "  Ensure docker CLI with buildx is available and the image exists in the registry."
     exit 1
 fi
 
-INDEX_RAW=$(echo "$MANIFEST_JSON" | sha256sum | awk '{print $1}')
+INDEX_RAW=$(sha256sum "$MANIFEST_RAW_FILE" | awk '{print $1}')
 INDEX_DIGEST="${REPO}@sha256:${INDEX_RAW}"
 echo "Index digest: ${INDEX_DIGEST}"
 
 # Extract per-arch digests from the manifest list
-AMD64_DIGEST=$(echo "$MANIFEST_JSON" | jq -r '.manifests[] | select(.platform.architecture=="amd64" and .platform.os=="linux") | .digest')
-ARM64_DIGEST=$(echo "$MANIFEST_JSON" | jq -r '.manifests[] | select(.platform.architecture=="arm64" and .platform.os=="linux") | .digest')
+AMD64_DIGEST=$(jq -r '.manifests[] | select(.platform.architecture=="amd64" and .platform.os=="linux") | .digest' "$MANIFEST_RAW_FILE")
+ARM64_DIGEST=$(jq -r '.manifests[] | select(.platform.architecture=="arm64" and .platform.os=="linux") | .digest' "$MANIFEST_RAW_FILE")
+rm -f "$MANIFEST_RAW_FILE"
 
 echo "Per-arch digests:"
 echo "  linux/amd64: ${AMD64_DIGEST}"
