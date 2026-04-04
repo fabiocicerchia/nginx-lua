@@ -305,6 +305,9 @@ release: ## create a github release
 			fi; \
 		done; \
 	done
+	# Normalize package filenames: GitHub replaces '~' with '.' in asset names,
+	# so rename files in dist/ to match what GitHub will serve.
+	cd dist && for f in *~*; do [ -e "$$f" ] && mv "$$f" "$$(echo $$f | tr '~' '.')"; done; cd ..
 	# List all release artifacts
 	@echo "=== Release artifacts ==="
 	@ls -lah dist/

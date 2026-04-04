@@ -75,11 +75,6 @@ main() {
         PACKAGE_TYPE=deb
     fi
 
-    # Override nginx version if IMAGE_ID is set
-    if [ "${IMAGE_ID}" != "" ]; then
-        SUPPORTED_NGINX_VER=1
-    fi
-
     # Create dist directory
     mkdir -p dist
 
@@ -97,8 +92,8 @@ main() {
         --build-arg FPM_OUTPUT_TYPE="$PACKAGE_TYPE" \
         src/packages
 
-    # Extract package from container
-    rm dist/nginx-lua*.$PACKAGE_TYPE
+    # Extract package from container (only remove packages for this specific nginx version)
+    rm -f dist/nginx-lua*${SUPPORTED_NGINX_VER}*.$PACKAGE_TYPE
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
