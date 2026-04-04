@@ -228,9 +228,9 @@ commands:
               TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
               FIRST_TAG=$(echo "$TAGS" | head -n1)
               # Write "source_tag target_tag" pairs so load step knows which image each tag belongs to
-              while IFS= read -r TAG; do
+              echo "$TAGS" | while IFS= read -r TAG; do
                 echo "${FIRST_TAG} ${TAG}" >> images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
-              done <<< "$TAGS"
+              done
               SAVE_REFS="${SAVE_REFS} fabiocicerchia/nginx-lua:${FIRST_TAG}"
             done
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" $SAVE_REFS
