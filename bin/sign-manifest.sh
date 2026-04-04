@@ -101,7 +101,7 @@ if command -v syft &> /dev/null; then
         retry_on_rate_limit syft "$IMAGE_REF" \
             --platform "$PLATFORM" \
             --output cyclonedx-json="$SBOM_FILE" \
-            --source-name "fabiocicerchia/nginx-lua" \
+            --source-name "fabiocicerchia/nginx-lua@${PLATFORM}" \
             --source-version "${VCS_REF}"
 
         echo "=== Attaching signed SBOM attestation (${PLATFORM}) ==="
