@@ -116,12 +116,12 @@ main() {
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
-        apktool d dist/*.apk || true
+        apktool d dist/*${SUPPORTED_NGINX_VER}*.apk || true
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
-        rpm2cpio dist/*.rpm | cpio -i --list
+        rpm2cpio dist/*${SUPPORTED_NGINX_VER}*.rpm | cpio -i --list
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
-        dpkg-deb -c dist/*.deb
+        dpkg-deb -c dist/*${SUPPORTED_NGINX_VER}*.deb
     fi
 }
 
