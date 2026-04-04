@@ -195,17 +195,11 @@ section "5. Download all assets and verify SHA256SUMS"
 # Download all files listed in SHA256SUMS
 DOWNLOAD_FAIL=0
 while IFS='  ' read -r hash filename; do
-    # Try both the exact name and with tilde replaced by dot (GitHub may rename)
     if download_asset "$filename" "$TMPDIR/$filename"; then
         : # OK
     else
-        ALT_NAME=$(echo "$filename" | sed 's/~/./')
-        if [ "$ALT_NAME" != "$filename" ] && download_asset "$ALT_NAME" "$TMPDIR/$filename"; then
-            warn "Asset filename on GitHub uses '.' not '~': $ALT_NAME (SHA256SUMS says $filename)"
-        else
-            fail "Cannot download asset: $filename (also tried $ALT_NAME)"
-            DOWNLOAD_FAIL=$((DOWNLOAD_FAIL + 1))
-        fi
+        fail "Cannot download asset: $filename"
+        DOWNLOAD_FAIL=$((DOWNLOAD_FAIL + 1))
     fi
 done < "$TMPDIR/SHA256SUMS"
 
