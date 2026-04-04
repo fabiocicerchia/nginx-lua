@@ -223,10 +223,14 @@ commands:
             # Collect all unique image IDs for this distro+arch
             ALL_IDS=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort -u)
             SAVE_REFS=""
+            > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
             for IMAGE_ID in $ALL_IDS; do
               TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
-              echo "${TAGS}" >> images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
               FIRST_TAG=$(echo "$TAGS" | head -n1)
+              # Write "source_tag target_tag" pairs so load step knows which image each tag belongs to
+              while IFS= read -r TAG; do
+                echo "${FIRST_TAG} ${TAG}" >> images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+              done <<< "$TAGS"
               SAVE_REFS="${SAVE_REFS} fabiocicerchia/nginx-lua:${FIRST_TAG}"
             done
             docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" $SAVE_REFS
@@ -280,12 +284,13 @@ commands:
             ARCH=$(dpkg --print-architecture)
             docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
             cat loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            echo $IMAGE_ID
-            echo "export IMAGE_ID=$IMAGE_ID" >> $BASH_ENV
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+            # Tags file has "source_tag target_tag" pairs — source_tag is the loaded reference
+            FIRST_IMAGE=""
+            while read -r SRC_TAG DST_TAG; do
+              [ -z "$FIRST_IMAGE" ] && FIRST_IMAGE="$SRC_TAG"
+              docker image tag "fabiocicerchia/nginx-lua:${SRC_TAG}" "fabiocicerchia/nginx-lua:${DST_TAG}" 2>/dev/null || true
             done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
+            echo "export IMAGE_ID=$FIRST_IMAGE" >> $BASH_ENV
 
             docker images
 
@@ -382,21 +387,14 @@ jobs:
           name: Load image
           command: |
             set -euo pipefail
-            ARCH=amd64
-            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
-            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
-
-            ARCH=arm64
-            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
-            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
-
-            echo "export IMAGE_ID=$IMAGE_ID" >> "$BASH_ENV"
+            for ARCH in amd64 arm64; do
+              docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
+              cat loading.txt
+              # Tags file has "source_tag target_tag" pairs
+              while read -r SRC_TAG DST_TAG; do
+                docker image tag "fabiocicerchia/nginx-lua:${SRC_TAG}" "fabiocicerchia/nginx-lua:${DST_TAG}" 2>/dev/null || true
+              done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
+            done
             docker images
 
       - run:
