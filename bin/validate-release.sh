@@ -251,39 +251,62 @@ else
     OIDC_ISSUER="https://oidc.circleci.com/org/139dac99-01a5-4da1-9a56-a8699c0a2c7c"
     CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/1d8730b7-9e11-4e2e-a1e3-3e21afa59503/pipeline-definitions/.*"
 
-    # Verify cosign signatures on multi-arch index images (not arch-specific tags)
+    # Verify cosign signatures on index images AND per-arch images
     for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
         for DISTRO in $DISTROS; do
             OS_VER=$(echo "$SUPPORTED_VERSIONS" | grep "^${DISTRO}=" | cut -d= -f2)
-            # Use the index (multi-arch) image for signature verification
             IMAGE_REF="fabiocicerchia/nginx-lua:${NGINX_VER}-${DISTRO}${OS_VER}"
+            REPO="${IMAGE_REF%%:*}"
 
+            # Verify index (manifest list) signature
             echo "  Checking signature on index image: $IMAGE_REF"
             if cosign verify \
                 --certificate-oidc-issuer "$OIDC_ISSUER" \
                 --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
                 "$IMAGE_REF" >/dev/null 2>&1; then
-                pass "Signature verified: $IMAGE_REF"
+                pass "Index signature verified: $IMAGE_REF"
             else
-                fail "Signature verification failed: $IMAGE_REF"
+                fail "Index signature verification failed: $IMAGE_REF"
+            fi
+
+            # Verify per-arch image signatures by digest
+            if command -v docker &>/dev/null; then
+                MANIFEST=$(docker manifest inspect "$IMAGE_REF" 2>/dev/null || true)
+                if [ -n "$MANIFEST" ]; then
+                    for ARCH in amd64 arm64; do
+                        ARCH_DIGEST=$(echo "$MANIFEST" | jq -r ".manifests[] | select(.platform.architecture==\"${ARCH}\" and .platform.os==\"linux\") | .digest")
+                        if [ -n "$ARCH_DIGEST" ]; then
+                            ARCH_REF="${REPO}@${ARCH_DIGEST}"
+                            echo "  Checking signature on per-arch image (${ARCH}): ${ARCH_REF}"
+                            if cosign verify \
+                                --certificate-oidc-issuer "$OIDC_ISSUER" \
+                                --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
+                                "$ARCH_REF" >/dev/null 2>&1; then
+                                pass "Per-arch signature verified (${ARCH}): ${ARCH_REF}"
+                            else
+                                fail "Per-arch signature verification failed (${ARCH}): ${ARCH_REF}"
+                            fi
+                        fi
+                    done
+                fi
             fi
         done
     done
 
-    # Verify SBOM attestation on each OS for both versions
+    # Verify SBOM attestation on index images
     for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
         for DISTRO in $DISTROS; do
             OS_VER=$(echo "$SUPPORTED_VERSIONS" | grep "^${DISTRO}=" | cut -d= -f2)
             IMAGE_REF="fabiocicerchia/nginx-lua:${NGINX_VER}-${DISTRO}${OS_VER}"
-            echo "  Checking SBOM attestation: $IMAGE_REF"
+            echo "  Checking SBOM attestation on index: $IMAGE_REF"
             if cosign verify-attestation \
                 --certificate-oidc-issuer "$OIDC_ISSUER" \
                 --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
                 --type cyclonedx \
                 "$IMAGE_REF" >/dev/null 2>&1; then
-                pass "CycloneDX SBOM attestation verified: $IMAGE_REF"
+                pass "CycloneDX SBOM attestation verified (index): $IMAGE_REF"
             else
-                fail "CycloneDX SBOM attestation not found: $IMAGE_REF"
+                fail "CycloneDX SBOM attestation not found (index): $IMAGE_REF"
             fi
         done
     done

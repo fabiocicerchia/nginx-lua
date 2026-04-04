@@ -3,15 +3,13 @@
 # This script should be used by consumers to verify image integrity
 # Ref: Cyber Resilience Act - downstream verification requirement
 #
-# Signatures and SBOM attestations are attached to multi-arch index
-# (manifest list) images, not to individual per-arch images.
-# When you verify an index image, cosign resolves the correct entry
-# based on the host architecture automatically.
+# Both the multi-arch index (manifest list) AND individual per-arch
+# images are signed.  You can verify by tag or by sha256 digest.
 #
 # SBOM attestations are generated per-platform (linux/amd64, linux/arm64)
-# and attached to the index digest.  You can filter the correct SBOM by
-# checking the CycloneDX metadata.component.name field, which contains
-# the platform identifier (e.g. "fabiocicerchia/nginx-lua@linux/amd64").
+# and attached to both the index digest and the per-arch image digest.
+# Each SBOM identifies its target platform via the CycloneDX
+# metadata.component.name field (e.g. "fabiocicerchia/nginx-lua@linux/amd64").
 #
 # Uses keyless verification via Sigstore certificate identity (Fulcio + Rekor).
 set -euo pipefail
@@ -26,20 +24,23 @@ if [ -z "$IMAGE_REF" ]; then
 Usage: $0 <image-reference>
 
 Verify the cosign signature and CycloneDX SBOM attestation on an
-nginx-lua multi-arch index image.
+nginx-lua image (by tag or by sha256 digest).
 
 Examples:
+  # Verify by tag (resolves to index/manifest list)
   $0 fabiocicerchia/nginx-lua:latest
   $0 fabiocicerchia/nginx-lua:1.29.7-alpine3.23.3
 
-What is verified:
-  1. Keyless cosign signature on the index (manifest list) image
-  2. CycloneDX SBOM attestation attached to the index digest
+  # Verify by digest (per-arch image)
+  $0 fabiocicerchia/nginx-lua@sha256:abc123...
 
-Note: Signatures are on the index image (multi-arch manifest list),
-not on individual per-arch images.  Per-platform SBOMs are attached
-to the same index digest; cosign resolves the correct attestation
-for your host architecture automatically.
+What is verified:
+  1. Keyless cosign signature (works on both index and per-arch images)
+  2. CycloneDX SBOM attestation
+
+Both index (manifest list) images and individual per-arch images are
+signed.  Per-platform SBOMs are attached to both, so verification
+works regardless of whether you pull by tag or by digest.
 
 To inspect a specific platform's SBOM manually:
   cosign verify-attestation \\
@@ -57,13 +58,13 @@ if ! command -v cosign &> /dev/null; then
     exit 1
 fi
 
-echo "=== Verifying index image signature: ${IMAGE_REF} ==="
+echo "=== Verifying image signature: ${IMAGE_REF} ==="
 
 cosign verify \
     --certificate-oidc-issuer "$OIDC_ISSUER" \
     --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
     "$IMAGE_REF"
-echo "PASS: Index image signature verified"
+echo "PASS: Image signature verified"
 
 echo ""
 echo "=== Verifying SBOM attestation ==="
