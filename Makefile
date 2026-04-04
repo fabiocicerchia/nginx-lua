@@ -34,7 +34,6 @@ NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginx/docker-nginx
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
-CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
 SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
@@ -298,19 +297,13 @@ release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
 	cp Dockerfile dist/
 	for NGINX_VER in $(SUPPORTED_NGINX_VER_MAINLINE) $(SUPPORTED_NGINX_VER_STABLE); do \
-		tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
-			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-			cp $$DOCKERFILE $$DEST; \
+		tail -n -6 supported_versions | tr '=' '/' | sed "s_^_nginx/$${NGINX_VER}/_" | while read FOLDER; do \
+			if [ -d "$$FOLDER" ]; then \
+				DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+				DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+				cp $$DOCKERFILE $$DEST; \
+			fi; \
 		done; \
-	done
-	# Copy Dockerfiles for stable version
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_STABLE)/_' | while read FOLDER; do \
-		if [ -d "$$FOLDER" ]; then \
-			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-			cp $$DOCKERFILE $$DEST; \
-		fi; \
 	done
 	# List all release artifacts
 	@echo "=== Release artifacts ==="
@@ -320,7 +313,8 @@ release: ## create a github release
 	# Download ghr with verified checksum (pinned to v0.16.2)
 	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "$(GH_CLI_SHA256)"
 	tar xvzf $(GH_CLI_NAME).tar.gz
-	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
+	COMMITS=$$(git log --pretty=format:'- %B' "$(PREVIOUS_TAG)..HEAD" 2>/dev/null || true); \
+	if [ -n "$$COMMITS" ]; then \
 		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi; \
 	rm -rf dist

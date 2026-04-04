@@ -25,7 +25,7 @@ EOF
 # Input validation function
 validate_input() {
     # Check if all required arguments are provided
-    if [ -z "$DISTRO" ] || [ -z "$SUPPORTED_NGINX_VER" ] || [ -z "$ARCH" ]; then
+    if [ -z "$GH_USERNAME" ] || [ -z "$PREVIOUS_TAG" ] || [ -z "$TAG_VER" ]; then
         echo "Error: Missing required arguments" >&2
         echo "Use '$(basename "$0") --help' for usage information" >&2
         exit 1
