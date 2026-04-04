@@ -206,9 +206,13 @@ commands:
             if test ! -f "GeoLite2-City.mmdb"; then
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o GeoLite2-City.tar.gz
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz.sha256" -o GeoLite2-City.tar.gz.sha256
+              # MaxMind's .sha256 file references the dated archive name (e.g. GeoLite2-City_20260331.tar.gz)
+              # but we save as GeoLite2-City.tar.gz, so rewrite the filename before verifying
+              sed -i 's/  .*/  GeoLite2-City.tar.gz/' GeoLite2-City.tar.gz.sha256
               sha256sum -c GeoLite2-City.tar.gz.sha256
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o GeoLite2-Country.tar.gz
               curl -fLu "$MAXMIND_ACCOUNT_ID:$MAXMIND_LICENSE_KEY" "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz.sha256" -o GeoLite2-Country.tar.gz.sha256
+              sed -i 's/  .*/  GeoLite2-Country.tar.gz/' GeoLite2-Country.tar.gz.sha256
               sha256sum -c GeoLite2-Country.tar.gz.sha256
               tar xvzf GeoLite2-City.tar.gz
               tar xvzf GeoLite2-Country.tar.gz
@@ -280,8 +284,15 @@ commands:
                 name: Sign images and generate SBOM
                 command: |
                   set -euo pipefail
+                  declare -A SIGNED_IDS
                   for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
-                    make sign-image IMAGE="${TAG}"
+                    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$TAG")
+                    if [[ -z "${SIGNED_IDS[$IMAGE_ID]+_}" ]]; then
+                      SIGNED_IDS[$IMAGE_ID]=1
+                      make sign-image IMAGE="${TAG}"
+                    else
+                      echo "Skipping ${TAG} – digest already signed"
+                    fi
                   done
             - run:
                 name: Promote signed images to final tags
@@ -460,8 +471,20 @@ jobs:
       - checkout
 
       - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
+      - run:
           name: Push metadata
           command: make auto-commit-metadata
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}
 
   Release:
     machine:
@@ -480,9 +503,18 @@ jobs:
           command: pip3 install -r bin/requirements.txt
 
       - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
+      - run:
           name: Install Skopeo
           command: |
-            sudo apt-get update -qq
             sudo apt-get install -y --no-install-recommends skopeo
             echo "skopeo version: $(skopeo --version)"
 
@@ -499,7 +531,11 @@ jobs:
           command: |
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}
 
       - run:
           name: Create Release
           command: make release
+          environment:
+            GH_TOKEN: ${GITHUB_TOKEN}

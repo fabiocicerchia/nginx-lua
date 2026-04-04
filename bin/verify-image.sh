@@ -2,9 +2,14 @@
 # Verify Docker image signature and SBOM attestation before use
 # This script should be used by consumers to verify image integrity
 # Ref: Cyber Resilience Act - downstream verification requirement
+#
+# Uses keyless verification via Sigstore certificate identity (Fulcio + Rekor).
 set -euo pipefail
 
-IMAGE_REF="$1"
+OIDC_ISSUER="https://oidc.circleci.com/org/139dac99-01a5-4da1-9a56-a8699c0a2c7c"
+CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/1d8730b7-9e11-4e2e-a1e3-3e21afa59503/pipeline-definitions/.*"
+
+IMAGE_REF="${1:-}"
 
 if [ -z "$IMAGE_REF" ]; then
     echo "Usage: $0 <image-reference>"
@@ -17,27 +22,20 @@ if ! command -v cosign &> /dev/null; then
     exit 1
 fi
 
-# Locate cosign.pub relative to script or allow override
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-COSIGN_PUB="${COSIGN_PUBLIC_KEY:-${SCRIPT_DIR}/../cosign.pub}"
-
-if [ ! -f "$COSIGN_PUB" ]; then
-    echo "ERROR: Public key not found at ${COSIGN_PUB}"
-    echo "Download it from: https://github.com/fabiocicerchia/nginx-lua/blob/main/cosign.pub"
-    exit 1
-fi
-
 echo "=== Verifying image signature: ${IMAGE_REF} ==="
-echo "Using public key: ${COSIGN_PUB}"
 
-cosign verify --key "$COSIGN_PUB" "$IMAGE_REF"
+cosign verify \
+    --certificate-oidc-issuer "$OIDC_ISSUER" \
+    --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
+    "$IMAGE_REF"
 echo "PASS: Image signature verified"
 
 echo ""
 echo "=== Verifying SBOM attestation ==="
 
 if cosign verify-attestation \
-    --key "$COSIGN_PUB" \
+    --certificate-oidc-issuer "$OIDC_ISSUER" \
+    --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
     --type cyclonedx \
     "$IMAGE_REF"; then
     echo "PASS: CycloneDX SBOM attestation verified"

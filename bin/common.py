@@ -203,47 +203,68 @@ def push_docker_image(tag):
     return exit_code
 
 
-def push_images(nginx_version, os_distro, os_version):
-    """Push images as unsigned tags for all architectures.
+def push_images(nginx_version, os_distro, os_version, arch=None):
+    """Tag images with an unsigned suffix, then push to the registry.
 
-    Images are pushed with an '-unsigned' suffix. After signing,
-    use promote_images() to copy them to the final tag.
+    Images are tagged with an '-unsigned' suffix and pushed so that
+    cosign can sign them in the registry (cosign attaches signatures as
+    OCI artifacts and therefore needs the image to exist in a registry).
+
+    If arch is provided, only images for that architecture are processed.
+    This is the expected behaviour in CI where each runner builds only
+    for its own architecture.
     """
-    for arch in ARCHITECTURES:
-        tags = generate_tags(nginx_version, os_distro, os_version, arch)
+    arches = [arch] if arch else ARCHITECTURES
+    for current_arch in arches:
+        tags = generate_tags(nginx_version, os_distro, os_version, current_arch)
         for tag in tags:
             unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # Tag the local image with the unsigned name
+            # Tag the local image with the unsigned name for signing
             tag_cmd = f"{DOCKER_TAG_COMMAND} {tag} {unsigned_tag}"
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
                 print(f"FATAL: Failed to tag image {tag} as {unsigned_tag}")
                 return exit_code
-            # Push the unsigned tag
+            # Push the unsigned tag so cosign can sign it in the registry
             exit_code = push_docker_image(unsigned_tag)
             if exit_code != 0:
-                print(f"FATAL: Failed to push image {unsigned_tag}")
+                print(f"FATAL: Failed to push unsigned image {unsigned_tag}")
                 return exit_code
 
     return 0
 
 
-def promote_images(nginx_version, os_distro, os_version):
-    """Promote unsigned images to final tags after signing.
+def promote_images(nginx_version, os_distro, os_version, arch=None):
+    """Promote signed images to final tags and push.
 
-    Copies the signed -unsigned image to the final tag using
-    docker tag + push, then cleans up the local unsigned tags.
+    Resolves the sha256 digest of the local -unsigned image and uses it
+    as the source for tagging.  This is more reliable than referencing
+    the unsigned tag name directly.
+
+    If arch is provided, only images for that architecture are processed.
+    This is the expected behaviour in CI where each runner builds only
+    for its own architecture.
     """
-    for arch in ARCHITECTURES:
-        tags = generate_tags(nginx_version, os_distro, os_version, arch)
+    arches = [arch] if arch else ARCHITECTURES
+    for current_arch in arches:
+        tags = generate_tags(nginx_version, os_distro, os_version, current_arch)
+
+        # All generated tags for the same arch/version refer to the same
+        # image, so resolve the sha256 digest once and use it for all tags.
+        first_unsigned = f"{tags[0]}{UNSIGNED_SUFFIX}"
+        inspect_cmd = f"{DOCKER_INSPECT_COMMAND} --format={{{{.Id}}}} {first_unsigned}"
+        exit_code, digest_output = run_command(inspect_cmd, False)
+        if exit_code != 0:
+            print(f"FATAL: Failed to get digest for {first_unsigned}")
+            return exit_code
+        image_id = digest_output.strip()
+        print(f"Resolved {first_unsigned} to {image_id}")
+
         for tag in tags:
-            unsigned_tag = f"{tag}{UNSIGNED_SUFFIX}"
-            # The unsigned image in the registry is now signed.
-            # Re-tag locally and push to the final tag name.
-            tag_cmd = f"{DOCKER_TAG_COMMAND} {unsigned_tag} {tag}"
+            tag_cmd = f"{DOCKER_TAG_COMMAND} {image_id} {tag}"
             exit_code = run_command(tag_cmd, True)[0]
             if exit_code != 0:
-                print(f"FATAL: Failed to tag {unsigned_tag} as {tag}")
+                print(f"FATAL: Failed to tag {image_id} as {tag}")
                 return exit_code
             exit_code = push_docker_image(tag)
             if exit_code != 0:
@@ -287,17 +308,29 @@ def bundle_images(nginx_version, os_distro, os_version):
 
 
 def generate_metadata(tag):
-    """Generate metadata documentation for image tag."""
-    pull_cmd = f"{DOCKER_PULL_COMMAND} {IMAGE_REPO}:{tag}"
-    pull_output = run_command(pull_cmd, False)[1]
+    """Generate metadata documentation for image tag.
 
-    if pull_output:
-        inspect_cmd = f"{DOCKER_INSPECT_COMMAND} {IMAGE_REPO}:{tag}"
+    Tries to inspect the image locally first to avoid unnecessary Docker Hub
+    pulls (and the associated rate-limit pressure).  Falls back to pulling only
+    when the image is not available in the local daemon.
+    """
+    image_ref = f"{IMAGE_REPO}:{tag}"
+    inspect_cmd = f"{DOCKER_INSPECT_COMMAND} {image_ref}"
+
+    # Try inspecting the local image first (no registry pull required).
+    exit_code, inspect_output = run_command(inspect_cmd, False)
+
+    if exit_code != 0:
+        # Image not available locally – pull it.
+        pull_cmd = f"{DOCKER_PULL_COMMAND} {image_ref}"
+        pull_output = run_command(pull_cmd, False)[1]
+        if not pull_output:
+            return 0
         exit_code, inspect_output = run_command(inspect_cmd, False)
 
-        if exit_code == 0:
-            content = f"# {IMAGE_REPO}:{tag}\n```json\n{inspect_output}\n```"
-            write_file(f"{DOCS_METADATA_DIR}/{tag}.md", content)
+    if exit_code == 0:
+        content = f"# {image_ref}\n```json\n{inspect_output}\n```"
+        write_file(f"{DOCS_METADATA_DIR}/{tag}.md", content)
 
     return 0
 
