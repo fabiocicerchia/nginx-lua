@@ -301,7 +301,7 @@ release: ## create a github release
 	tar xvzf $(GH_CLI_NAME).tar.gz
 	COMMITS=$$(git log --pretty=format:'- %B' "$(PREVIOUS_TAG)..HEAD" 2>/dev/null || true); \
 	if [ -n "$$COMMITS" ]; then \
-		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
+		./$(GH_CLI_NAME)/ghr -draft -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi; \
 	rm -rf dist
 
