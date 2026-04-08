@@ -21,7 +21,7 @@ workflows:
               only:
                 - main
     jobs:
-      - Release
+      - Nightly Update
 
   builds:
     jobs:
@@ -167,37 +167,6 @@ commands:
             TRIVY_VERSION: "v0.69.3"
 
       - run:
-          name: Install Cosign (image signing)
-          command: |
-            set -euo pipefail
-            COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
-            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
-            EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
-            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
-            chmod +x "/tmp/${COSIGN_BINARY}"
-            sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
-            rm -f /tmp/cosign_checksums.txt
-            cosign version
-          environment:
-            COSIGN_VERSION: "v3.0.5"
-
-      - run:
-          name: Install Syft (SBOM generator)
-          command: |
-            set -euo pipefail
-            SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
-            SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
-            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
-            EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
-            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
-            tar xzf "/tmp/${SYFT_ARCHIVE}" syft
-            sudo mv syft /usr/local/bin/syft
-            rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
-            syft version
-          environment:
-            SYFT_VERSION: "v1.42.3"
-
-      - run:
           name: Install GeoIP2 MaxMindDB
           command: |
             set -euo pipefail
@@ -244,18 +213,27 @@ commands:
           environment:
             FORCE: "YES"
 
-      # passing docker images to another job
+      # passing docker images to another job (save ALL unique images: mainline + stable)
       - run:
-          name: Save image as tar
+          name: Save images as tar
           command: |
             set -euxo pipefail
             mkdir -p images
             ARCH=$(dpkg --print-architecture)
-            IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
-            TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
-            TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
-            echo "${TAGS}" > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
-            docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" "fabiocicerchia/nginx-lua:${TAG}"
+            # Collect all unique image IDs for this distro+arch
+            ALL_IDS=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort -u)
+            SAVE_REFS=""
+            > images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+            for IMAGE_ID in $ALL_IDS; do
+              TAGS=$(docker images | grep "${IMAGE_ID}" | awk '{ print $2 }' | sort)
+              FIRST_TAG=$(echo "$TAGS" | head -n1)
+              # Write "source_tag target_tag" pairs so load step knows which image each tag belongs to
+              echo "$TAGS" | while IFS= read -r TAG; do
+                echo "${FIRST_TAG} ${TAG}" >> images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt
+              done
+              SAVE_REFS="${SAVE_REFS} fabiocicerchia/nginx-lua:${FIRST_TAG}"
+            done
+            docker image save -o "images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" $SAVE_REFS
 
       - when:
           condition:
@@ -275,29 +253,9 @@ commands:
                   TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
                   make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
             - run:
-                name: Push images (unsigned tags)
+                name: Push images
                 command: |
                   make -j $(nproc) push-<< parameters.distro >>
-                environment:
-                  FORCE: "YES"
-            - run:
-                name: Sign images and generate SBOM
-                command: |
-                  set -euo pipefail
-                  declare -A SIGNED_IDS
-                  for TAG in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep "fabiocicerchia/nginx-lua" | grep "<< parameters.distro >>" | grep "\-unsigned"); do
-                    IMAGE_ID=$(docker inspect --format='{{.Id}}' "$TAG")
-                    if [[ -z "${SIGNED_IDS[$IMAGE_ID]+_}" ]]; then
-                      SIGNED_IDS[$IMAGE_ID]=1
-                      make sign-image IMAGE="${TAG}"
-                    else
-                      echo "Skipping ${TAG} – digest already signed"
-                    fi
-                  done
-            - run:
-                name: Promote signed images to final tags
-                command: |
-                  make -j $(nproc) promote-<< parameters.distro >>
                 environment:
                   FORCE: "YES"
       - persist_to_workspace:
@@ -326,12 +284,13 @@ commands:
             ARCH=$(dpkg --print-architecture)
             docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
             cat loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            echo $IMAGE_ID
-            echo "export IMAGE_ID=$IMAGE_ID" >> $BASH_ENV
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
+            # Tags file has "source_tag target_tag" pairs — source_tag is the loaded reference
+            FIRST_IMAGE=""
+            while read -r SRC_TAG DST_TAG; do
+              [ -z "$FIRST_IMAGE" ] && FIRST_IMAGE="$SRC_TAG"
+              docker image tag "fabiocicerchia/nginx-lua:${SRC_TAG}" "fabiocicerchia/nginx-lua:${DST_TAG}" 2>/dev/null || true
             done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
+            echo "export IMAGE_ID=$FIRST_IMAGE" >> $BASH_ENV
 
             docker images
 
@@ -428,26 +387,50 @@ jobs:
           name: Load image
           command: |
             set -euo pipefail
-            ARCH=amd64
-            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
-            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
-
-            ARCH=arm64
-            docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
-            IMAGE_ID=$(grep "Loaded image:" loading.txt | cut -d: -f3)
-            while read -r TAG; do
-              docker image tag "fabiocicerchia/nginx-lua:$IMAGE_ID" "fabiocicerchia/nginx-lua:$TAG"
-            done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
-
-            echo "export IMAGE_ID=$IMAGE_ID" >> "$BASH_ENV"
+            for ARCH in amd64 arm64; do
+              docker image load < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}" > loading.txt
+              cat loading.txt
+              # Tags file has "source_tag target_tag" pairs
+              while read -r SRC_TAG DST_TAG; do
+                docker image tag "fabiocicerchia/nginx-lua:${SRC_TAG}" "fabiocicerchia/nginx-lua:${DST_TAG}" 2>/dev/null || true
+              done < "/tmp/previous-jobs/images/${ARCH}-<< parameters.distro >>_${CIRCLE_SHA1}.txt"
+            done
             docker images
 
       - run:
           name: Install Python Dependencies
           command: pip3 install -vvv -r bin/requirements.txt
+
+      - run:
+          name: Install Cosign (image signing)
+          command: |
+            set -euo pipefail
+            COSIGN_BINARY="cosign-linux-$(dpkg --print-architecture)"
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign_checksums.txt" "/tmp/cosign_checksums.txt"
+            EXPECTED_SHA256=$(grep "${COSIGN_BINARY}$" "/tmp/cosign_checksums.txt" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/${COSIGN_BINARY}" "/tmp/${COSIGN_BINARY}" "${EXPECTED_SHA256}"
+            chmod +x "/tmp/${COSIGN_BINARY}"
+            sudo mv "/tmp/${COSIGN_BINARY}" /usr/local/bin/cosign
+            rm -f /tmp/cosign_checksums.txt
+            cosign version
+          environment:
+            COSIGN_VERSION: "v3.0.5"
+
+      - run:
+          name: Install Syft (SBOM generator)
+          command: |
+            set -euo pipefail
+            SYFT_ARCHIVE="syft_${SYFT_VERSION#v}_linux_$(dpkg --print-architecture).tar.gz"
+            SYFT_CHECKSUMS="syft_${SYFT_VERSION#v}_checksums.txt"
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_CHECKSUMS}" "/tmp/${SYFT_CHECKSUMS}"
+            EXPECTED_SHA256=$(grep "${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}" | awk '{print $1}')
+            ./bin/download-and-verify.sh "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/${SYFT_ARCHIVE}" "/tmp/${SYFT_ARCHIVE}" "${EXPECTED_SHA256}"
+            tar xzf "/tmp/${SYFT_ARCHIVE}" syft
+            sudo mv syft /usr/local/bin/syft
+            rm -f "/tmp/${SYFT_ARCHIVE}" "/tmp/${SYFT_CHECKSUMS}"
+            syft version
+          environment:
+            SYFT_VERSION: "v1.42.3"
 
       - run:
           name: Log into registry
@@ -460,6 +443,25 @@ jobs:
             make -j $(nproc) bundle-<< parameters.distro >>
           environment:
             FORCE: "YES"
+
+      - run:
+          name: Sign manifest lists and attach SBOMs
+          command: |
+            set -euo pipefail
+            source supported_versions
+            NGINX_MAINLINE=$(grep nginx_mainline supported_versions | cut -d= -f2)
+            NGINX_STABLE=$(grep nginx_stable supported_versions | cut -d= -f2)
+            OS_VER=${<< parameters.distro >>}
+            for NGINX_VER in $NGINX_MAINLINE $NGINX_STABLE; do
+              IMAGE="fabiocicerchia/nginx-lua:${NGINX_VER}-<< parameters.distro >>${OS_VER}"
+              make sign-manifest IMAGE="${IMAGE}"
+            done
+
+      - run:
+          name: Cleanup per-arch suffix tags from Docker Hub
+          command: |
+            pip3 install requests
+            make cleanup-docker-images
 
   Metadata:
     machine:
@@ -513,12 +515,6 @@ jobs:
             sudo apt-get install -y --no-install-recommends gh
 
       - run:
-          name: Install Skopeo
-          command: |
-            sudo apt-get install -y --no-install-recommends skopeo
-            echo "skopeo version: $(skopeo --version)"
-
-      - run:
           name: Collect packages from previous jobs
           command: |
             mkdir -p dist
@@ -527,14 +523,42 @@ jobs:
             ls -lah dist/ || true
 
       - run:
-          name: Generate Supported Versions and create PR
-          command: |
-            export GH_TOKEN="${GITHUB_TOKEN}"
-            git pull --ff-only origin main || true
-            make auto-update-and-commit || echo "No updates to commit (already up to date)"
-
-      - run:
           name: Create Release
           command: |
             export GH_TOKEN="${GITHUB_TOKEN}"
             make release
+
+  Nightly Update:
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2404:2025.09.1
+      docker_layer_caching: false
+    steps:
+      - checkout
+
+      - run:
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
+      - run:
+          name: Generate Supported Versions and create PR
+          command: |
+            # Only run auto-update in the scheduled nightly workflow
+            if [ -z "${CIRCLE_CRON_NAME:-}" ] && [ "${CIRCLE_BUILD_TRIGGER:-}" != "schedule" ]; then
+              echo "Skipping auto-update (not a scheduled nightly run)"
+              exit 0
+            fi
+            export GH_TOKEN="${GITHUB_TOKEN}"
+            git pull --ff-only origin main || true
+            make auto-update-and-commit || echo "No updates to commit (already up to date)"
