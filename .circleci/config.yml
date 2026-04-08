@@ -21,7 +21,7 @@ workflows:
               only:
                 - main
     jobs:
-      - Release
+      - Nightly
 
   builds:
     jobs:
@@ -528,14 +528,31 @@ jobs:
             export GH_TOKEN="${GITHUB_TOKEN}"
             make release
 
+  Nightly:
+    machine:
+      image: ubuntu-2404:2025.09.1
+      docker_layer_caching: false
+    steps:
+      - checkout
+
+      - run:
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
+
       - run:
           name: Generate Supported Versions and create PR
           command: |
-            # Only run auto-update in the scheduled nightly workflow
-            if [ -z "${CIRCLE_CRON_NAME:-}" ] && [ "${CIRCLE_BUILD_TRIGGER:-}" != "schedule" ]; then
-              echo "Skipping auto-update (not a scheduled nightly run)"
-              exit 0
-            fi
             export GH_TOKEN="${GITHUB_TOKEN}"
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
+
