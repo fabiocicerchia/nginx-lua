@@ -78,13 +78,13 @@ main() {
     # Determine package type and install command based on distribution
     if [ "${DISTRO}" = "alpine" ]; then
         PACKAGE_TYPE=apk
-        INSTALL_CMD="apk add -v --allow-untrusted /app/*.apk"
+        INSTALL_CMD="apk add -v --allow-untrusted /app/*${SUPPORTED_NGINX_VER}*.apk"
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         PACKAGE_TYPE=rpm
-        INSTALL_CMD="yum install -y /app/*.rpm"
+        INSTALL_CMD="yum install -y /app/*${SUPPORTED_NGINX_VER}*.rpm"
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
         PACKAGE_TYPE=deb
-        INSTALL_CMD="apt update && apt install -yf /app/*.deb"
+        INSTALL_CMD="apt update && apt install -yf /app/*${SUPPORTED_NGINX_VER}*.deb"
     fi
 
     # Test package installation
