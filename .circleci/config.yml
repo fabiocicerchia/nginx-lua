@@ -21,7 +21,7 @@ workflows:
               only:
                 - main
     jobs:
-      - Release
+      - Nightly Update
 
   builds:
     jobs:
@@ -527,6 +527,29 @@ jobs:
           command: |
             export GH_TOKEN="${GITHUB_TOKEN}"
             make release
+
+  Nightly Update:
+    machine:
+      # https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
+      # https://circleci.com/developer/machine/image/ubuntu-2204
+      image: ubuntu-2404:2025.09.1
+      docker_layer_caching: false
+    steps:
+      - checkout
+
+      - run:
+          name: Install Python Dependencies
+          command: pip3 install -r bin/requirements.txt
+
+      - run:
+          name: Install GitHub CLI
+          command: |
+            sudo mkdir -p -m 755 /etc/apt/keyrings
+            wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+            sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y --no-install-recommends gh
 
       - run:
           name: Generate Supported Versions and create PR
