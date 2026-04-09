@@ -65,15 +65,10 @@ PUSH
   push-fedora                                         push one docker images to docker hub
   push-ubuntu                                         push one docker images to docker hub
 
-PROMOTE
-  promote-all                                         promote all unsigned images to final tags
-  promote-almalinux                                   promote one distro's unsigned images to final tags
-  promote-alpine                                      promote one distro's unsigned images to final tags
-  promote-amazonlinux                                 promote one distro's unsigned images to final tags
-  promote-debian                                      promote one distro's unsigned images to final tags
-  promote-fedora                                      promote one distro's unsigned images to final tags
-  promote-ubuntu                                      promote one distro's unsigned images to final tags
-  cleanup-docker-images                               delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
+SIGNING
+  sign-manifest                                       sign a multi-arch manifest list and attach per-platform SBOMs
+  verify-image                                        verify a docker image signature and SBOM attestation
+  cleanup-docker-images                               delete temporary per-arch tags (-amd64, -arm64v8) from Docker Hub
 
 BUNDLE
   bundle-almalinux                                    bundle multiple docker images into one  

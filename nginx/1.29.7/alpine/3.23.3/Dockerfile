@@ -78,13 +78,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.30RC1
+ARG VER_LUA_NGINX_MODULE=0.10.29
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.33RC1
+ARG VER_LUA_RESTY_CORE=0.1.32
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -352,6 +352,7 @@ RUN set -eux \
         $NGINX_BUILD_DEPS
 
 COPY tpl/Makefile Makefile
+COPY tpl/.env.dist .env.dist
 COPY tpl/patches patches
 
 RUN make deps \

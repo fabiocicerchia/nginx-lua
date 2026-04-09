@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# Delete temporary tags from Docker Hub:
-#   - -unsigned tags (pre-signing staging tags)
-#   - -amd64 / -arm64v8 tags (single-arch, superseded by manifest lists)
+# Delete temporary per-arch tags from Docker Hub:
+#   - -amd64 / -arm64v8 tags (single-arch, superseded by signed manifest lists)
 # Usage: ./bin/cleanup-docker-images.py
 # Requires: DOCKER_HUB_USER and DOCKER_HUB_TOKEN environment variables
 import os
@@ -10,7 +9,7 @@ import sys
 import requests
 
 REPO = "fabiocicerchia/nginx-lua"
-SUFFIXES = ("-unsigned", "-amd64", "-arm64v8")
+SUFFIXES = ("-amd64", "-arm64v8")
 
 
 def get_token(username, password):
