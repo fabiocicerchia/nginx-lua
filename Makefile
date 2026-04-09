@@ -29,15 +29,15 @@ GH_USERNAME=fabiocicerchia
 GH_CLI_NAME=ghr_v0.16.2_linux_amd64
 GH_CLI_TARBALL=https://github.com/tcnksm/ghr/releases/download/v0.16.2/$(GH_CLI_NAME).tar.gz
 GH_CLI_SHA256=084ed9819dff71ea77f77a3071a643b6d1cbe5d2ab57bb5f56bb23de17189cd0
-NGINX_UPSTREAM_URL=https://github.com/nginxinc/docker-nginx
-NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginxinc/docker-nginx
+NGINX_UPSTREAM_URL=https://github.com/nginx/docker-nginx
+NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginx/docker-nginx
 
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
-CHANGELOG=$(shell $(MAKE) changelog)
 
 SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
 SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
+UPSTREAM_NGINX_VER_MAINLINE=$(shell curl -s https://api.github.com/repos/nginx/docker-nginx/tags | grep '"name"' | head -n 1 | cut -d '"' -f 4)
 
 amd64_distros=$(addprefix amd64-, $(DISTROS))
 arm64_distros=$(addprefix arm64-, $(DISTROS))
@@ -54,7 +54,7 @@ packagetest_targets_arm64=$(addprefix package-test-, $(arm64_distros))
 
 test_targets=${dockertest_targets_amd64} ${dockertest_targets_arm64}
 push_targets=$(addprefix push-, $(DISTROS))
-promote_targets=$(addprefix promote-, $(DISTROS))
+
 bundle_targets=$(addprefix bundle-, $(DISTROS))
 security_targets=$(addprefix test-security-, $(DISTROS))
 minimal_targets=$(addprefix build-minimal-, $(DISTROS))
@@ -180,24 +180,7 @@ endif
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
 
-################################################################################
-##@ PROMOTE
-################################################################################
-
-PROMOTE_CMD:=./bin/docker-promote.py
-
-promote-all: $(promote_targets) ## promote all unsigned images to final tags
-
-$(promote_targets): ## promote one distro's unsigned images to final tags
-ifeq ($(SKIP), YES)
-	echo "SKIPPING $@"
-	return
-endif
-	DISTRO=$(subst promote-,,$(@)); \
-	echo "PROMOTING $$DISTRO"; \
-	$(PROMOTE_CMD) "$$DISTRO"
-
-cleanup-docker-images: ## delete temporary tags (-unsigned, -amd64, -arm64v8) from Docker Hub
+cleanup-docker-images: ## delete temporary per-arch tags (-amd64, -arm64v8) from Docker Hub
 	./bin/cleanup-docker-images.py
 
 ################################################################################
@@ -297,20 +280,17 @@ release: ## create a github release
 	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
 	cp Dockerfile dist/
 	for NGINX_VER in $(SUPPORTED_NGINX_VER_MAINLINE) $(SUPPORTED_NGINX_VER_STABLE); do \
-		tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_MAINLINE)/_' | while read FOLDER; do \
-			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-			cp $$DOCKERFILE $$DEST; \
+		tail -n -6 supported_versions | tr '=' '/' | sed "s_^_nginx/$${NGINX_VER}/_" | while read FOLDER; do \
+			if [ -d "$$FOLDER" ]; then \
+				DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
+				DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
+				cp $$DOCKERFILE $$DEST; \
+			fi; \
 		done; \
 	done
-	# Copy Dockerfiles for stable version
-	tail -n -6 supported_versions | tr '=' '/' | sed 's_^_nginx/$(SUPPORTED_NGINX_VER_STABLE)/_' | while read FOLDER; do \
-		if [ -d "$$FOLDER" ]; then \
-			DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
-			DEST="dist/$$(echo $$DOCKERFILE | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/\(Dockerfile.*\)_\4-nginx\1-\2\3_')"; \
-			cp $$DOCKERFILE $$DEST; \
-		fi; \
-	done
+	# Normalize package filenames: GitHub replaces '~' with '.' in asset names,
+	# so rename files in dist/ to match what GitHub will serve.
+	cd dist && for f in *~*; do [ -e "$$f" ] && mv "$$f" "$$(echo $$f | tr '~' '.')"; done; cd ..
 	# List all release artifacts
 	@echo "=== Release artifacts ==="
 	@ls -lah dist/
@@ -319,8 +299,9 @@ release: ## create a github release
 	# Download ghr with verified checksum (pinned to v0.16.2)
 	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "$(GH_CLI_SHA256)"
 	tar xvzf $(GH_CLI_NAME).tar.gz
-	if [ "$(shell git log --pretty=format:'- %B' $(PREVIOUS_TAG)..HEAD)" != "" ]; then \
-		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
+	COMMITS=$$(git log --pretty=format:'- %B' "$(PREVIOUS_TAG)..HEAD" 2>/dev/null || true); \
+	if [ -n "$$COMMITS" ]; then \
+		./$(GH_CLI_NAME)/ghr -prerelease -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
 	fi; \
 	rm -rf dist
 
@@ -347,12 +328,12 @@ pull-nginx-entrypoints: ## retrieves the official entrypoint files (from mainlin
 		echo "=== Existing checksums OK ===" ; \
 	fi
 	@# Require a tagged release - never fall back to master/main to prevent supply chain attacks
-	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(SUPPORTED_NGINX_VER_MAINLINE)); \
+	HTTP_CODE=$$(curl --write-out '%{http_code}' --silent --output /dev/null $(NGINX_UPSTREAM_URL)/releases/tag/$(UPSTREAM_NGINX_VER_MAINLINE)); \
 	if [ "$$HTTP_CODE" != "200" ]; then \
-		echo "ERROR: Upstream tag $(SUPPORTED_NGINX_VER_MAINLINE) not found (HTTP $$HTTP_CODE). Refusing to fall back to master."; \
+		echo "ERROR: Upstream tag $(UPSTREAM_NGINX_VER_MAINLINE) not found (HTTP $$HTTP_CODE). Refusing to fall back to master."; \
 		exit 1; \
 	fi; \
-	USE_VERSION=$(SUPPORTED_NGINX_VER_MAINLINE); \
+	USE_VERSION=$(UPSTREAM_NGINX_VER_MAINLINE); \
 	ENTRYPOINT_BASE="$(NGINX_UPSTREAM_RAW_FILES)/$${USE_VERSION}/entrypoint"; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/10-listen-on-ipv6-by-default.sh" src/10-listen-on-ipv6-by-default.sh; \
 	./bin/download-and-verify.sh "$${ENTRYPOINT_BASE}/15-local-resolvers.envsh"        src/15-local-resolvers.envsh; \
@@ -379,8 +360,8 @@ benchmark: ## benchmark (wip)
 scan-image: ## scan a docker image for vulnerabilities (usage: make scan-image IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/scan-vulnerabilities.sh "$(IMAGE)" "CRITICAL,HIGH" "1"
 
-sign-image: ## sign a docker image and attach SBOM (usage: make sign-image IMAGE=fabiocicerchia/nginx-lua:latest)
-	./bin/sign-and-sbom.sh "$(IMAGE)"
+sign-manifest: ## sign a multi-arch manifest list and attach per-platform SBOMs (usage: make sign-manifest IMAGE=fabiocicerchia/nginx-lua:latest)
+	./bin/sign-manifest.sh "$(IMAGE)"
 
 verify-image: ## verify a docker image signature and SBOM (usage: make verify-image IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/verify-image.sh "$(IMAGE)"

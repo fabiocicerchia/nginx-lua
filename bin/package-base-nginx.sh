@@ -75,11 +75,6 @@ main() {
         PACKAGE_TYPE=deb
     fi
 
-    # Override nginx version if IMAGE_ID is set
-    if [ "${IMAGE_ID}" != "" ]; then
-        SUPPORTED_NGINX_VER=1
-    fi
-
     # Create dist directory
     mkdir -p dist
 
@@ -97,8 +92,8 @@ main() {
         --build-arg FPM_OUTPUT_TYPE="$PACKAGE_TYPE" \
         src/packages
 
-    # Extract package from container
-    rm -f dist/nginx-lua*."$PACKAGE_TYPE"
+    # Extract package from container (only remove packages for this specific nginx version)
+    rm -f dist/nginx-lua*${SUPPORTED_NGINX_VER}*.$PACKAGE_TYPE
     docker inspect extract-$PACKAGE_TYPE > /dev/null 2>&1 && docker rm -f extract-$PACKAGE_TYPE
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
@@ -121,12 +116,12 @@ main() {
     # List files
     if [ "${DISTRO}" = "alpine" ]; then
         sudo apt install -y apktool
-        apktool d dist/*."$PACKAGE_TYPE" || true
+        apktool d dist/*${SUPPORTED_NGINX_VER}*.apk || true
     elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
         sudo apt install -y rpm2cpio cpio
-        rpm2cpio dist/*.rpm | cpio -i --list
+        rpm2cpio dist/*${SUPPORTED_NGINX_VER}*.rpm | cpio -i --list
     elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
-        dpkg-deb -c dist/*.deb
+        dpkg-deb -c dist/*${SUPPORTED_NGINX_VER}*.deb
     fi
 }
 
