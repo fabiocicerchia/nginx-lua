@@ -14,7 +14,7 @@ import common
 
 # Constants
 DOCKERFILE_PATTERN = "Dockerfile*"
-FIND_COMMAND = f"find nginx -type f -name '{DOCKERFILE_PATTERN}' | sort -V"
+FIND_COMMAND = ['/usr/bin/find', 'nginx', '-type', 'f', '-name', DOCKERFILE_PATTERN]
 DOCKERFILE_REGEX = r"nginx/(.+)/(.+)/(.+)/Dockerfile(-compat)?"
 COMPAT_SUFFIX = "-compat"
 ALPINE_DISTRO = "alpine"
@@ -24,7 +24,9 @@ LATEST_TAG = "latest"
 GITHUB_BASE_URL = "https://github.com/fabiocicerchia/nginx-lua/blob/main/"
 
 def main():
-    files = subprocess.getoutput(FIND_COMMAND).splitlines()
+    files = sorted(
+        subprocess.check_output(FIND_COMMAND, text=True).splitlines()
+    )
 
     supported = common.get_supported_versions()
 

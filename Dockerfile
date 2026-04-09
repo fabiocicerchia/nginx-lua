@@ -556,7 +556,7 @@ RUN set -x \
             | xargs -r apk info --installed \
             | sort -u \
     )" \
-    && apk add --no-cache $runDeps \
+    && echo "$runDeps" | xargs apk add --no-cache \
     && apk del .gettext \
     && mv /tmp/envsubst /usr/local/bin/ \
 # Bring in tzdata so users could set the timezones through the environment

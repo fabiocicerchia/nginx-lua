@@ -184,7 +184,9 @@ def build_image(nginx_version, os_distro, os_version, arch):
     """Build Docker image for given configuration."""
     dockerfile_path = get_dockerfile_path(nginx_version, os_distro, os_version)
     tags = generate_tags(nginx_version, os_distro, os_version, arch)
-    vcs_ref = subprocess.getoutput(GIT_REV_PARSE_COMMAND).strip()
+    vcs_ref = subprocess.check_output(
+        shlex.split(GIT_REV_PARSE_COMMAND), text=True
+    ).strip()
 
     return build_docker_image(vcs_ref, tags, dockerfile_path, arch)
 
@@ -360,7 +362,7 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     for script_file in glob.glob(f"{SRC_DIR}/*.sh"):
         dest = tpl_folder / Path(script_file).name
         shutil.copyfile(script_file, dest)
-        os.chmod(dest, 0o755)
+        os.chmod(dest, 0o750)
 
     # Copy patches
     patches_folder = tpl_folder / PATCHES_DIR

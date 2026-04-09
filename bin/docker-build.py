@@ -49,7 +49,9 @@ def main():
     if exit_code > 0:
         sys.exit(1)
 
-    stdout = subprocess.getoutput(DOCKER_IMAGES_COMMAND)
+    stdout = subprocess.check_output(
+        DOCKER_IMAGES_COMMAND.split(), text=True
+    )
     print(stdout)
 
 if __name__ == "__main__":
