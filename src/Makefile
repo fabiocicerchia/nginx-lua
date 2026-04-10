@@ -354,9 +354,8 @@ luarocks:
 #### TEST
 # # PERL_MM_USE_DEFAULT=1
 .prereq-test:
-	PERL_MM_USE_DEFAULT=1 cpanm install Test::Harness
-	PERL_MM_USE_DEFAULT=1 cpanm install Test::Nginx::Socket
-	PERL_MM_USE_DEFAULT=1 cpanm install LWP::UserAgent
+	PERL_MM_USE_DEFAULT=1 cpanm Test::Harness
+	PERL_MM_USE_DEFAULT=1 cpanm Test::Nginx::Socket
 # 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 # 	tar -C / -xf Python-2.7.18.tgz
 # 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
