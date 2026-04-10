@@ -49,37 +49,18 @@ define secure_download
 	fi
 endef
 
-# TODO: Find a better way to fallback when openresty is behind the nginx latest
-# version and no patch is available.
-# Ref: https://github.com/openresty/openresty/tree/master/patches/nginx
-FALLBACK_VER_NGINX=1.27.1
-
 # ##############################################################################
 # CORE
 # ##############################################################################
 
-# DISABLED PATCHES
-#
-# >>> /nginx-1.29.0/patches/nginx-1.27.1-stream_proxy_protocol_v2.patch <<<
-#     src/mail/ngx_mail_proxy_module.c: In function 'ngx_mail_proxy_send_proxy_protocol':
-#     src/mail/ngx_mail_proxy_module.c:906:9: error: too few arguments to function 'ngx_proxy_protocol_write'
-#       906 |     p = ngx_proxy_protocol_write(s->connection, buf,
-#           |         ^~~~~~~~~~~~~~~~~~~~~~~~
-#     In file included from src/core/ngx_core.h:98,
-#                      from src/mail/ngx_mail_proxy_module.c:9:
-#     src/core/ngx_proxy_protocol.h:31:9: note: declared here
-#        31 | u_char *ngx_proxy_protocol_write(ngx_connection_t *c, u_char *buf,
-#           |         ^~~~~~~~~~~~~~~~~~~~~~~~
-#     make[2]: *** [objs/Makefile:2229: objs/src/mail/ngx_mail_proxy_module.o] Error 1
-SKIPPED_PATCHES=" \
-patches/nginx-1.27.1-stream_proxy_protocol_v2.patch \
-"
+SKIPPED_PATCHES=""
 openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
 	git clone https://github.com/openresty/openresty.git; \
 	PATCH_VER=${VER_NGINX}; \
-	if [ "$(ls -1 openresty/patches/nginx/${VER_NGINX}/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
-		PATCH_VER=${FALLBACK_VER_NGINX}; \
+	if [ "$$(ls -1 openresty/patches/nginx/${VER_NGINX}/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
+		PATCH_VER=$$(ls -1d openresty/patches/nginx/*/ 2>/dev/null | xargs -I{} basename {} | sort -V | tail -1); \
+		echo "No patches for ${VER_NGINX}, falling back to latest available: $${PATCH_VER}"; \
 	fi; \
 	for patch_file in openresty/patches/nginx/$${PATCH_VER}/nginx-$${PATCH_VER}-*.patch; do \
 		echo "copying openresty patch $${patch_file}"; \
