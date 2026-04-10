@@ -307,6 +307,7 @@ ARG BUILD_DEPS_BASE="\
         libxslt1-dev \
         make \
         patch \
+        perl \
         python3 \
         unzip \
         wget \
