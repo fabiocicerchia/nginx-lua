@@ -388,32 +388,36 @@ test: .prereq-test
 		&& $(MAKE) test;
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
 		&& $(MAKE) test;
-# NOTE: lua-resty-memcached tests require a running memcached server and the
-# echo-nginx-module (echo_sleep); neither is available in the build container,
-# so we run them non-fatally to avoid blocking the Docker build.
+# NOTE: the 3rd-party test suites below depend on runtime services
+# (memcached, mysql, redis, websocket/upstream servers) and/or nginx modules
+# (echo-nginx-module — echo_sleep) that are NOT available inside the build
+# container. They also occasionally ship test helpers that fail to load under
+# Perl 5.26+ strict @INC (e.g. lua-resty-mysql's `use t::Test;` can't locate
+# `t/Test.pm`). We therefore run them non-fatally (`-` prefix) so a single
+# environmental failure cannot cascade and abort the whole Docker build.
 	-cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
 		&& $(MAKE) test;
-	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+	-cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 		&& $(MAKE) test;
-	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+	-cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
 		&& $(MAKE) test;
-	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+	-cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
 		&& $(MAKE) test;
-	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
+	-cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
 		&& $(MAKE) test;
-	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
+	-cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
 		&& $(MAKE) test;
-	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
+	-cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
 		&& $(MAKE) test;
-	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+	-cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
 		&& $(MAKE) test;
-	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+	-cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 		&& $(MAKE) test;
-	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
+	-cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
 		&& $(MAKE) test;
-	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
+	-cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
 		&& $(MAKE) test;
-	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+	-cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
 		&& $(MAKE) test;
-	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
+	-cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 		&& $(MAKE) test;
