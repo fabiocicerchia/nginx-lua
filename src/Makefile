@@ -356,7 +356,13 @@ luarocks:
 .prereq-test:
 	PERL_MM_USE_DEFAULT=1 cpanm Test::Harness
 	PERL_MM_USE_DEFAULT=1 cpanm Test::Nginx::Socket
-	PERL_MM_USE_DEFAULT=1 cpanm HTTP::Daemon
+	# HTTP::Daemon is normally pulled in as a transitive dep of Test::Nginx::Socket
+	# (via libwww-perl). Only invoke cpanm when it is missing, otherwise cpanm will
+	# re-query cpanmetadb.cpan.org (HTTPS) to check for updates — and without
+	# LWP::Protocol::https that query fails, aborting the build even though the
+	# module is already available.
+	perl -MHTTP::Daemon -e 1 2>/dev/null \
+		|| PERL_MM_USE_DEFAULT=1 cpanm HTTP::Daemon
 # 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 # 	tar -C / -xf Python-2.7.18.tgz
 # 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
