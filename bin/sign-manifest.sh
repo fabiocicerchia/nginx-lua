@@ -1,16 +1,23 @@
 #!/bin/bash
-# Sign multi-arch manifest lists AND per-arch images with cosign (keyless OIDC)
-# and attach platform-specific SBOMs.
+# Sign a multi-arch manifest list (index) with cosign (keyless OIDC) and
+# attach per-platform CycloneDX SBOM attestations to the index digest.
 #
-# This script is used after `docker manifest push` to sign:
-#   1. The index image (manifest list) — for tag-based consumers
-#   2. Each per-arch image by digest — for digest-based consumers (sha256)
+# This script runs after `docker manifest push` has published the index.
+# It is the counterpart to bin/sign-image.sh:
 #
-# Per-platform SBOMs are attached to BOTH the index digest and the matching
-# per-arch image digest, so consumers always get the correct SBOM regardless
-# of how they reference the image.
+#   * bin/sign-image.sh    — signs each per-arch image right after its
+#                            `docker push` (runs in the per-arch CI jobs).
+#   * bin/sign-manifest.sh — signs the multi-arch index after the manifest
+#                            list has been pushed (runs in the bundle job).
 #
-# Resolves digests from the registry via `docker manifest inspect`.
+# Per-arch images already have their own signatures and SBOM attestations
+# attached (done by sign-image.sh at push time), so this script only deals
+# with the index digest.  Per-platform SBOMs are still attached to the
+# index so that tag-based consumers (who resolve through the manifest list)
+# can retrieve an SBOM via the index tag.
+#
+# Resolves the index digest from the registry via `docker buildx imagetools
+# inspect --raw` so it matches the bytes the registry actually stores.
 # Ref: Cyber Resilience Act Article 47 - SBOM requirement
 # Ref: NIS2 Article 21(2)(d) - supply chain security
 set -euo pipefail
@@ -84,14 +91,18 @@ INDEX_RAW=$(sha256sum "$MANIFEST_RAW_FILE" | awk '{print $1}')
 INDEX_DIGEST="${REPO}@sha256:${INDEX_RAW}"
 echo "Index digest: ${INDEX_DIGEST}"
 
-# Extract per-arch digests from the manifest list
-AMD64_DIGEST=$(jq -r '.manifests[] | select(.platform.architecture=="amd64" and .platform.os=="linux") | .digest' "$MANIFEST_RAW_FILE")
-ARM64_DIGEST=$(jq -r '.manifests[] | select(.platform.architecture=="arm64" and .platform.os=="linux") | .digest' "$MANIFEST_RAW_FILE")
-rm -f "$MANIFEST_RAW_FILE"
+# Extract the list of per-arch platforms the index covers.  We only use
+# these to drive per-platform SBOM generation — per-arch signatures are
+# already attached by bin/sign-image.sh and are not re-applied here.
+PLATFORMS=$(jq -r '.manifests[] | select(.platform.os=="linux") | "\(.platform.os)/\(.platform.architecture)"' "$MANIFEST_RAW_FILE")
+if [ -z "$PLATFORMS" ]; then
+    echo "ERROR: No linux platforms found in manifest list"
+    exit 1
+fi
+echo "Index covers platforms:"
+echo "$PLATFORMS" | sed 's/^/  /'
 
-echo "Per-arch digests:"
-echo "  linux/amd64: ${AMD64_DIGEST}"
-echo "  linux/arm64: ${ARM64_DIGEST}"
+rm -f "$MANIFEST_RAW_FILE"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Keyless OIDC signing via CircleCI
@@ -123,28 +134,11 @@ retry_on_rate_limit cosign sign \
 echo "=== Index image signed ==="
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 2. Sign each per-arch image by digest
-# ─────────────────────────────────────────────────────────────────────────────
-for ARCH_ENTRY in "amd64:${AMD64_DIGEST}" "arm64:${ARM64_DIGEST}"; do
-    ARCH="${ARCH_ENTRY%%:*}"
-    ARCH_DIGEST="${REPO}@${ARCH_ENTRY#*:}"
-    echo "=== Signing per-arch image (${ARCH}): ${ARCH_DIGEST} ==="
-    retry_on_rate_limit cosign sign \
-        --yes \
-        "${SIGN_ANNOTATIONS[@]}" \
-        -a "type=per-arch" \
-        -a "architecture=${ARCH}" \
-        "$ARCH_DIGEST"
-    echo "=== Per-arch image signed (${ARCH}) ==="
-done
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. Generate and attach per-platform SBOMs
+# 2. Generate and attach per-platform SBOMs to the index
 # ─────────────────────────────────────────────────────────────────────────────
 if command -v syft &> /dev/null; then
-    for PLATFORM_ENTRY in "linux/amd64:${AMD64_DIGEST}" "linux/arm64:${ARM64_DIGEST}"; do
-        PLATFORM="${PLATFORM_ENTRY%%:*}"
-        ARCH_DIGEST="${REPO}@${PLATFORM_ENTRY#*:}"
+    while IFS= read -r PLATFORM; do
+        [ -z "$PLATFORM" ] && continue
         PLAT_LABEL=$(echo "$PLATFORM" | tr '/' '-')
         SBOM_FILE="/tmp/sbom-${IMAGE_REF_PATH}-${PLAT_LABEL}.cdx.json"
 
@@ -155,7 +149,6 @@ if command -v syft &> /dev/null; then
             --source-name "fabiocicerchia/nginx-lua@${PLATFORM}" \
             --source-version "${VCS_REF}"
 
-        # Attach SBOM to the index image (for tag-based consumers)
         echo "=== Attaching SBOM attestation (${PLATFORM}) to index ==="
         retry_on_rate_limit cosign attest \
             --yes \
@@ -163,23 +156,15 @@ if command -v syft &> /dev/null; then
             --type cyclonedx \
             "$INDEX_DIGEST"
 
-        # Attach the same SBOM to the per-arch image (for digest-based consumers)
-        echo "=== Attaching SBOM attestation (${PLATFORM}) to per-arch image ==="
-        retry_on_rate_limit cosign attest \
-            --yes \
-            --predicate "$SBOM_FILE" \
-            --type cyclonedx \
-            "$ARCH_DIGEST"
-
-        echo "=== SBOM attached for ${PLATFORM} (index + per-arch) ==="
+        echo "=== SBOM attached for ${PLATFORM} (index) ==="
         rm -f "$SBOM_FILE"
-    done
+    done <<< "$PLATFORMS"
 else
     echo "WARN: syft not installed, skipping SBOM generation"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 4. Verify signatures
+# 3. Verify the index signature
 # ─────────────────────────────────────────────────────────────────────────────
 OIDC_ISSUER="https://oidc.circleci.com/org/${CIRCLE_ORGANIZATION_ID}"
 CERT_IDENTITY_REGEXP="https://circleci\\.com/api/v2/projects/${CIRCLE_PROJECT_ID}/pipeline-definitions/.*"
@@ -190,17 +175,5 @@ retry_on_rate_limit cosign verify \
     --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
     "$INDEX_DIGEST"
 
-for ARCH_ENTRY in "amd64:${AMD64_DIGEST}" "arm64:${ARM64_DIGEST}"; do
-    ARCH="${ARCH_ENTRY%%:*}"
-    ARCH_DIGEST="${REPO}@${ARCH_ENTRY#*:}"
-    echo "=== Verifying per-arch signature (${ARCH}) ==="
-    retry_on_rate_limit cosign verify \
-        --certificate-oidc-issuer "$OIDC_ISSUER" \
-        --certificate-identity-regexp "$CERT_IDENTITY_REGEXP" \
-        "$ARCH_DIGEST"
-done
-
-echo "=== All signatures verified ==="
+echo "=== Index signature verified ==="
 echo "Signed: index ${INDEX_DIGEST}"
-echo "Signed: amd64 ${REPO}@${AMD64_DIGEST}"
-echo "Signed: arm64 ${REPO}@${ARM64_DIGEST}"
