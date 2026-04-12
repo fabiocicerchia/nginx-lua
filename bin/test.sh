@@ -66,7 +66,7 @@ parse_arguments() {
     fi
     
     if [ $# -ge 4 ]; then
-        TYPE="$4"
+        _TYPE="$4"
     fi
 }
 
@@ -222,7 +222,9 @@ main() {
     docker images
 
     for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
-        TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
+        TAG="${DOCKERFILE//nginx\//}"
+        TAG="${TAG//\/Dockerfile/}"
+        TAG="${TAG//\//-}"
 
         TESTING_TAG="$TAG-$ARCH"
 
