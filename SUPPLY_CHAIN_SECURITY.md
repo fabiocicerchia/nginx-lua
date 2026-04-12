@@ -16,6 +16,24 @@ are signed individually.  This means consumers can verify signatures whether
 they pull by tag (which resolves to the index) or by sha256 digest (which
 resolves to a specific architecture image).
 
+### When signing happens
+
+The pipeline follows the standard Sigstore workflow of **push → sign by
+digest**.  Cosign stores signatures as OCI artifacts alongside the image
+in the registry (referenced by content digest), so the image must already
+exist in the registry before it can be signed.
+
+1. **Per-arch images** are signed *immediately after* their `docker push`
+   in the same CI job that built them (`Docker AMD` / `Docker ARM`).  The
+   signature and CycloneDX SBOM attestation are attached to the per-arch
+   content digest as soon as the push completes — there is no window in
+   which an unsigned per-arch image is available on Docker Hub before its
+   signature is recorded.
+2. **The multi-arch index** (manifest list) is signed *immediately after*
+   `docker manifest push` in the `Docker Bundle` job.  Per-platform SBOMs
+   are attached to the index digest so tag-based consumers can retrieve
+   an SBOM through the index tag.
+
 Instead of a static key pair, each CI run obtains a short-lived signing
 certificate from Fulcio, authenticated by CircleCI's OIDC identity token.
 The signing event is recorded in Sigstore's public [Rekor](https://docs.sigstore.dev/logging/overview/)

@@ -360,6 +360,9 @@ benchmark: ## benchmark (wip)
 scan-image: ## scan a docker image for vulnerabilities (usage: make scan-image IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/scan-vulnerabilities.sh "$(IMAGE)" "CRITICAL,HIGH" "1"
 
+sign-image: ## sign a docker image and attach SBOM (usage: make sign-image IMAGE=fabiocicerchia/nginx-lua:1.29.7-alpine3.23.3-amd64)
+	./bin/sign-image.sh "$(IMAGE)"
+
 sign-manifest: ## sign a multi-arch manifest list and attach per-platform SBOMs (usage: make sign-manifest IMAGE=fabiocicerchia/nginx-lua:latest)
 	./bin/sign-manifest.sh "$(IMAGE)"
 
