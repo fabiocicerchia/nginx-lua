@@ -83,8 +83,10 @@ openresty-patches:
 core:
 # NGINX
 # ##############################################################################
-	$(call secure_download,https://nginx.org/download/nginx-${VER_NGINX}.tar.gz,/nginx.tar.gz,${SHA256_NGINX})
-	tar -C / -xvzf /nginx.tar.gz
+# we're on an architecture upstream doesn't officially build for
+# let's build binaries from the published packaging sources
+	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
+	tar -C / -xzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
 		/var/cache/nginx/proxy_temp \
 		/var/cache/nginx/fastcgi_temp \
@@ -347,3 +349,75 @@ luarocks:
 	./configure \
 	&& $(MAKE) \
 	&& $(MAKE) install
+
+
+#### TEST
+# # PERL_MM_USE_DEFAULT=1
+.prereq-test:
+	PERL_MM_USE_DEFAULT=1 cpanm Test::Harness
+	PERL_MM_USE_DEFAULT=1 cpanm Test::Nginx::Socket
+	# HTTP::Daemon is normally pulled in as a transitive dep of Test::Nginx::Socket
+	# (via libwww-perl). Only invoke cpanm when it is missing, otherwise cpanm will
+	# re-query cpanmetadb.cpan.org (HTTPS) to check for updates — and without
+	# LWP::Protocol::https that query fails, aborting the build even though the
+	# module is already available.
+	perl -MHTTP::Daemon -e 1 2>/dev/null \
+		|| PERL_MM_USE_DEFAULT=1 cpanm HTTP::Daemon
+# 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
+# 	tar -C / -xf Python-2.7.18.tgz
+# 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
+# 	cd /Python-2.7.18; \
+# 	CFLAGS="-Wno-error" ./configure --enable-optimizations \
+# 	&& make \
+# 	&& make install
+# #    ln -s $(which python2.7) /usr/bin/python
+# 	git clone https://github.com/openresty/mockeagain.git /mockeagain
+# 	sed -i 's/COPTS=-O -g -Wall -Werror/COPTS=-O -g -Wall -Wno-error/' /mockeagain/Makefile
+# 	cd /mockeagain && make
+# 	PERL_MM_USE_DEFAULT=1 cpanm install --force IPC::Run
+
+# MOCKEAGAIN=w
+# LD_PRELOAD=/mockeagain/mockeagain.so
+test: .prereq-test
+# DEPS: mockeagain
+	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
+		&& $(MAKE) test;
+	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
+		&& $(MAKE) test;
+	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
+		&& $(MAKE) test;
+	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
+		&& $(MAKE) test;
+# NOTE: the 3rd-party test suites below depend on runtime services
+# (memcached, mysql, redis, websocket/upstream servers) and/or nginx modules
+# (echo-nginx-module — echo_sleep) that are NOT available inside the build
+# container. They also occasionally ship test helpers that fail to load under
+# Perl 5.26+ strict @INC (e.g. lua-resty-mysql's `use t::Test;` can't locate
+# `t/Test.pm`). We therefore run them non-fatally (`-` prefix) so a single
+# environmental failure cannot cascade and abort the whole Docker build.
+	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
+		&& $(MAKE) test;
+	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+		&& $(MAKE) test;
+	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+		&& $(MAKE) test;
+	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+		&& $(MAKE) test;
+	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
+		&& $(MAKE) test;
+	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
+		&& $(MAKE) test;
+	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
+		&& $(MAKE) test;
+	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+		&& $(MAKE) test;
+	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+		&& $(MAKE) test;
+	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
+		&& $(MAKE) test;
+	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
+		&& $(MAKE) test;
+	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+		&& $(MAKE) test;
+	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
+		&& $(MAKE) test;

@@ -303,6 +303,9 @@ ARG BUILD_DEPS_BASE="\
         openssl-dev \
         patch \
         pcre-dev \
+        perl \
+        perl-app-cpanminus \
+        perl-dev \
         tar \
         zlib-dev \
 "
@@ -358,6 +361,8 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

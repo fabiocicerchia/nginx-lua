@@ -306,8 +306,11 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
+        perl-CPAN \
+        perl-devel \
         tar \
         unzip \
+        wget \
         which \
         zlib-devel \
 "
@@ -359,6 +362,22 @@ RUN set -eux \
         gettext \
     && yum clean all \
     && rm -rf /var/cache/yum
+
+# Amazon Linux 2023 does not package App::cpanminus (the `cpanm` binary) in
+# its default repositories, so `make test` below cannot install the Perl test
+# prerequisites out-of-the-box. cpanm is a self-contained Perl script, so we
+# fetch the official fatpacked installer directly from the upstream mirror.
+# The fallback via `cpan` (from the already-installed `perl-CPAN` package)
+# covers transient network failures against cpanmin.us.
+RUN set -eux \
+    && ( curl -fsSL https://cpanmin.us -o /usr/local/bin/cpanm \
+         && chmod 0755 /usr/local/bin/cpanm \
+         && /usr/local/bin/cpanm --version ) \
+       || ( PERL_MM_USE_DEFAULT=1 cpan -T App::cpanminus \
+            && command -v cpanm \
+            && cpanm --version )
+
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
