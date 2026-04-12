@@ -380,16 +380,10 @@ luarocks:
 # LD_PRELOAD=/mockeagain/mockeagain.so
 test: .prereq-test
 # DEPS: mockeagain
-#	 cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-#	 	&& $(MAKE) test;
-#
-#11 143.6 #   Failed test 't/003-init-by-lua.t TEST 2: sanity - pattern "3 lrucache initialized." should match a line in error.log (req 0)'
-#11 143.6 #   at /usr/local/share/perl/5.38.2/Test/Nginx/Socket.pm line 1284.
-#11 143.7
-#11 143.7 #   Failed test 't/003-init-by-lua.t TEST 1: sanity - grep_error_log_out (req 0)'
-#11 143.7 #   at /usr/local/share/perl/5.38.2/Test/Nginx/Socket.pm line 1220.
-#    cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-#     	&& $(MAKE) test;
+	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
+		&& $(MAKE) test;
+	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
+		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
 		&& $(MAKE) test;
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
@@ -401,29 +395,29 @@ test: .prereq-test
 # Perl 5.26+ strict @INC (e.g. lua-resty-mysql's `use t::Test;` can't locate
 # `t/Test.pm`). We therefore run them non-fatally (`-` prefix) so a single
 # environmental failure cannot cascade and abort the whole Docker build.
-	-cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
+	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
 		&& $(MAKE) test;
-	-cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 		&& $(MAKE) test;
-	-cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
+	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
 		&& $(MAKE) test;
-	-cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
+	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
 		&& $(MAKE) test;
-	-cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
+	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
 		&& $(MAKE) test;
-	-cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
+	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
 		&& $(MAKE) test;
-	-cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
+	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
 		&& $(MAKE) test;
-	-cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
+	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
 		&& $(MAKE) test;
-	-cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
+	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
 		&& $(MAKE) test;
-	-cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
+	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
 		&& $(MAKE) test;
-	-cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
+	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
 		&& $(MAKE) test;
-	-cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
+	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
 		&& $(MAKE) test;
-	-cd /lua-resty-string-${VER_OPENRESTY_STRING} \
+	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 		&& $(MAKE) test;
