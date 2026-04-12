@@ -303,7 +303,9 @@ ARG BUILD_DEPS_BASE="\
         openssl-dev \
         patch \
         pcre-dev \
+        perl \
         perl-app-cpanminus \
+        perl-dev \
         tar \
         zlib-dev \
 "
