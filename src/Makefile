@@ -109,7 +109,8 @@ core:
 
 deps: dep-ngx_devel_kit dep-njs dep-geoip2 dep-luajit dep-lua-nginx dep-lua-resty-core dep-lua-resty-lrucache
 ifeq ($(EXTENDED_IMAGE), YES)
-	$(MAKE) dep-headers-more-nginx-module dep-lua-resty-cookie dep-lua-openresty-dns \
+	$(MAKE) dep-headers-more-nginx-module dep-echo-nginx-module \
+		dep-lua-resty-cookie dep-lua-openresty-dns \
 		dep-lua-openresty-memcached dep-lua-openresty-mysql dep-lua-openresty-redis \
 		dep-lua-openresty-shell dep-lua-openresty-tablepool dep-lua-openresty-signal \
 		dep-lua-resty-upstream-healthcheck dep-lua-openresty-websocket \
@@ -268,6 +269,12 @@ dep-lua-openresty-websocket:
 	&& $(MAKE) \
 	&& $(MAKE) install
 
+# Echo Nginx Module (needed by Test::Nginx test suites)
+# ##############################################################################
+dep-echo-nginx-module:
+	$(call secure_download,https://github.com/openresty/echo-nginx-module/archive/v${VER_ECHO_NGINX}.tar.gz,/echo-nginx-module.tar.gz,${SHA256_ECHO_NGINX})
+	tar -C / -xvzf /echo-nginx-module.tar.gz
+
 # OpenResty Nginx Misc
 # ##############################################################################
 dep-lua-openresty-misc:
@@ -363,61 +370,58 @@ luarocks:
 	# module is already available.
 	perl -MHTTP::Daemon -e 1 2>/dev/null \
 		|| PERL_MM_USE_DEFAULT=1 cpanm HTTP::Daemon
-# 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-# 	tar -C / -xf Python-2.7.18.tgz
-# 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
-# 	cd /Python-2.7.18; \
-# 	CFLAGS="-Wno-error" ./configure --enable-optimizations \
-# 	&& make \
-# 	&& make install
-# #    ln -s $(which python2.7) /usr/bin/python
-# 	git clone https://github.com/openresty/mockeagain.git /mockeagain
-# 	sed -i 's/COPTS=-O -g -Wall -Werror/COPTS=-O -g -Wall -Wno-error/' /mockeagain/Makefile
-# 	cd /mockeagain && make
-# 	PERL_MM_USE_DEFAULT=1 cpanm install --force IPC::Run
+	git clone https://github.com/openresty/mockeagain.git /mockeagain
+	sed -i 's/COPTS=-O -g -Wall -Werror/COPTS=-O -g -Wall -Wno-error/' /mockeagain/Makefile
+	cd /mockeagain && make
+	PERL_MM_USE_DEFAULT=1 cpanm --force IPC::Run
 
-# MOCKEAGAIN=w
-# LD_PRELOAD=/mockeagain/mockeagain.so
+# TEST_NGINX_EVENT_TYPE=epoll tells Test::Nginx to use epoll (Linux default)
+# instead of "poll" which requires --with-poll_module at compile time.
+TEST_NGINX_ENV = TEST_NGINX_EVENT_TYPE=epoll \
+	LD_PRELOAD=/mockeagain/mockeagain.so \
+	LD_LIBRARY_PATH=/mockeagain:$(LD_LIBRARY_PATH) \
+	MOCKEAGAIN=w \
+	TEST_NGINX_NO_SHUFFLE=1
+
 test: .prereq-test
-# DEPS: mockeagain
 	cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 # NOTE: the 3rd-party test suites below depend on runtime services
-# (memcached, mysql, redis, websocket/upstream servers) and/or nginx modules
-# (echo-nginx-module — echo_sleep) that are NOT available inside the build
-# container. They also occasionally ship test helpers that fail to load under
-# Perl 5.26+ strict @INC (e.g. lua-resty-mysql's `use t::Test;` can't locate
-# `t/Test.pm`). We therefore run them non-fatally (`-` prefix) so a single
-# environmental failure cannot cascade and abort the whole Docker build.
+# (memcached, mysql, redis, websocket/upstream servers) that are NOT available
+# inside the build container. They also occasionally ship test helpers that
+# fail to load under Perl 5.26+ strict @INC (e.g. lua-resty-mysql's
+# `use t::Test;` can't locate `t/Test.pm`). We therefore run them non-fatally
+# (`-` prefix) so a single environmental failure cannot cascade and abort the
+# whole Docker build.
 	cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-redis-${VER_OPENRESTY_REDIS} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-shell-${VER_OPENRESTY_SHELL} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-tablepool-${VER_OPENRESTY_TABLEPOOL} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-signal-${VER_OPENRESTY_SIGNAL} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-upstream-healthcheck-${VER_OPENRESTY_HEALTHCHECK} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-websocket-${VER_OPENRESTY_WEBSOCKET} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-limit-traffic-${VER_OPENRESTY_LIMITTRAFFIC} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-upload-${VER_OPENRESTY_UPLOAD} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-lock-${VER_OPENRESTY_LOCK} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-balancer-${VER_OPENRESTY_BALANCER} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
 	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
-		&& $(MAKE) test;
+		&& $(TEST_NGINX_ENV) $(MAKE) test;
