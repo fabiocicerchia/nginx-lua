@@ -356,13 +356,9 @@ RUN make deps \
 RUN set -eux \
 # envsubst
 # ##############################################################################
-    && yum makecache \
     && yum install -y \
-        gettext \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+        gettext
 
-# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
 RUN make test
 
 ##########################################

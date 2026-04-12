@@ -367,7 +367,6 @@ RUN set -eux \
     && dnf install -y \
         gettext
 
-# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
 RUN make test
 
 ##########################################
