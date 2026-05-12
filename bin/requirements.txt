@@ -1,5 +1,5 @@
-requests==2.32.3
-certifi>=2024.7.4
-charset-normalizer>=3.3.2,<4
-idna>=3.7,<4
-urllib3>=2.2.2,<3
+requests>=2.33.1
+certifi>=2026.2.25
+charset-normalizer>=3.4.7,<4
+idna>=3.11,<4
+urllib3>=2.6.3,<3
