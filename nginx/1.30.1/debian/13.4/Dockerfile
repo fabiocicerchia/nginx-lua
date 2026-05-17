@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.9.6
+ARG VER_NJS=0.9.8
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -66,7 +66,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT=2.1-20260311
+ARG VER_LUAJIT=2.1-20260415
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -128,7 +128,7 @@ ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql
-ARG VER_OPENRESTY_MYSQL=0.29
+ARG VER_OPENRESTY_MYSQL=0.30
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
@@ -148,7 +148,7 @@ ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck
-ARG VER_OPENRESTY_HEALTHCHECK=0.08
+ARG VER_OPENRESTY_HEALTHCHECK=0.09
 ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
@@ -163,7 +163,7 @@ ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module
-ARG VER_LUA_UPSTREAM=0.07
+ARG VER_LUA_UPSTREAM=0.08
 ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=c5b3410939478069b2af6552205173fb8b6a43fd
+ARG VER_OPENRESTY_STREAMLUA=cbb8ca4184681e12259b867a6fac9318182407ca
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -203,7 +203,7 @@ ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
 
 # lua-resty-string
 # https://github.com/openresty/lua-resty-string/tags
-ARG VER_OPENRESTY_STRING=0.16
+ARG VER_OPENRESTY_STRING=0.17
 ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 
 ################################################################################
