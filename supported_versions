@@ -1,8 +1,8 @@
 nginx_mainline=1.31.0
 nginx_stable=1.30.1
-almalinux=10.1-20260330
-alpine=3.23.3
-amazonlinux=2023.10.20260330.0
+almalinux=10.1-20260509
+alpine=3.23.4
+amazonlinux=2023.11.20260505.0
 debian=13.4
-fedora=43
+fedora=44
 ubuntu=26.04
