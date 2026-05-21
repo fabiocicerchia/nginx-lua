@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.9.8
+ARG VER_NJS=0.9.9
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -178,7 +178,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=cbb8ca4184681e12259b867a6fac9318182407ca
+ARG VER_OPENRESTY_STREAMLUA=78713f0524e255fb6dc957d6f7393437816bc133
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
