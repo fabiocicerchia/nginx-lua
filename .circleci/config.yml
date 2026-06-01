@@ -457,11 +457,11 @@ jobs:
               make sign-manifest IMAGE="${IMAGE}"
             done
 
-      - run:
-          name: Cleanup per-arch suffix tags from Docker Hub
-          command: |
-            pip3 install requests
-            make cleanup-docker-images
+#      - run:
+#          name: Cleanup per-arch suffix tags from Docker Hub
+#          command: |
+#            pip3 install requests
+#            make cleanup-docker-images
 
   Metadata:
     machine:
