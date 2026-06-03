@@ -457,11 +457,11 @@ jobs:
               make sign-manifest IMAGE="${IMAGE}"
             done
 
-      - run:
-          name: Cleanup per-arch suffix tags from Docker Hub
-          command: |
-            pip3 install requests
-            make cleanup-docker-images
+#      - run:
+#          name: Cleanup per-arch suffix tags from Docker Hub
+#          command: |
+#            pip3 install requests
+#            make cleanup-docker-images
 
   Metadata:
     machine:
@@ -555,10 +555,10 @@ jobs:
           name: Generate Supported Versions and create PR
           command: |
             # Only run auto-update in the scheduled nightly workflow
-            if [ -z "${CIRCLE_CRON_NAME:-}" ] && [ "${CIRCLE_BUILD_TRIGGER:-}" != "schedule" ]; then
-              echo "Skipping auto-update (not a scheduled nightly run)"
-              exit 0
-            fi
+            #if [ -z "${CIRCLE_CRON_NAME:-}" ] && [ "${CIRCLE_BUILD_TRIGGER:-}" != "schedule" ]; then
+            #  echo "Skipping auto-update (not a scheduled nightly run)"
+            #  exit 0
+            #fi
             export GH_TOKEN="${GITHUB_TOKEN}"
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
