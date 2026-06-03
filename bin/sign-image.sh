@@ -1,5 +1,19 @@
 #!/bin/bash
-# Sign Docker images with cosign (keyless OIDC) and generate signed SBOM
+# Sign a single Docker image with cosign (keyless OIDC) and attach a signed
+# CycloneDX SBOM attestation.
+#
+# This is the "sign immediately after push" path — it runs right after
+# `docker push` for a per-arch image in CI.  Cosign requires the image to
+# exist in a registry because signatures are stored as OCI artifacts
+# alongside the image and referenced by digest, so the caller MUST push
+# the image before invoking this script.
+#
+# The multi-arch index (manifest list) is signed separately by
+# bin/sign-manifest.sh after `docker manifest push`.
+#
+# Usage:
+#   ./bin/sign-image.sh fabiocicerchia/nginx-lua:1.29.7-alpine3.23.3-amd64
+#
 # Ref: Cyber Resilience Act Article 47 - SBOM requirement
 # Ref: NIS2 Article 21(2)(d) - supply chain security
 # Ref: https://github.com/CircleCI-Public/sign-and-publish-examples
@@ -82,6 +96,7 @@ retry_on_rate_limit cosign sign \
     -a "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     -a "vcs_ref=${VCS_REF}" \
     -a "pipeline=circleci" \
+    -a "type=per-arch" \
     "$DIGEST"
 
 echo "=== Image signed successfully ==="
