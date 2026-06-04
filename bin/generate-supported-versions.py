@@ -26,6 +26,55 @@ def run_command(cmd: List[str], capture_output: bool = True) -> subprocess.Compl
         sys.exit(1)
 
 
+def _version_sort_key(tag: str):
+    """Generate a sort key that handles mixed numeric/string version components."""
+    return [int(c) if c.isdigit() else c for c in re.split(r'([0-9]+)', tag)]
+
+
+def _filter_and_sort_tags(tags: list, filter_pattern: str) -> list:
+    """Filter tags by regex pattern and sort by version in descending order."""
+    matching = [t for t in tags if re.match(filter_pattern, t)]
+    matching.sort(key=_version_sort_key, reverse=True)
+    return matching
+
+
+def _fetch_from_library(distro: str, filter_pattern: str, specific_tag: str) -> Optional[str]:
+    """Try to get a version tag from Docker's official-images library."""
+    url = f"https://raw.githubusercontent.com/docker-library/official-images/master/library/{distro}"
+    response = requests.get(url, timeout=30)
+    response.raise_for_status()
+
+    for line in response.text.split('\n'):
+        if specific_tag not in line:
+            continue
+        parts = line.split(':')
+        if len(parts) <= 1:
+            continue
+        tags = [tag.strip() for tag in parts[1].strip().split(',')]
+        matching = _filter_and_sort_tags(tags, filter_pattern)
+        if matching:
+            return matching[0]
+    return None
+
+
+def _fetch_via_skopeo(distro: str, filter_pattern: str, specific_tag: str) -> Optional[str]:
+    """Fallback: use skopeo to find the version tag matching a specific digest."""
+    cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{specific_tag}"]
+    digest = json.loads(run_command(cmd)).get('Digest')
+    if not digest:
+        return None
+
+    cmd = ["skopeo", "list-tags", "--override-arch", "amd64", f"docker://{distro}"]
+    all_tags = json.loads(run_command(cmd)).get('Tags', [])
+    matching = _filter_and_sort_tags(all_tags, filter_pattern)
+
+    for tag in matching:
+        cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{tag}"]
+        if json.loads(run_command(cmd)).get('Digest') == digest:
+            return tag
+    return None
+
+
 def fetch_specific(distro: str, filter_pattern: str = ".+", specific_tag: str = "latest") -> Optional[str]:
     """
     Fetch a specific version tag for a Docker image.
@@ -38,62 +87,15 @@ def fetch_specific(distro: str, filter_pattern: str = ".+", specific_tag: str = 
     Returns:
         The matching version tag or None if not found
     """
-    # First try to get tag from official-images library
     try:
-        url = f"https://raw.githubusercontent.com/docker-library/official-images/master/library/{distro}"
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
-
-        # Parse the content to find the specific tag
-        lines = response.text.split('\n')
-        for line in lines:
-            if specific_tag in line:
-                # Extract tags from the line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    tags_part = parts[1].strip()
-                    # Split by comma and clean up
-                    tags = [tag.strip() for tag in tags_part.split(',')]
-
-                    # Filter tags by pattern and sort
-                    matching_tags = []
-                    for tag in tags:
-                        if re.match(filter_pattern, tag):
-                            matching_tags.append(tag)
-
-                    if matching_tags:
-                        # Sort by version (reverse order) and return the first
-                        matching_tags.sort(key=lambda x: [int(c) if c.isdigit() else c for c in re.split(r'([0-9]+)', x)], reverse=True)
-                        return matching_tags[0]
+        result = _fetch_from_library(distro, filter_pattern, specific_tag)
+        if result:
+            return result
     except Exception as e:
         print(f"Warning: Could not fetch from official-images library: {e}")
 
-    # Fallback: use skopeo to inspect the image
     try:
-        # Get digest for the specific tag
-        cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{specific_tag}"]
-        digest = json.loads(run_command(cmd)).get('Digest')
-        if not digest:
-            return None
-
-        # List all tags
-        cmd = ["skopeo", "list-tags", "--override-arch", "amd64", f"docker://{distro}"]
-        all_tags = json.loads(run_command(cmd)).get('Tags', [])
-
-        # Filter and sort tags
-        matching_tags = []
-        for tag in all_tags:
-            if re.match(filter_pattern, tag):
-                matching_tags.append(tag)
-
-        matching_tags.sort(key=lambda x: [int(c) if c.isdigit() else c for c in re.split(r'([0-9]+)', x)], reverse=True)
-
-        # Find the tag with matching digest
-        for tag in matching_tags:
-            cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{tag}"]
-            if json.loads(run_command(cmd)).get('Digest') == digest:
-                return tag
-
+        return _fetch_via_skopeo(distro, filter_pattern, specific_tag)
     except Exception as e:
         print(f"Error fetching version for {distro}: {e}")
 

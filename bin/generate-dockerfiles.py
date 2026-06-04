@@ -21,7 +21,7 @@ def main():
     for os_distro in common.get_supported_os():
         common.setup_dockerfile(versions["nginx_stable"], os_distro, versions[os_distro])
 
-    dockerfiles = subprocess.check_output(['find', 'nginx', '-type', 'f', '-name', 'Dockerfile'])
+    dockerfiles = subprocess.check_output(['/usr/bin/find', 'nginx', '-type', 'f', '-name', 'Dockerfile'])
     dockerfiles = list(
         filter(
             lambda elem: re.search(r"nginx/.+/alpine/\d+\.\d+\.\d+/", elem),

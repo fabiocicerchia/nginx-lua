@@ -23,7 +23,7 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # RUN
-npm install artillery
+npm install artillery@2.0.22
 docker-compose -f docker-compose.test.yml up -d
 
 echo "ARTILLERY - NGINX"
