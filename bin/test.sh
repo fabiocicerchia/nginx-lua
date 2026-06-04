@@ -7,7 +7,6 @@ set -e
 OS=""
 ARCH=""
 MAX="1"
-TYPE="docker"
 
 # Help function
 show_help() {
@@ -20,7 +19,6 @@ ARGUMENTS:
     os              Operating system (alpine, almalinux, amazonlinux, debian, fedora, ubuntu)
     arch            Architecture (amd64, arm64)
     max             Maximum number of Dockerfiles to test (default: 1)
-    type            Test type: docker or package (default: docker)
 
 OPTIONS:
     -h, --help      Show this help message and exit
@@ -59,14 +57,10 @@ parse_arguments() {
     # Assign positional arguments
     OS="$1"
     ARCH="$2"
-    
+
     # Optional arguments
     if [ $# -ge 3 ]; then
         MAX="$3"
-    fi
-    
-    if [ $# -ge 4 ]; then
-        TYPE="$4"
     fi
 }
 
@@ -213,7 +207,7 @@ function do_test() {
 main() {
     # Parse arguments
     parse_arguments "$@"
-    
+
     # Validate inputs
     validate_input
 
@@ -222,7 +216,9 @@ main() {
     docker images
 
     for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
-        TAG=$(echo "$DOCKERFILE" | sed 's_nginx/\(.*\)/\(.*\)/\(.*\)/Dockerfile_\1-\2\3_')
+        TAG="${DOCKERFILE//nginx\//}"
+        TAG="${TAG//\/Dockerfile/}"
+        TAG="${TAG//\//-}"
 
         TESTING_TAG="$TAG-$ARCH"
 

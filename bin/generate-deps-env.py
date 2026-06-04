@@ -8,7 +8,6 @@ the GitHub API to get the latest tags and commits.
 """
 
 import hashlib
-import re
 import sys
 from pathlib import Path
 from urllib.parse import urlparse

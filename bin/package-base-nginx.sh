@@ -106,7 +106,7 @@ main() {
     if [ "${PACKAGE_TYPE}" = "apk" ]; then
         for f in dist/nginx-lua-*-r*.apk; do
             [ -f "$f" ] || continue
-            NEWNAME=$(echo "$f" | sed "s/\.apk/_${ARCH}.apk/")
+            NEWNAME="${f%.apk}_${ARCH}.apk"
             if [ "$f" != "$NEWNAME" ]; then
                 mv "$f" "$NEWNAME"
             fi

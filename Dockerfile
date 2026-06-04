@@ -462,7 +462,7 @@ RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
     && addgroup -g 101 -S nginx \
     && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.25.4/mainline/alpine/Dockerfile
+# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.31.1/mainline/alpine/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && apkArch="$(cat /etc/apk/arch)" \
 #     && nginxPackages=" \
@@ -471,6 +471,7 @@ RUN set -x \
 #         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
 #         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
 #         nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
+#         nginx-module-acme=${NGINX_VERSION}.${ACME_VERSION}-r${PKG_RELEASE} \
 #     " \
 # # install prerequisites for public key and pkg-oss checks
 #     && apk add --no-cache --virtual .checksum-deps \
@@ -478,17 +479,7 @@ RUN set -x \
 #     && case "$apkArch" in \
 #         x86_64|aarch64) \
 # # arches officially built by upstream
-#             set -x \
-#             && KEY_SHA512="e09fa32f0a0eab2b879ccbbc4d0e4fb9751486eedda75e35fac65802cc9faa266425edf83e261137a2f4d16281ce2c1a5f4502930fe75154723da014214f0655" \
-#             && wget -O /tmp/nginx_signing.rsa.pub https://nginx.org/keys/nginx_signing.rsa.pub \
-#             && if echo "$KEY_SHA512 */tmp/nginx_signing.rsa.pub" | sha512sum -c -; then \
-#                 echo "key verification succeeded!"; \
-#                 mv /tmp/nginx_signing.rsa.pub /etc/apk/keys/; \
-#             else \
-#                 echo "key verification failed!"; \
-#                 exit 1; \
-#             fi \
-#             && apk add -X "https://nginx.org/packages/mainline/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
+#             apk add -X "https://nginx.org/packages/mainline/alpine/v$(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release)/main" --no-cache $nginxPackages \
 #             ;; \
 #         *) \
 # # we're on an architecture upstream doesn't officially build for
@@ -511,26 +502,32 @@ RUN set -x \
 #                 bash \
 #                 alpine-sdk \
 #                 findutils \
+#                 curl \
+#                 cargo \
+#                 clang-libclang \
 #             && su nobody -s /bin/sh -c " \
 #                 export HOME=${tempDir} \
 #                 && cd ${tempDir} \
-#                 && curl -f -O https://hg.nginx.org/pkg-oss/archive/${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-#                 && PKGOSSCHECKSUM=\"79bf214256bf55700c776a87abfc3cf542323a267d879e89110aa44b551d12f6df7d56676a68f255ebbb54275185980d1fa37075f000d98e0ecac28db9e89fe3 *${NGINX_VERSION}-${PKG_RELEASE}.tar.gz\" \
-#                 && if [ \"\$(openssl sha512 -r ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
+#                 && curl -f -L -O https://github.com/nginx/pkg-oss/archive/b151aac903a6fc121d57f0909415381d0a1c1bbd.tar.gz \
+#                 && PKGOSSCHECKSUM=\"72c13cfedc25a6c1e01c24dd1f736b0fefd1ef7f73ef569e2726fc99c0137327d2e71c8694bd8b0157be2a7247ec1769904746a852e7698caf7df8a5b0040440 *b151aac903a6fc121d57f0909415381d0a1c1bbd.tar.gz\" \
+#                 && if [ \"\$(openssl sha512 -r b151aac903a6fc121d57f0909415381d0a1c1bbd.tar.gz)\" = \"\$PKGOSSCHECKSUM\" ]; then \
 #                     echo \"pkg-oss tarball checksum verification succeeded!\"; \
 #                 else \
 #                     echo \"pkg-oss tarball checksum verification failed!\"; \
 #                     exit 1; \
 #                 fi \
-#                 && tar xzvf ${NGINX_VERSION}-${PKG_RELEASE}.tar.gz \
-#                 && cd pkg-oss-${NGINX_VERSION}-${PKG_RELEASE} \
+#                 && tar xzvf b151aac903a6fc121d57f0909415381d0a1c1bbd.tar.gz \
+#                 && cd pkg-oss-b151aac903a6fc121d57f0909415381d0a1c1bbd \
 #                 && cd alpine \
-#                 && make module-geoip module-image-filter module-njs module-xslt \
-#                 && apk index -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
+#                 && export BUILDTARGET=\"module-geoip module-image-filter module-njs module-xslt module-acme\" \
+#                 && if [ \"\$(apk --print-arch)\" = \"armhf\" ]; then BUILDTARGET=\"\$( echo \$BUILDTARGET | sed 's,module-acme,,' )\"; fi \
+#                 && make \$BUILDTARGET \
+#                 && apk index --allow-untrusted -o ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz ${tempDir}/packages/alpine/${apkArch}/*.apk \
 #                 && abuild-sign -k ${tempDir}/.abuild/abuild-key.rsa ${tempDir}/packages/alpine/${apkArch}/APKINDEX.tar.gz \
 #                 " \
 #             && cp ${tempDir}/.abuild/abuild-key.rsa.pub /etc/apk/keys/ \
 #             && apk del --no-network .build-deps \
+#             && if [ "$apkArch" = "armhf" ]; then nginxPackages="$( echo $nginxPackages | sed 's,nginx-module-acme=.*,,')"; fi \
 #             && apk add -X ${tempDir}/packages/alpine/ --no-cache $nginxPackages \
 #             ;; \
 #     esac \
@@ -539,7 +536,6 @@ RUN set -x \
 # # if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
 #     && if [ -n "$tempDir" ]; then rm -rf "$tempDir"; fi \
 #     && if [ -f "/etc/apk/keys/abuild-key.rsa.pub" ]; then rm -f /etc/apk/keys/abuild-key.rsa.pub; fi \
-#     && if [ -f "/etc/apk/keys/nginx_signing.rsa.pub" ]; then rm -f /etc/apk/keys/nginx_signing.rsa.pub; fi \
 # Bring in curl and ca-certificates to make registering on DNS SD easier
     && apk add --no-cache curl ca-certificates \
 # Bring in gettext so we can get `envsubst`, then throw
