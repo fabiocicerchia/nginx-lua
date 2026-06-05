@@ -456,31 +456,34 @@ RUN set -x \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
-# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.23.2/mainline/debian/Dockerfile
+# COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.31.1/mainline/debian/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && \
-#     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
-#     NGINX_GPGKEY_PATH=/usr/share/keyrings/nginx-archive-keyring.gpg; \
+#     NGINX_GPGKEYS="573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 8540A6F18833A80E9C1653A42FD21310B49F6B46 9E9BE90EACBCDE69FE9B204CBCDCD8A38D88A2B3"; \
+#     NGINX_GPGKEY_PATH=/etc/apt/keyrings/nginx-archive-keyring.gpg; \
 #     export GNUPGHOME="$(mktemp -d)"; \
 #     found=''; \
+#     for NGINX_GPGKEY in $NGINX_GPGKEYS; do \
 #     for server in \
 #         hkp://keyserver.ubuntu.com:80 \
 #         pgp.mit.edu \
 #     ; do \
 #         echo "Fetching GPG key $NGINX_GPGKEY from $server"; \
-#         gpg1 --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
+#         gpg1 --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
 #     done; \
 #     test -z "$found" && echo >&2 "error: failed to fetch GPG key $NGINX_GPGKEY" && exit 1; \
-#     gpg1 --export "$NGINX_GPGKEY" > "$NGINX_GPGKEY_PATH" ; \
+#     done; \
+#     gpg1 --batch --export $NGINX_GPGKEYS > "$NGINX_GPGKEY_PATH" ; \
 #     rm -rf "$GNUPGHOME"; \
 #     apt-get remove --purge --auto-remove -y gnupg1 && rm -rf /var/lib/apt/lists/* \
 #     && dpkgArch="$(dpkg --print-architecture)" \
 #     && nginxPackages=" \
 #         nginx=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE} \
-#         nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${PKG_RELEASE} \
+#         nginx-module-xslt=${NGINX_VERSION}-${DYNPKG_RELEASE} \
+#         nginx-module-geoip=${NGINX_VERSION}-${DYNPKG_RELEASE} \
+#         nginx-module-image-filter=${NGINX_VERSION}-${DYNPKG_RELEASE} \
+#         nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${NJS_RELEASE} \
+#         nginx-module-acme=${NGINX_VERSION}+${ACME_VERSION}-${PKG_RELEASE} \
 #     " \
 #     && case "$dpkgArch" in \
 #         amd64|arm64) \
@@ -490,9 +493,7 @@ RUN set -x \
 #             ;; \
 #         *) \
 # # we're on an architecture upstream doesn't officially build for
-# # let's build binaries from the published source packages
-#             echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
-#             \
+# # let's build binaries from the published packaging sources
 # # new directory for storing sources and .deb files
 #             && tempDir="$(mktemp -d)" \
 #             && chmod 777 "$tempDir" \
@@ -501,13 +502,39 @@ RUN set -x \
 # # save list of currently-installed packages so build dependencies can be cleanly removed later
 #             && savedAptMark="$(apt-mark showmanual)" \
 #             \
-# # build .deb files from upstream's source packages (which are verified by apt-get)
+# # build .deb files from upstream's packaging sources
 #             && apt-get update \
-#             && apt-get build-dep -y $nginxPackages \
+#             && apt-get install --no-install-recommends --no-install-suggests -y \
+#                 cargo \
+#                 curl \
+#                 devscripts \
+#                 equivs \
+#                 git \
+#                 libxml2-utils \
+#                 lsb-release \
+#                 xsltproc \
 #             && ( \
 #                 cd "$tempDir" \
-#                 && DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
-#                     apt-get source --compile $nginxPackages \
+#                 && export CARGO_HOME="$tempDir/.cargo" \
+#                 && REVISION="b151aac903a6fc121d57f0909415381d0a1c1bbd" \
+#                 && REVISION=${REVISION%~*} \
+#                 && curl -f -L -O https://github.com/nginx/pkg-oss/archive/${REVISION}.tar.gz \
+#                 && PKGOSSCHECKSUM="72c13cfedc25a6c1e01c24dd1f736b0fefd1ef7f73ef569e2726fc99c0137327d2e71c8694bd8b0157be2a7247ec1769904746a852e7698caf7df8a5b0040440 *${REVISION}.tar.gz" \
+#                 && if [ "$(openssl sha512 -r ${REVISION}.tar.gz)" = "$PKGOSSCHECKSUM" ]; then \
+#                     echo "pkg-oss tarball checksum verification succeeded!"; \
+#                 else \
+#                     echo "pkg-oss tarball checksum verification failed!"; \
+#                     exit 1; \
+#                 fi \
+#                 && tar xzvf ${REVISION}.tar.gz \
+#                 && cd pkg-oss-${REVISION} \
+#                 && cd debian \
+#                 && for target in base module-geoip module-image-filter module-njs module-xslt module-acme; do \
+#                     make rules-$target; \
+#                     mk-build-deps --install --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes" \
+#                         debuild-$target/nginx-$NGINX_VERSION/debian/control; \
+#                 done \
+#                 && make base module-geoip module-image-filter module-njs module-xslt module-acme \
 #             ) \
 # # we don't remove APT lists here because they get re-downloaded and removed later
 #             \
