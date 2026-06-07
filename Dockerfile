@@ -362,6 +362,17 @@ RUN make deps \
     && make core \
     && make luarocks
 
+# Test prerequisites: install the heavier Perl deps of Test::Nginx from Alpine's
+# repos instead of letting cpanm build them from CPAN source. Building these in
+# the minimal builder is flaky (Module::Build::Tiny / libwww-perl / List::MoreUtils
+# fail), which previously aborted `make test`. With these present, cpanm only has
+# to build the pure-Perl Test-Nginx itself.
+RUN apk add --no-cache \
+        perl-libwww \
+        perl-http-message \
+        perl-http-daemon \
+        perl-list-moreutils
+
 RUN make test
 
 ##########################################
