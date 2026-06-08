@@ -313,6 +313,7 @@ ARG BUILD_DEPS_BASE="\
         patch \
         python3 \
         pcre2-devel \
+        perl-devel \
         tar \
         unzip \
         wget \

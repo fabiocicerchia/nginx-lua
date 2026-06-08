@@ -303,6 +303,7 @@ ARG BUILD_DEPS_BASE="\
         g++ \
         libmaxminddb-dev \
         libpcre2-dev \
+        libperl-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
