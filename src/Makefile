@@ -359,15 +359,15 @@ luarocks:
 	# Module::Build::Tiny), which aborts the whole install. The Perl API headers
 	# (perl-dev / libperl-dev / perl-devel, provided per distro in BUILD_DEPS_BASE)
 	# are what let the XS dists (e.g. List::MoreUtils) configure successfully.
-	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Harness
+	#
+	# HTTP::Daemon is installed up front, *before* Test::Nginx::Socket pulls in
+	# libwww-perl (LWP). cpanm fetches over HTTPS via HTTP::Tiny while LWP is
+	# absent; once LWP is installed cpanm switches to it, and LWP cannot fetch
+	# HTTPS without LWP::Protocol::https — so a later `cpanm HTTP::Daemon` dies on
+	# its cpanmetadb lookup. libwww-perl >= 6.83 no longer pulls in HTTP::Daemon
+	# transitively, so it must be requested explicitly.
+	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Harness HTTP::Daemon
 	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Nginx::Socket
-	# HTTP::Daemon is normally pulled in as a transitive dep of Test::Nginx::Socket
-	# (via libwww-perl). Only invoke cpanm when it is missing, otherwise cpanm will
-	# re-query cpanmetadb.cpan.org (HTTPS) to check for updates — and without
-	# LWP::Protocol::https that query fails, aborting the build even though the
-	# module is already available.
-	perl -MHTTP::Daemon -e 1 2>/dev/null \
-		|| PERL_MM_USE_DEFAULT=1 cpanm --notest HTTP::Daemon
 # 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 # 	tar -C / -xf Python-2.7.18.tgz
 # 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
