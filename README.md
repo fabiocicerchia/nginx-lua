@@ -46,7 +46,7 @@ If you'd like to support this open-source project I'll appreciate any kind of [c
 
 <!-- START_SUPPORTED_TAGS -->
 - [`almalinux`, `1-almalinux`, `1.31-almalinux`, `1.31.1-almalinux`, `1-almalinux10.2-20260602`, `1.31-almalinux10.2-20260602`, `1.31.1-almalinux10.2-20260602`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/almalinux/10.2-20260602/Dockerfile)
-- [`1`, `1.31`, `1.31.1`, `alpine`, `latest`, `1-alpine`, `1.31-alpine`, `1.31.1-alpine`, `1-alpine3.23.4`, `1.31-alpine3.23.4`, `1.31.1-alpine3.23.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/alpine/3.23.4/Dockerfile)
+- [`1`, `1.31`, `1.31.1`, `alpine`, `latest`, `1-alpine`, `1.31-alpine`, `1.31.1-alpine`, `1-alpine3.24.0`, `1.31-alpine3.24.0`, `1.31.1-alpine3.24.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/alpine/3.24.0/Dockerfile)
 - [`amazonlinux`, `1-amazonlinux`, `1.31-amazonlinux`, `1.31.1-amazonlinux`, `1-amazonlinux2023.11.20260526.0`, `1.31-amazonlinux2023.11.20260526.0`, `1.31.1-amazonlinux2023.11.20260526.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/amazonlinux/2023.11.20260526.0/Dockerfile)
 - [`debian`, `1-debian`, `1.31-debian`, `1-debian13.5`, `1.31.1-debian`, `1.31-debian13.5`, `1.31.1-debian13.5`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/debian/13.5/Dockerfile)
 - [`fedora`, `1-fedora`, `1-fedora44`, `1.31-fedora`, `1.31-fedora44`, `1.31.1-fedora`, `1.31.1-fedora44`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.1/fedora/44/Dockerfile)
