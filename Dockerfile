@@ -9,7 +9,7 @@
 
 ARG ARCH=
 ARG DISTRO=alpine
-ARG DISTRO_VER=3.23.3
+ARG DISTRO_VER=3.24.1
 
 #############################
 # Settings Common Variables #
@@ -33,7 +33,7 @@ ENV VCS_REF=$VCS_REF
 
 # nginx
 # https://github.com/nginx/nginx/releases
-ARG VER_NGINX=1.31.0
+ARG VER_NGINX=1.31.2
 ENV VER_NGINX=$VER_NGINX
 
 # NGINX MODULES
@@ -47,7 +47,7 @@ ENV VER_NGX_DEVEL_KIT=$VER_NGX_DEVEL_KIT
 
 # njs
 # https://github.com/nginx/njs
-ARG VER_NJS=0.9.6
+ARG VER_NJS=1.0.0
 ENV VER_NJS=$VER_NJS
 
 # geoip2
@@ -66,7 +66,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT=2.1-20260311
+ARG VER_LUAJIT=2.1-20260620
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -102,7 +102,7 @@ ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS=0.39
+ARG VER_OPENRESTY_HEADERS=0.40
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
@@ -123,12 +123,12 @@ ENV VER_LUA_RESTY_LRUCACHE=$VER_LUA_RESTY_LRUCACHE
 
 # lua-resty-memcached
 # https://github.com/openresty/lua-resty-memcached
-ARG VER_OPENRESTY_MEMCACHED=0.17
+ARG VER_OPENRESTY_MEMCACHED=0.18
 ENV VER_OPENRESTY_MEMCACHED=$VER_OPENRESTY_MEMCACHED
 
 # lua-resty-mysql
 # https://github.com/openresty/lua-resty-mysql
-ARG VER_OPENRESTY_MYSQL=0.29
+ARG VER_OPENRESTY_MYSQL=0.31
 ENV VER_OPENRESTY_MYSQL=$VER_OPENRESTY_MYSQL
 
 # lua-resty-redis
@@ -143,17 +143,17 @@ ENV VER_OPENRESTY_SHELL=$VER_OPENRESTY_SHELL
 
 # lua-resty-signal
 # https://github.com/openresty/lua-resty-signal
-ARG VER_OPENRESTY_SIGNAL=0.04
+ARG VER_OPENRESTY_SIGNAL=0.05
 ENV VER_OPENRESTY_SIGNAL=$VER_OPENRESTY_SIGNAL
 
 # lua-resty-upstream-healthcheck
 # https://github.com/openresty/lua-resty-upstream-healthcheck
-ARG VER_OPENRESTY_HEALTHCHECK=0.08
+ARG VER_OPENRESTY_HEALTHCHECK=0.10
 ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket
-ARG VER_OPENRESTY_WEBSOCKET=0.13
+ARG VER_OPENRESTY_WEBSOCKET=0.14
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-tablepool
@@ -163,7 +163,7 @@ ENV VER_OPENRESTY_TABLEPOOL=$VER_OPENRESTY_TABLEPOOL
 
 # lua-upstream-nginx-module
 # https://github.com/openresty/lua-upstream-nginx-module
-ARG VER_LUA_UPSTREAM=0.07
+ARG VER_LUA_UPSTREAM=0.08
 ENV VER_LUA_UPSTREAM=$VER_LUA_UPSTREAM
 
 # nginx-lua-prometheus
@@ -173,12 +173,12 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 
 # set-misc-nginx-module
 # https://github.com/openresty/set-misc-nginx-module
-ARG VER_MISC_NGINX=0.33
+ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=c5b3410939478069b2af6552205173fb8b6a43fd
+ARG VER_OPENRESTY_STREAMLUA=11f9e38a20dc79783a9d793201d6ec399ff368e7
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -203,7 +203,7 @@ ENV VER_OPENRESTY_BALANCER=$VER_OPENRESTY_BALANCER
 
 # lua-resty-string
 # https://github.com/openresty/lua-resty-string/tags
-ARG VER_OPENRESTY_STRING=0.16
+ARG VER_OPENRESTY_STRING=0.19
 ENV VER_OPENRESTY_STRING=$VER_OPENRESTY_STRING
 
 ################################################################################
@@ -367,18 +367,18 @@ FROM base
 # http://label-schema.org/rc1/
 LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.23.3." \
-    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.23.3" \
+    org.label-schema.description="Nginx ${VER_NGINX} with Lua support based on alpine (${ARCH}) 3.24.1." \
+    org.label-schema.docker.cmd="docker run -p 80:80 -d ${DOCKER_IMAGE}:${VER_NGINX}-alpine3.24.1" \
     org.label-schema.name="${DOCKER_IMAGE}" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://github.com/${DOCKER_IMAGE}" \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-url="https://github.com/${DOCKER_IMAGE}" \
-    org.label-schema.version="${VER_NGINX}-alpine3.23.3" \
+    org.label-schema.version="${VER_NGINX}-alpine3.24.1" \
     image.target.platform="${TARGETPLATFORM}" \
     image.target.os="${TARGETOS}" \
     image.target.arch="${ARCH}" \
-    versions.os="3.23.3" \
+    versions.os="3.24.1" \
     versions.luajit2="${VER_LUAJIT}" \
     versions.luarocks="${VER_LUAROCKS}" \
     versions.nginx="${VER_NGINX}" \
@@ -471,7 +471,6 @@ RUN set -x \
 #         nginx-module-geoip=${NGINX_VERSION}-r${PKG_RELEASE} \
 #         nginx-module-image-filter=${NGINX_VERSION}-r${PKG_RELEASE} \
 #         nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-r${PKG_RELEASE} \
-#         nginx-module-acme=${NGINX_VERSION}.${ACME_VERSION}-r${PKG_RELEASE} \
 #     " \
 # # install prerequisites for public key and pkg-oss checks
 #     && apk add --no-cache --virtual .checksum-deps \
