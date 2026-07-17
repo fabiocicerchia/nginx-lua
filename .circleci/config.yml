@@ -22,6 +22,7 @@ workflows:
                 - main
     jobs:
       - Nightly Update
+      - Verify Published Signatures
 
   builds:
     jobs:
@@ -614,3 +615,31 @@ jobs:
             export GH_TOKEN="${GITHUB_TOKEN}"
             git pull --ff-only origin main || true
             make auto-update-and-commit || echo "No updates to commit (already up to date)"
+
+  # Independently re-checks that the tags people actually pull are signed.
+  # Issue #279: alpine/amazonlinux images were pushed unsigned by a build
+  # where "Docker Bundle" (the job that runs sign-manifest.sh) never posted
+  # a GitHub status at all, while sibling distros in the same run signed
+  # fine — so a green commit status is not reliable evidence that signing
+  # happened. This job re-verifies the live tags on a schedule so drift like
+  # that is caught within a day instead of sitting undetected indefinitely.
+  Verify Published Signatures:
+    machine:
+      image: ubuntu-2404:2025.09.1
+      docker_layer_caching: false
+    steps:
+      - checkout
+      - install_cosign
+      - run:
+          name: Verify published tags are signed
+          command: |
+            set -euo pipefail
+            FAILED=0
+            for TAG in latest almalinux alpine amazonlinux debian fedora ubuntu; do
+              echo "=== Verifying fabiocicerchia/nginx-lua:${TAG} ==="
+              if ! ./bin/verify-image.sh "fabiocicerchia/nginx-lua:${TAG}"; then
+                echo "FAIL: fabiocicerchia/nginx-lua:${TAG} is not signed"
+                FAILED=1
+              fi
+            done
+            exit $FAILED
