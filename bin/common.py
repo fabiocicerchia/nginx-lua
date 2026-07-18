@@ -8,7 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Configuration
@@ -41,6 +41,7 @@ DOCKER_IMAGES_COMMAND = "docker images"
 
 # Git constants
 GIT_REV_PARSE_COMMAND = "git rev-parse --short HEAD"
+GIT_COMMIT_DATE_COMMAND = "git log -1 --format=%ct"
 
 # Architecture constants
 AMD64_ARCH = "amd64"
@@ -173,10 +174,26 @@ def get_tarball_path(dockerfile_path):
     return f"{DIST_DIR}/{MULTIARCH_PREFIX}-{safe_name}{TARBALL_EXTENSION}"
 
 
+def get_build_date():
+    """Derive BUILD_DATE from the current commit's timestamp rather than
+    wall-clock build time.
+
+    Rebuilding the exact same commit (e.g. a CI rerun of a single job,
+    whether same-day or not) then always produces the identical BUILD_DATE
+    build-arg, so the resulting image digest is identical too. A rerun
+    becomes a genuine no-op instead of silently pushing a new, unsigned
+    digest under an already-signed tag and orphaning the earlier signature.
+    """
+    commit_epoch = subprocess.check_output(
+        shlex.split(GIT_COMMIT_DATE_COMMAND), text=True
+    ).strip()
+    return datetime.fromtimestamp(int(commit_epoch), tz=timezone.utc).strftime(BUILD_DATE_FORMAT)
+
+
 def build_docker_image(vcs_ref, tags, dockerfile_path, arch):
     """Build Docker image with given parameters."""
     tag_params = " ".join([f"-t {tag}" for tag in tags])
-    build_date = datetime.now().strftime(BUILD_DATE_FORMAT)
+    build_date = get_build_date()
 
     tarball_path = get_tarball_path(dockerfile_path)
     os.makedirs(os.path.dirname(tarball_path), exist_ok=True)
