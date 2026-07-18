@@ -114,28 +114,42 @@ def generate_tags(nginx_version, os_distro, os_version, arch=""):
 
     major, minor, patch = get_version_parts(nginx_version)
     is_default = os_distro == DEFAULT_DISTRO
+    # Tags that only encode the major version ("1") are ambiguous between
+    # mainline and stable, since both track the same major (e.g. 1.31.x and
+    # 1.30.x are both "1"). Granting those tags to both builds makes them
+    # fight over the same tag name — whichever gets built/pushed last
+    # silently wins, orphaning the cosign signature made against the
+    # specific per-version tag from whatever "latest"/the bare distro tag
+    # actually resolves to. Minor/patch-qualified tags are never ambiguous
+    # (mainline and stable always differ there), so they don't need gating.
+    is_mainline = nginx_version == load_supported_versions()["nginx_mainline"]
 
     tags = []
 
     # Add default tags for alpine (default distro)
     if is_default:
+        if is_mainline:
+            tags.extend([
+                f"{major}{arch_suffix}",
+                f"{LATEST_TAG}{arch_suffix}"
+            ])
         tags.extend([
-            f"{major}{arch_suffix}",
             f"{minor}{arch_suffix}",
             f"{patch}{arch_suffix}",
-            f"{LATEST_TAG}{arch_suffix}"
         ])
 
     # Add OS-specific tags
+    if is_mainline:
+        tags.extend([
+            f"{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{os_version}{arch_suffix}",
+        ])
     tags.extend([
-        f"{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}",
         f"{minor}-{os_distro}{arch_suffix}",
         f"{patch}-{os_distro}{arch_suffix}",
         f"{patch}-{os_distro}{os_version}{arch_suffix}",
         f"{minor}-{os_distro}{os_version}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}"
     ])
 
     # Add repository prefix and remove duplicates
