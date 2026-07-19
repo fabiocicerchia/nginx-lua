@@ -57,10 +57,17 @@ SKIPPED_PATCHES=""
 openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
 	git clone https://github.com/openresty/openresty.git; \
+	# ponytail: openresty only publishes patches for mainline (odd) nginx
+	# releases, so "nearest available version <= VER_NGINX" already resolves
+	# to the previous mainline branch for stable targets - no parity filter needed.
 	PATCH_VER=${VER_NGINX}; \
 	if [ "$$(ls -1 openresty/patches/nginx/${VER_NGINX}/nginx-${VER_NGINX}-*.patch 2>/dev/null)" = "" ]; then \
-		PATCH_VER=$$(ls -1d openresty/patches/nginx/*/ 2>/dev/null | xargs -I{} basename {} | sort -V | tail -1); \
-		echo "No patches for ${VER_NGINX}, falling back to latest available: $${PATCH_VER}"; \
+		PATCH_VER=$$(printf '%s\n' $$(ls -1d openresty/patches/nginx/*/ 2>/dev/null | xargs -I{} basename {}) ${VER_NGINX} | sort -V | grep -B1 -x "${VER_NGINX}" | head -1); \
+		if [ -z "$$PATCH_VER" ] || [ "$$PATCH_VER" = "${VER_NGINX}" ]; then \
+			echo "FATAL: no openresty nginx patch version <= ${VER_NGINX} available" >&2; \
+			exit 1; \
+		fi; \
+		echo "No patches for ${VER_NGINX}, falling back to most recent lower version: $${PATCH_VER}"; \
 	fi; \
 	for patch_file in openresty/patches/nginx/$${PATCH_VER}/nginx-$${PATCH_VER}-*.patch; do \
 		echo "copying openresty patch $${patch_file}"; \
