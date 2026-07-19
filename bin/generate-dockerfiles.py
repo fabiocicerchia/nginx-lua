@@ -9,8 +9,8 @@ versions for each supported OS distribution.
 
 import shutil
 import common
-import subprocess
 import re
+from pathlib import Path
 
 def main():
     versions = common.load_supported_versions()
@@ -21,11 +21,10 @@ def main():
     for os_distro in common.get_supported_os():
         common.setup_dockerfile(versions["nginx_stable"], os_distro, versions[os_distro])
 
-    dockerfiles = subprocess.check_output(['/usr/bin/find', 'nginx', '-type', 'f', '-name', 'Dockerfile'])
-    dockerfiles = list(
-        filter(
-            lambda elem: re.search(r"nginx/.+/alpine/\d+\.\d+\.\d+/", elem),
-            dockerfiles.decode("utf-8").split("\n")))
+    dockerfiles = [
+        str(path) for path in Path("nginx").rglob("Dockerfile")
+        if re.search(r"nginx/.+/alpine/\d+\.\d+\.\d+/", str(path))
+    ]
     dockerfiles.sort(reverse=True)
     shutil.copyfile(dockerfiles[0], "./Dockerfile")
 

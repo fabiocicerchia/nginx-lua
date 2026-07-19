@@ -12,10 +12,7 @@ import subprocess
 import common
 import argparse
 
-# Constants
 ARM64_ARCH = "arm64"
-ARM64V8_ARCH = "arm64v8"
-DOCKER_IMAGES_COMMAND = "docker images"
 
 def main():
     parser = argparse.ArgumentParser(description="Build Docker images for nginx-lua")
@@ -33,7 +30,7 @@ def main():
     arch = args.arch
 
     if arch == ARM64_ARCH:
-        arch = ARM64V8_ARCH
+        arch = common.ARM64V8_ARCH
 
     versions = common.load_supported_versions()
 
@@ -50,7 +47,7 @@ def main():
         sys.exit(1)
 
     stdout = subprocess.check_output(
-        DOCKER_IMAGES_COMMAND.split(), text=True
+        common.DOCKER_IMAGES_COMMAND.split(), text=True
     )
     print(stdout)
 
