@@ -29,6 +29,10 @@ SHA256_LUAJIT={sha256_luajit}
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module/tags
 # Production ready.
+# NOTE: lua-resty-core pins this to an EXACT version (ngx_lua_version ~= check in
+# resty/core/base.lua), so it MUST match VER_LUA_RESTY_CORE's required version.
+# generate-deps-env.py derives this from resty-core - do not hand-edit without
+# also checking get_resty_core_required_lua_module().
 VER_LUA_NGINX_MODULE={ver_lua_nginx_module}
 SHA256_LUA_NGINX_MODULE={sha256_lua_nginx_module}
 
