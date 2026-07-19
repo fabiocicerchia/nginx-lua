@@ -8,7 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Configuration
@@ -41,6 +41,7 @@ DOCKER_IMAGES_COMMAND = "docker images"
 
 # Git constants
 GIT_REV_PARSE_COMMAND = "git rev-parse --short HEAD"
+GIT_COMMIT_DATE_COMMAND = "git log -1 --format=%ct"
 
 # Architecture constants
 AMD64_ARCH = "amd64"
@@ -114,28 +115,42 @@ def generate_tags(nginx_version, os_distro, os_version, arch=""):
 
     major, minor, patch = get_version_parts(nginx_version)
     is_default = os_distro == DEFAULT_DISTRO
+    # Tags that only encode the major version ("1") are ambiguous between
+    # mainline and stable, since both track the same major (e.g. 1.31.x and
+    # 1.30.x are both "1"). Granting those tags to both builds makes them
+    # fight over the same tag name — whichever gets built/pushed last
+    # silently wins, orphaning the cosign signature made against the
+    # specific per-version tag from whatever "latest"/the bare distro tag
+    # actually resolves to. Minor/patch-qualified tags are never ambiguous
+    # (mainline and stable always differ there), so they don't need gating.
+    is_mainline = nginx_version == load_supported_versions()["nginx_mainline"]
 
     tags = []
 
     # Add default tags for alpine (default distro)
     if is_default:
+        if is_mainline:
+            tags.extend([
+                f"{major}{arch_suffix}",
+                f"{LATEST_TAG}{arch_suffix}"
+            ])
         tags.extend([
-            f"{major}{arch_suffix}",
             f"{minor}{arch_suffix}",
             f"{patch}{arch_suffix}",
-            f"{LATEST_TAG}{arch_suffix}"
         ])
 
     # Add OS-specific tags
+    if is_mainline:
+        tags.extend([
+            f"{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{os_version}{arch_suffix}",
+        ])
     tags.extend([
-        f"{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}",
         f"{minor}-{os_distro}{arch_suffix}",
         f"{patch}-{os_distro}{arch_suffix}",
         f"{patch}-{os_distro}{os_version}{arch_suffix}",
         f"{minor}-{os_distro}{os_version}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}"
     ])
 
     # Add repository prefix and remove duplicates
@@ -159,10 +174,26 @@ def get_tarball_path(dockerfile_path):
     return f"{DIST_DIR}/{MULTIARCH_PREFIX}-{safe_name}{TARBALL_EXTENSION}"
 
 
+def get_build_date():
+    """Derive BUILD_DATE from the current commit's timestamp rather than
+    wall-clock build time.
+
+    Rebuilding the exact same commit (e.g. a CI rerun of a single job,
+    whether same-day or not) then always produces the identical BUILD_DATE
+    build-arg, so the resulting image digest is identical too. A rerun
+    becomes a genuine no-op instead of silently pushing a new, unsigned
+    digest under an already-signed tag and orphaning the earlier signature.
+    """
+    commit_epoch = subprocess.check_output(
+        shlex.split(GIT_COMMIT_DATE_COMMAND), text=True
+    ).strip()
+    return datetime.fromtimestamp(int(commit_epoch), tz=timezone.utc).strftime(BUILD_DATE_FORMAT)
+
+
 def build_docker_image(vcs_ref, tags, dockerfile_path, arch):
     """Build Docker image with given parameters."""
     tag_params = " ".join([f"-t {tag}" for tag in tags])
-    build_date = datetime.now().strftime(BUILD_DATE_FORMAT)
+    build_date = get_build_date()
 
     tarball_path = get_tarball_path(dockerfile_path)
     os.makedirs(os.path.dirname(tarball_path), exist_ok=True)
