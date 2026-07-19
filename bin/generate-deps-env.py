@@ -8,6 +8,7 @@ the GitHub API to get the latest tags and commits.
 """
 
 import hashlib
+import re
 import sys
 from pathlib import Path
 from urllib.parse import urlparse
@@ -51,6 +52,36 @@ def get_latest_tag(repo_url):
         return name.lstrip("v")
 
     return ""
+
+
+def get_resty_core_required_lua_module(tag):
+    """Return the lua-nginx-module version that lua-resty-core <tag> pins to.
+
+    lua-resty-core enforces an EXACT lua-nginx-module version via an
+    `ngx.config.ngx_lua_version ~= NNNNN` check in resty/core/base.lua. The
+    HTTP-subsystem number (e.g. 10029) encodes the required version as
+    major*1000000 + minor*1000 + patch, i.e. 10029 -> 0.10.29. Tracking the
+    latest tags of each library independently can desync them (lua-nginx-module
+    may ship a stable release before its matching lua-resty-core does), so we
+    derive the module version from resty-core to keep the pair consistent.
+    """
+    url = (
+        "https://raw.githubusercontent.com/openresty/lua-resty-core/"
+        f"v{tag}/lib/resty/core/base.lua"
+    )
+    resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
+
+    # The first `~= NNNNN` guard is the HTTP subsystem (ngx_http_lua_module).
+    match = re.search(r"ngx_lua_version\s*~=\s*(\d+)", resp.text)
+    if not match:
+        raise RuntimeError(f"Could not find ngx_lua_version check in {url}")
+
+    ver = int(match.group(1))
+    major = ver // 1000000
+    minor = (ver // 1000) % 1000
+    patch = ver % 1000
+    return f"{major}.{minor}.{patch}"
 
 
 def get_latest_commit(repo_url):
@@ -148,9 +179,24 @@ def main():
 
     template_vars = {}
 
+    # lua-resty-core pins lua-nginx-module to an exact version (see
+    # get_resty_core_required_lua_module), so resolve resty-core first and
+    # derive the module version from it instead of fetching each library's
+    # latest tag independently - that desyncs them whenever lua-nginx-module
+    # ships a stable release before its matching lua-resty-core does.
+    resty_core_ver = get_latest_tag("https://github.com/openresty/lua-resty-core")
+    pinned_lua_nginx_module = get_resty_core_required_lua_module(resty_core_ver)
+    print(
+        f"lua-resty-core {resty_core_ver} pins lua-nginx-module to "
+        f"{pinned_lua_nginx_module}",
+        file=sys.stderr,
+    )
+
     for name, repo_url, is_commit, tarball_pattern in deps:
         print(f"Fetching version for {name}...", file=sys.stderr)
-        if is_commit:
+        if name == "lua_nginx_module":
+            ver = pinned_lua_nginx_module
+        elif is_commit:
             ver = get_latest_commit(repo_url)
         else:
             ver = get_latest_tag(repo_url)
