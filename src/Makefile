@@ -90,10 +90,8 @@ openresty-patches:
 core:
 # NGINX
 # ##############################################################################
-# we're on an architecture upstream doesn't officially build for
-# let's build binaries from the published packaging sources
-	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
-	tar -C / -xzf /nginx.tar.gz
+	$(call secure_download,https://nginx.org/download/nginx-${VER_NGINX}.tar.gz,/nginx.tar.gz,${SHA256_NGINX})
+	tar -C / -xvzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
 		/var/cache/nginx/proxy_temp \
 		/var/cache/nginx/fastcgi_temp \
