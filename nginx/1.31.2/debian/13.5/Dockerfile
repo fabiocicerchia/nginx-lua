@@ -297,21 +297,16 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        cpanminus \
         curl \
         g++ \
         libmaxminddb-dev \
         libpcre2-dev \
-        libperl-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
         make \
         patch \
-        perl \
-        python3 \
         unzip \
-        wget \
         zlib1g-dev \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
@@ -356,9 +351,6 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
-
-# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
-RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

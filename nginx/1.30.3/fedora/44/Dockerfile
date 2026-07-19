@@ -308,11 +308,8 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
-        perl-App-cpanminus \
-        perl-devel \
         tar \
         unzip \
-        wget \
         which \
         zlib-devel \
 "
@@ -359,8 +356,6 @@ RUN set -eux \
 # ##############################################################################
     && yum install -y \
         gettext
-
-RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

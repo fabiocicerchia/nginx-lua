@@ -300,7 +300,6 @@ ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        cpanminus \
         findutils \
         gcc-c++ \
         gzip \
@@ -311,12 +310,9 @@ ARG BUILD_DEPS_BASE="\
         make \
         openssl-devel \
         patch \
-        python3 \
         pcre2-devel \
-        perl-devel \
         tar \
         unzip \
-        wget \
         which \
         zlib-devel \
 "
@@ -367,8 +363,6 @@ RUN set -eux \
     && dnf makecache \
     && dnf install -y \
         gettext
-
-RUN make test
 
 ##########################################
 # Combine everything with minimal layers #

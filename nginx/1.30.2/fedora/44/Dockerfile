@@ -78,7 +78,7 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.29
+ARG VER_LUA_NGINX_MODULE=0.10.31
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
@@ -308,11 +308,8 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
-        perl-App-cpanminus \
-        perl-devel \
         tar \
         unzip \
-        wget \
         which \
         zlib-devel \
 "
@@ -359,8 +356,6 @@ RUN set -eux \
 # ##############################################################################
     && yum install -y \
         gettext
-
-RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
