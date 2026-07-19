@@ -1,0 +1,108 @@
+"""
+Single source of truth for third-party nginx/Lua module dependencies.
+
+Used by generate-deps-env.py (resolves latest versions -> src/.env.dist) and
+generate-fossa-deps.py (reads src/.env.dist -> fossa-deps.yml), so both stay
+in sync automatically instead of drifting apart.
+
+Fields:
+    key:             lowercase identifier; VER_<KEY.upper()> is the .env.dist variable.
+    fossa_name:      display name used in fossa-deps.yml.
+    repo_url:        GitHub repo URL (no trailing slash).
+    is_commit:       True if pinned to a commit SHA instead of a tag (tracks a branch).
+    tarball_pattern: archive URL template, {ver} is the tag/commit.
+"""
+
+DEPENDENCIES = [
+    dict(key='ngx_devel_kit', fossa_name='ngx_devel_kit',
+         repo_url="https://github.com/vision5/ngx_devel_kit", is_commit=False,
+         tarball_pattern="https://github.com/vision5/ngx_devel_kit/archive/v{ver}.tar.gz"),
+    dict(key='njs', fossa_name='njs',
+         repo_url="https://github.com/nginx/njs", is_commit=False,
+         tarball_pattern="https://github.com/nginx/njs/archive/{ver}.tar.gz"),
+    dict(key='geoip', fossa_name='geoip2',
+         repo_url="https://github.com/leev/ngx_http_geoip2_module", is_commit=False,
+         tarball_pattern="https://github.com/leev/ngx_http_geoip2_module/archive/{ver}.tar.gz"),
+    dict(key='luajit', fossa_name='luajit2',
+         repo_url="https://github.com/openresty/luajit2", is_commit=False,
+         tarball_pattern="https://github.com/openresty/luajit2/archive/v{ver}.tar.gz"),
+    dict(key='lua_nginx_module', fossa_name='lua-nginx-module',
+         repo_url="https://github.com/openresty/lua-nginx-module", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-nginx-module/archive/v{ver}.tar.gz"),
+    dict(key='lua_resty_core', fossa_name='lua-resty-core',
+         repo_url="https://github.com/openresty/lua-resty-core", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-core/archive/v{ver}.tar.gz"),
+    dict(key='luarocks', fossa_name='lua-rocks',
+         repo_url="https://github.com/luarocks/luarocks", is_commit=False,
+         tarball_pattern="https://github.com/luarocks/luarocks/archive/refs/tags/v{ver}.tar.gz"),
+    dict(key='lua_resty_lrucache', fossa_name='lua-resty-lrucache',
+         repo_url="https://github.com/openresty/lua-resty-lrucache", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-lrucache/archive/v{ver}.tar.gz"),
+    dict(key='openresty_headers', fossa_name='headers-more-nginx-module',
+         repo_url="https://github.com/openresty/headers-more-nginx-module", is_commit=False,
+         tarball_pattern="https://github.com/openresty/headers-more-nginx-module/archive/v{ver}.tar.gz"),
+    dict(key='cloudflare_cookie', fossa_name='lua-resty-cookie',
+         repo_url="https://github.com/cloudflare/lua-resty-cookie", is_commit=True,
+         tarball_pattern="https://github.com/cloudflare/lua-resty-cookie/archive/{ver}.tar.gz"),
+    dict(key='openresty_dns', fossa_name='lua-resty-dns',
+         repo_url="https://github.com/openresty/lua-resty-dns", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-dns/archive/v{ver}.tar.gz"),
+    dict(key='openresty_memcached', fossa_name='lua-resty-memcached',
+         repo_url="https://github.com/openresty/lua-resty-memcached", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-memcached/archive/v{ver}.tar.gz"),
+    dict(key='openresty_mysql', fossa_name='lua-resty-mysql',
+         repo_url="https://github.com/openresty/lua-resty-mysql", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-mysql/archive/v{ver}.tar.gz"),
+    dict(key='openresty_redis', fossa_name='lua-resty-redis',
+         repo_url="https://github.com/openresty/lua-resty-redis", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-redis/archive/v{ver}.tar.gz"),
+    dict(key='openresty_shell', fossa_name='lua-resty-shell',
+         repo_url="https://github.com/openresty/lua-resty-shell", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-shell/archive/v{ver}.tar.gz"),
+    dict(key='openresty_signal', fossa_name='lua-resty-signal',
+         repo_url="https://github.com/openresty/lua-resty-signal", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-signal/archive/v{ver}.tar.gz"),
+    dict(key='openresty_tablepool', fossa_name='lua-tablepool',
+         repo_url="https://github.com/openresty/lua-tablepool", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-tablepool/archive/v{ver}.tar.gz"),
+    dict(key='openresty_healthcheck', fossa_name='lua-resty-upstream-healthcheck',
+         repo_url="https://github.com/openresty/lua-resty-upstream-healthcheck", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-upstream-healthcheck/archive/v{ver}.tar.gz"),
+    dict(key='openresty_websocket', fossa_name='lua-resty-websocket',
+         repo_url="https://github.com/openresty/lua-resty-websocket", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-websocket/archive/v{ver}.tar.gz"),
+    dict(key='lua_upstream', fossa_name='lua-upstream-nginx-module',
+         repo_url="https://github.com/openresty/lua-upstream-nginx-module", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-upstream-nginx-module/archive/v{ver}.tar.gz"),
+    dict(key='prometheus', fossa_name='nginx-lua-prometheus',
+         repo_url="https://github.com/knyar/nginx-lua-prometheus", is_commit=False,
+         tarball_pattern="https://github.com/knyar/nginx-lua-prometheus/archive/{ver}.tar.gz"),
+    dict(key='misc_nginx', fossa_name='set-misc-nginx-module',
+         repo_url="https://github.com/openresty/set-misc-nginx-module", is_commit=False,
+         tarball_pattern="https://github.com/openresty/set-misc-nginx-module/archive/v{ver}.tar.gz"),
+    dict(key='openresty_streamlua', fossa_name='stream-lua-nginx-module',
+         repo_url="https://github.com/openresty/stream-lua-nginx-module", is_commit=True,
+         tarball_pattern="https://github.com/openresty/stream-lua-nginx-module/archive/{ver}.tar.gz"),
+    dict(key='openresty_limittraffic', fossa_name='lua-resty-limit-traffic',
+         repo_url="https://github.com/openresty/lua-resty-limit-traffic", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-limit-traffic/archive/v{ver}.tar.gz"),
+    dict(key='openresty_upload', fossa_name='lua-resty-upload',
+         repo_url="https://github.com/openresty/lua-resty-upload", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-upload/archive/v{ver}.tar.gz"),
+    dict(key='openresty_lock', fossa_name='lua-resty-lock',
+         repo_url="https://github.com/openresty/lua-resty-lock", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-lock/archive/v{ver}.tar.gz"),
+    dict(key='openresty_balancer', fossa_name='lua-resty-balancer',
+         repo_url="https://github.com/openresty/lua-resty-balancer", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-balancer/archive/v{ver}.tar.gz"),
+    dict(key='openresty_string', fossa_name='lua-resty-string',
+         repo_url="https://github.com/openresty/lua-resty-string", is_commit=False,
+         tarball_pattern="https://github.com/openresty/lua-resty-string/archive/v{ver}.tar.gz"),
+]
+
+# Vendored file with no version to track (not in src/.env.dist) - kept static.
+STATIC_DEPENDENCIES = [
+    dict(fossa_name="SSL implementation by Eric Young",
+         url="https://raw.githubusercontent.com/vision5/ngx_devel_kit/refs/heads/master/src/hash/sha.h",
+         version="0.0.0"),
+]
