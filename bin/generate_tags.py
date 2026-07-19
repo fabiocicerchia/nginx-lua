@@ -9,12 +9,11 @@ a markdown-formatted list of tags organized by supported and unsupported version
 
 import operator
 import re
-import subprocess
+from pathlib import Path
 import common
 
 # Constants
 DOCKERFILE_PATTERN = "Dockerfile*"
-FIND_COMMAND = ['/usr/bin/find', 'nginx', '-type', 'f', '-name', DOCKERFILE_PATTERN]
 DOCKERFILE_REGEX = r"nginx/(.+)/(.+)/(.+)/Dockerfile(-compat)?"
 COMPAT_SUFFIX = "-compat"
 ALPINE_DISTRO = "alpine"
@@ -24,9 +23,7 @@ LATEST_TAG = "latest"
 GITHUB_BASE_URL = "https://github.com/fabiocicerchia/nginx-lua/blob/main/"
 
 def main():
-    files = sorted(
-        subprocess.check_output(FIND_COMMAND, text=True).splitlines()
-    )
+    files = sorted(str(path) for path in Path("nginx").rglob(DOCKERFILE_PATTERN) if path.is_file())
 
     supported = common.get_supported_versions()
 
