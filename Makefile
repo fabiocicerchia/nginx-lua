@@ -239,7 +239,7 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles generate-fossa-deps update-readme update-tags ## auto update supported versions, dockerfiles, fossa deps and tags
 
 .setup_gitrepo:
 	git config user.name "$(GH_USERNAME)"
@@ -247,7 +247,7 @@ auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-en
 	git remote set-url --push origin "https://x-access-token:${GITHUB_TOKEN}@github.com/$(GH_USERNAME)/nginx-lua.git"
 
 auto-update-and-commit: .setup_gitrepo auto-update
-	git add supported_versions nginx/ src/ docs/TAGS.md README.md || true; \
+	git add supported_versions nginx/ src/ docs/TAGS.md README.md fossa-deps.yml || true; \
 	CHANGES=$$(git status --porcelain | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
@@ -313,6 +313,9 @@ generate-dockerfiles: ## generate all dockerfiles
 
 generate-deps-env: ## generate .env for dependencies
 	./bin/generate-deps-env.py | tee ./src/.env.dist
+
+generate-fossa-deps: ## regenerate fossa-deps.yml from src/.env.dist
+	./bin/generate-fossa-deps.py
 
 ENTRYPOINT_FILES=src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh
 ENTRYPOINT_CHECKSUMS=src/entrypoint-checksums.sha256
