@@ -112,11 +112,6 @@ def fetch_stable(distro: str, filter_pattern: str = "") -> Optional[str]:
     return fetch_specific(distro, filter_pattern, "stable")
 
 
-def fetch_latest(distro: str, filter_pattern: str = "") -> Optional[str]:
-    """Fetch latest version."""
-    return fetch_specific(distro, filter_pattern, "latest")
-
-
 def main():
     """Main function to generate supported versions."""
     # Create temp directory if it doesn't exist
@@ -142,32 +137,32 @@ def main():
         print("Wrong version count in NGINX (stable).")
         sys.exit(1)
 
-    ver_almalinux = fetch_latest("almalinux", r"^[0-9]{1,2}\.[0-9]{1,2}-[0-9]{8}$")
+    ver_almalinux = fetch_specific("almalinux", r"^[0-9]{1,2}\.[0-9]{1,2}-[0-9]{8}$")
     if not ver_almalinux:
         print("Wrong version count in ALMALINUX.")
         sys.exit(1)
 
-    ver_alpine = fetch_latest("alpine", r"^[0-9]\.[0-9]{1,2}\.[0-9]{1,2}$")
+    ver_alpine = fetch_specific("alpine", r"^[0-9]\.[0-9]{1,2}\.[0-9]{1,2}$")
     if not ver_alpine:
         print("Wrong version count in ALPINE.")
         sys.exit(1)
 
-    ver_amazonlinux = fetch_latest("amazonlinux", r"^202[3-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
+    ver_amazonlinux = fetch_specific("amazonlinux", r"^202[3-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
     if not ver_amazonlinux:
         print("Wrong version count in AMAZONLINUX.")
         sys.exit(1)
 
-    ver_debian = fetch_latest("debian", r"^[0-9]{2}\.[0-9]{1,2}")
+    ver_debian = fetch_specific("debian", r"^[0-9]{2}\.[0-9]{1,2}")
     if not ver_debian:
         print("Wrong version count in DEBIAN.")
         sys.exit(1)
 
-    ver_fedora = fetch_latest("fedora", r"^[0-9]{2}$")
+    ver_fedora = fetch_specific("fedora", r"^[0-9]{2}$")
     if not ver_fedora:
         print("Wrong version count in FEDORA.")
         sys.exit(1)
 
-    ver_ubuntu = fetch_latest("ubuntu", r"^[0-9]{2}\.[0-9]{2}")
+    ver_ubuntu = fetch_specific("ubuntu", r"^[0-9]{2}\.[0-9]{2}")
     if not ver_ubuntu:
         print("Wrong version count in UBUNTU.")
         sys.exit(1)
