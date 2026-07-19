@@ -391,33 +391,5 @@ def print_tags(nginx_version, os_distro, os_version):
     print(f"- [`{tag_list}`](https://github.com/fabiocicerchia/nginx-lua/blob/main/{dockerfile_path})")
 
 
-# Backward compatibility aliases
-def get_tags(nginx_ver, os_distro, os_ver, arch):
-    return generate_tags(nginx_ver, os_distro, os_ver, arch)
-
-def get_dockerfile(nginx_ver, os_distro, os_ver):
-    return get_dockerfile_path(nginx_ver, os_distro, os_ver)
-
 def get_supported_os():
     return SUPPORTED_OS
-
-def build(nginx_ver, os_distro, os_ver, arch):
-    return build_image(nginx_ver, os_distro, os_ver, arch)
-
-def push(nginx_ver, os_distro, os_ver):
-    return push_images(nginx_ver, os_distro, os_ver)
-
-def bundle(nginx_ver, os_distro, os_ver):
-    return bundle_images(nginx_ver, os_distro, os_ver)
-
-def metadata(tag):
-    return generate_metadata(tag)
-
-def get_all_versions():
-    return load_supported_versions()
-
-def init_dockerfile(nginx_ver, os_distro, os_ver):
-    return setup_dockerfile(nginx_ver, os_distro, os_ver)
-
-def tag(nginx_ver, os_distro, os_ver):
-    return print_tags(nginx_ver, os_distro, os_ver)
