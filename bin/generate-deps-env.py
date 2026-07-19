@@ -179,10 +179,11 @@ def main():
 
     template_vars = {}
 
-    # lua-resty-core pins lua-nginx-module to an exact version, so resolve
-    # resty-core first and derive the module version from it (see
-    # get_resty_core_required_lua_module). This overrides the independently
-    # fetched latest tag for lua_nginx_module to keep the two in sync.
+    # lua-resty-core pins lua-nginx-module to an exact version (see
+    # get_resty_core_required_lua_module), so resolve resty-core first and
+    # derive the module version from it instead of fetching each library's
+    # latest tag independently - that desyncs them whenever lua-nginx-module
+    # ships a stable release before its matching lua-resty-core does.
     resty_core_ver = get_latest_tag("https://github.com/openresty/lua-resty-core")
     pinned_lua_nginx_module = get_resty_core_required_lua_module(resty_core_ver)
     print(

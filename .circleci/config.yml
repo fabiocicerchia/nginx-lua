@@ -192,6 +192,23 @@ commands:
             echo "libseccomp2 version: $(dpkg -s libseccomp2 | grep '^Version:')"
 
       - run:
+          name: Log into registry
+          command: |
+            # Authenticate before the base-image FROM pulls below (in "Build
+            # docker image"), not just before the main-branch push/scan steps.
+            # Anonymous pulls share Docker Hub's per-IP rate limit across every
+            # CircleCI tenant on the same runner IP; authenticating up front
+            # puts these pulls against our own account's quota instead.
+            # DOCKER_HUB_TOKEN is unset on fork PR builds (CircleCI doesn't
+            # expose secrets to those) — fall back to anonymous rather than
+            # failing the job.
+            if [ -n "${DOCKER_HUB_TOKEN:-}" ]; then
+              echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
+            else
+              echo "No DOCKER_HUB_TOKEN available (e.g. fork PR) — pulling anonymously"
+            fi
+
+      - run:
           name: Install Python Dependencies
           command: pip3 install -r bin/requirements.txt
 
@@ -285,10 +302,6 @@ commands:
             and:
               - equal: [main, << pipeline.git.branch >>]
           steps:
-            - run:
-                name: Log into registry
-                command: |
-                  echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
             - run:
                 name: Scan for vulnerabilities (build gate)
                 command: |
