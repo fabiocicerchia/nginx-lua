@@ -15,6 +15,8 @@ from urllib.parse import urlparse
 
 import requests
 
+from deps_manifest import DEPENDENCIES
+
 
 def compute_sha256(url):
     """Download a file and compute its SHA256 hash. Returns 'RECOMPUTE_REQUIRED' on failure."""
@@ -189,67 +191,11 @@ def main():
     # Load template
     template = load_template()
 
-    # Define dependencies: key -> (repo_url, is_commit, tarball_url_pattern)
-    # tarball_url_pattern uses {ver} as placeholder for the version
+    # Dependency list (repo, tarball URL pattern, ...) lives in deps_manifest.py,
+    # shared with generate-fossa-deps.py so both stay in sync.
     deps = [
-        ('ngx_devel_kit', "https://github.com/vision5/ngx_devel_kit", False,
-         "https://github.com/vision5/ngx_devel_kit/archive/v{ver}.tar.gz"),
-        ('njs', "https://github.com/nginx/njs", False,
-         "https://github.com/nginx/njs/archive/{ver}.tar.gz"),
-        ('geoip', "https://github.com/leev/ngx_http_geoip2_module", False,
-         "https://github.com/leev/ngx_http_geoip2_module/archive/{ver}.tar.gz"),
-        ('luajit', "https://github.com/openresty/luajit2", False,
-         "https://github.com/openresty/luajit2/archive/v{ver}.tar.gz"),
-        ('lua_nginx_module', "https://github.com/openresty/lua-nginx-module", False,
-         "https://github.com/openresty/lua-nginx-module/archive/v{ver}.tar.gz"),
-        ('lua_resty_core', "https://github.com/openresty/lua-resty-core", False,
-         "https://github.com/openresty/lua-resty-core/archive/v{ver}.tar.gz"),
-        ('luarocks', "https://github.com/luarocks/luarocks", False,
-         "https://github.com/luarocks/luarocks/archive/refs/tags/v{ver}.tar.gz"),
-        ('lua_resty_lrucache', "https://github.com/openresty/lua-resty-lrucache", False,
-         "https://github.com/openresty/lua-resty-lrucache/archive/v{ver}.tar.gz"),
-        ('openresty_headers', "https://github.com/openresty/headers-more-nginx-module", False,
-         "https://github.com/openresty/headers-more-nginx-module/archive/v{ver}.tar.gz"),
-        ('cloudflare_cookie', "https://github.com/cloudflare/lua-resty-cookie", True,
-         "https://github.com/cloudflare/lua-resty-cookie/archive/{ver}.tar.gz"),
-        ('openresty_dns', "https://github.com/openresty/lua-resty-dns", False,
-         "https://github.com/openresty/lua-resty-dns/archive/v{ver}.tar.gz"),
-        ('openresty_memcached', "https://github.com/openresty/lua-resty-memcached", False,
-         "https://github.com/openresty/lua-resty-memcached/archive/v{ver}.tar.gz"),
-        ('openresty_mysql', "https://github.com/openresty/lua-resty-mysql", False,
-         "https://github.com/openresty/lua-resty-mysql/archive/v{ver}.tar.gz"),
-        ('openresty_redis', "https://github.com/openresty/lua-resty-redis", False,
-         "https://github.com/openresty/lua-resty-redis/archive/v{ver}.tar.gz"),
-        ('openresty_shell', "https://github.com/openresty/lua-resty-shell", False,
-         "https://github.com/openresty/lua-resty-shell/archive/v{ver}.tar.gz"),
-        ('openresty_signal', "https://github.com/openresty/lua-resty-signal", False,
-         "https://github.com/openresty/lua-resty-signal/archive/v{ver}.tar.gz"),
-        ('openresty_tablepool', "https://github.com/openresty/lua-tablepool", False,
-         "https://github.com/openresty/lua-tablepool/archive/v{ver}.tar.gz"),
-        ('openresty_healthcheck', "https://github.com/openresty/lua-resty-upstream-healthcheck", False,
-         "https://github.com/openresty/lua-resty-upstream-healthcheck/archive/v{ver}.tar.gz"),
-        ('openresty_websocket', "https://github.com/openresty/lua-resty-websocket", False,
-         "https://github.com/openresty/lua-resty-websocket/archive/v{ver}.tar.gz"),
-        ('lua_upstream', "https://github.com/openresty/lua-upstream-nginx-module", False,
-         "https://github.com/openresty/lua-upstream-nginx-module/archive/v{ver}.tar.gz"),
-        ('prometheus', "https://github.com/knyar/nginx-lua-prometheus", False,
-         "https://github.com/knyar/nginx-lua-prometheus/archive/{ver}.tar.gz"),
-        ('misc_nginx', "https://github.com/openresty/set-misc-nginx-module", False,
-         "https://github.com/openresty/set-misc-nginx-module/archive/v{ver}.tar.gz"),
-        ('echo_nginx', "https://github.com/openresty/echo-nginx-module", False,
-         "https://github.com/openresty/echo-nginx-module/archive/v{ver}.tar.gz"),
-        ('openresty_streamlua', "https://github.com/openresty/stream-lua-nginx-module", True,
-         "https://github.com/openresty/stream-lua-nginx-module/archive/{ver}.tar.gz"),
-        ('openresty_limittraffic', "https://github.com/openresty/lua-resty-limit-traffic", False,
-         "https://github.com/openresty/lua-resty-limit-traffic/archive/v{ver}.tar.gz"),
-        ('openresty_upload', "https://github.com/openresty/lua-resty-upload", False,
-         "https://github.com/openresty/lua-resty-upload/archive/v{ver}.tar.gz"),
-        ('openresty_lock', "https://github.com/openresty/lua-resty-lock", False,
-         "https://github.com/openresty/lua-resty-lock/archive/v{ver}.tar.gz"),
-        ('openresty_balancer', "https://github.com/openresty/lua-resty-balancer", False,
-         "https://github.com/openresty/lua-resty-balancer/archive/v{ver}.tar.gz"),
-        ('openresty_string', "https://github.com/openresty/lua-resty-string", False,
-         "https://github.com/openresty/lua-resty-string/archive/v{ver}.tar.gz"),
+        (dep['key'], dep['repo_url'], dep['is_commit'], dep['tarball_pattern'])
+        for dep in DEPENDENCIES
     ]
 
     template_vars = {}

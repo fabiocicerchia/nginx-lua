@@ -35,6 +35,8 @@ NGINX_UPSTREAM_RAW_FILES=https://raw.githubusercontent.com/nginx/docker-nginx
 PREVIOUS_TAG=$(shell git ls-remote --tags 2>&1 | awk '{print $$2}' | sort -r | head -n 1 | cut -d "/" -f3)
 TAG_VER=$(shell date +'v1.%Y%m%d.%H%M%S')
 
+# One release per nginx track, tagged with the exact nginx version (e.g. v1.30.3, v1.31.2).
+
 SUPPORTED_NGINX_VER_MAINLINE=$(shell cat supported_versions | grep nginx_mainline | cut -d= -f2)
 SUPPORTED_NGINX_VER_STABLE=$(shell cat supported_versions | grep nginx_stable | cut -d= -f2)
 UPSTREAM_NGINX_VER_MAINLINE=$(shell curl -s https://api.github.com/repos/nginx/docker-nginx/tags | grep '"name"' | head -n 1 | cut -d '"' -f 4)
@@ -237,7 +239,7 @@ $(packagetest_targets_arm64): ## testing the system package in arm64/v8 arch
 ################################################################################
 ##@ UTILITIES
 ################################################################################
-auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles update-readme update-tags ## auto update supported versions, dockerfiles and tags
+auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-env generate-dockerfiles generate-fossa-deps update-readme update-tags ## auto update supported versions, dockerfiles, fossa deps and tags
 
 .setup_gitrepo:
 	git config user.name "$(GH_USERNAME)"
@@ -245,7 +247,7 @@ auto-update: generate-supported-versions pull-nginx-entrypoints generate-deps-en
 	git remote set-url --push origin "https://x-access-token:${GITHUB_TOKEN}@github.com/$(GH_USERNAME)/nginx-lua.git"
 
 auto-update-and-commit: .setup_gitrepo auto-update
-	git add supported_versions nginx/ src/ docs/TAGS.md README.md || true; \
+	git add supported_versions nginx/ src/ docs/TAGS.md README.md fossa-deps.yml || true; \
 	CHANGES=$$(git status --porcelain | wc -l | tr -d ' '); \
 	if [ "$$CHANGES" = "0" ]; then \
 		exit 1; \
@@ -276,10 +278,18 @@ auto-commit-metadata: .setup_gitrepo generate-metadata
 		--base main \
 		--head "$$BRANCH_NAME"
 
-release: ## create a github release
-	mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS
-	cp Dockerfile dist/
-	for NGINX_VER in $(SUPPORTED_NGINX_VER_MAINLINE) $(SUPPORTED_NGINX_VER_STABLE); do \
+release: ## create a github release per nginx track (stable + mainline), each tagged with its exact nginx version
+	# Download ghr with verified checksum (pinned to v0.16.2)
+	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "$(GH_CLI_SHA256)"
+	tar xvzf $(GH_CLI_NAME).tar.gz
+	for NGINX_VER in $(SUPPORTED_NGINX_VER_STABLE) $(SUPPORTED_NGINX_VER_MAINLINE); do \
+		TAG="v$$NGINX_VER"; \
+		if git ls-remote --tags origin "refs/tags/$$TAG" | grep -q "refs/tags/$$TAG$$"; then \
+			echo "=== $$TAG already released, skipping ==="; \
+			continue; \
+		fi; \
+		mkdir -p dist && rm -rf dist/Dockerfile* dist/SHA256SUMS; \
+		cp Dockerfile dist/; \
 		tail -n -6 supported_versions | tr '=' '/' | sed "s_^_nginx/$${NGINX_VER}/_" | while read FOLDER; do \
 			if [ -d "$$FOLDER" ]; then \
 				DOCKERFILE=$$(find $$FOLDER -name "Dockerfile"); \
@@ -287,23 +297,13 @@ release: ## create a github release
 				cp $$DOCKERFILE $$DEST; \
 			fi; \
 		done; \
+		cd dist && for f in *~*; do [ -e "$$f" ] && mv "$$f" "$$(echo $$f | tr '~' '.')"; done; cd ..; \
+		echo "=== Release artifacts ($$TAG) ==="; \
+		ls -lah dist/; \
+		cd dist && sha256sum * > SHA256SUMS && cd ..; \
+		./$(GH_CLI_NAME)/ghr -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog TAG_VER=$$TAG))" "$$TAG" dist; \
+		rm -rf dist; \
 	done
-	# Normalize package filenames: GitHub replaces '~' with '.' in asset names,
-	# so rename files in dist/ to match what GitHub will serve.
-	cd dist && for f in *~*; do [ -e "$$f" ] && mv "$$f" "$$(echo $$f | tr '~' '.')"; done; cd ..
-	# List all release artifacts
-	@echo "=== Release artifacts ==="
-	@ls -lah dist/
-	# Generate SHA256 checksums for all release artifacts (Dockerfiles + packages)
-	cd dist && sha256sum * > SHA256SUMS && cd ..
-	# Download ghr with verified checksum (pinned to v0.16.2)
-	./bin/download-and-verify.sh "$(GH_CLI_TARBALL)" "$(GH_CLI_NAME).tar.gz" "$(GH_CLI_SHA256)"
-	tar xvzf $(GH_CLI_NAME).tar.gz
-	COMMITS=$$(git log --pretty=format:'- %B' "$(PREVIOUS_TAG)..HEAD" 2>/dev/null || true); \
-	if [ -n "$$COMMITS" ]; then \
-		./$(GH_CLI_NAME)/ghr -prerelease -b "$$(printf '%q' $$($(MAKE) --no-print-directory changelog))" $(TAG_VER) dist; \
-	fi; \
-	rm -rf dist
 
 generate-supported-versions: ## generate supported_versions file
 	./bin/generate-supported-versions.py
@@ -313,6 +313,9 @@ generate-dockerfiles: ## generate all dockerfiles
 
 generate-deps-env: ## generate .env for dependencies
 	./bin/generate-deps-env.py | tee ./src/.env.dist
+
+generate-fossa-deps: ## regenerate fossa-deps.yml from src/.env.dist
+	./bin/generate-fossa-deps.py
 
 ENTRYPOINT_FILES=src/10-listen-on-ipv6-by-default.sh src/15-local-resolvers.envsh src/20-envsubst-on-templates.sh src/30-tune-worker-processes.sh src/docker-entrypoint.sh
 ENTRYPOINT_CHECKSUMS=src/entrypoint-checksums.sha256
