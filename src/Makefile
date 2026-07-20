@@ -92,7 +92,7 @@ core:
 # ##############################################################################
 # we're on an architecture upstream doesn't officially build for
 # let's build binaries from the published packaging sources
-	curl -sLo /nginx.tar.gz https://nginx.org/download/nginx-${VER_NGINX}.tar.gz
+	$(call secure_download,https://nginx.org/download/nginx-${VER_NGINX}.tar.gz,/nginx.tar.gz,${SHA256_NGINX})
 	tar -C / -xzf /nginx.tar.gz
 	mkdir -p /var/cache/nginx/client_temp \
 		/var/cache/nginx/proxy_temp \
@@ -377,18 +377,10 @@ luarocks:
 #### TEST
 # # PERL_MM_USE_DEFAULT=1
 .prereq-test:
-	# --notest skips each dependency's test phase. Building Test::Nginx::Socket's
-	# dep tree from CPAN otherwise dies on flaky XS test suites (B::COW,
-	# Module::Build::Tiny), which aborts the whole install. The Perl API headers
-	# (perl-dev / libperl-dev / perl-devel, provided per distro in BUILD_DEPS_BASE)
-	# are what let the XS dists (e.g. List::MoreUtils) configure successfully.
-	#
-	# HTTP::Daemon is installed up front, *before* Test::Nginx::Socket pulls in
-	# libwww-perl (LWP). cpanm fetches over HTTPS via HTTP::Tiny while LWP is
-	# absent; once LWP is installed cpanm switches to it, and LWP cannot fetch
-	# HTTPS without LWP::Protocol::https — so a later `cpanm HTTP::Daemon` dies on
-	# its cpanmetadb lookup. libwww-perl >= 6.83 no longer pulls in HTTP::Daemon
-	# transitively, so it must be requested explicitly.
+	# --notest: Test::Nginx::Socket's own CPAN dep tree fails its test phase
+	# on flaky XS dists otherwise. HTTP::Daemon must install before LWP
+	# pulls in (cpanm needs LWP::Protocol::https once LWP is present, and
+	# HTTP::Daemon isn't a transitive LWP dep anymore).
 	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Harness HTTP::Daemon
 	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Nginx::Socket
 	# lua-resty-websocket's test suite (t/*.t) needs a real WebSocket frame
@@ -420,21 +412,6 @@ luarocks:
 	cd /lua-cjson-${VER_LUA_CJSON_TEST} \
 		&& $(MAKE) LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1 \
 		&& $(MAKE) install LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1
-# 	wget -q https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
-# 	tar -C / -xf Python-2.7.18.tgz
-# 	sed -i 's#CFLAGS="$$CFLAGS -Werror#CFLAGS="$$CFLAGS -Wno-error#' /Python-2.7.18/configure
-# 	cd /Python-2.7.18; \
-# 	CFLAGS="-Wno-error" ./configure --enable-optimizations \
-# 	&& make \
-# 	&& make install
-# #    ln -s $(which python2.7) /usr/bin/python
-# 	git clone https://github.com/openresty/mockeagain.git /mockeagain
-# 	sed -i 's/COPTS=-O -g -Wall -Werror/COPTS=-O -g -Wall -Wno-error/' /mockeagain/Makefile
-# 	cd /mockeagain && make
-# 	PERL_MM_USE_DEFAULT=1 cpanm install --force IPC::Run
-
-# MOCKEAGAIN=w
-# LD_PRELOAD=/mockeagain/mockeagain.so
 
 # lua-resty-memcached/mysql/redis need a real server to talk to. Upstream's
 # own CI gets this from a service container (Travis services:, or a sibling
@@ -637,3 +614,8 @@ test: .prereq-test .start-test-daemons
 		&& $(MAKE) test;
 	cd /lua-resty-string-${VER_OPENRESTY_STRING} \
 		&& $(MAKE) test;
+	# lua-cjson (test-only, see .prereq-test) installs to
+	# /usr/local/lib/lua/5.1/cjson.so - inside /usr/local/lib, which the
+	# final image stage copies wholesale. Remove it now, in this same
+	# `RUN make test` layer, so it never reaches the shipped image.
+	rm -f /usr/local/lib/lua/5.1/cjson.so
