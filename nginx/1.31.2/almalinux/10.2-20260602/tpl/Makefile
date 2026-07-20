@@ -460,8 +460,15 @@ luarocks:
 	# --skip-networking=0: distro packages ship a default my.cnf with
 	# `skip-networking` on (socket-only), which silently wins over --port
 	# unless explicitly overridden - lua-resty-mysql connects over TCP.
-	( nohup mariadbd --user=root --datadir=/var/lib/mysql \
+	# --version=...: Debian/Ubuntu's MariaDB package bakes a "-<pkgsuffix>
+	# from Debian/Ubuntu" tail onto @@version (e.g. "11.8.6-MariaDB-5ubuntu0.1
+	# from Ubuntu"); lua-resty-mysql's t/sanity.t and t/ssl.t assert on a
+	# plain "<ver>-MariaDB" banner with no embedded spaces, so strip it back
+	# to the plain version (a no-op on distros that don't add one).
+	MARIADB_VERSION=$$(mariadbd --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+-MariaDB') \
+	&& ( nohup mariadbd --user=root --datadir=/var/lib/mysql \
 		--socket=/var/run/mysql/mysql.sock --port=3306 --bind-address=127.0.0.1 --skip-networking=0 \
+		--version=$$MARIADB_VERSION \
 		--ssl-cert=/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.crt \
 		--ssl-key=/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.key \
 		> /var/log/mariadbd.log 2>&1 & )
