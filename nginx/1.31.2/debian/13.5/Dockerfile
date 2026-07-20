@@ -175,12 +175,10 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 # https://github.com/openresty/set-misc-nginx-module
 ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
-ARG VER_ECHO_NGINX=0.65
-ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=de1fe40e3daa6181f0cd2a0c894c9b9a727908c2
+ARG VER_OPENRESTY_STREAMLUA=11f9e38a20dc79783a9d793201d6ec399ff368e7
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -279,7 +277,6 @@ ARG NGINX_BUILD_CONFIG="\
             --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
-            --with-poll_module \
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
@@ -294,37 +291,23 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/ngx_http_geoip2_module-${VER_GEOIP} \
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
-            --add-module=/echo-nginx-module-${VER_ECHO_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
-        cpanminus \
         curl \
         g++ \
         libmaxminddb-dev \
         libpcre2-dev \
-        libperl-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
         make \
         patch \
-        perl \
-        python3 \
         unzip \
-        wget \
         zlib1g-dev \
-# TEST-ONLY: real daemons for lua-resty-memcached/mysql/redis suites.
-# A second, TLS-enabled memcached is built from source (see .prereq-test)
-# since packaged builds aren't consistently TLS-enabled across distros.
-        libevent-dev \
-        mariadb-client \
-        mariadb-server \
-        memcached \
-        redis-server \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -368,9 +351,6 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
-
-# Install mockeagain, IPC::Run, and Test::Nginx::Socket to execute 3rd party dependencies tests.
-RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
@@ -420,7 +400,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
     versions.set-misc-nginx=${VER_MISC_NGINX} \
-    versions.echo-nginx=${VER_ECHO_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\

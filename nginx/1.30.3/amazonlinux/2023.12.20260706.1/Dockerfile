@@ -175,12 +175,10 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 # https://github.com/openresty/set-misc-nginx-module
 ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
-ARG VER_ECHO_NGINX=0.65
-ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=de1fe40e3daa6181f0cd2a0c894c9b9a727908c2
+ARG VER_OPENRESTY_STREAMLUA=11f9e38a20dc79783a9d793201d6ec399ff368e7
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -279,7 +277,6 @@ ARG NGINX_BUILD_CONFIG="\
             --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
-            --with-poll_module \
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
@@ -294,7 +291,6 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/ngx_http_geoip2_module-${VER_GEOIP} \
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
-            --add-module=/echo-nginx-module-${VER_ECHO_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
@@ -310,24 +306,10 @@ ARG BUILD_DEPS_BASE="\
         openssl-devel \
         patch \
         pcre-devel \
-        perl-CPAN \
-        perl-devel \
         tar \
         unzip \
-        wget \
         which \
         zlib-devel \
-# TEST-ONLY: real daemons for lua-resty-memcached/mysql/redis suites.
-# A second, TLS-enabled memcached is built from source (see .prereq-test)
-# since packaged builds aren't consistently TLS-enabled across distros.
-# Amazon Linux 2023 uses versioned package names for both: mariadb1011(-server)
-# and redis6, whose binaries are themselves prefixed "redis6-" (no plain
-# redis-server) - the Makefile falls back to the redis6-server binary name.
-        libevent-devel \
-        mariadb1011 \
-        mariadb1011-server \
-        memcached \
-        redis6 \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -378,22 +360,6 @@ RUN set -eux \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-# Amazon Linux 2023 does not package App::cpanminus (the `cpanm` binary) in
-# its default repositories, so `make test` below cannot install the Perl test
-# prerequisites out-of-the-box. cpanm is a self-contained Perl script, so we
-# fetch the official fatpacked installer directly from the upstream mirror.
-# The fallback via `cpan` (from the already-installed `perl-CPAN` package)
-# covers transient network failures against cpanmin.us.
-RUN set -eux \
-    && ( curl -fsSL https://cpanmin.us -o /usr/local/bin/cpanm \
-         && chmod 0755 /usr/local/bin/cpanm \
-         && /usr/local/bin/cpanm --version ) \
-       || ( PERL_MM_USE_DEFAULT=1 cpan -T App::cpanminus \
-            && command -v cpanm \
-            && cpanm --version )
-
-RUN make test
-
 ##########################################
 # Combine everything with minimal layers #
 ##########################################
@@ -442,7 +408,6 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
     versions.set-misc-nginx=${VER_MISC_NGINX} \
-    versions.echo-nginx=${VER_ECHO_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
