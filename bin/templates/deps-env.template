@@ -129,6 +129,14 @@ SHA256_PROMETHEUS={sha256_prometheus}
 VER_MISC_NGINX={ver_misc_nginx}
 SHA256_MISC_NGINX={sha256_misc_nginx}
 
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module/tags
+# Provides the echo/echo_sleep directives several upstream lua-resty test
+# suites (e.g. lua-resty-upstream-healthcheck) depend on; bundled by default
+# in official OpenResty builds.
+VER_ECHO_NGINX={ver_echo_nginx}
+SHA256_ECHO_NGINX={sha256_echo_nginx}
+
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module/commits/master
 # NOTE:
@@ -163,3 +171,29 @@ SHA256_OPENRESTY_BALANCER={sha256_openresty_balancer}
 # https://github.com/openresty/lua-resty-string/tags
 VER_OPENRESTY_STRING={ver_openresty_string}
 SHA256_OPENRESTY_STRING={sha256_openresty_string}
+
+# lua-resty-openssl (TEST-ONLY: lua-resty-mysql's t/ed25519.t computes the
+# client_ed25519 auth signature via this library, matching what upstream's
+# own CI clones as a sibling dep)
+# https://github.com/fffonion/lua-resty-openssl/tags
+# NOTE: not part of the auto-update loop above - bump this pin by hand.
+VER_LUA_RESTY_OPENSSL_TEST=1.8.0
+SHA256_LUA_RESTY_OPENSSL_TEST=c6c7286498459129512b44fdc1d6ce998b764604011b440b7736fc890c4a88dc
+
+# lua-cjson (TEST-ONLY: several lua-resty-redis/memcached test files do a
+# bare `require "cjson"`, which official OpenResty bundles by default but
+# our image does not ship - test-only until/unless this becomes a real
+# production feature request)
+# https://github.com/openresty/lua-cjson/tags
+# NOTE: not part of the auto-update loop above - bump this pin by hand.
+VER_LUA_CJSON_TEST=2.1.0.19
+SHA256_LUA_CJSON_TEST=d1aded44b4cfe5ec6b395e178902aba3eed1dbe7999a753c0662222de2890ec0
+
+# memcached (TEST-ONLY: real server for lua-resty-memcached's test suite)
+# https://memcached.org/downloads
+# Built from source with --enable-tls: packaged builds aren't consistently
+# TLS-enabled across distros, and lua-resty-memcached's t/tls.t needs that.
+# NOTE: not part of the auto-update loop above (memcached.org doesn't tag
+# releases the way GitHub repos do) - bump this pin by hand when needed.
+VER_MEMCACHED_TEST=1.6.42
+SHA256_MEMCACHED_TEST=50f08b879d4f9d36dea9d905e9eaade15c708e38db7e9a73fc21dc8b45395de7

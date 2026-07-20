@@ -84,6 +84,79 @@ def get_resty_core_required_lua_module(tag):
     return f"{major}.{minor}.{patch}"
 
 
+def get_resty_core_required_stream_lua_api_version(tag):
+    """Return the ngx_stream_lua_version lua-resty-core <tag> pins to.
+
+    Same exact-version lock as get_resty_core_required_lua_module(), but for
+    the stream subsystem: resty/core/base.lua checks
+    `ngx.config.ngx_lua_version ~= NNNNN` under `subsystem == 'stream'` (a
+    raw ngx_stream_lua_version int, not the http subsystem's encoded
+    major*1e6+minor*1e3+patch number - stream-lua-nginx-module doesn't
+    version its releases that way).
+    """
+    url = (
+        "https://raw.githubusercontent.com/openresty/lua-resty-core/"
+        f"v{tag}/lib/resty/core/base.lua"
+    )
+    resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
+
+    match = re.search(
+        r"subsystem == 'stream'.*?ngx_lua_version\s*~=\s*(\d+)", resp.text, re.S
+    )
+    if not match:
+        raise RuntimeError(f"Could not find stream ngx_lua_version check in {url}")
+
+    return int(match.group(1))
+
+
+def get_stream_lua_commit_for_api_version(required_version):
+    """Return the newest stream-lua-nginx-module commit at ngx_stream_lua_version
+    == required_version.
+
+    The module bumps src/api/ngx_stream_lua_api.h's #define in its own commits
+    (e.g. "bumped api version to 18"), so the commit tracking the *latest*
+    fixes at our required version is the parent of whichever commit bumps the
+    define to required_version + 1. Auto-tracking the latest commit on the
+    default branch (as for other is_commit deps) desyncs from whatever
+    ngx_stream_lua_version lua-resty-core actually requires - this is the
+    stream-subsystem equivalent of get_resty_core_required_lua_module().
+    """
+    owner_repo = "openresty/stream-lua-nginx-module"
+    api_path = "src/api/ngx_stream_lua_api.h"
+    resp = requests.get(
+        f"https://api.github.com/repos/{owner_repo}/commits",
+        params={"path": api_path, "per_page": 100},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    bump_commits = resp.json()
+
+    def api_version_at(sha):
+        raw = requests.get(
+            f"https://raw.githubusercontent.com/{owner_repo}/{sha}/{api_path}",
+            timeout=30,
+        )
+        raw.raise_for_status()
+        m = re.search(r"ngx_stream_lua_version\s+(\d+)", raw.text)
+        if not m:
+            raise RuntimeError(f"Could not find ngx_stream_lua_version in {sha}:{api_path}")
+        return int(m.group(1))
+
+    for commit in bump_commits:
+        sha = commit["sha"]
+        if api_version_at(sha) == required_version + 1:
+            parents = commit.get("parents", [])
+            if not parents:
+                raise RuntimeError(f"Commit {sha} bumping to {required_version + 1} has no parent")
+            return parents[0]["sha"]
+
+    raise RuntimeError(
+        f"Could not find the commit bumping ngx_stream_lua_version to "
+        f"{required_version + 1} (needed to pin the commit before it)"
+    )
+
+
 def get_latest_commit(repo_url):
     """Get the latest commit SHA from a GitHub repository's default branch via API."""
     owner_repo = github_owner_repo(repo_url)
@@ -163,6 +236,8 @@ def main():
          "https://github.com/knyar/nginx-lua-prometheus/archive/{ver}.tar.gz"),
         ('misc_nginx', "https://github.com/openresty/set-misc-nginx-module", False,
          "https://github.com/openresty/set-misc-nginx-module/archive/v{ver}.tar.gz"),
+        ('echo_nginx', "https://github.com/openresty/echo-nginx-module", False,
+         "https://github.com/openresty/echo-nginx-module/archive/v{ver}.tar.gz"),
         ('openresty_streamlua', "https://github.com/openresty/stream-lua-nginx-module", True,
          "https://github.com/openresty/stream-lua-nginx-module/archive/{ver}.tar.gz"),
         ('openresty_limittraffic', "https://github.com/openresty/lua-resty-limit-traffic", False,
@@ -192,10 +267,21 @@ def main():
         file=sys.stderr,
     )
 
+    # Same lock as lua-nginx-module above, for the stream subsystem.
+    required_stream_api_version = get_resty_core_required_stream_lua_api_version(resty_core_ver)
+    pinned_stream_lua = get_stream_lua_commit_for_api_version(required_stream_api_version)
+    print(
+        f"lua-resty-core {resty_core_ver} pins ngx_stream_lua_version to "
+        f"{required_stream_api_version} -> commit {pinned_stream_lua}",
+        file=sys.stderr,
+    )
+
     for name, repo_url, is_commit, tarball_pattern in deps:
         print(f"Fetching version for {name}...", file=sys.stderr)
         if name == "lua_nginx_module":
             ver = pinned_lua_nginx_module
+        elif name == "openresty_streamlua":
+            ver = pinned_stream_lua
         elif is_commit:
             ver = get_latest_commit(repo_url)
         else:
