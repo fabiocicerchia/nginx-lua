@@ -526,13 +526,43 @@ luarocks:
 
 # These suites genuinely pass now (missing nginx modules/CPAN deps/daemons
 # fixed at the root cause, not papered over) and run fatally like any other
-# build step. lua-resty-core is the sole exception, still `-`-prefixed: its
-# t/balancer-keepalive.t exhibits a real behavioral discrepancy (upstream
-# connection pool logs "not saving connection" for every request instead of
-# reusing per-SNI, even with upstream's own CI env vars applied) that needs
-# more investigation - see task tracking, not swept under an environmental
-# excuse. Every other suite below must stay green; a regression here should
-# fail the build.
+# build step. lua-resty-core is the sole exception, still `-`-prefixed:
+#
+# t/balancer-keepalive.t's SNI-based subrequest scenarios (e.g. "sanity
+# (different ip port)", "sanity(same ip port with different sni)") always
+# hit lua-nginx-module's `keepalive not saving connection` branch instead of
+# saving to the per-SNI pool. Debugged down to the actual C-level guard with
+# a temporary instrumented rebuild (not committed): every individual guard
+# in ngx_http_lua_balancer_free_peer()'s `if (bp->keepalive)` block was
+# checked, and it's unconditionally `c == NULL` (pc->connection is NULL)
+# every time. But ngx_http_upstream_finalize_request() in nginx core logs
+# u->peer.connection as a valid, non-NULL pointer *immediately* before
+# calling `u->peer.free(&u->peer, ...)` - same struct address (&u->peer),
+# same struct size, "connection" confirmed at offset 0 on both sides (no
+# ABI/struct-layout mismatch between how nginx core and the module see
+# ngx_peer_connection_t). So the pointer reads non-NULL one line before the
+# call and NULL inside the callee, with nothing but the call itself between
+# the two reads - unexplained without a live debugger session against the
+# actual Test::Nginx-managed nginx process (attempted with gdb but stopped
+# short of that: reproducing the harness's exact subrequest timing manually
+# outside `prove` is a separate, nontrivial undertaking).
+#
+# Working theory: this project builds nginx.org mainline (1.30.3/1.31.2)
+# paired with individually version-locked lua modules to satisfy
+# lua-resty-core's exact-version check (see
+# lua-nginx-resty-core-exact-version-lock in project memory) - NOT the
+# official OpenResty bundle, where nginx and every lua module ship as one
+# unit validated together. lua-nginx-module 0.10.29 was never necessarily
+# validated against nginx 1.30/1.31 specifically by anyone; this SNI +
+# subrequest + lua-managed-keepalive path is a narrow enough scenario that
+# a real incompatibility here wouldn't be surprising. Confirming that
+# theory (e.g. bisecting nginx versions, or testing against nginx paired
+# with lua-nginx-module the way an actual OpenResty release does it) is the
+# next step if this is revisited - not something fixable by editing our
+# own Dockerfiles/Makefile.
+#
+# Every other suite below must stay green; a regression there should fail
+# the build.
 test: .prereq-test .start-test-daemons
 # DEPS: mockeagain
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
