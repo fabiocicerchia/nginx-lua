@@ -328,10 +328,17 @@ ARG BUILD_DEPS_BASE="\
 # since packaged builds aren't consistently TLS-enabled across distros.
 # AlmaLinux ships only Valkey (Redis fork), with no redis-cli/redis-server
 # compat package - the Makefile falls back to the valkey-server binary name.
+# perl-LWP-Protocol-https: once Test::Nginx::Socket pulls in LWP::UserAgent,
+# cpanm's own cpanmetadb lookups need https support too, and cpanm can't
+# bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary, not just openssl-devel's headers - needed to
+# generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
         libevent-devel \
         mariadb \
         mariadb-server \
         memcached \
+        openssl \
+        perl-LWP-Protocol-https \
         valkey \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE

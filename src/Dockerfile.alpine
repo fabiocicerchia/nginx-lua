@@ -315,10 +315,17 @@ ARG BUILD_DEPS_BASE="\
 # TEST-ONLY: real daemons for lua-resty-memcached/mysql/redis suites.
 # A second, TLS-enabled memcached is built from source (see .prereq-test)
 # since packaged builds aren't consistently TLS-enabled across distros.
+# perl-lwp-protocol-https: once Test::Nginx::Socket pulls in LWP::UserAgent,
+# cpanm's own cpanmetadb lookups need https support too, and cpanm can't
+# bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary - openssl-dev's headers don't pull it in - needed
+# to generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
         libevent-dev \
         mariadb \
         mariadb-client \
         memcached \
+        openssl \
+        perl-lwp-protocol-https \
         redis \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE

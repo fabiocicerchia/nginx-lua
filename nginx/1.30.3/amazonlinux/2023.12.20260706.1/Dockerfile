@@ -323,10 +323,17 @@ ARG BUILD_DEPS_BASE="\
 # Amazon Linux 2023 uses versioned package names for both: mariadb1011(-server)
 # and redis6, whose binaries are themselves prefixed "redis6-" (no plain
 # redis-server) - the Makefile falls back to the redis6-server binary name.
+# perl-LWP-Protocol-https: once Test::Nginx::Socket pulls in LWP::UserAgent,
+# cpanm's own cpanmetadb lookups need https support too, and cpanm can't
+# bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary, not just openssl-devel's headers - needed to
+# generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
         libevent-devel \
         mariadb1011 \
         mariadb1011-server \
         memcached \
+        openssl \
+        perl-LWP-Protocol-https \
         redis6 \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE

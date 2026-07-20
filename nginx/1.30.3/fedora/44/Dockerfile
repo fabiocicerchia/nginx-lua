@@ -324,10 +324,17 @@ ARG BUILD_DEPS_BASE="\
 # since packaged builds aren't consistently TLS-enabled across distros.
 # Fedora ships Valkey (Redis fork) rather than redis, with a redis-cli/
 # redis-server compat package.
+# perl-LWP-Protocol-https: once Test::Nginx::Socket pulls in LWP::UserAgent,
+# cpanm's own cpanmetadb lookups need https support too, and cpanm can't
+# bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary, not just openssl-devel's headers - needed to
+# generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
         libevent-devel \
         mariadb \
         mariadb-server \
         memcached \
+        openssl \
+        perl-LWP-Protocol-https \
         valkey \
         valkey-compat-redis \
 "

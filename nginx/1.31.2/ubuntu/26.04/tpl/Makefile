@@ -378,9 +378,14 @@ luarocks:
 # # PERL_MM_USE_DEFAULT=1
 .prereq-test:
 	# --notest: Test::Nginx::Socket's own CPAN dep tree fails its test phase
-	# on flaky XS dists otherwise. HTTP::Daemon must install before LWP
-	# pulls in (cpanm needs LWP::Protocol::https once LWP is present, and
-	# HTTP::Daemon isn't a transitive LWP dep anymore).
+	# on flaky XS dists otherwise. HTTP::Daemon must install before LWP pulls
+	# in (it isn't a transitive LWP dep anymore). Once LWP::UserAgent is
+	# installed, every later cpanm call in this target prefers it over
+	# cpanm's bundled fetcher for its own cpanmetadb lookups - without https
+	# support that fails ("Finding X on cpanmetadb failed"), and cpanm can't
+	# bootstrap LWP::Protocol::https itself (needs https to fetch it), so
+	# BUILD_DEPS_TEST installs the distro's LWP::Protocol::https package
+	# ahead of time instead.
 	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Harness HTTP::Daemon
 	PERL_MM_USE_DEFAULT=1 cpanm --notest Test::Nginx::Socket
 	# lua-resty-websocket's test suite (t/*.t) needs a real WebSocket frame
