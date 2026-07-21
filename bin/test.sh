@@ -227,6 +227,7 @@ main() {
 
     docker images
 
+    TESTED_COUNT=0
     for DOCKERFILE in $(find nginx/*/"$OS" -name "Dockerfile" -type f | sort -Vr | head -n "$MAX"); do
         TAG="${DOCKERFILE//nginx\//}"
         TAG="${TAG//\/Dockerfile/}"
@@ -241,7 +242,17 @@ main() {
 
         echo "TESTING TAG: ${TESTING_TAG}"
         do_test "$TESTING_TAG"
+        TESTED_COUNT=$((TESTED_COUNT + 1))
     done
+
+    # `find nginx/*/"$OS"` matching nothing (a bad $OS, a typo, an empty tree)
+    # is not a shell error - the loop above would silently run zero
+    # iterations and this script would exit 0 having tested nothing at all.
+    # Fail loudly instead of reporting a false green.
+    if [ "$TESTED_COUNT" -eq 0 ]; then
+        echo "Error: no Dockerfiles found under nginx/*/${OS} - tested 0 images" >&2
+        exit 1
+    fi
 }
 
 # Run main function with all arguments
