@@ -151,8 +151,9 @@ ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
 	return
 endif
-	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-.*/\1/'); \
-	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-//'); \
+	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64)-.*/\1/'); \
+	if [ "$$ARCH" = "arm64" ]; then ARCH=arm64v8; fi; \
+	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64)-//'); \
 	echo "TESTING $$DISTRO"; \
 	$(TEST_CMD) "$$DISTRO" "$$ARCH" "" "docker"
 
