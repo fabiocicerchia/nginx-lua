@@ -465,9 +465,17 @@ luarocks:
 	# from Ubuntu"); lua-resty-mysql's t/sanity.t and t/ssl.t assert on a
 	# plain "<ver>-MariaDB" banner with no embedded spaces, so strip it back
 	# to the plain version (a no-op on distros that don't add one).
+	# --pid-file: Debian's mariadb-server package (unlike Ubuntu's) never
+	# creates /run/mysqld - it relies on a systemd tmpfiles.d rule that only
+	# runs via the package's own service unit, which we bypass by invoking
+	# mariadbd directly. Its compiled-in mariadb.conf.d default pid-file path
+	# is under /run/mysqld, so mariadbd fails outright ("Can't create/write
+	# to file '/run/mysqld/mysqld.pid'") unless redirected to a directory we
+	# already created ourselves.
 	MARIADB_VERSION=$$(mariadbd --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+-MariaDB') \
 	&& ( nohup mariadbd --user=root --datadir=/var/lib/mysql \
 		--socket=/var/run/mysql/mysql.sock --port=3306 --bind-address=127.0.0.1 --skip-networking=0 \
+		--pid-file=/var/run/mysql/mysqld.pid \
 		--version=$$MARIADB_VERSION \
 		--ssl-cert=/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.crt \
 		--ssl-key=/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.key \

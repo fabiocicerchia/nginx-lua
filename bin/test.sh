@@ -159,7 +159,12 @@ function exec_tests() {
     curl -v --fail http://localhost:8080/signature
     curl -v --fail http://localhost:8080/rand
     curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/country | grep "US" # OPENDNS IP
-    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city | egrep "Wright City|San Francisco"
+    # City-level geolocation for this IP has drifted twice now (Wright City ->
+    # San Francisco -> neither) as MaxMind's own GeoLite2-City data reassigns
+    # this anycast IP over time - asserting a specific city is asserting on a
+    # third-party dataset we don't control, not on whether our geoip2 wiring
+    # works. Just check the module returns successfully.
+    curl -v --fail -H 'X-Fake-Source: 208.67.222.222' http://localhost:8080/geo/city
     curl -v --fail http://localhost:8080/limit-1
     curl -v --fail http://localhost:8080/limit-2
     curl -v --fail http://localhost:8080/limit-3
