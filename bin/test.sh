@@ -99,7 +99,13 @@ function inject_dependencies() {
         docker exec nginx_lua_test apt update
         docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip
     elif [[ "$DOCKER_TAG" == *"almalinux"* ]] || [[ "$DOCKER_TAG" == *"fedora"* ]] || [[ "$DOCKER_TAG" == *"amazon"* ]]; then
-        docker exec nginx_lua_test yum install -y gcc musl-devel coreutils unzip
+        # musl-devel doesn't exist on these repos (glibc-based, not musl) and
+        # was never needed: gcc already pulls in glibc-devel as its own
+        # dependency, which is what luarocks needs to build lua-cjson here.
+        # coreutils: AlmaLinux/Amazon Linux ship coreutils-single by default,
+        # which conflicts with the full coreutils package - already provides
+        # every utility needed, so don't request it explicitly.
+        docker exec nginx_lua_test yum install -y gcc unzip
     fi
 
     # cannot run on almalinux (which uses 5.1) :
