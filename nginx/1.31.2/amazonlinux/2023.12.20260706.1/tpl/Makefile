@@ -525,6 +525,18 @@ luarocks:
 # fixed at the root cause, not papered over) and run fatally like any other
 # build step. lua-resty-core is the sole exception, still `-`-prefixed:
 #
+# lua-resty-core's own Makefile hardcodes OPENRESTY_PREFIX to the release
+# (non-debug) nginx build by default. Overriding it to openresty-debug below
+# (same trick as lua-resty-shell/lua-resty-websocket above) turned out to
+# fix the large majority of what looked like a broad, suite-wide problem:
+# t/ctx.t, t/ocsp.t, t/semaphore.t, t/stream/ctx.t and t/stream/semaphore.t
+# went from double-digit failure counts to fully green, because their
+# assertions were matching debug-only log lines that a release build never
+# emits - not a real defect. t/balancer-keepalive.t and
+# t/balancer-keepalive-localaddr.t, previously silently SKIPPED entirely
+# ("--with-debug required"), now actually run under debug and confirm the
+# one still-unresolved, genuine issue:
+#
 # t/balancer-keepalive.t's SNI-based subrequest scenarios (e.g. "sanity
 # (different ip port)", "sanity(same ip port with different sni)") always
 # hit lua-nginx-module's `keepalive not saving connection` branch instead of
@@ -558,12 +570,19 @@ luarocks:
 # next step if this is revisited - not something fixable by editing our
 # own Dockerfiles/Makefile.
 #
+# A tail of other failures remains under debug too (t/balancer-timeout.t and
+# t/exit.t both report "Bad plan" mismatches - debug mode runs more
+# conditional subtests than the suite's own plan() count expects; assorted
+# residual failures also remain in t/pipe*.t, t/ssl*.t, and t/request.t's
+# CONNECT-method status code) - not yet individually triaged, tracked
+# alongside balancer-keepalive.t in issue #297.
+#
 # Every other suite below must stay green; a regression there should fail
 # the build.
 test: .prereq-test .start-test-daemons
 # DEPS: mockeagain
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-		&& $(MAKE) test;
+		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
