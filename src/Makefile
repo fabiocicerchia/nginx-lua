@@ -417,6 +417,16 @@ luarocks:
 	cd /lua-cjson-${VER_LUA_CJSON_TEST} \
 		&& $(MAKE) LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1 \
 		&& $(MAKE) install LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1
+	# lua-resty-core's own upstream CI LD_PRELOADs this to simulate
+	# slow/EAGAIN-prone I/O for its pipe/socket test files (see
+	# .travis.yml: builds it, then `export LD_PRELOAD=.../mockeagain.so`
+	# before `prove`). COPTS drops -Werror: musl's <sys/poll.h> emits a
+	# #warning (redirecting to <poly.h>) that -Werror turns fatal; glibc
+	# doesn't hit this, so dropping it is a no-op there.
+	$(call secure_download,https://github.com/openresty/mockeagain/archive/${VER_MOCKEAGAIN_TEST}.tar.gz,/mockeagain-test.tar.gz,${SHA256_MOCKEAGAIN_TEST})
+	tar -C / -xzf /mockeagain-test.tar.gz
+	mv /mockeagain-${VER_MOCKEAGAIN_TEST} /mockeagain
+	cd /mockeagain && $(MAKE) COPTS='-O -g -Wall'
 
 # lua-resty-memcached/mysql/redis need a real server to talk to. Upstream's
 # own CI gets this from a service container (Travis services:, or a sibling
@@ -580,9 +590,12 @@ luarocks:
 # Every other suite below must stay green; a regression there should fail
 # the build.
 test: .prereq-test .start-test-daemons
-# DEPS: mockeagain
+	# LD_PRELOAD/LD_LIBRARY_PATH: same mockeagain wiring as upstream's own
+	# CI (see .prereq-test) - simulates slow/EAGAIN-prone I/O that some of
+	# this suite's pipe/socket test files assert on.
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
+		&& LD_PRELOAD=/mockeagain/mockeagain.so LD_LIBRARY_PATH=/mockeagain:$$LD_LIBRARY_PATH \
+			$(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \

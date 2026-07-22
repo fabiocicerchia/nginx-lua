@@ -197,3 +197,14 @@ SHA256_LUA_CJSON_TEST=d1aded44b4cfe5ec6b395e178902aba3eed1dbe7999a753c0662222de2
 # releases the way GitHub repos do) - bump this pin by hand when needed.
 VER_MEMCACHED_TEST=1.6.42
 SHA256_MEMCACHED_TEST=50f08b879d4f9d36dea9d905e9eaade15c708e38db7e9a73fc21dc8b45395de7
+
+# mockeagain (TEST-ONLY: lua-resty-core's own upstream CI (.travis.yml)
+# LD_PRELOADs this to simulate slow/EAGAIN-prone I/O for its pipe/socket
+# test files - without it those tests still run, just without the
+# intended fault injection. No tagged releases upstream; pinned to the
+# latest commit as of 2026-07-22.
+# NOTE: not part of the auto-update loop above (no tags to track) - bump
+# this pin by hand when needed.
+# https://github.com/openresty/mockeagain/commits/master
+VER_MOCKEAGAIN_TEST=070e1992a28bdc97669a4947b02bb1329250594a
+SHA256_MOCKEAGAIN_TEST=708bbc67e42c9a8b1942bf022d027fef967adf78c3bdbc80c8737e9908ed0c6e
