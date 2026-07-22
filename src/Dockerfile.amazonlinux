@@ -353,6 +353,14 @@ ARG NGINX_BUILD_DEPS="\
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
+
 ####################################
 # Build Nginx with support for LUA #
 ####################################
@@ -508,9 +516,7 @@ RUN set -eux \
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+# nginx user/group already created in the shared base stage above
 # Upgrade software to latest version
 # ##############################################################################
     && yum upgrade --releasever=2023.11.20260427 -y \
