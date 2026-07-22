@@ -394,12 +394,14 @@ RUN make deps \
 # repos instead of letting cpanm build them from CPAN source. Building these in
 # the minimal builder is flaky (Module::Build::Tiny / libwww-perl / List::MoreUtils
 # fail), which previously aborted `make test`. With these present, cpanm only has
-# to build the pure-Perl Test-Nginx itself.
+# to build the pure-Perl Test-Nginx itself. util-linux: lua-resty-core's
+# t/pipe-cpu-affinity.t execvp()s `taskset`, not present in Alpine's base image.
 RUN apk add --no-cache \
         perl-libwww \
         perl-http-message \
         perl-http-daemon \
-        perl-list-moreutils
+        perl-list-moreutils \
+        util-linux
 
 RUN make test
 
