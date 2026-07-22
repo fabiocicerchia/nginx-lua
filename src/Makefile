@@ -417,16 +417,6 @@ luarocks:
 	cd /lua-cjson-${VER_LUA_CJSON_TEST} \
 		&& $(MAKE) LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1 \
 		&& $(MAKE) install LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1
-	# lua-resty-core's own upstream CI LD_PRELOADs this to simulate
-	# slow/EAGAIN-prone I/O for its pipe/socket test files (see
-	# .travis.yml: builds it, then `export LD_PRELOAD=.../mockeagain.so`
-	# before `prove`). COPTS drops -Werror: musl's <sys/poll.h> emits a
-	# #warning (redirecting to <poly.h>) that -Werror turns fatal; glibc
-	# doesn't hit this, so dropping it is a no-op there.
-	$(call secure_download,https://github.com/openresty/mockeagain/archive/${VER_MOCKEAGAIN_TEST}.tar.gz,/mockeagain-test.tar.gz,${SHA256_MOCKEAGAIN_TEST})
-	tar -C / -xzf /mockeagain-test.tar.gz
-	mv /mockeagain-${VER_MOCKEAGAIN_TEST} /mockeagain
-	cd /mockeagain && $(MAKE) COPTS='-O -g -Wall'
 
 # lua-resty-memcached/mysql/redis need a real server to talk to. Upstream's
 # own CI gets this from a service container (Travis services:, or a sibling
@@ -590,15 +580,26 @@ luarocks:
 # CONNECT-method status code) - not yet individually triaged, tracked
 # alongside balancer-keepalive.t in issue #297.
 #
+# Separately: `prove` occasionally Bailout()s partway through this suite with
+# "bind() to unix:.../nginx.sock failed (98: Address in use)" - a later test
+# file's nginx instance racing a still-shutting-down earlier one for the same
+# hardcoded servroot socket/port. Reproduces with a plain `make test` (no
+# mockeagain involved) and at a different file each time, consistent with
+# [[local-buildkit-dns-flaky]]-style local resource contention rather than a
+# deterministic bug in any one test file - not yet root-caused further.
+#
 # Every other suite below must stay green; a regression there should fail
 # the build.
 test: .prereq-test .start-test-daemons
-	# LD_PRELOAD/LD_LIBRARY_PATH: same mockeagain wiring as upstream's own
-	# CI (see .prereq-test) - simulates slow/EAGAIN-prone I/O that some of
-	# this suite's pipe/socket test files assert on.
+	# mockeagain (LD_PRELOAD-based EAGAIN fault injection) was tried here to
+	# match upstream's own CI, but A/B testing showed it's net-negative in
+	# this environment: every t/pipe*.t file already passes without it, it
+	# introduces new failures in otherwise-green files (t/ndk.t, t/ocsp.t),
+	# and it makes an unrelated nginx-worker-socket-reuse race (separate,
+	# pre-existing issue - see below) trigger even earlier in the run. Not
+	# used.
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-		&& LD_PRELOAD=/mockeagain/mockeagain.so LD_LIBRARY_PATH=/mockeagain:$$LD_LIBRARY_PATH \
-			$(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
+		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
