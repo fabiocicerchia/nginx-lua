@@ -360,6 +360,15 @@ ARG NGINX_BUILD_DEPS="\
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN set -x \
+    && addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+
 ####################################
 # Build Nginx with support for LUA #
 ####################################
@@ -385,12 +394,14 @@ RUN make deps \
 # repos instead of letting cpanm build them from CPAN source. Building these in
 # the minimal builder is flaky (Module::Build::Tiny / libwww-perl / List::MoreUtils
 # fail), which previously aborted `make test`. With these present, cpanm only has
-# to build the pure-Perl Test-Nginx itself.
+# to build the pure-Perl Test-Nginx itself. util-linux: lua-resty-core's
+# t/pipe-cpu-affinity.t execvp()s `taskset`, not present in Alpine's base image.
 RUN apk add --no-cache \
         perl-libwww \
         perl-http-message \
         perl-http-daemon \
-        perl-list-moreutils
+        perl-list-moreutils \
+        util-linux
 
 RUN make test
 
@@ -495,9 +506,7 @@ RUN set -eux \
     && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
 
 RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+# nginx user/group already created in the shared base stage above
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.31.1/mainline/alpine/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && apkArch="$(cat /etc/apk/arch)" \

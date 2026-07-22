@@ -11,6 +11,13 @@ ARG ARCH=
 ARG DISTRO=fedora
 ARG DISTRO_VER=44
 
+# TEST-ONLY: source of the prebuilt redisbloom.so for lua-resty-redis's
+# t/module.t (BF.ADD/BF.EXISTS), glibc-linked - see .start-test-daemons in
+# tpl/Makefile for how it's conditionally loaded. Pinned by tag+digest since
+# there's no source tarball/checksum to verify like this project's other deps.
+ARG REDISBLOOM_IMAGE=redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a
+FROM ${REDISBLOOM_IMAGE} AS redisbloom
+
 #############################
 # Settings Common Variables #
 #############################
@@ -355,6 +362,14 @@ ARG NGINX_BUILD_DEPS="\
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
+
 ####################################
 # Build Nginx with support for LUA #
 ####################################
@@ -375,6 +390,8 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+COPY --from=redisbloom /opt/redis-stack/lib/redisbloom.so /usr/local/lib/redisbloom.so
 
 RUN set -eux \
 # envsubst
@@ -490,10 +507,8 @@ RUN yum install -y curl ca-certificates \
 # forward request and error logs to docker log collector
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+# nginx user/group already created in the shared base stage above
 # Upgrade software to latest version
 # ##############################################################################
 RUN yum upgrade -y \

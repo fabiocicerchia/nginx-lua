@@ -11,6 +11,13 @@ ARG ARCH=
 ARG DISTRO=amazonlinux
 ARG DISTRO_VER=2023.12.20260706.1
 
+# TEST-ONLY: source of the prebuilt redisbloom.so for lua-resty-redis's
+# t/module.t (BF.ADD/BF.EXISTS), glibc-linked - see .start-test-daemons in
+# tpl/Makefile for how it's conditionally loaded. Pinned by tag+digest since
+# there's no source tarball/checksum to verify like this project's other deps.
+ARG REDISBLOOM_IMAGE=redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a
+FROM ${REDISBLOOM_IMAGE} AS redisbloom
+
 #############################
 # Settings Common Variables #
 #############################
@@ -328,6 +335,9 @@ ARG BUILD_DEPS_BASE="\
 # bootstrap that module itself (see .prereq-test).
 # openssl: the CLI binary, not just openssl-devel's headers - needed to
 # generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
+# util-linux: lua-resty-core's t/pipe-cpu-affinity.t execvp()s `taskset`,
+# which Amazon Linux 2023's minimal base image doesn't install by default
+# (unlike Debian/Ubuntu/Fedora/AlmaLinux, which all ship it out of the box).
         libevent-devel \
         mariadb1011 \
         mariadb1011-server \
@@ -335,6 +345,7 @@ ARG BUILD_DEPS_BASE="\
         openssl \
         perl-LWP-Protocol-https \
         redis6 \
+        util-linux \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -352,6 +363,14 @@ ARG NGINX_BUILD_DEPS="\
         git \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
+
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
 
 ####################################
 # Build Nginx with support for LUA #
@@ -375,6 +394,8 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+COPY --from=redisbloom /opt/redis-stack/lib/redisbloom.so /usr/local/lib/redisbloom.so
 
 RUN set -eux \
 # envsubst
@@ -508,9 +529,7 @@ RUN set -eux \
     && mkdir -p /var/log/nginx \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
-# create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+# nginx user/group already created in the shared base stage above
 # Upgrade software to latest version
 # ##############################################################################
     && yum upgrade --releasever=2023.11.20260427 -y \

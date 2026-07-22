@@ -417,6 +417,16 @@ luarocks:
 	cd /lua-cjson-${VER_LUA_CJSON_TEST} \
 		&& $(MAKE) LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1 \
 		&& $(MAKE) install LUA_INCLUDE_DIR=/usr/local/include/luajit-2.1
+	# lua-resty-core's own upstream CI LD_PRELOADs this to simulate
+	# slow/EAGAIN-prone I/O for its pipe/socket test files (see
+	# .travis.yml: builds it, then `export LD_PRELOAD=.../mockeagain.so`
+	# before `prove`). COPTS drops -Werror: musl's <sys/poll.h> emits a
+	# #warning (redirecting to <poly.h>) that -Werror turns fatal; glibc
+	# doesn't hit this, so dropping it is a no-op there.
+	$(call secure_download,https://github.com/openresty/mockeagain/archive/${VER_MOCKEAGAIN_TEST}.tar.gz,/mockeagain-test.tar.gz,${SHA256_MOCKEAGAIN_TEST})
+	tar -C / -xzf /mockeagain-test.tar.gz
+	mv /mockeagain-${VER_MOCKEAGAIN_TEST} /mockeagain
+	cd /mockeagain && $(MAKE) COPTS='-O -g -Wall'
 
 # lua-resty-memcached/mysql/redis need a real server to talk to. Upstream's
 # own CI gets this from a service container (Travis services:, or a sibling
@@ -445,10 +455,13 @@ luarocks:
 	cat /tmp/memcached-tls-leaf.crt /tmp/memcached-tls-ca.crt > /tmp/memcached-tls-chain.crt
 	memcached-tls -d -u root -p 11212 -Z -o ssl_chain_cert=/tmp/memcached-tls-chain.crt,ssl_key=/tmp/memcached-tls-leaf.key
 	# Binary name varies by distro/package: plain "redis" (alpine, debian,
-	# ubuntu), Valkey without a redis-compat package (almalinux - "valkey"),
-	# or a versioned "redis6" (amazonlinux).
+	# ubuntu), Valkey without a redis-compat package (almalinux, fedora -
+	# "valkey"), or a versioned "redis6" (amazonlinux).
+	# redisbloom.so (glibc distros only, see Dockerfile's redisbloom stage):
+	# gives lua-resty-redis's t/module.t a real "bf" module to test against.
 	REDIS_SERVER=$$(command -v redis-server || command -v valkey-server || command -v redis6-server) \
-		&& $$REDIS_SERVER --daemonize yes --port 6379 --bind 127.0.0.1
+		&& if [ -f /usr/local/lib/redisbloom.so ]; then REDIS_LOADMODULE="--loadmodule /usr/local/lib/redisbloom.so"; else REDIS_LOADMODULE=""; fi \
+		&& $$REDIS_SERVER --daemonize yes --port 6379 --bind 127.0.0.1 $$REDIS_LOADMODULE
 	mkdir -p /var/run/mysql
 	mariadb-install-db --user=root --datadir=/var/lib/mysql --auth-root-authentication-method=normal > /var/log/mariadb-install.log 2>&1
 	# Use the module's own stronger bundled cert (2048-bit/SHA-256) for the
@@ -580,9 +593,12 @@ luarocks:
 # Every other suite below must stay green; a regression there should fail
 # the build.
 test: .prereq-test .start-test-daemons
-# DEPS: mockeagain
+	# LD_PRELOAD/LD_LIBRARY_PATH: same mockeagain wiring as upstream's own
+	# CI (see .prereq-test) - simulates slow/EAGAIN-prone I/O that some of
+	# this suite's pipe/socket test files assert on.
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
-		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
+		&& LD_PRELOAD=/mockeagain/mockeagain.so LD_LIBRARY_PATH=/mockeagain:$$LD_LIBRARY_PATH \
+			$(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
@@ -608,13 +624,16 @@ test: .prereq-test .start-test-daemons
 	# match the mariadb package version .start-test-daemons actually starts.
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 		&& DB_VERSION=mariadb:11.8 PERL5LIB=.:$$PERL5LIB $(MAKE) test;
-	# Three known, non-fixable-here gaps remain: t/module.t needs the
-	# third-party RedisBloom Redis module (BF.ADD/BF.EXISTS) compiled and
-	# loaded, a much larger undertaking than this project's own dependency
-	# set for one test file's coverage of a niche module-prefix API;
-	# t/sanity.t's "connect timeout" case has the same musl ENETUNREACH
-	# wording gap as lua-resty-memcached above (127.0.0.2, not an external
-	# host, but same deterministic libc string difference); t/ssl.t's
+	# t/module.t (BF.ADD/BF.EXISTS via RedisBloom) now passes on glibc
+	# distros - see .start-test-daemons' conditional --loadmodule. Alpine
+	# (musl) has no prebuilt redisbloom.so available and stays a documented
+	# gap there: building RedisBloom itself from source needs a much
+	# heavier toolchain (cmake, clang, openblas, python3+numpy...) than this
+	# project's own dependency set, for one test file's niche coverage.
+	# Two remaining known, non-fixable-here gaps (all distros): t/sanity.t's
+	# "connect timeout" case has the same musl ENETUNREACH wording gap as
+	# lua-resty-memcached above (127.0.0.2, not an external host, but same
+	# deterministic libc string difference - Alpine only); t/ssl.t's
 	# "verify server certificate failed" case hardcodes OpenSSL's old
 	# "self signed certificate" wording, which OpenSSL >= 3.x renders as
 	# "self-signed certificate" (hyphenated) - a library-version wording
