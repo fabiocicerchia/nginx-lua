@@ -318,7 +318,13 @@ ARG BUILD_DEPS_BASE="\
         make \
         openssl-devel \
         patch \
-        pcre-devel \
+# pcre2-devel (not pcre-devel): nginx's configure auto-detects and prefers
+# whichever is present, silently linking the old PCRE1 if only pcre-devel is
+# installed. lua-resty-core's own upstream CI explicitly builds against
+# PCRE2, and several of its t/re-*.t tests assert on PCRE2-specific error
+# strings (e.g. "pcre2_compile() failed: missing closing parenthesis" vs
+# PCRE1's "pcre_compile() failed: missing )").
+        pcre2-devel \
         perl-App-cpanminus \
         perl-devel \
         tar \
@@ -457,7 +463,7 @@ ARG PKG_DEPS="\
         gcc-c++ \
         libxml2-devel \
         openssl-devel \
-        pcre-devel \
+        pcre2-devel \
         unzip \
         zlib-devel \
 "

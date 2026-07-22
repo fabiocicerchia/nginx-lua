@@ -306,7 +306,7 @@ ARG BUILD_DEPS_BASE="\
         make \
         openssl-dev \
         patch \
-        pcre-dev \
+        pcre2-dev \
         perl \
         perl-app-cpanminus \
         perl-dev \
@@ -353,7 +353,13 @@ ARG NGINX_BUILD_DEPS="\
         linux-headers \
         make \
         openssl-dev \
-        pcre-dev \
+# pcre2-dev (not pcre-dev): nginx's configure auto-detects and prefers
+# whichever is present, silently linking the old PCRE1 if only pcre-dev is
+# installed. lua-resty-core's own upstream CI explicitly builds against
+# PCRE2 (PCRE2_VER pin in .travis.yml), and several of its t/re-*.t tests
+# assert on PCRE2-specific error strings (e.g. "pcre2_compile() failed:
+# missing closing parenthesis" vs PCRE1's "pcre_compile() failed: missing )").
+        pcre2-dev \
         zlib-dev \
 # OPENRESTY PATCHES
         git \
@@ -462,7 +468,7 @@ ARG PKG_DEPS="\
         libmaxminddb-dev \
         libxml2-dev \
         openssl-dev \
-        pcre-dev \
+        pcre2-dev \
         unzip \
         wget \
         zlib-dev \
