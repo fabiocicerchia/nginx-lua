@@ -598,6 +598,18 @@ test: .prereq-test .start-test-daemons
 	# and it makes an unrelated nginx-worker-socket-reuse race (separate,
 	# pre-existing issue - see below) trigger even earlier in the run. Not
 	# used.
+	#
+	# t/ssl.t and t/ssl-client-hello.t assert a proxied response's "Server:"
+	# header is literally "nginx" - true for upstream's own CI (a bare
+	# nginx.org build), but this project applies openresty/openresty's own
+	# official nginx patches (see `make openresty-patches` above), which
+	# rename that header to "openresty" - confirmed with a real request
+	# (`Server: openresty/<ver>.unknown`). Patch the vendored tests'
+	# expectation to match our own, deliberately-patched build instead of
+	# reverting a patch applied for its other, legitimate changes.
+	sed -i 's/Server: nginx/Server: openresty/' \
+		/lua-resty-core-${VER_LUA_RESTY_CORE}/t/ssl.t \
+		/lua-resty-core-${VER_LUA_RESTY_CORE}/t/ssl-client-hello.t
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
