@@ -374,8 +374,11 @@ ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 # so it also exists in the builder stage: `make test` spawns nested nginx
 # processes whose config has `user nginx;`, and nginx resolves that via
 # getpwnam() at startup even before the builder stage's own COPY/final split -
-# without this the tests failed with "getpwnam(\"nginx\") failed".
-RUN groupadd --system --gid 101 nginx \
+# without this the tests failed with "getpwnam(\"nginx\") failed". Amazon
+# Linux's base image (unlike AlmaLinux/Fedora) doesn't ship shadow-utils
+# (groupadd/useradd) by default - install it first.
+RUN yum install -y shadow-utils \
+    && groupadd --system --gid 101 nginx \
     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
 
 ####################################
