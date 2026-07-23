@@ -11,6 +11,13 @@ ARG ARCH=
 ARG DISTRO=ubuntu
 ARG DISTRO_VER=26.04
 
+# TEST-ONLY: source of the prebuilt redisbloom.so for lua-resty-redis's
+# t/module.t (BF.ADD/BF.EXISTS), glibc-linked - see .start-test-daemons in
+# tpl/Makefile for how it's conditionally loaded. Pinned by tag+digest since
+# there's no source tarball/checksum to verify like this project's other deps.
+ARG REDISBLOOM_IMAGE=redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a
+FROM ${REDISBLOOM_IMAGE} AS redisbloom
+
 #############################
 # Settings Common Variables #
 #############################
@@ -78,13 +85,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.29
+ARG VER_LUA_NGINX_MODULE=0.10.31
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.32
+ARG VER_LUA_RESTY_CORE=0.1.34rc2
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -176,9 +183,17 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on: lua-resty-core, lua-resty-upstream-healthcheck, lua-resty-redis,
+# and lua-resty-memcached's own vendored test suites all use them.
+ARG VER_ECHO_NGINX=0.65
+ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
+
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=11f9e38a20dc79783a9d793201d6ec399ff368e7
+ARG VER_OPENRESTY_STREAMLUA=889cb589150a261811dc1b6d0d19e8a252ff3081
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -278,6 +293,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
+            --with-poll_module \
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
@@ -292,23 +308,44 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/ngx_http_geoip2_module-${VER_GEOIP} \
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
+            --add-module=/echo-nginx-module-${VER_ECHO_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
 
 ARG BUILD_DEPS_BASE="\
         ca-certificates \
+        cpanminus \
         curl \
         g++ \
         libmaxminddb-dev \
         libpcre2-dev \
+        libperl-dev \
         libssl-dev \
         libxml2-dev \
         libxslt1-dev \
         make \
         patch \
+        perl \
+        python3 \
         unzip \
+        wget \
         zlib1g-dev \
+# TEST-ONLY: real daemons for lua-resty-memcached/mysql/redis suites.
+# A second, TLS-enabled memcached is built from source (see .prereq-test)
+# since packaged builds aren't consistently TLS-enabled across distros.
+# liblwp-protocol-https-perl: once Test::Nginx::Socket pulls in
+# LWP::UserAgent, cpanm's own cpanmetadb lookups need https support too, and
+# cpanm can't bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary, not just libssl-dev's headers - needed to
+# generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
+        libevent-dev \
+        liblwp-protocol-https-perl \
+        mariadb-client \
+        mariadb-server \
+        memcached \
+        openssl \
+        redis-server \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -328,6 +365,14 @@ ARG NGINX_BUILD_DEPS="\
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
 
 ENV DEBIAN_FRONTEND noninteractive
+
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx
 
 ####################################
 # Build Nginx with support for LUA #
@@ -352,6 +397,10 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+COPY --from=redisbloom /opt/redis-stack/lib/redisbloom.so /usr/local/lib/redisbloom.so
+
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
@@ -401,6 +450,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
     versions.set-misc-nginx=${VER_MISC_NGINX} \
+    versions.echo-nginx=${VER_ECHO_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 ARG PKG_DEPS="\
@@ -455,9 +505,7 @@ RUN set -eux \
     && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
 
 RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && groupadd --system --gid 101 nginx \
-    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+# nginx user/group already created in the shared base stage above
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.25.4/mainline/debian/Dockerfile

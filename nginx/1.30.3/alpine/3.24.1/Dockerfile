@@ -78,13 +78,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.29
+ARG VER_LUA_NGINX_MODULE=0.10.31
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.32
+ARG VER_LUA_RESTY_CORE=0.1.34rc2
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -176,9 +176,17 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
 
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on: lua-resty-core, lua-resty-upstream-healthcheck, lua-resty-redis,
+# and lua-resty-memcached's own vendored test suites all use them.
+ARG VER_ECHO_NGINX=0.65
+ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
+
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=11f9e38a20dc79783a9d793201d6ec399ff368e7
+ARG VER_OPENRESTY_STREAMLUA=889cb589150a261811dc1b6d0d19e8a252ff3081
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic
@@ -277,6 +285,7 @@ ARG NGINX_BUILD_CONFIG="\
             --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
+            --with-poll_module \
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
@@ -291,6 +300,7 @@ ARG NGINX_BUILD_CONFIG="\
             --add-module=/ngx_http_geoip2_module-${VER_GEOIP} \
             --add-module=/njs-${VER_NJS}/nginx \
             --add-module=/set-misc-nginx-module-${VER_MISC_NGINX} \
+            --add-module=/echo-nginx-module-${VER_ECHO_NGINX} \
             --add-module=/stream-lua-nginx-module-${VER_OPENRESTY_STREAMLUA} \
 "
 ENV NGINX_BUILD_CONFIG=$NGINX_BUILD_CONFIG
@@ -302,9 +312,27 @@ ARG BUILD_DEPS_BASE="\
         make \
         openssl-dev \
         patch \
-        pcre-dev \
+        pcre2-dev \
+        perl \
+        perl-app-cpanminus \
+        perl-dev \
         tar \
         zlib-dev \
+# TEST-ONLY: real daemons for lua-resty-memcached/mysql/redis suites.
+# A second, TLS-enabled memcached is built from source (see .prereq-test)
+# since packaged builds aren't consistently TLS-enabled across distros.
+# perl-lwp-protocol-https: once Test::Nginx::Socket pulls in LWP::UserAgent,
+# cpanm's own cpanmetadb lookups need https support too, and cpanm can't
+# bootstrap that module itself (see .prereq-test).
+# openssl: the CLI binary - openssl-dev's headers don't pull it in - needed
+# to generate the throwaway CA+leaf cert chains for memcached/redis TLS tests.
+        libevent-dev \
+        mariadb \
+        mariadb-client \
+        memcached \
+        openssl \
+        perl-lwp-protocol-https \
+        redis \
 "
 ENV BUILD_DEPS_BASE=$BUILD_DEPS_BASE
 ARG BUILD_DEPS_AMD64="\
@@ -331,12 +359,27 @@ ARG NGINX_BUILD_DEPS="\
         linux-headers \
         make \
         openssl-dev \
-        pcre-dev \
+# pcre2-dev (not pcre-dev): nginx's configure auto-detects and prefers
+# whichever is present, silently linking the old PCRE1 if only pcre-dev is
+# installed. lua-resty-core's own upstream CI explicitly builds against
+# PCRE2 (PCRE2_VER pin in .travis.yml), and several of its t/re-*.t tests
+# assert on PCRE2-specific error strings (e.g. "pcre2_compile() failed:
+# missing closing parenthesis" vs PCRE1's "pcre_compile() failed: missing )").
+        pcre2-dev \
         zlib-dev \
 # OPENRESTY PATCHES
         git \
 "
 ENV NGINX_BUILD_DEPS=$NGINX_BUILD_DEPS
+
+# Create nginx user/group in the shared base stage (not just the final stage)
+# so it also exists in the builder stage: `make test` spawns nested nginx
+# processes whose config has `user nginx;`, and nginx resolves that via
+# getpwnam() at startup even before the builder stage's own COPY/final split -
+# without this the tests failed with "getpwnam(\"nginx\") failed".
+RUN set -x \
+    && addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
 
 ####################################
 # Build Nginx with support for LUA #
@@ -358,6 +401,21 @@ COPY tpl/patches patches
 RUN make deps \
     && make core \
     && make luarocks
+
+# Test prerequisites: install the heavier Perl deps of Test::Nginx from Alpine's
+# repos instead of letting cpanm build them from CPAN source. Building these in
+# the minimal builder is flaky (Module::Build::Tiny / libwww-perl / List::MoreUtils
+# fail), which previously aborted `make test`. With these present, cpanm only has
+# to build the pure-Perl Test-Nginx itself. util-linux: lua-resty-core's
+# t/pipe-cpu-affinity.t execvp()s `taskset`, not present in Alpine's base image.
+RUN apk add --no-cache \
+        perl-libwww \
+        perl-http-message \
+        perl-http-daemon \
+        perl-list-moreutils \
+        util-linux
+
+RUN make test
 
 ##########################################
 # Combine everything with minimal layers #
@@ -407,6 +465,7 @@ LABEL maintainer="Fabio Cicerchia <info@fabiocicerchia.it>" \
     versions.lua-upstream="${VER_LUA_UPSTREAM}" \
     versions.nginx-lua-prometheus="${VER_PROMETHEUS}" \
     versions.set-misc-nginx=${VER_MISC_NGINX} \
+    versions.echo-nginx=${VER_ECHO_NGINX} \
     versions.stream-lua-nginx-module="${VER_OPENRESTY_STREAMLUA}"
 
 # wget is required due to https://github.com/luarocks/luarocks/issues/952
@@ -415,7 +474,7 @@ ARG PKG_DEPS="\
         libmaxminddb-dev \
         libxml2-dev \
         openssl-dev \
-        pcre-dev \
+        pcre2-dev \
         unzip \
         wget \
         zlib-dev \
@@ -459,9 +518,7 @@ RUN set -eux \
     && ln -sf /usr/local/bin/luajit /usr/local/bin/lua
 
 RUN set -x \
-# create nginx user/group first, to be consistent throughout docker variants
-    && addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+# nginx user/group already created in the shared base stage above
 # COMMENTED OUT FROM ORIGINAL DOCKERFILE: https://github.com/nginxinc/docker-nginx/blob/1.31.1/mainline/alpine/Dockerfile
 # REASON: No need to use the existing distributed package as the binary is recompiled.
 #     && apkArch="$(cat /etc/apk/arch)" \

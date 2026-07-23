@@ -394,13 +394,14 @@ The following are the available build-time options. They can be set using the `-
 | `VER_NJS`                    | `0.9.6`                                    | The version of [Njs](https://github.com/nginx/njs) to use. |
 | `VER_GEOIP`                  | `3.4`                                      | The version of [GeoIP2](https://github.com/leev/ngx_http_geoip2_module) to use. |
 | `VER_LUAJIT`                 | `2.1-20260311`                             | The version of [LuaJIT](https://github.com/openresty/luajit2) to use. |
-| `VER_LUA_NGINX_MODULE`       | `0.10.30RC1`                               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) to use. |
-| `VER_LUA_RESTY_CORE`         | `0.1.33RC1`                                | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) to use. |
+| `VER_LUA_NGINX_MODULE`       | `0.10.31`                                  | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) to use. |
+| `VER_LUA_RESTY_CORE`         | `0.1.34rc2`                                | The version of [lua-resty-core](https://github.com/openresty/lua-resty-core) to use. |
 | `VER_LUAROCKS`               | `3.13.0`                                   | The version of [LuaRocks](https://luarocks.org/) to use. |
 | `VER_CLOUDFLARE_COOKIE`      | `f418d77082eaef48331302e84330488fdc810ef4` | The version of [lua-resty-cookie](https://github.com/cloudflare/lua-resty-cookie) to use. |
 | `VER_LUA_RESTY_LRUCACHE`     | `0.15`                                     | The version of [lua-resty-lrucache](https://github.com/openresty/lua-resty-lrucache) to use. |
 | `VER_LUA_UPSTREAM`           | `0.07`                                     | The version of [lua-upstream-nginx-module](https://github.com/openresty/lua-upstream-nginx-module) to use. |
 | `VER_MISC_NGINX`             | `0.33`                                     | The version of [set-misc-nginx-module](https://github.com/openresty/set-misc-nginx-module) to use. |
+| `VER_ECHO_NGINX`             | `0.65`                                     | The version of [echo-nginx-module](https://github.com/openresty/echo-nginx-module) to use. |
 | `VER_OPENRESTY_DNS`          | `0.23`                                     | The version of [lua-resty-dns](https://github.com/openresty/lua-resty-dns) to use. |
 | `VER_OPENRESTY_HEADERS`      | `0.39`                                     | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) to use. |
 | `VER_OPENRESTY_HEALTHCHECK`  | `0.08`                                     | The version of [lua-resty-upstream-healthcheck](https://github.com/openresty/lua-resty-upstream-healthcheck) to use. |
@@ -410,7 +411,7 @@ The following are the available build-time options. They can be set using the `-
 | `VER_OPENRESTY_REDIS`        | `0.33`                                     | The version of [lua-resty-redis](https://github.com/openresty/lua-resty-redis) to use. |
 | `VER_OPENRESTY_SHELL`        | `0.03`                                     | The version of [lua-resty-shell](https://github.com/openresty/lua-resty-shell) to use. |
 | `VER_OPENRESTY_SIGNAL`       | `0.04`                                     | The version of [lua-resty-signal](https://github.com/openresty/lua-resty-signal) to use. |
-| `VER_OPENRESTY_STREAMLUA`    | `c5b3410`                                  | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
+| `VER_OPENRESTY_STREAMLUA`    | `889cb58`                                  | The version of [stream-lua-nginx-module](https://github.com/openresty/stream-lua-nginx-module) to use. |
 | `VER_OPENRESTY_STRING`       | `0.16`                                     | The version of [lua-resty-string](https://github.com/openresty/lua-resty-string) to use. |
 | `VER_OPENRESTY_TABLEPOOL`    | `0.03`                                     | The version of [lua-tablepool](https://github.com/openresty/lua-tablepool) to use. |
 | `VER_OPENRESTY_UPLOAD`       | `0.11`                                     | The version of [lua-resty-upload](https://github.com/openresty/lua-resty-upload) to use. |
@@ -517,6 +518,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
   "org.label-schema.vcs-ref": "b0482b3",
   "org.label-schema.vcs-url": "https://github.com/fabiocicerchia/nginx-lua",
   "org.label-schema.version": "1.25.3-alpine3.19.0",
+  "versions.echo-nginx": "0.65",
   "versions.geoip": "3.4",
   "versions.headers-more-nginx-module": "0.36",
   "versions.lua-nginx-module": "0.10.25",
@@ -565,6 +567,7 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 | `org.label-schema.vcs-ref`                | buildarg `VCS_REF` |
 | `org.label-schema.vcs-url`                | URL for the source code under version control from which this container image was built. |
 | `org.label-schema.version`                | Release identifier for the contents of the image. |
+| `versions.echo-nginx`                     | The version of [echo-nginx-module](https://github.com/openresty/echo-nginx-module) used. |
 | `versions.geoip`                          | The version of [geoip](https://github.com/leev/ngx_http_geoip2_module) used. |
 | `versions.headers-more-nginx-module`      | The version of [headers-more-nginx-module](https://github.com/openresty/headers-more-nginx-module) used. |
 | `versions.lua-nginx-module`               | The version of [ngx_http_lua_module](https://github.com/openresty/lua-nginx-module) used. |
