@@ -182,6 +182,12 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 # https://github.com/openresty/set-misc-nginx-module
 ARG VER_MISC_NGINX={{VER_MISC_NGINX}}
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
+
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on: lua-resty-core, lua-resty-upstream-healthcheck, lua-resty-redis,
+# and lua-resty-memcached's own vendored test suites all use them.
 ARG VER_ECHO_NGINX={{VER_ECHO_NGINX}}
 ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
 
