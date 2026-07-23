@@ -78,13 +78,13 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 # lua-nginx-module
 # https://github.com/openresty/lua-nginx-module
 # Production ready.
-ARG VER_LUA_NGINX_MODULE=0.10.29
+ARG VER_LUA_NGINX_MODULE=0.10.31
 ENV VER_LUA_NGINX_MODULE=$VER_LUA_NGINX_MODULE
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core
 # This library is production ready.
-ARG VER_LUA_RESTY_CORE=0.1.32
+ARG VER_LUA_RESTY_CORE=0.1.34rc2
 ENV VER_LUA_RESTY_CORE=$VER_LUA_RESTY_CORE
 ARG LUA_LIB_DIR=/usr/local/share/lua/5.1
 ENV LUA_LIB_DIR=$LUA_LIB_DIR
@@ -175,12 +175,18 @@ ENV VER_PROMETHEUS=$VER_PROMETHEUS
 # https://github.com/openresty/set-misc-nginx-module
 ARG VER_MISC_NGINX=0.34
 ENV VER_MISC_NGINX=$VER_MISC_NGINX
+
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on: lua-resty-core, lua-resty-upstream-healthcheck, lua-resty-redis,
+# and lua-resty-memcached's own vendored test suites all use them.
 ARG VER_ECHO_NGINX=0.65
 ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
 
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module
-ARG VER_OPENRESTY_STREAMLUA=de1fe40e3daa6181f0cd2a0c894c9b9a727908c2
+ARG VER_OPENRESTY_STREAMLUA=889cb589150a261811dc1b6d0d19e8a252ff3081
 ENV VER_OPENRESTY_STREAMLUA=$VER_OPENRESTY_STREAMLUA
 
 # lua-resty-limit-traffic

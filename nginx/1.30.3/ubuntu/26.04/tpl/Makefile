@@ -704,3 +704,8 @@ test: .prereq-test .start-test-daemons
 	# final image stage copies wholesale. Remove it now, in this same
 	# `RUN make test` layer, so it never reaches the shipped image.
 	rm -f /usr/local/lib/lua/5.1/cjson.so
+	# redisbloom.so (test-only, glibc distros only - see the Dockerfile's
+	# redisbloom stage) lands directly in /usr/local/lib for the same
+	# reason: remove it here so it doesn't leak into the shipped image
+	# either.
+	rm -f /usr/local/lib/redisbloom.so
