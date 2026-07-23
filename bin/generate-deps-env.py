@@ -205,7 +205,17 @@ def main():
     # derive the module version from it instead of fetching each library's
     # latest tag independently - that desyncs them whenever lua-nginx-module
     # ships a stable release before its matching lua-resty-core does.
-    resty_core_ver = get_latest_tag("https://github.com/openresty/lua-resty-core")
+    #
+    # get_latest_tag() skips RC tags by design, which would pin us to v0.1.32
+    # indefinitely - lua-resty-core hasn't cut a non-RC release since, and its
+    # own newer tags (v0.1.33+) are all RC-only. Hardcoded to v0.1.34rc2
+    # instead: OpenResty's own official v1.31.1.1 bundle ships this exact
+    # lua-resty-core release (see openresty.org/en/changelog-1031001.html),
+    # paired with the STABLE lua-nginx-module v0.10.31 - de-risked by
+    # running in OpenResty's own numbered production release, not just an
+    # isolated upstream RC tag. Bump this by hand when a newer combination
+    # gets the same treatment (i.e. ships in an official OpenResty release).
+    resty_core_ver = "0.1.34rc2"
     pinned_lua_nginx_module = get_resty_core_required_lua_module(resty_core_ver)
     print(
         f"lua-resty-core {resty_core_ver} pins lua-nginx-module to "

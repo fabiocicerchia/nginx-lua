@@ -38,7 +38,14 @@ SHA256_LUA_NGINX_MODULE={sha256_lua_nginx_module}
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core/tags
-# This library is production ready.
+# NOTE: may be pinned to an RC - generate-deps-env.py's get_latest_tag()
+# skips RC tags by design, but lua-resty-core's own newer tags can be
+# RC-only for long stretches. When that happens, this project only adopts
+# an RC if the exact same version ships in an official, numbered OpenResty
+# bundle release (see openresty.org/en/changelog - cross-check the bundled
+# lua-resty-core version there) - de-risked by running in OpenResty's own
+# production release, not just an isolated upstream RC tag. See
+# generate-deps-env.py's main() for the current hardcoded override, if any.
 VER_LUA_RESTY_CORE={ver_lua_resty_core}
 SHA256_LUA_RESTY_CORE={sha256_lua_resty_core}
 
@@ -131,9 +138,11 @@ SHA256_MISC_NGINX={sha256_misc_nginx}
 
 # echo-nginx-module
 # https://github.com/openresty/echo-nginx-module/tags
-# Provides the echo/echo_sleep directives several upstream lua-resty test
-# suites (e.g. lua-resty-upstream-healthcheck) depend on; bundled by default
-# in official OpenResty builds.
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on - confirmed by grepping each vendored suite's t/ directory:
+# lua-resty-core (14 files), lua-resty-upstream-healthcheck (t/sanity.t),
+# lua-resty-redis (t/bugs.t), and lua-resty-memcached (t/sanity.t). Bundled
+# by default in official OpenResty builds.
 VER_ECHO_NGINX={ver_echo_nginx}
 SHA256_ECHO_NGINX={sha256_echo_nginx}
 
