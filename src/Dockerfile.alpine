@@ -409,6 +409,13 @@ RUN make deps \
 # fail), which previously aborted `make test`. With these present, cpanm only has
 # to build the pure-Perl Test-Nginx itself. util-linux: lua-resty-core's
 # t/pipe-cpu-affinity.t execvp()s `taskset`, not present in Alpine's base image.
+# None of these need cleanup like lua-cjson.so/redisbloom.so do: verified by
+# listing every file each package owns (`apk info -L <pkg>`) - they install
+# under /usr/bin, system perl paths, etc., never under /usr/local/lib,
+# /etc/nginx, /var/cache/nginx, or /usr/sbin/nginx, the only paths the final
+# stage's `COPY --from=builder` pulls. The final stage is its own separate
+# `FROM base` build, not a copy of the whole builder filesystem, so anything
+# outside those paths simply never exists there.
 RUN apk add --no-cache \
         perl-libwww \
         perl-http-message \
