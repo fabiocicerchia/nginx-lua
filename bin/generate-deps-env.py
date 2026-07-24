@@ -39,6 +39,19 @@ def github_owner_repo(repo_url):
     return f"{parts[0]}/{parts[1]}"
 
 
+def version_tuple(ver):
+    """Parse a dotted version's leading numeric part into an int tuple.
+
+    Ignores any trailing rc/RC/alpha/beta suffix, so "0.1.34rc2" and
+    "0.1.34" both compare as (0, 1, 34) - used to check whether a
+    non-prerelease tag has caught up to (or passed) a hand-pinned RC.
+    """
+    match = re.match(r"(\d+(?:\.\d+)*)", ver)
+    if not match:
+        raise ValueError(f"Could not parse a version number from {ver!r}")
+    return tuple(int(part) for part in match.group(1).split("."))
+
+
 def get_latest_tag(repo_url):
     """Get the latest non-prerelease tag from a GitHub repository via API."""
     owner_repo = github_owner_repo(repo_url)
@@ -208,14 +221,33 @@ def main():
     #
     # get_latest_tag() skips RC tags by design, which would pin us to v0.1.32
     # indefinitely - lua-resty-core hasn't cut a non-RC release since, and its
-    # own newer tags (v0.1.33+) are all RC-only. Hardcoded to v0.1.34rc2
-    # instead: OpenResty's own official v1.31.1.1 bundle ships this exact
-    # lua-resty-core release (see openresty.org/en/changelog-1031001.html),
-    # paired with the STABLE lua-nginx-module v0.10.31 - de-risked by
-    # running in OpenResty's own numbered production release, not just an
-    # isolated upstream RC tag. Bump this by hand when a newer combination
-    # gets the same treatment (i.e. ships in an official OpenResty release).
-    resty_core_ver = "0.1.34rc2"
+    # own newer tags (v0.1.33+) are all RC-only. VERIFIED_RESTY_CORE_RC is a
+    # floor, not a permanent override: OpenResty's own official v1.31.1.1
+    # bundle ships this exact lua-resty-core release (see
+    # openresty.org/en/changelog-1031001.html), paired with the STABLE
+    # lua-nginx-module v0.10.31 - de-risked by running in OpenResty's own
+    # numbered production release, not just an isolated upstream RC tag. The
+    # moment lua-resty-core cuts a real tag at or past this version, prefer
+    # that one automatically - only fall back to the verified RC while
+    # nothing non-RC has caught up yet. Bump VERIFIED_RESTY_CORE_RC by hand
+    # when an even newer RC gets the same treatment (ships in an official
+    # OpenResty release) ahead of its own next stable tag.
+    VERIFIED_RESTY_CORE_RC = "0.1.34rc2"
+    latest_stable_resty_core = get_latest_tag("https://github.com/openresty/lua-resty-core")
+    if version_tuple(latest_stable_resty_core) >= version_tuple(VERIFIED_RESTY_CORE_RC):
+        resty_core_ver = latest_stable_resty_core
+        print(
+            f"lua-resty-core: using stable tag {resty_core_ver} "
+            f"(caught up to verified RC pin {VERIFIED_RESTY_CORE_RC})",
+            file=sys.stderr,
+        )
+    else:
+        resty_core_ver = VERIFIED_RESTY_CORE_RC
+        print(
+            f"lua-resty-core: latest stable tag is {latest_stable_resty_core}, "
+            f"still behind verified RC pin {VERIFIED_RESTY_CORE_RC} - using the RC",
+            file=sys.stderr,
+        )
     pinned_lua_nginx_module = get_resty_core_required_lua_module(resty_core_ver)
     print(
         f"lua-resty-core {resty_core_ver} pins lua-nginx-module to "
