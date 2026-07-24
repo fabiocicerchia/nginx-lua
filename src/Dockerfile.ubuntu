@@ -393,6 +393,7 @@ RUN set -eux \
 COPY tpl/Makefile Makefile
 COPY tpl/.env.dist .env.dist
 COPY tpl/patches patches
+COPY tpl/start-test-daemons.sh start-test-daemons.sh
 
 RUN make deps \
     && make core \
