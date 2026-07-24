@@ -437,63 +437,25 @@ luarocks:
 #
 # lua-resty-core's own Makefile hardcodes OPENRESTY_PREFIX to the release
 # (non-debug) nginx build by default. Overriding it to openresty-debug below
-# (same trick as lua-resty-shell/lua-resty-websocket above) turned out to
-# fix the large majority of what looked like a broad, suite-wide problem:
-# t/ctx.t, t/ocsp.t, t/semaphore.t, t/stream/ctx.t and t/stream/semaphore.t
-# went from double-digit failure counts to fully green, because their
-# assertions were matching debug-only log lines that a release build never
-# emits - not a real defect. t/balancer-keepalive.t and
-# t/balancer-keepalive-localaddr.t, previously silently SKIPPED entirely
-# ("--with-debug required"), now actually run under debug and confirm the
-# one still-unresolved, genuine issue:
+# fixes t/ctx.t, t/ocsp.t, t/semaphore.t, and their t/stream/ equivalents,
+# whose assertions match debug-only log lines a release build never emits.
 #
-# t/balancer-keepalive.t's SNI-based subrequest scenarios (e.g. "sanity
-# (different ip port)", "sanity(same ip port with different sni)") always
-# hit lua-nginx-module's `keepalive not saving connection` branch instead of
-# saving to the per-SNI pool. Debugged down to the actual C-level guard with
-# a temporary instrumented rebuild (not committed): every individual guard
-# in ngx_http_lua_balancer_free_peer()'s `if (bp->keepalive)` block was
-# checked, and it's unconditionally `c == NULL` (pc->connection is NULL)
-# every time. But ngx_http_upstream_finalize_request() in nginx core logs
-# u->peer.connection as a valid, non-NULL pointer *immediately* before
-# calling `u->peer.free(&u->peer, ...)` - same struct address (&u->peer),
-# same struct size, "connection" confirmed at offset 0 on both sides (no
-# ABI/struct-layout mismatch between how nginx core and the module see
-# ngx_peer_connection_t). So the pointer reads non-NULL one line before the
-# call and NULL inside the callee, with nothing but the call itself between
-# the two reads - unexplained without a live debugger session against the
-# actual Test::Nginx-managed nginx process (attempted with gdb but stopped
-# short of that: reproducing the harness's exact subrequest timing manually
-# outside `prove` is a separate, nontrivial undertaking).
+# t/balancer-keepalive.t's connection-pool bug (tracked here for a while as
+# a genuinely unresolved nginx-core C-level regression, issue #297) turned
+# out to be an upstream lua-resty-core/lua-nginx-module bug, already fixed
+# somewhere between v0.1.32/0.10.29 and v0.1.34rc2/0.10.31 - the version
+# bump (see VER_LUA_RESTY_CORE's own comment in .env.dist) fixed it with no
+# code changes here.
 #
-# Working theory: this project builds nginx.org mainline (1.30.3/1.31.2)
-# paired with individually version-locked lua modules to satisfy
-# lua-resty-core's exact-version check (see
-# lua-nginx-resty-core-exact-version-lock in project memory) - NOT the
-# official OpenResty bundle, where nginx and every lua module ship as one
-# unit validated together. lua-nginx-module 0.10.29 was never necessarily
-# validated against nginx 1.30/1.31 specifically by anyone; this SNI +
-# subrequest + lua-managed-keepalive path is a narrow enough scenario that
-# a real incompatibility here wouldn't be surprising. Confirming that
-# theory (e.g. bisecting nginx versions, or testing against nginx paired
-# with lua-nginx-module the way an actual OpenResty release does it) is the
-# next step if this is revisited - not something fixable by editing our
-# own Dockerfiles/Makefile.
-#
-# A tail of other failures remains under debug too (t/balancer-timeout.t and
-# t/exit.t both report "Bad plan" mismatches - debug mode runs more
-# conditional subtests than the suite's own plan() count expects; assorted
-# residual failures also remain in t/pipe*.t, t/ssl*.t, and t/request.t's
-# CONNECT-method status code) - not yet individually triaged, tracked
-# alongside balancer-keepalive.t in issue #297.
-#
-# Separately: `prove` occasionally Bailout()s partway through this suite with
-# "bind() to unix:.../nginx.sock failed (98: Address in use)" - a later test
-# file's nginx instance racing a still-shutting-down earlier one for the same
-# hardcoded servroot socket/port. Reproduces with a plain `make test` (no
-# mockeagain involved) and at a different file each time, consistent with
-# [[local-buildkit-dns-flaky]]-style local resource contention rather than a
-# deterministic bug in any one test file - not yet root-caused further.
+# Remaining residual tail, not yet individually triaged: t/balancer-timeout.t
+# and t/exit.t report "Bad plan" mismatches (debug mode runs more conditional
+# subtests than the suite's own plan() count expects); assorted failures in
+# t/pipe*.t/t/ssl*.t/t/request.t. Separately, `prove` occasionally Bailout()s
+# mid-suite with "bind() ... Address in use" - a later test file's nginx
+# racing a still-shutting-down earlier one for the same hardcoded servroot
+# port, reproducing at a different file each time - consistent with
+# [[local-buildkit-dns-flaky]]-style local resource contention, not a
+# deterministic per-file bug.
 #
 # Every other suite below must stay green; a regression there should fail
 # the build.
@@ -530,14 +492,9 @@ test: .prereq-test .start-test-daemons
 	# fully green.
 	-cd /lua-resty-memcached-${VER_OPENRESTY_MEMCACHED} \
 		&& $(MAKE) test;
-	# lua-resty-mysql/redis's own t/Test.pm does `use t::Test;`, a relative
-	# import Perl 5.26+ can't resolve without "." on @INC (Perl dropped it by
-	# default for security). Upstream's own CI adds `-I.` to `prove` for the
-	# same reason; PERL5LIB=. is the equivalent for their Makefile's `prove`
-	# invocation, which we don't control directly.
-	# DB_VERSION: t/auth.t maps this to the set of auth plugins its DB
-	# version supports (mirroring upstream's own Travis job matrix); must
-	# match the mariadb package version .start-test-daemons actually starts.
+	# PERL5LIB=.: t/Test.pm's `use t::Test;` needs "." on @INC, which Perl
+	# 5.26+ dropped by default; matches upstream CI's `-I.` on prove.
+	# DB_VERSION: must match the mariadb version .start-test-daemons starts.
 	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 		&& DB_VERSION=mariadb:11.8 PERL5LIB=.:$$PERL5LIB $(MAKE) test;
 	# t/module.t (BF.ADD/BF.EXISTS via RedisBloom) now passes on glibc
