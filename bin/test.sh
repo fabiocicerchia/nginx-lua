@@ -96,8 +96,12 @@ function inject_dependencies() {
         # Ref: https://github.com/luarocks/luarocks/issues/952
         docker exec nginx_lua_test apk add gcc musl-dev coreutils wget
     elif [[ "$DOCKER_TAG" == *"ubuntu"* ]] || [[ "$DOCKER_TAG" == *"debian"* ]]; then
+        # musl-dev doesn't exist on these repos (glibc-based, not musl) and was
+        # never needed: gcc already pulls in libc6-dev as its own dependency,
+        # which is what luarocks needs to build lua-cjson here. Same fix as
+        # already applied below for the RPM-based distros.
         docker exec nginx_lua_test apt update
-        docker exec nginx_lua_test apt install -y gcc musl-dev coreutils unzip
+        docker exec nginx_lua_test apt install -y gcc coreutils unzip
     elif [[ "$DOCKER_TAG" == *"almalinux"* ]] || [[ "$DOCKER_TAG" == *"fedora"* ]] || [[ "$DOCKER_TAG" == *"amazon"* ]]; then
         # musl-devel doesn't exist on these repos (glibc-based, not musl) and
         # was never needed: gcc already pulls in glibc-devel as its own
