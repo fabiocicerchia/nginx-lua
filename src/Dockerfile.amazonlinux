@@ -350,6 +350,13 @@ ARG BUILD_DEPS_BASE="\
 # util-linux: lua-resty-core's t/pipe-cpu-affinity.t execvp()s `taskset`,
 # which Amazon Linux 2023's minimal base image doesn't install by default
 # (unlike Debian/Ubuntu/Fedora/AlmaLinux, which all ship it out of the box).
+# None of BUILD_DEPS_BASE needs cleanup like lua-cjson.so/redisbloom.so do:
+# verified for util-linux specifically (`rpm -ql util-linux`) - it installs
+# under /usr/bin and other system paths, never under /usr/local/lib,
+# /etc/nginx, /var/cache/nginx, or /usr/sbin/nginx, the only paths the final
+# stage's `COPY --from=builder` pulls. This whole ARG is builder-stage only
+# (see the final stage's own PKG_DEPS below), so nothing here reaches the
+# shipped image regardless.
         libevent-devel \
         mariadb1011 \
         mariadb1011-server \
