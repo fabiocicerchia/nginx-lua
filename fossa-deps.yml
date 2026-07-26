@@ -109,10 +109,15 @@ remote-dependencies:
   url: "https://github.com/openresty/set-misc-nginx-module/archive/v0.34.tar.gz"
   version: "0.34"
 
+# https://github.com/openresty/echo-nginx-module/tags
+- name: echo-nginx-module
+  url: "https://github.com/openresty/echo-nginx-module/archive/v0.65.tar.gz"
+  version: "0.65"
+
 # https://github.com/openresty/stream-lua-nginx-module/commits/master
 - name: stream-lua-nginx-module
-  url: "https://github.com/openresty/stream-lua-nginx-module/archive/11f9e38a20dc79783a9d793201d6ec399ff368e7.tar.gz"
-  version: "11f9e38a20dc79783a9d793201d6ec399ff368e7"
+  url: "https://github.com/openresty/stream-lua-nginx-module/archive/de1fe40e3daa6181f0cd2a0c894c9b9a727908c2.tar.gz"
+  version: "de1fe40e3daa6181f0cd2a0c894c9b9a727908c2"
 
 # https://github.com/openresty/lua-resty-limit-traffic/tags
 - name: lua-resty-limit-traffic
