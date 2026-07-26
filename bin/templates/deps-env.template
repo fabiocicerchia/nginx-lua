@@ -38,7 +38,14 @@ SHA256_LUA_NGINX_MODULE={sha256_lua_nginx_module}
 
 # lua-resty-core
 # https://github.com/openresty/lua-resty-core/tags
-# This library is production ready.
+# NOTE: may be pinned to an RC - generate-deps-env.py's get_latest_tag()
+# skips RC tags by design, but lua-resty-core's own newer tags can be
+# RC-only for long stretches. When that happens, this project only adopts
+# an RC if the exact same version ships in an official, numbered OpenResty
+# bundle release (see openresty.org/en/changelog - cross-check the bundled
+# lua-resty-core version there) - de-risked by running in OpenResty's own
+# production release, not just an isolated upstream RC tag. See
+# generate-deps-env.py's main() for the current hardcoded override, if any.
 VER_LUA_RESTY_CORE={ver_lua_resty_core}
 SHA256_LUA_RESTY_CORE={sha256_lua_resty_core}
 
@@ -129,13 +136,23 @@ SHA256_PROMETHEUS={sha256_prometheus}
 VER_MISC_NGINX={ver_misc_nginx}
 SHA256_MISC_NGINX={sha256_misc_nginx}
 
+# echo-nginx-module
+# https://github.com/openresty/echo-nginx-module/tags
+# Provides the echo/echo_sleep directives this project's own test: target
+# depends on - confirmed by grepping each vendored suite's t/ directory:
+# lua-resty-core (14 files), lua-resty-upstream-healthcheck (t/sanity.t),
+# lua-resty-redis (t/bugs.t), and lua-resty-memcached (t/sanity.t). Bundled
+# by default in official OpenResty builds.
+VER_ECHO_NGINX={ver_echo_nginx}
+SHA256_ECHO_NGINX={sha256_echo_nginx}
+
 # stream-lua-nginx-module
 # https://github.com/openresty/stream-lua-nginx-module/commits/master
-# NOTE:
-# The latest tag 0.0.14 is incompatible with nginx 1.25.5+:
-# error: unknown type name 'ngx_stream_ssl_conf_t'; did you mean 'ngx_stream_addr_conf_t'
-# The fix is released in master branch only without proper tag yet.
-# So using the latest master commit available to date.
+# lua-resty-core pins stream subsystem support to an EXACT ngx_stream_lua_version
+# (ngx_lua_version ~= check for the "stream" subsystem in resty/core/base.lua),
+# so this MUST match VER_LUA_RESTY_CORE's required version -
+# generate-deps-env.py derives this from resty-core - do not hand-edit
+# without also checking get_resty_core_required_stream_lua_version().
 VER_OPENRESTY_STREAMLUA={ver_openresty_streamlua}
 SHA256_OPENRESTY_STREAMLUA={sha256_openresty_streamlua}
 
@@ -163,3 +180,29 @@ SHA256_OPENRESTY_BALANCER={sha256_openresty_balancer}
 # https://github.com/openresty/lua-resty-string/tags
 VER_OPENRESTY_STRING={ver_openresty_string}
 SHA256_OPENRESTY_STRING={sha256_openresty_string}
+
+# lua-resty-openssl (TEST-ONLY: lua-resty-mysql's t/ed25519.t computes the
+# client_ed25519 auth signature via this library, matching what upstream's
+# own CI clones as a sibling dep)
+# https://github.com/fffonion/lua-resty-openssl/tags
+# NOTE: not part of the auto-update loop above - bump this pin by hand.
+VER_LUA_RESTY_OPENSSL_TEST=1.8.0
+SHA256_LUA_RESTY_OPENSSL_TEST=c6c7286498459129512b44fdc1d6ce998b764604011b440b7736fc890c4a88dc
+
+# lua-cjson (TEST-ONLY: several lua-resty-redis/memcached test files do a
+# bare `require "cjson"`, which official OpenResty bundles by default but
+# our image does not ship - test-only until/unless this becomes a real
+# production feature request)
+# https://github.com/openresty/lua-cjson/tags
+# NOTE: not part of the auto-update loop above - bump this pin by hand.
+VER_LUA_CJSON_TEST=2.1.0.19
+SHA256_LUA_CJSON_TEST=d1aded44b4cfe5ec6b395e178902aba3eed1dbe7999a753c0662222de2890ec0
+
+# memcached (TEST-ONLY: real server for lua-resty-memcached's test suite)
+# https://memcached.org/downloads
+# Built from source with --enable-tls: packaged builds aren't consistently
+# TLS-enabled across distros, and lua-resty-memcached's t/tls.t needs that.
+# NOTE: not part of the auto-update loop above (memcached.org doesn't tag
+# releases the way GitHub repos do) - bump this pin by hand when needed.
+VER_MEMCACHED_TEST=1.6.42
+SHA256_MEMCACHED_TEST=50f08b879d4f9d36dea9d905e9eaade15c708e38db7e9a73fc21dc8b45395de7
