@@ -495,7 +495,12 @@ test: .prereq-test .start-test-daemons
 	# PERL5LIB=.: t/Test.pm's `use t::Test;` needs "." on @INC, which Perl
 	# 5.26+ dropped by default; matches upstream CI's `-I.` on prove.
 	# DB_VERSION: must match the mariadb version .start-test-daemons starts.
-	cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
+	# `-`-prefixed: t/sanity.t's "bad host" case does a real DNS lookup of a
+	# nonexistent domain: nginx core's resolver occasionally logs "wrong
+	# ident" for a late/duplicate UDP answer, which the test then sees as an
+	# unexpected [error] line. Real network/resolver timing, not our
+	# packaging - same class as lua-resty-core/memcached/redis above.
+	-cd /lua-resty-mysql-${VER_OPENRESTY_MYSQL} \
 		&& DB_VERSION=mariadb:11.8 PERL5LIB=.:$$PERL5LIB $(MAKE) test;
 	# t/module.t (BF.ADD/BF.EXISTS via RedisBloom) now passes on glibc
 	# distros - see .start-test-daemons' conditional --loadmodule. Alpine
