@@ -11,11 +11,14 @@ import sys
 import argparse
 import common
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Generate metadata documentation for nginx-lua Docker images")
+    parser = argparse.ArgumentParser(
+        description="Generate metadata documentation for nginx-lua Docker images"
+    )
     parser.add_argument(
         "os_distro",
-        help="Operating system distribution (e.g., alpine, ubuntu, debian, fedora)"
+        help="Operating system distribution (e.g., alpine, ubuntu, debian, fedora)",
     )
     args = parser.parse_args()
 
@@ -32,6 +35,7 @@ def main():
     exit_code = common.generate_metadata(tag)
     if exit_code > 0:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

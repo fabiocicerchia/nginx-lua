@@ -14,16 +14,13 @@ import argparse
 
 ARM64_ARCH = "arm64"
 
+
 def main():
     parser = argparse.ArgumentParser(description="Build Docker images for nginx-lua")
     parser.add_argument(
-        "os_distro",
-        help="Operating system distribution (e.g., alpine, ubuntu, debian)"
+        "os_distro", help="Operating system distribution (e.g., alpine, ubuntu, debian)"
     )
-    parser.add_argument(
-        "arch",
-        help="Architecture (amd64 or arm64)"
-    )
+    parser.add_argument("arch", help="Architecture (amd64 or arm64)")
     args = parser.parse_args()
 
     os_distro = args.os_distro
@@ -46,10 +43,9 @@ def main():
     if exit_code > 0:
         sys.exit(1)
 
-    stdout = subprocess.check_output(
-        common.DOCKER_IMAGES_COMMAND.split(), text=True
-    )
+    stdout = subprocess.check_output(common.DOCKER_IMAGES_COMMAND.split(), text=True)
     print(stdout)
+
 
 if __name__ == "__main__":
     main()

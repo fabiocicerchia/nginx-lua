@@ -11,11 +11,13 @@ import argparse
 import sys
 import common
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Create multi-arch Docker manifests for nginx-lua images")
+    parser = argparse.ArgumentParser(
+        description="Create multi-arch Docker manifests for nginx-lua images"
+    )
     parser.add_argument(
-        "os_distro",
-        help="Operating system distribution (e.g., alpine, ubuntu, debian)"
+        "os_distro", help="Operating system distribution (e.g., alpine, ubuntu, debian)"
     )
     args = parser.parse_args()
 
@@ -34,6 +36,7 @@ def main():
     )
     if exit_code > 0:
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

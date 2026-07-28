@@ -15,10 +15,12 @@ import json
 import requests
 
 
-def run_command(cmd: List[str], capture_output: bool = True) -> subprocess.CompletedProcess:
+def run_command(cmd: List[str], capture_output: bool = True) -> str:
     """Run a shell command and return the result."""
     try:
-        result = subprocess.run(cmd, capture_output=capture_output, text=True, check=True)
+        result = subprocess.run(
+            cmd, capture_output=capture_output, text=True, check=True
+        )
         return result.stdout
     except subprocess.CalledProcessError as e:
         print(f"Command failed: {' '.join(cmd)}")
@@ -28,7 +30,7 @@ def run_command(cmd: List[str], capture_output: bool = True) -> subprocess.Compl
 
 def _version_sort_key(tag: str):
     """Generate a sort key that handles mixed numeric/string version components."""
-    return [int(c) if c.isdigit() else c for c in re.split(r'([0-9]+)', tag)]
+    return [int(c) if c.isdigit() else c for c in re.split(r"([0-9]+)", tag)]
 
 
 def _filter_and_sort_tags(tags: list, filter_pattern: str) -> list:
@@ -38,44 +40,62 @@ def _filter_and_sort_tags(tags: list, filter_pattern: str) -> list:
     return matching
 
 
-def _fetch_from_library(distro: str, filter_pattern: str, specific_tag: str) -> Optional[str]:
+def _fetch_from_library(
+    distro: str, filter_pattern: str, specific_tag: str
+) -> Optional[str]:
     """Try to get a version tag from Docker's official-images library."""
     url = f"https://raw.githubusercontent.com/docker-library/official-images/master/library/{distro}"
     response = requests.get(url, timeout=30)
     response.raise_for_status()
 
-    for line in response.text.split('\n'):
+    for line in response.text.split("\n"):
         if specific_tag not in line:
             continue
-        parts = line.split(':')
+        parts = line.split(":")
         if len(parts) <= 1:
             continue
-        tags = [tag.strip() for tag in parts[1].strip().split(',')]
+        tags = [tag.strip() for tag in parts[1].strip().split(",")]
         matching = _filter_and_sort_tags(tags, filter_pattern)
         if matching:
             return matching[0]
     return None
 
 
-def _fetch_via_skopeo(distro: str, filter_pattern: str, specific_tag: str) -> Optional[str]:
+def _fetch_via_skopeo(
+    distro: str, filter_pattern: str, specific_tag: str
+) -> Optional[str]:
     """Fallback: use skopeo to find the version tag matching a specific digest."""
-    cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{specific_tag}"]
-    digest = json.loads(run_command(cmd)).get('Digest')
+    cmd = [
+        "skopeo",
+        "inspect",
+        "--override-arch",
+        "amd64",
+        f"docker://{distro}:{specific_tag}",
+    ]
+    digest = json.loads(run_command(cmd)).get("Digest")
     if not digest:
         return None
 
     cmd = ["skopeo", "list-tags", "--override-arch", "amd64", f"docker://{distro}"]
-    all_tags = json.loads(run_command(cmd)).get('Tags', [])
+    all_tags = json.loads(run_command(cmd)).get("Tags", [])
     matching = _filter_and_sort_tags(all_tags, filter_pattern)
 
     for tag in matching:
-        cmd = ["skopeo", "inspect", "--override-arch", "amd64", f"docker://{distro}:{tag}"]
-        if json.loads(run_command(cmd)).get('Digest') == digest:
+        cmd = [
+            "skopeo",
+            "inspect",
+            "--override-arch",
+            "amd64",
+            f"docker://{distro}:{tag}",
+        ]
+        if json.loads(run_command(cmd)).get("Digest") == digest:
             return tag
     return None
 
 
-def fetch_specific(distro: str, filter_pattern: str = ".+", specific_tag: str = "latest") -> Optional[str]:
+def fetch_specific(
+    distro: str, filter_pattern: str = ".+", specific_tag: str = "latest"
+) -> Optional[str]:
     """
     Fetch a specific version tag for a Docker image.
 
@@ -147,7 +167,9 @@ def main():
         print("Wrong version count in ALPINE.")
         sys.exit(1)
 
-    ver_amazonlinux = fetch_specific("amazonlinux", r"^202[3-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$")
+    ver_amazonlinux = fetch_specific(
+        "amazonlinux", r"^202[3-9]\.[0-9]{1,2}\.[0-9]{8}(\.[0-9])?$"
+    )
     if not ver_amazonlinux:
         print("Wrong version count in AMAZONLINUX.")
         sys.exit(1)
@@ -170,7 +192,7 @@ def main():
     supported_versions_file = Path("supported_versions")
 
     # Write new supported versions
-    with open(supported_versions_file, 'w') as f:
+    with open(supported_versions_file, "w") as f:
         f.write(f"nginx_mainline={ver_nginx_mainline}\n")
         f.write(f"nginx_stable={ver_nginx_stable}\n")
         f.write(f"almalinux={ver_almalinux}\n")
@@ -182,9 +204,10 @@ def main():
 
     # Print the content of the file
     print("Generated supported versions:")
-    with open(supported_versions_file, 'r') as f:
+    with open(supported_versions_file, "r") as f:
         file_content = f.read()
         print(file_content)
 
+
 if __name__ == "__main__":
-    main() 
+    main()

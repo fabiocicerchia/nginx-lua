@@ -15,9 +15,9 @@ REPO = "fabiocicerchia/nginx-lua"
 SUFFIXES = ("-amd64", "-arm64v8")
 
 API = "https://hub.docker.com/v2"
-DELETE_DELAY = 0.5      # seconds between deletes, to stay under the rate limit
-MAX_RETRIES = 5         # retries on HTTP 429
-MAX_AUTH_FAILURES = 5   # abort after this many consecutive 403s (bad token scope)
+DELETE_DELAY = 0.5  # seconds between deletes, to stay under the rate limit
+MAX_RETRIES = 5  # retries on HTTP 429
+MAX_AUTH_FAILURES = 5  # abort after this many consecutive 403s (bad token scope)
 
 session = requests.Session()
 
@@ -29,7 +29,7 @@ def request_with_backoff(method, url, **kwargs):
         resp = session.request(method, url, **kwargs)
         if resp.status_code != 429:
             return resp
-        retry_after = int(resp.headers.get("Retry-After", 2 ** attempt))
+        retry_after = int(resp.headers.get("Retry-After", 2**attempt))
         print(
             f"    Rate limited (429); sleeping {retry_after}s "
             f"(attempt {attempt + 1}/{MAX_RETRIES})"
