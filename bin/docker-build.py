@@ -7,7 +7,6 @@ and architecture. It builds both nginx mainline and stable versions for the
 given OS distribution.
 """
 
-import sys
 import subprocess
 import common
 import argparse
@@ -31,17 +30,7 @@ def main():
 
     versions = common.load_supported_versions()
 
-    exit_code = common.build_image(
-        versions["nginx_mainline"], os_distro, versions[os_distro], arch
-    )
-    if exit_code > 0:
-        sys.exit(1)
-
-    exit_code = common.build_image(
-        versions["nginx_stable"], os_distro, versions[os_distro], arch
-    )
-    if exit_code > 0:
-        sys.exit(1)
+    common.for_mainline_and_stable(common.build_image, versions, os_distro, arch)
 
     stdout = subprocess.check_output(common.DOCKER_IMAGES_COMMAND.split(), text=True)
     print(stdout)

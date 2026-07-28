@@ -8,7 +8,6 @@ versions for the specified operating system distribution.
 """
 
 import argparse
-import sys
 import common
 
 
@@ -25,17 +24,7 @@ def main():
 
     versions = common.load_supported_versions()
 
-    exit_code = common.bundle_images(
-        versions["nginx_mainline"], os_distro, versions[os_distro]
-    )
-    if exit_code > 0:
-        sys.exit(1)
-
-    exit_code = common.bundle_images(
-        versions["nginx_stable"], os_distro, versions[os_distro]
-    )
-    if exit_code > 0:
-        sys.exit(1)
+    common.for_mainline_and_stable(common.bundle_images, versions, os_distro)
 
 
 if __name__ == "__main__":

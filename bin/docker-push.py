@@ -8,7 +8,6 @@ versions for the given OS distribution.
 """
 
 import platform
-import sys
 import common
 import argparse
 
@@ -45,17 +44,7 @@ def main():
 
     versions = common.load_supported_versions()
 
-    exit_code = common.push_images(
-        versions["nginx_mainline"], os_distro, versions[os_distro], arch
-    )
-    if exit_code > 0:
-        sys.exit(1)
-
-    exit_code = common.push_images(
-        versions["nginx_stable"], os_distro, versions[os_distro], arch
-    )
-    if exit_code > 0:
-        sys.exit(1)
+    common.for_mainline_and_stable(common.push_images, versions, os_distro, arch)
 
 
 if __name__ == "__main__":

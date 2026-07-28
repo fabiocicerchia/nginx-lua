@@ -8,6 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -398,3 +399,13 @@ def print_tags(nginx_version, os_distro, os_version):
 
 def get_supported_os():
     return SUPPORTED_OS
+
+
+def for_mainline_and_stable(fn, versions, os_distro, *extra_args):
+    """Call fn(nginx_version, os_distro, os_version, *extra_args) once for the
+    mainline version then once for the stable version; sys.exit(1) on the
+    first failure."""
+    for version_key in ("nginx_mainline", "nginx_stable"):
+        exit_code = fn(versions[version_key], os_distro, versions[os_distro], *extra_args)
+        if exit_code > 0:
+            sys.exit(1)

@@ -9,6 +9,7 @@ a markdown-formatted list of tags organized by supported and unsupported version
 
 import operator
 import re
+from collections import defaultdict
 from pathlib import Path
 import common
 
@@ -41,7 +42,6 @@ def main():
         if compat is not None:
             suffix = COMPAT_SUFFIX
 
-        # tags[os_distro] = file # currently missing
         tags[
             f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"
         ] = file
@@ -75,16 +75,12 @@ def main():
             tags[f"{nginx_ver_major}{suffix}"] = file
             tags[f"{LATEST_TAG}{suffix}"] = file
 
-    dockerfiles = {}
+    dockerfiles = defaultdict(list)
     reversed_list = files
     for tag in tags:
-        dockerfile = tags[tag]
-        if dockerfile not in dockerfiles:
-            dockerfiles[dockerfile] = []
-        dockerfiles[dockerfile].append(tag)
-        dockerfiles[dockerfile] = sorted(
-            dockerfiles[dockerfile], key=operator.itemgetter(0)
-        )
+        dockerfiles[tags[tag]].append(tag)
+    for dockerfile in dockerfiles:
+        dockerfiles[dockerfile] = sorted(dockerfiles[dockerfile], key=operator.itemgetter(0))
 
     print("# Tags\n")
     print("## Supported Tags\n")
