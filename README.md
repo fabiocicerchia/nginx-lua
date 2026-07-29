@@ -17,7 +17,6 @@
 ![Known Vulnerabilities](https://img.shields.io/badge/vulnerabilities-snyk-4b45a9)
 
 [![Documentation Status](https://readthedocs.org/projects/nginx-lua/badge/?version=latest)](https://nginx-lua.readthedocs.io/en/latest/?badge=latest)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
 Latest Nginx with LUA support based on AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, and Ubuntu.
 
@@ -673,8 +672,6 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - This product includes cryptographic software written by Eric Young (eay@cryptsoft.com).
 
 All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [licenses](/src/licenses).
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
 ### `fabiocicerchia/nginx-lua`
 
