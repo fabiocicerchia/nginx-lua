@@ -8,7 +8,6 @@ versions for the given OS distribution.
 """
 
 import platform
-import sys
 import common
 import argparse
 
@@ -24,15 +23,19 @@ def detect_arch():
     machine = platform.machine()
     arch = _MACHINE_TO_ARCH.get(machine)
     if arch is None:
-        print(f"WARNING: Unknown machine type '{machine}', will push for all architectures")
+        print(
+            f"WARNING: Unknown machine type '{machine}', will push for all architectures"
+        )
     return arch
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Push Docker images to registry for nginx-lua")
+    parser = argparse.ArgumentParser(
+        description="Push Docker images to registry for nginx-lua"
+    )
     parser.add_argument(
         "os_distro",
-        help="Operating system distribution (e.g., alpine, ubuntu, debian, fedora)"
+        help="Operating system distribution (e.g., alpine, ubuntu, debian, fedora)",
     )
     args = parser.parse_args()
 
@@ -41,13 +44,8 @@ def main():
 
     versions = common.load_supported_versions()
 
-    exit_code = common.push_images(versions["nginx_mainline"], os_distro, versions[os_distro], arch)
-    if exit_code > 0:
-        sys.exit(1)
+    common.for_mainline_and_stable(common.push_images, versions, os_distro, arch)
 
-    exit_code = common.push_images(versions["nginx_stable"], os_distro, versions[os_distro], arch)
-    if exit_code > 0:
-        sys.exit(1)
 
 if __name__ == "__main__":
     main()

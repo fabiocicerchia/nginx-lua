@@ -9,6 +9,7 @@ a markdown-formatted list of tags organized by supported and unsupported version
 
 import operator
 import re
+from collections import defaultdict
 from pathlib import Path
 import common
 
@@ -22,8 +23,11 @@ AMAZONLINUX_2018_PREFIX = "2018"
 LATEST_TAG = "latest"
 GITHUB_BASE_URL = "https://github.com/fabiocicerchia/nginx-lua/blob/main/"
 
+
 def main():
-    files = sorted(str(path) for path in Path("nginx").rglob(DOCKERFILE_PATTERN) if path.is_file())
+    files = sorted(
+        str(path) for path in Path("nginx").rglob(DOCKERFILE_PATTERN) if path.is_file()
+    )
 
     supported = common.get_supported_versions()
 
@@ -35,37 +39,48 @@ def main():
         nginx_ver_pieces = re.split(r"\.", nginx_ver)
         nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
         suffix = ""
-        if compat != None:
+        if compat is not None:
             suffix = COMPAT_SUFFIX
 
-        # tags[os_distro] = file # currently missing
-        tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"] = file
-        tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"] = file
+        tags[
+            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"
+        ] = file
+        tags[
+            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"
+        ] = file
         if os_distro == ALPINE_DISTRO:
-            tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{suffix}"] = file
-        tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"] = file
-        if not (os_distro == AMAZONLINUX_DISTRO and osVer.startswith(AMAZONLINUX_2018_PREFIX)):
-            tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"] = file
+            tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{suffix}"] = (
+                file
+            )
+        tags[
+            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"
+        ] = file
+        if not (
+            os_distro == AMAZONLINUX_DISTRO
+            and osVer.startswith(AMAZONLINUX_2018_PREFIX)
+        ):
+            tags[
+                f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"
+            ] = file
         if os_distro == ALPINE_DISTRO:
             tags[f"{nginx_ver_major}.{nginx_ver_minor}{suffix}"] = file
         tags[f"{nginx_ver_major}-{os_distro}{osVer}{suffix}"] = file
         tags[f"{os_distro}{suffix}"] = file
-        if not (os_distro == AMAZONLINUX_DISTRO and osVer.startswith(AMAZONLINUX_2018_PREFIX)):
+        if not (
+            os_distro == AMAZONLINUX_DISTRO
+            and osVer.startswith(AMAZONLINUX_2018_PREFIX)
+        ):
             tags[f"{nginx_ver_major}-{os_distro}{suffix}"] = file
         if os_distro == ALPINE_DISTRO:
             tags[f"{nginx_ver_major}{suffix}"] = file
             tags[f"{LATEST_TAG}{suffix}"] = file
 
-    dockerfiles = {}
+    dockerfiles = defaultdict(list)
     reversed_list = files
     for tag in tags:
-        dockerfile = tags[tag]
-        if dockerfile not in dockerfiles:
-            dockerfiles[dockerfile] = []
-        dockerfiles[dockerfile].append(tag)
-        dockerfiles[dockerfile] = sorted(
-            dockerfiles[dockerfile], key=operator.itemgetter(0)
-        )
+        dockerfiles[tags[tag]].append(tag)
+    for dockerfile in dockerfiles:
+        dockerfiles[dockerfile] = sorted(dockerfiles[dockerfile], key=operator.itemgetter(0))
 
     print("# Tags\n")
     print("## Supported Tags\n")
@@ -77,6 +92,7 @@ def main():
     reversed_list = list(reversed_list)[::-1]
     for file in reversed_list:
         print(f"- [`{', '.join(dockerfiles[file])}`]({GITHUB_BASE_URL}{file})")
+
 
 if __name__ == "__main__":
     main()

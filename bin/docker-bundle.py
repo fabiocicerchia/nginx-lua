@@ -8,14 +8,15 @@ versions for the specified operating system distribution.
 """
 
 import argparse
-import sys
 import common
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Create multi-arch Docker manifests for nginx-lua images")
+    parser = argparse.ArgumentParser(
+        description="Create multi-arch Docker manifests for nginx-lua images"
+    )
     parser.add_argument(
-        "os_distro",
-        help="Operating system distribution (e.g., alpine, ubuntu, debian)"
+        "os_distro", help="Operating system distribution (e.g., alpine, ubuntu, debian)"
     )
     args = parser.parse_args()
 
@@ -23,17 +24,8 @@ def main():
 
     versions = common.load_supported_versions()
 
-    exit_code = common.bundle_images(
-        versions["nginx_mainline"], os_distro, versions[os_distro]
-    )
-    if exit_code > 0:
-        sys.exit(1)
+    common.for_mainline_and_stable(common.bundle_images, versions, os_distro)
 
-    exit_code = common.bundle_images(
-        versions["nginx_stable"], os_distro, versions[os_distro]
-    )
-    if exit_code > 0:
-        sys.exit(1)
 
 if __name__ == "__main__":
     main()

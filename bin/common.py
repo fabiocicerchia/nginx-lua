@@ -8,6 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -36,7 +37,6 @@ DOCKER_MANIFEST_CREATE = "docker manifest create"
 DOCKER_MANIFEST_PUSH = "docker manifest push"
 DOCKER_TAG_COMMAND = "docker tag"
 DOCKER_IMAGES_COMMAND = "docker images"
-
 
 
 # Git constants
@@ -74,9 +74,7 @@ def run_command(command, print_stdout=True):
     print(f"Running: {command}")
 
     process = subprocess.Popen(
-        shlex.split(command),
-        shell=False, 
-        stdout=subprocess.PIPE
+        shlex.split(command), shell=False, stdout=subprocess.PIPE
     )
 
     streamdata = process.communicate()[0]
@@ -119,24 +117,28 @@ def generate_tags(nginx_version, os_distro, os_version, arch=""):
 
     # Add default tags for alpine (default distro)
     if is_default:
-        tags.extend([
-            f"{major}{arch_suffix}",
-            f"{minor}{arch_suffix}",
-            f"{patch}{arch_suffix}",
-            f"{LATEST_TAG}{arch_suffix}"
-        ])
+        tags.extend(
+            [
+                f"{major}{arch_suffix}",
+                f"{minor}{arch_suffix}",
+                f"{patch}{arch_suffix}",
+                f"{LATEST_TAG}{arch_suffix}",
+            ]
+        )
 
     # Add OS-specific tags
-    tags.extend([
-        f"{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}",
-        f"{minor}-{os_distro}{arch_suffix}",
-        f"{patch}-{os_distro}{arch_suffix}",
-        f"{patch}-{os_distro}{os_version}{arch_suffix}",
-        f"{minor}-{os_distro}{os_version}{arch_suffix}",
-        f"{major}-{os_distro}{os_version}{arch_suffix}"
-    ])
+    tags.extend(
+        [
+            f"{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{arch_suffix}",
+            f"{major}-{os_distro}{os_version}{arch_suffix}",
+            f"{minor}-{os_distro}{arch_suffix}",
+            f"{patch}-{os_distro}{arch_suffix}",
+            f"{patch}-{os_distro}{os_version}{arch_suffix}",
+            f"{minor}-{os_distro}{os_version}{arch_suffix}",
+            f"{major}-{os_distro}{os_version}{arch_suffix}",
+        ]
+    )
 
     # Add repository prefix and remove duplicates
     full_tags = [f"{IMAGE_REPO}:{tag}" for tag in tags]
@@ -307,10 +309,12 @@ def get_supported_versions():
     dockerfiles = []
     for os_distro in SUPPORTED_OS:
         os_version = versions[os_distro]
-        dockerfiles.extend([
-            get_dockerfile_path(nginx_mainline, os_distro, os_version),
-            get_dockerfile_path(nginx_stable, os_distro, os_version)
-        ])
+        dockerfiles.extend(
+            [
+                get_dockerfile_path(nginx_mainline, os_distro, os_version),
+                get_dockerfile_path(nginx_stable, os_distro, os_version),
+            ]
+        )
 
     return dockerfiles
 
@@ -324,7 +328,7 @@ def patch_dockerfile(dockerfile_path, nginx_version, os_distro, os_version):
         "{{DOCKER_IMAGE}}": IMAGE_REPO,
         "{{DOCKER_IMAGE_OS}}": os_distro,
         "{{DOCKER_IMAGE_TAG}}": os_version,
-        "{{VER_NGINX}}": nginx_version
+        "{{VER_NGINX}}": nginx_version,
     }
 
     for placeholder, value in replacements.items():
@@ -388,8 +392,20 @@ def print_tags(nginx_version, os_distro, os_version):
     tag_list = "`, `".join(tag_names)
     dockerfile_path = get_dockerfile_path(nginx_version, os_distro, os_version)
 
-    print(f"- [`{tag_list}`](https://github.com/fabiocicerchia/nginx-lua/blob/main/{dockerfile_path})")
+    print(
+        f"- [`{tag_list}`](https://github.com/fabiocicerchia/nginx-lua/blob/main/{dockerfile_path})"
+    )
 
 
 def get_supported_os():
     return SUPPORTED_OS
+
+
+def for_mainline_and_stable(fn, versions, os_distro, *extra_args):
+    """Call fn(nginx_version, os_distro, os_version, *extra_args) once for the
+    mainline version then once for the stable version; sys.exit(1) on the
+    first failure."""
+    for version_key in ("nginx_mainline", "nginx_stable"):
+        exit_code = fn(versions[version_key], os_distro, versions[os_distro], *extra_args)
+        if exit_code > 0:
+            sys.exit(1)

@@ -28,7 +28,10 @@ def compute_sha256(url):
             h.update(chunk)
         return h.hexdigest()
     except Exception as e:
-        print(f"WARNING: Could not download {url} for SHA256 computation: {e}", file=sys.stderr)
+        print(
+            f"WARNING: Could not download {url} for SHA256 computation: {e}",
+            file=sys.stderr,
+        )
         return "RECOMPUTE_REQUIRED"
 
 
@@ -194,7 +197,7 @@ def load_template():
         print(f"Error: Template file not found: {template_path}")
         sys.exit(1)
 
-    with open(template_path, 'r') as f:
+    with open(template_path, "r") as f:
         return f.read()
 
 
@@ -207,7 +210,7 @@ def main():
     # Dependency list (repo, tarball URL pattern, ...) lives in deps_manifest.py,
     # shared with generate-fossa-deps.py so both stay in sync.
     deps = [
-        (dep['key'], dep['repo_url'], dep['is_commit'], dep['tarball_pattern'])
+        (dep["key"], dep["repo_url"], dep["is_commit"], dep["tarball_pattern"])
         for dep in DEPENDENCIES
     ]
 
@@ -275,13 +278,13 @@ def main():
         else:
             ver = get_latest_tag(repo_url)
 
-        template_vars[f'ver_{name}'] = ver
+        template_vars[f"ver_{name}"] = ver
 
         # Compute SHA256 hash of the tarball
         tarball_url = tarball_pattern.format(ver=ver)
         print(f"  Computing SHA256 for {tarball_url}...", file=sys.stderr)
         sha256 = compute_sha256(tarball_url)
-        template_vars[f'sha256_{name}'] = sha256
+        template_vars[f"sha256_{name}"] = sha256
         print(f"  {name} v{ver}: {sha256}", file=sys.stderr)
 
     # Format template with versions and hashes
@@ -289,6 +292,7 @@ def main():
 
     # Print the result
     print(output)
+
 
 if __name__ == "__main__":
     main()

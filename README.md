@@ -7,7 +7,7 @@
 
 [![Awesome Nginx](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/agile6v/awesome-nginx#tools)
 
-[![MIT License](https://img.shields.io/badge/License-MIT-lightgrey.svg?longCache=true)](LICENSE)
+[![MIT License](https://img.shields.io/badge/License-MIT-lightgrey.svg?longCache=true)](LICENSE.md)
 [![Pull Requests](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?longCache=true)](https://github.com/fabiocicerchia/nginx-lua/pulls)
 ![Last Commit](https://img.shields.io/github/last-commit/fabiocicerchia/nginx-lua)
 ![Release Date](https://img.shields.io/github/release-date/fabiocicerchia/nginx-lua)
@@ -16,11 +16,7 @@
 ![Docker stars](https://img.shields.io/docker/stars/fabiocicerchia/nginx-lua.svg "Docker stars")
 ![Known Vulnerabilities](https://img.shields.io/badge/vulnerabilities-snyk-4b45a9)
 
-![Docker](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker/badge.svg)
-![Docker Builds](https://github.com/fabiocicerchia/nginx-lua/workflows/Docker%20Builds/badge.svg)
-![Auto Update](https://github.com/fabiocicerchia/nginx-lua/workflows/Auto%20Update/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/nginx-lua/badge/?version=latest)](https://nginx-lua.readthedocs.io/en/latest/?badge=latest)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_shield)
 
 Latest Nginx with LUA support based on AlmaLinux, Alpine Linux, Amazon Linux, Debian, Fedora, and Ubuntu.
 
@@ -34,6 +30,8 @@ Maintaining a project is a very time consuming activity, especially when done al
 I really want to make this project better and become super cool 🚀
 
 If you'd like to support this open-source project I'll appreciate any kind of [contribution](https://github.com/sponsors/fabiocicerchia).
+
+Need help implementing this? [Get in touch](https://fabiocicerchia.it/contact).
 
 ---
 
@@ -603,15 +601,9 @@ $ docker inspect fabiocicerchia/nginx-lua:1-alpine | jq '.[].Config.Labels'
 
 ## nginx vs nginx-lua vs openresty
 
-![Benchmark Mean Requests per Second](http://chart.googleapis.com/chart?chco=00B140,000080,4D8D89&chd=t:256.8|257.91|259.59&chdl=nginx|nginx-lua|openresty&chdlp=bvr&chds=250,270&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Requests+per+second&chxl=0:|reqs/sec&chxr=1,250,270,5&chxt=x,y)
-![Benchmark Median Response Time](http://chart.googleapis.com/chart?&chco=00B140,000080,4D8D89&chd=t:8.8|8.83|8.76&chdl=nginx|nginx-lua|openresty&chdlp=bvr&chds=8,9&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Median+Response+Time&chxl=0:|msec&chxr=1,8,9,0.2&chxt=x,y)
-
 More details about the benchark can be found in [docs/benchmarks/different_images](docs/benchmarks/different_images).
 
 ## nginx-lua different distro
-
-![Benchmark Mean Requests per Second](http://chart.googleapis.com/chart?&chco=0D597F,9CCE28,CD2B4A,3D6EB4,DD4915&chd=t:226.12|226.23|217.74|222.27|216.50&chdl=alpine|centos|debian|fedora|ubuntu&chdlp=bvr&chds=180,250&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Requests+per+second&chxl=0:|reqs/sec&chxr=1,180,250,20&chxt=x,y)
-![Benchmark Median Response Time](http://chart.googleapis.com/chart?&chco=0D597F,9CCE28,CD2B4A,3D6EB4,DD4915&chd=t:9.86|9.93|10.4|10.06|10.3&chdl=alpine|centos|debian|fedora|ubuntu&chdlp=bvr&chds=9.5,10&chma=20,20,20,20&chs=300x200&cht=bvg&chts=000000,15,l&chtt=Median+Response+Time&chxl=0:|msec&chxr=1,9.5,10,0.1&chxt=x,y)
 
 More details about the benchark can be found in [docs/benchmarks/distros](docs/benchmarks/distros).
 
@@ -683,8 +675,6 @@ As for any pre-built image usage, it is the image user's responsibility to ensur
 - This product includes cryptographic software written by Eric Young (eay@cryptsoft.com).
 
 All the `LICENSE` files of the dependencies used to build the nginx & lua (with addons) are available in the folder [licenses](/src/licenses).
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffabiocicerchia%2Fnginx-lua?ref=badge_large)
 
 ### `fabiocicerchia/nginx-lua`
 

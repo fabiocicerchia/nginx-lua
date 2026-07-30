@@ -37,8 +37,8 @@ def main():
             print(f"ERROR: {env_key} not found in {ENV_DIST_PATH}", file=sys.stderr)
             sys.exit(1)
         ver = versions[env_key]
-        url = dep['tarball_pattern'].format(ver=ver)
-        ref = "commits/master" if dep['is_commit'] else "tags"
+        url = dep["tarball_pattern"].format(ver=ver)
+        ref = "commits/master" if dep["is_commit"] else "tags"
         lines.append(f"# {dep['repo_url']}/{ref}")
         lines.append(f"- name: {dep['fossa_name']}")
         lines.append(f'  url: "{url}"')
