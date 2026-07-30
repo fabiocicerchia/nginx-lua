@@ -132,13 +132,13 @@ $(build_targets_arm64): ## build one distro in arm64/v8 arch
 build-single: generate-dockerfiles
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-	return
-endif
+else
 	ARCH=$(shell echo $$TASK | cut -d"-" -f2); \
 	DISTRO=$(shell echo $$TASK | cut -d"-" -f3); \
 	echo "BUILDING $$DISTRO"; \
 	export DOCKER_CLI_EXPERIMENTAL=enabled; \
 	$(BUILD_CMD) "$$DISTRO" "$$ARCH"
+endif
 
 ################################################################################
 ##@ TESTING
@@ -149,23 +149,24 @@ test-all: $(test_targets) ## test all docker images
 $(test_targets): ## test one docker image
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-	return
-endif
-	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-.*/\1/'); \
-	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64v8)-//'); \
+else
+	ARCH=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64)-.*/\1/'); \
+	if [ "$$ARCH" = "arm64" ]; then ARCH=arm64v8; fi; \
+	DISTRO=$(shell echo $(@) | sed -r 's/docker-test-(amd64|arm64)-//'); \
 	echo "TESTING $$DISTRO"; \
 	$(TEST_CMD) "$$DISTRO" "$$ARCH" "" "docker"
+endif
 
 test-security: $(security_targets) ## test security all docker images
 
 $(security_targets): ## test security one docker images
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-	return
-endif
+else
 	DISTRO=$(subst test-security-,,$(@)); \
 	echo "SECURITY $$DISTRO"; \
 	$(SEC_CMD) "$$DISTRO"
+endif
 
 ################################################################################
 ##@ PUSH
@@ -176,11 +177,11 @@ push-all: $(push_targets) ## push all docker images to docker hub
 $(push_targets): ## push one docker images to docker hub
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-	return
-endif
+else
 	DISTRO=$(subst push-,,$(@)); \
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
+endif
 
 cleanup-docker-images: ## delete temporary per-arch tags (-amd64, -arm64v8) from Docker Hub
 	./bin/cleanup-docker-images.py
@@ -192,11 +193,11 @@ cleanup-docker-images: ## delete temporary per-arch tags (-amd64, -arm64v8) from
 $(bundle_targets): ## bundle multiple docker images into one
 ifeq ($(SKIP), YES)
 	echo "SKIPPING $@"
-	return
-endif
+else
 	DISTRO=$(subst bundle-,,$(@)); \
 	echo "BUNDLING $$DISTRO"; \
 	$(BUNDLE_CMD) "$$DISTRO"
+endif
 
 ################################################################################
 ##@ DEPENDENCIES
