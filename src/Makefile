@@ -54,6 +54,14 @@ endef
 # ##############################################################################
 
 SKIPPED_PATCHES=""
+# ponytail: openresty patch source. Empty (default) tracks master, because
+# openresty only adds a patches/nginx/<ver>/ directory for a new nginx release
+# on master - a hard pin would break `make auto-update` the moment nginx bumps.
+# Set VER_OPENRESTY_PATCHES=<tag|sha> to pin a specific build. Either way the
+# resolved commit is written to patches/.openresty-ref so any image can be
+# traced back to the exact patch set it was built from (see
+# licenses/openresty-patches.LICENSE).
+VER_OPENRESTY_PATCHES?=
 # Individual patch failures are tolerated (WARNING, not FATAL): stable tracks
 # fall back to an older patch set (openresty only tags patches for mainline),
 # whose context has already drifted from newer nginx sources - several
@@ -64,7 +72,12 @@ SKIPPED_PATCHES=""
 # instead of an accident of loop ordering.
 openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
-	git clone https://github.com/openresty/openresty.git; \
+	git clone --depth 1 https://github.com/openresty/openresty.git; \
+	if [ -n "$(VER_OPENRESTY_PATCHES)" ]; then \
+		( cd openresty && git fetch --depth 1 origin "$(VER_OPENRESTY_PATCHES)" && git checkout -q FETCH_HEAD ); \
+	fi; \
+	( cd openresty && git rev-parse HEAD ) > /nginx-${VER_NGINX}/patches/.openresty-ref; \
+	echo "openresty patch source: $$(cat /nginx-${VER_NGINX}/patches/.openresty-ref)"; \
 	# ponytail: openresty only publishes patches for mainline (odd) nginx
 	# releases, so "nearest available version <= VER_NGINX" already resolves
 	# to the previous mainline branch for stable targets - no parity filter needed.
