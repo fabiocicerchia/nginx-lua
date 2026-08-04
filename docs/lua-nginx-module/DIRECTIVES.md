@@ -1,5 +1,16 @@
 # Directives
 
+> **Upstream documentation.** This page is reproduced from the
+> [openresty/lua-nginx-module](https://github.com/openresty/lua-nginx-module)
+> project, which is licensed under the BSD 2-Clause License.
+>
+> Copyright (C) 2009-2017, by Xiaozhe Wang (chaoslawful) chaoslawful@gmail.com.
+> Copyright (C) 2009-2019, by Yichun "agentzh" Zhang (章亦春) agentzh@gmail.com, OpenResty Inc.
+> All rights reserved.
+>
+> The full license text is in
+> [`src/licenses/lua-nginx-module.LICENSE`](https://github.com/fabiocicerchia/nginx-lua/blob/main/src/licenses/lua-nginx-module.LICENSE).
+
 - [lua_load_resty_core](#lua_load_resty_core)
 - [lua_capture_error_log](#lua_capture_error_log)
 - [lua_use_default_type](#lua_use_default_type)
