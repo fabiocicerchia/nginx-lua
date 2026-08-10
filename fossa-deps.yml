@@ -16,13 +16,13 @@ remote-dependencies:
 
 # https://github.com/openresty/luajit2/tags
 - name: luajit2
-  url: "https://github.com/openresty/luajit2/archive/v2.1-20260701.tar.gz"
-  version: "2.1-20260701"
+  url: "https://github.com/openresty/luajit2/archive/v2.1-20260724.tar.gz"
+  version: "2.1-20260724"
 
 # https://github.com/openresty/lua-nginx-module/tags
 - name: lua-nginx-module
-  url: "https://github.com/openresty/lua-nginx-module/archive/v0.10.29.tar.gz"
-  version: "0.10.29"
+  url: "https://github.com/openresty/lua-nginx-module/archive/v0.10.31.tar.gz"
+  version: "0.10.31"
 
 # https://github.com/openresty/lua-resty-core/tags
 - name: lua-resty-core
@@ -116,8 +116,8 @@ remote-dependencies:
 
 # https://github.com/openresty/stream-lua-nginx-module/commits/master
 - name: stream-lua-nginx-module
-  url: "https://github.com/openresty/stream-lua-nginx-module/archive/de1fe40e3daa6181f0cd2a0c894c9b9a727908c2.tar.gz"
-  version: "de1fe40e3daa6181f0cd2a0c894c9b9a727908c2"
+  url: "https://github.com/openresty/stream-lua-nginx-module/archive/889cb589150a261811dc1b6d0d19e8a252ff3081.tar.gz"
+  version: "889cb589150a261811dc1b6d0d19e8a252ff3081"
 
 # https://github.com/openresty/lua-resty-limit-traffic/tags
 - name: lua-resty-limit-traffic
