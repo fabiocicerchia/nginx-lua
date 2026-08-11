@@ -269,7 +269,12 @@ def main():
 
     for name, repo_url, is_commit, tarball_pattern in deps:
         print(f"Fetching version for {name}...", file=sys.stderr)
-        if name == "lua_nginx_module":
+        if name == "lua_resty_core":
+            # NOT get_latest_tag(): that skips RC tags and would emit the
+            # stable 0.1.32 while lua_nginx_module below is derived from
+            # resty_core_ver - a pair that fails every resty test at runtime.
+            ver = resty_core_ver
+        elif name == "lua_nginx_module":
             ver = pinned_lua_nginx_module
         elif name == "openresty_streamlua":
             ver = pinned_stream_lua
@@ -286,6 +291,17 @@ def main():
         sha256 = compute_sha256(tarball_url)
         template_vars[f"sha256_{name}"] = sha256
         print(f"  {name} v{ver}: {sha256}", file=sys.stderr)
+
+    # The pair below is what actually breaks at runtime when it desyncs
+    # (every resty test bails with "ngx_http_lua_module X required"), and it
+    # desyncs silently - fail the nightly here instead of in the image build.
+    emitted_pin = get_resty_core_required_lua_module(template_vars["ver_lua_resty_core"])
+    if emitted_pin != template_vars["ver_lua_nginx_module"]:
+        raise RuntimeError(
+            f"version pair desync: lua-resty-core "
+            f"{template_vars['ver_lua_resty_core']} requires lua-nginx-module "
+            f"{emitted_pin}, but {template_vars['ver_lua_nginx_module']} is pinned"
+        )
 
     # Format template with versions and hashes
     output = template.format(**template_vars)
