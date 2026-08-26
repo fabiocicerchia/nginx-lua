@@ -454,7 +454,8 @@ luarocks:
 
 # These suites genuinely pass now (missing nginx modules/CPAN deps/daemons
 # fixed at the root cause, not papered over) and run fatally like any other
-# build step. lua-resty-core is the sole exception, still `-`-prefixed:
+# build step. The `-`-prefixed ones below are the exceptions, each with its
+# own comment explaining why; lua-resty-core is the largest:
 #
 # lua-resty-core's own Makefile hardcodes OPENRESTY_PREFIX to the release
 # (non-debug) nginx build by default. Overriding it to openresty-debug below
@@ -502,7 +503,13 @@ test: .prereq-test .start-test-daemons
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
 		&& $(MAKE) test;
-	cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
+	# `-`-prefixed: t/sanity.t's query cases point nginx's resolver at the real
+	# 8.8.8.8 and send live UDP queries (t/mock.t is the offline half of the
+	# suite and stays green); when the builder can't reach 8.8.8.8:53 the
+	# resolver logs "lua udp socket read timed out", which the test sees as an
+	# unexpected [error] line. Real network reachability, not our packaging -
+	# same class as lua-resty-memcached/mysql/redis below.
+	-cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
 		&& $(MAKE) test;
 	# t/sanity.t's "connect timeout" case connects to the real www.taobao.com
 	# and accepts either a genuine timeout or glibc's "network is unreachable"
