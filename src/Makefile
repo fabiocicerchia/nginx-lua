@@ -62,6 +62,10 @@ SKIPPED_PATCHES=""
 # traced back to the exact patch set it was built from (see
 # licenses/openresty-patches.LICENSE).
 VER_OPENRESTY_PATCHES?=
+# Patches are applied all-or-nothing (dry-run first): a patch whose context has
+# drifted otherwise lands only *some* of its hunks, which corrupts the source
+# (e.g. nginx 1.30.4 reworked ngx_http_log_module.c, so log_escape_non_ascii
+# landed its callers but not the ngx_http_log_escape signature -> build error).
 # Individual patch failures are tolerated (WARNING, not FATAL): stable tracks
 # fall back to an older patch set (openresty only tags patches for mainline),
 # whose context has already drifted from newer nginx sources - several
@@ -104,7 +108,11 @@ openresty-patches:
 			echo "skipping openresty patch $${patch_file}"; \
 		else \
 			echo "applying openresty patch $${patch_file}"; \
-			patch -p1 < "$${patch_file}" || echo "WARNING: $${patch_file} did not apply cleanly (see .rej files)"; \
+			if patch -p1 --dry-run --silent < "$${patch_file}" >/dev/null 2>&1; then \
+				patch -p1 < "$${patch_file}"; \
+			else \
+				echo "WARNING: $${patch_file} does not apply cleanly to nginx ${VER_NGINX} - skipped entirely"; \
+			fi; \
 		fi; \
 	done; \
 
