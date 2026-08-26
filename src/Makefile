@@ -62,18 +62,16 @@ SKIPPED_PATCHES=""
 # traced back to the exact patch set it was built from (see
 # licenses/openresty-patches.LICENSE).
 VER_OPENRESTY_PATCHES?=
-# Patches are applied all-or-nothing (dry-run first): a patch whose context has
-# drifted otherwise lands only *some* of its hunks, which corrupts the source
-# (e.g. nginx 1.30.4 reworked ngx_http_log_module.c, so log_escape_non_ascii
-# landed its callers but not the ngx_http_log_escape signature -> build error).
-# Individual patch failures are tolerated (WARNING, not FATAL): stable tracks
-# fall back to an older patch set (openresty only tags patches for mainline),
-# whose context has already drifted from newer nginx sources - several
-# official patches already fail a hunk or two here (e.g. server_header.patch's
-# own nginx.h hunk on the 1.30.3/1.29.8-fallback pairing), and this has always
-# been silently tolerated since only the LAST patch applied in the loop below
-# actually determined this recipe's exit code. Made explicit and uniform
-# instead of an accident of loop ordering.
+# All-or-nothing per patch FILE, not across the set. The dry-run gate below
+# exits non-zero if any hunk would fail and writes nothing, so a drifted patch
+# is skipped whole rather than landing a subset and corrupting the source.
+# A skipped patch is a WARNING, never fatal, and the loop continues: stable
+# tracks fall back to an older mainline patch set whose context has already
+# drifted, so some official patches never apply here.
+# KNOWN GAP: the gate catches hunk failure, not fuzz. GNU patch defaults to
+# fuzz 2, so context drift of <=2 lines still applies (possibly at the wrong
+# offset) and the dry-run returns 0. `-F0` on both patch calls closes it, but
+# skips more official patches outright - i.e. changes what ships.
 openresty-patches:
 	mkdir -p /nginx-${VER_NGINX}/patches
 	git clone --depth 1 https://github.com/openresty/openresty.git; \
@@ -503,12 +501,14 @@ test: .prereq-test .start-test-daemons
 		&& $(MAKE) test;
 	cd /lua-resty-cookie-${VER_CLOUDFLARE_COOKIE} \
 		&& $(MAKE) test;
-	# `-`-prefixed: t/sanity.t's query cases point nginx's resolver at the real
-	# 8.8.8.8 and send live UDP queries (t/mock.t is the offline half of the
-	# suite and stays green); when the builder can't reach 8.8.8.8:53 the
-	# resolver logs "lua udp socket read timed out", which the test sees as an
-	# unexpected [error] line. Real network reachability, not our packaging -
-	# same class as lua-resty-memcached/mysql/redis below.
+	# `-`-prefixed: t/sanity.t sends live UDP queries (t/mock.t is the offline
+	# half and stays green). Not a reachability problem - resty.dns.resolver
+	# retransmits on a lost datagram and logs "lua udp socket read timed out"
+	# at [error] each time, while every block asserts no_error_log: [error].
+	# One dropped packet out of ~40 fails a subtest even though the query
+	# succeeded on retry (response_body_like passes, only the log grep fails).
+	# Swapping resolvers doesn't help - the real fix is a local caching
+	# forwarder via sanity.t's own TEST_NGINX_RESOLVER knob.
 	-cd /lua-resty-dns-${VER_OPENRESTY_DNS} \
 		&& $(MAKE) test;
 	# t/sanity.t's "connect timeout" case connects to the real www.taobao.com
