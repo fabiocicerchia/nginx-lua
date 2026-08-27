@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared by bin/sign-image.sh and bin/sign-manifest.sh.
 # Retry a command with exponential backoff on Docker rate-limit errors (HTTP 429 / TOOMANYREQUESTS).
 retry_on_rate_limit() {
