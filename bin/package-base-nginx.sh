@@ -98,6 +98,18 @@ main() {
     docker run -d --name extract-$PACKAGE_TYPE package-nginx-$PACKAGE_TYPE /bin/sh -c 'while sleep 3600; do :; done'
     docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE"
     docker cp extract-$PACKAGE_TYPE:$(docker exec extract-$PACKAGE_TYPE sh -c "ls -1 /nginx-lua*.$PACKAGE_TYPE") dist/
+
+    # List the package contents with the tooling already inside the build image
+    # (rpm-build / dpkg / busybox tar). Installing rpm2cpio & co. on the CI host
+    # made a purely informational listing depend on a flaky distro mirror, and a
+    # 503 from ports.ubuntu.com failed the whole arm64 rpm job.
+    case "$PACKAGE_TYPE" in
+        apk) LIST_CMD="tar -tzf" ;;
+        rpm) LIST_CMD="rpm -qlp" ;;
+        deb) LIST_CMD="dpkg -c" ;;
+    esac
+    docker exec extract-$PACKAGE_TYPE sh -c "$LIST_CMD /nginx-lua*.$PACKAGE_TYPE" || true
+
     docker rm -f extract-$PACKAGE_TYPE
 
     # Rename APK files to include architecture, preventing filename collisions
@@ -111,17 +123,6 @@ main() {
                 mv "$f" "$NEWNAME"
             fi
         done
-    fi
-
-    # List files
-    if [ "${DISTRO}" = "alpine" ]; then
-        sudo apt install -y apktool
-        apktool d dist/*${SUPPORTED_NGINX_VER}*.apk || true
-    elif [ "${DISTRO}" = "almalinux" -o "${DISTRO}" = "amazonlinux" -o "${DISTRO}" = "fedora" ]; then
-        sudo apt install -y rpm2cpio cpio
-        rpm2cpio dist/*${SUPPORTED_NGINX_VER}*.rpm | cpio -i --list
-    elif [ "${DISTRO}" = "debian" -o "${DISTRO}" = "ubuntu" ]; then
-        dpkg-deb -c dist/*${SUPPORTED_NGINX_VER}*.deb
     fi
 }
 
