@@ -16,8 +16,8 @@ remote-dependencies:
 
 # https://github.com/openresty/luajit2/tags
 - name: luajit2
-  url: "https://github.com/openresty/luajit2/archive/v2.1-20260701.tar.gz"
-  version: "2.1-20260701"
+  url: "https://github.com/openresty/luajit2/archive/v2.1-20260824.tar.gz"
+  version: "2.1-20260824"
 
 # https://github.com/openresty/lua-nginx-module/tags
 - name: lua-nginx-module
