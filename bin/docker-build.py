@@ -9,6 +9,7 @@ given OS distribution.
 
 import subprocess
 import common
+import docker_ops
 import argparse
 
 ARM64_ARCH = "arm64"
@@ -26,13 +27,15 @@ def main():
     arch = args.arch
 
     if arch == ARM64_ARCH:
-        arch = common.ARM64V8_ARCH
+        arch = docker_ops.ARM64V8_ARCH
 
     versions = common.load_supported_versions()
 
-    common.for_mainline_and_stable(common.build_image, versions, os_distro, arch)
+    common.for_mainline_and_stable(docker_ops.build_image, versions, os_distro, arch)
 
-    stdout = subprocess.check_output(common.DOCKER_IMAGES_COMMAND.split(), text=True)
+    stdout = subprocess.check_output(
+        docker_ops.DOCKER_IMAGES_COMMAND.split(), text=True
+    )
     print(stdout)
 
 

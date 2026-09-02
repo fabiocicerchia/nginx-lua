@@ -10,6 +10,7 @@ markdown files with JSON metadata for both nginx mainline and stable versions.
 import sys
 import argparse
 import common
+import docker_ops
 
 
 def main():
@@ -27,12 +28,12 @@ def main():
     versions = common.load_supported_versions()
 
     tag = "%s-%s%s" % (versions["nginx_mainline"], os_distro, versions[os_distro])
-    exit_code = common.generate_metadata(tag)
+    exit_code = docker_ops.generate_metadata(tag)
     if exit_code > 0:
         sys.exit(1)
 
     tag = "%s-%s%s" % (versions["nginx_stable"], os_distro, versions[os_distro])
-    exit_code = common.generate_metadata(tag)
+    exit_code = docker_ops.generate_metadata(tag)
     if exit_code > 0:
         sys.exit(1)
 

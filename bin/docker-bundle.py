@@ -9,6 +9,7 @@ versions for the specified operating system distribution.
 
 import argparse
 import common
+import docker_ops
 
 
 def main():
@@ -24,7 +25,7 @@ def main():
 
     versions = common.load_supported_versions()
 
-    common.for_mainline_and_stable(common.bundle_images, versions, os_distro)
+    common.for_mainline_and_stable(docker_ops.bundle_images, versions, os_distro)
 
 
 if __name__ == "__main__":
