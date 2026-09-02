@@ -52,16 +52,6 @@ def main():
             tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{suffix}"] = (
                 file
             )
-        tags[
-            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"
-        ] = file
-        if not (
-            os_distro == AMAZONLINUX_DISTRO
-            and osVer.startswith(AMAZONLINUX_2018_PREFIX)
-        ):
-            tags[
-                f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"
-            ] = file
         if os_distro == ALPINE_DISTRO:
             tags[f"{nginx_ver_major}.{nginx_ver_minor}{suffix}"] = file
         tags[f"{nginx_ver_major}-{os_distro}{osVer}{suffix}"] = file
