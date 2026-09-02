@@ -134,10 +134,6 @@ def fetch_stable(distro: str, filter_pattern: str = "") -> Optional[str]:
 
 def main():
     """Main function to generate supported versions."""
-    # Create temp directory if it doesn't exist
-    temp_dir = Path("/tmp/generate-supported-versions")
-    temp_dir.mkdir(exist_ok=True)
-
     print("Fetching Docker image versions...")
 
     # nginx stable vs mainline
