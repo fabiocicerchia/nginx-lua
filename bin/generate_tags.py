@@ -33,54 +33,53 @@ def main():
 
     tags = {}
     for file in files:
-        pieces = re.search(DOCKERFILE_REGEX, file)
+        match = re.search(DOCKERFILE_REGEX, file)
 
-        nginx_ver, os_distro, osVer, compat = pieces.group(1, 2, 3, 4)
-        nginx_ver_pieces = re.split(r"\.", nginx_ver)
-        nginx_ver_major, nginx_ver_minor, nginx_ver_patch = nginx_ver_pieces
+        nginx_ver, os_distro, os_version, compat = match.group(1, 2, 3, 4)
+        major, minor, patch = re.split(r"\.", nginx_ver)
         suffix = ""
         if compat is not None:
             suffix = COMPAT_SUFFIX
 
-        tags[
-            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{osVer}{suffix}"
-        ] = file
-        tags[
-            f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{os_distro}{suffix}"
-        ] = file
-        if os_distro == ALPINE_DISTRO:
-            tags[f"{nginx_ver_major}.{nginx_ver_minor}.{nginx_ver_patch}-{suffix}"] = (
-                file
-            )
-        if os_distro == ALPINE_DISTRO:
-            tags[f"{nginx_ver_major}.{nginx_ver_minor}{suffix}"] = file
-        tags[f"{nginx_ver_major}-{os_distro}{osVer}{suffix}"] = file
-        tags[f"{os_distro}{suffix}"] = file
-        if not (
+        is_alpine = os_distro == ALPINE_DISTRO
+        # amazonlinux 2018 predates the unversioned distro tags and never claims them
+        claims_distro_tag = not (
             os_distro == AMAZONLINUX_DISTRO
-            and osVer.startswith(AMAZONLINUX_2018_PREFIX)
-        ):
-            tags[f"{nginx_ver_major}-{os_distro}{suffix}"] = file
-        if os_distro == ALPINE_DISTRO:
-            tags[f"{nginx_ver_major}{suffix}"] = file
+            and os_version.startswith(AMAZONLINUX_2018_PREFIX)
+        )
+
+        tags[f"{major}.{minor}.{patch}-{os_distro}{os_version}{suffix}"] = file
+        tags[f"{major}.{minor}.{patch}-{os_distro}{suffix}"] = file
+        if is_alpine:
+            tags[f"{major}.{minor}.{patch}-{suffix}"] = file
+        if is_alpine:
+            tags[f"{major}.{minor}{suffix}"] = file
+        tags[f"{major}-{os_distro}{os_version}{suffix}"] = file
+        tags[f"{os_distro}{suffix}"] = file
+        if claims_distro_tag:
+            tags[f"{major}-{os_distro}{suffix}"] = file
+        if is_alpine:
+            tags[f"{major}{suffix}"] = file
             tags[f"{LATEST_TAG}{suffix}"] = file
 
     dockerfiles = defaultdict(list)
-    reversed_list = files
+    unsupported = files
     for tag in tags:
         dockerfiles[tags[tag]].append(tag)
     for dockerfile in dockerfiles:
-        dockerfiles[dockerfile] = sorted(dockerfiles[dockerfile], key=operator.itemgetter(0))
+        dockerfiles[dockerfile] = sorted(
+            dockerfiles[dockerfile], key=operator.itemgetter(0)
+        )
 
     print("# Tags\n")
     print("## Supported Tags\n")
     for file in supported:
-        reversed_list.remove(file)
+        unsupported.remove(file)
         print(f"- [`{', '.join(dockerfiles[file])}`]({GITHUB_BASE_URL}{file})")
 
     print("\n## Unsupported Tags\n")
-    reversed_list = list(reversed_list)[::-1]
-    for file in reversed_list:
+    unsupported = list(unsupported)[::-1]
+    for file in unsupported:
         print(f"- [`{', '.join(dockerfiles[file])}`]({GITHUB_BASE_URL}{file})")
 
 
