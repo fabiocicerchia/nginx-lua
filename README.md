@@ -53,6 +53,12 @@ Need help implementing this? [Get in touch](https://fabiocicerchia.it/contact).
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
 
+**Note:** Docker Hub carries every distro. The alpine (default) tags are also mirrored to GitHub Container Registry as `ghcr.io/fabiocicerchia/nginx-lua/nginx-lua`, pointing at the same digests:
+
+```console
+$ docker pull ghcr.io/fabiocicerchia/nginx-lua/nginx-lua:1-alpine
+```
+
 ## Quick reference (cont.)
 
 - **Where to file issues:** [https://github.com/fabiocicerchia/nginx-lua/issues](https://github.com/fabiocicerchia/nginx-lua/issues)

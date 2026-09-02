@@ -523,6 +523,37 @@ jobs:
               make sign-manifest IMAGE="${IMAGE}"
             done
 
+      # GHCR is a secondary channel carrying only the default distro (alpine).
+      # The manifest lists are copied from Docker Hub rather than re-pushed, so
+      # both registries serve the exact same digests.
+      - when:
+          condition:
+            equal: [alpine, << parameters.distro >>]
+          steps:
+            - run:
+                name: Mirror alpine images to GHCR
+                command: |
+                  set -euo pipefail
+                  echo "${GHCR_TOKEN}" | docker login ghcr.io --username "${GHCR_USER}" --password-stdin
+                  make mirror-ghcr
+                environment:
+                  FORCE: "YES"
+
+            # imagetools does not carry cosign signatures across registries, so
+            # the mirrored index is signed and SBOM'd in its own right.
+            - run:
+                name: Sign GHCR manifest list index and attach per-platform SBOMs
+                command: |
+                  set -euo pipefail
+                  source supported_versions
+                  NGINX_MAINLINE=$(grep nginx_mainline supported_versions | cut -d= -f2)
+                  NGINX_STABLE=$(grep nginx_stable supported_versions | cut -d= -f2)
+                  OS_VER=${alpine}
+                  for NGINX_VER in $NGINX_MAINLINE $NGINX_STABLE; do
+                    IMAGE="ghcr.io/fabiocicerchia/nginx-lua/nginx-lua:${NGINX_VER}-alpine${OS_VER}"
+                    make sign-manifest IMAGE="${IMAGE}"
+                  done
+
 #      - run:
 #          name: Cleanup per-arch suffix tags from Docker Hub
 #          command: |
