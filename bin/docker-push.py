@@ -9,12 +9,13 @@ versions for the given OS distribution.
 
 import platform
 import common
+import docker_ops
 import argparse
 
 # Map platform.machine() values to Docker architecture names
 _MACHINE_TO_ARCH = {
-    "x86_64": common.AMD64_ARCH,
-    "aarch64": common.ARM64V8_ARCH,
+    "x86_64": docker_ops.AMD64_ARCH,
+    "aarch64": docker_ops.ARM64V8_ARCH,
 }
 
 
@@ -44,7 +45,7 @@ def main():
 
     versions = common.load_supported_versions()
 
-    common.for_mainline_and_stable(common.push_images, versions, os_distro, arch)
+    common.for_mainline_and_stable(docker_ops.push_images, versions, os_distro, arch)
 
 
 if __name__ == "__main__":
