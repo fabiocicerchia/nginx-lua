@@ -1,6 +1,6 @@
-nginx_mainline=1.31.4
+nginx_mainline=1.31.5
 nginx_stable=1.30.4
-almalinux=10.2-20260602
+almalinux=10.2-20260902
 alpine=3.24.1
 amazonlinux=2023.12.20260817.0
 debian=13.6
