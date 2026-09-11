@@ -6,8 +6,8 @@ remote-dependencies:
 
 # https://github.com/nginx/njs/tags
 - name: njs
-  url: "https://github.com/nginx/njs/archive/1.0.0.tar.gz"
-  version: "1.0.0"
+  url: "https://github.com/nginx/njs/archive/1.0.1.tar.gz"
+  version: "1.0.1"
 
 # https://github.com/leev/ngx_http_geoip2_module/tags
 - name: geoip2
