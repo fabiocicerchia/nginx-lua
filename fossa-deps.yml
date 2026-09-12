@@ -6,8 +6,8 @@ remote-dependencies:
 
 # https://github.com/nginx/njs/tags
 - name: njs
-  url: "https://github.com/nginx/njs/archive/1.0.0.tar.gz"
-  version: "1.0.0"
+  url: "https://github.com/nginx/njs/archive/1.0.1.tar.gz"
+  version: "1.0.1"
 
 # https://github.com/leev/ngx_http_geoip2_module/tags
 - name: geoip2
@@ -101,8 +101,8 @@ remote-dependencies:
 
 # https://github.com/knyar/nginx-lua-prometheus/tags
 - name: nginx-lua-prometheus
-  url: "https://github.com/knyar/nginx-lua-prometheus/archive/0.20240525.tar.gz"
-  version: "0.20240525"
+  url: "https://github.com/knyar/nginx-lua-prometheus/archive/0.20260912.tar.gz"
+  version: "0.20260912"
 
 # https://github.com/openresty/set-misc-nginx-module/tags
 - name: set-misc-nginx-module
