@@ -20,6 +20,7 @@ endif
 BUILD_CMD:=./bin/docker-build.py
 PUSH_CMD:=./bin/docker-push.py
 BUNDLE_CMD:=./bin/docker-bundle.py
+MIRROR_CMD:=./bin/mirror-ghcr.py
 TEST_CMD:=./bin/test.sh
 SEC_CMD:=./bin/test-security.sh
 META_CMD:=./bin/docker-metadata.py
@@ -181,6 +182,13 @@ else
 	DISTRO=$(subst push-,,$(@)); \
 	echo "PUSHING $$DISTRO"; \
 	$(PUSH_CMD) "$$DISTRO"
+endif
+
+mirror-ghcr: ## mirror the default distro (alpine) manifest lists from docker hub to ghcr
+ifeq ($(SKIP), YES)
+	echo "SKIPPING $@"
+else
+	$(MIRROR_CMD)
 endif
 
 cleanup-docker-images: ## delete temporary per-arch tags (-amd64, -arm64v8) from Docker Hub
