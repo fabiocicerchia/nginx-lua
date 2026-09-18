@@ -1,0 +1,56 @@
+# The review half of boneyard: what a pull request did to the dependency tree.
+#
+# One record per pull request, labelled with its number, so the 1,100-line
+# lockfile diff a reviewer cannot read stays answerable after the merge.
+# Boneyard stores sbom-diff's classification as given.
+
+name: boneyard-release
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: boneyard-release-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: diff the tree and post
+    runs-on: ubuntu-latest
+    steps:
+      # Credentials stay here, unlike the other two workflows. The sbom-diff
+      # Action re-fetches the base ref even when `fetch-depth: 0` already has
+      # it, and on a private repository that fetch needs a credential —
+      # without one it dies with "could not read Username for github.com".
+      # This job uploads no artifact, so there is nothing to leak the token
+      # into, which is the whole of what artipacked is about.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1  # zizmor: ignore[artipacked]
+        with:
+          fetch-depth: 0 # the base side is generated from the base ref
+
+      - uses: fabiocicerchia/sbom-diff@f908506c6e70e3d5a8749b162c1188b6d2df24ee # v1.1.1
+        with:
+          # No comment and no gate: gandalf-pr-review.yml and dependency-review
+          # already speak on the pull request. This run exists for the record.
+          github-token: ""
+          skip-unchanged: "false"
+
+      - name: Post to boneyard
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.BONEYARD_TOKEN }}
+          LABEL: PR #${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          test -s sbom-diff-result.json
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-connrefused --max-time 60 \
+            -X POST https://app.boneyard.run/v1/releases \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -H "Boneyard-Repo: ${GITHUB_REPOSITORY}" \
+            -H "Boneyard-Label: ${LABEL}" \
+            --data-binary @sbom-diff-result.json
