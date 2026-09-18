@@ -1,0 +1,58 @@
+# The portfolio half of boneyard: how far behind this repository is, and
+# whether the things it depends on could even be caught up with.
+#
+# Boneyard stores depwatch's quadrant as given and never recomputes it, so this
+# posts the report untouched. Scheduled as well as pushed because viability
+# moves without this repository changing: a maintainer walks away and the
+# quadrant shifts under a manifest nobody edited.
+
+name: boneyard-scan
+
+on:
+  push:
+    branches: [main]
+    paths: ["Dockerfile"]
+  schedule:
+    - cron: "41 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: boneyard-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: measure drift and post
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # this job never pushes
+
+      - id: depwatch
+        uses: fabiocicerchia/depwatch@8567c81b6ec8160aa50c9a7c010ea4222a5fa46d # v1.6.5
+        with:
+          manifest: Dockerfile
+          eco: docker
+          json: depwatch.json
+          # Recording, not gating. depwatch.yml is where a threshold belongs.
+          fail-on-threshold: "false"
+          github-token: ${{ github.token }}
+
+      - name: Post to boneyard
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.BONEYARD_TOKEN }}
+          REPORT: ${{ steps.depwatch.outputs.report }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-connrefused --max-time 60 \
+            -X POST https://app.boneyard.run/v1/scans \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -H "Boneyard-Repo: ${GITHUB_REPOSITORY}" \
+            --data-binary "@${REPORT}"
