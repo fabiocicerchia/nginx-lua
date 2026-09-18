@@ -1,0 +1,87 @@
+# This repository's gandalf record, posted to proofhouse.
+#
+# gandalf-pr-review.yml scores a pull request's diff; this scores the whole
+# tree on main, which is the number the fleet dashboard trends. The POST
+# lives here rather than in gandalf: a quality gate that phones home on its own
+# initiative is a worse default than one that does not.
+#
+# Source: kodebeat/proofhouse -> ci/github-workflow.yml
+
+name: proofhouse
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: proofhouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    name: scan and post
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # This job never pushes, so the token must not be left behind where
+          # anything archiving the workspace would pick it up.
+          persist-credentials: false
+          fetch-depth: 0 # gandalf samples history for the trend
+
+      # gandalf is stdlib-only; the ~130 scanners it wraps are not, and a gate
+      # whose scanner is missing is reported `unavailable` and left out of the
+      # score. Running bare would post a record covering almost nothing, so the
+      # image comes too — the same split gandalf's own Action uses.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: fabiocicerchia/gandalf
+          ref: v0.14.0
+          path: .gandalf-src
+
+      # Out of the workspace before the scan starts: left where checkout put it,
+      # gandalf would score its own source alongside this repository's.
+      - name: Stage the scanner
+        run: mv .gandalf-src "${RUNNER_TEMP}/gandalf"
+
+      - name: Run gandalf
+        # A red verdict is the run most worth recording, so it must not stop the
+        # POST below. gandalf-pr-review.yml is where findings gate a change.
+        continue-on-error: true
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 \
+            -v "${GITHUB_WORKSPACE}:/src" -v "${RUNNER_TEMP}/gandalf:/gandalf:ro" -w /src \
+            ghcr.io/fabiocicerchia/gandalf-tools:latest \
+            sh -c 'git config --global --add safe.directory "*" \
+              && PYTHONPATH=/gandalf/src python -m gandalf --no-llm --no-html --out-dir reports'
+
+      - name: Post to proofhouse
+        # Telemetry. A dashboard being down is not this repository's problem.
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.PROOFHOUSE_TOKEN }}
+        run: |
+          set -euo pipefail
+          # Newest report without parsing `ls` output, which shellcheck refuses.
+          report="$(find reports -name 'gandalf-*.json' -printf '%T@ %p\n' \
+                    | sort -rn | head -1 | cut -d' ' -f2-)"
+          echo "posting ${report} ($(wc -c < "${report}") bytes)"
+          gzip -c "${report}" > report.json.gz
+          curl --fail-with-body --silent --show-error \
+            --retry 3 --retry-connrefused --max-time 120 \
+            -X POST https://app.proofhouse.cloud/v1/runs \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Content-Type: application/json" \
+            -H "Content-Encoding: gzip" \
+            -H "X-Proofhouse-Repo: ${GITHUB_REPOSITORY}" \
+            -H "X-Proofhouse-Ref: ${GITHUB_REF}" \
+            -H "X-Gandalf-Version: v0.14.0" \
+            --data-binary @report.json.gz
