@@ -11,8 +11,8 @@ on:
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
   schedule:
     - cron: '0 20 * * 5'
-  push:
-    branches: [ "main" ]
+  # No push trigger: the pull request already ran this on the identical
+  # tree. What a merge cannot tell you, the schedule below can.
 
 # Declare default permissions as read only.
 permissions: read-all
