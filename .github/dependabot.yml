@@ -39,3 +39,7 @@ updates:
       - "fabiocicerchia"
     commit-message:
       prefix: "ci"
+    groups:
+      # Everything else rides in one pull request rather than one each.
+      actions:
+        patterns: ["*"]
