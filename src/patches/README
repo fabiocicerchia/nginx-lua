@@ -1,0 +1,4 @@
+# Local overrides for openresty's nginx patch set.
+# Any *.patch here is copied over the openresty set and applied after it.
+# Empty on purpose - to drop an openresty patch use SKIPPED_PATCHES in
+# ../Makefile rather than adding a patch here that reverts it.
