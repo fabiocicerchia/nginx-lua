@@ -33,7 +33,7 @@ jobs:
           persist-credentials: false # this job never pushes
 
       - id: depwatch
-        uses: fabiocicerchia/depwatch@8567c81b6ec8160aa50c9a7c010ea4222a5fa46d # v1.6.5
+        uses: fabiocicerchia/depwatch@30cde77c2137028bf82a6a9587e5094686ba0d1a # v1.6.6
         with:
           manifest: Dockerfile
           eco: docker
