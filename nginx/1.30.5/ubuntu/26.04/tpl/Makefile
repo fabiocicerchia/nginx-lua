@@ -53,7 +53,17 @@ endef
 # CORE
 # ##############################################################################
 
-SKIPPED_PATCHES=""
+# Substrings matched against each patch filename; a match is never applied.
+# server_header: openresty's patch does one thing, rewrite the Server response
+# header (plus the HTTP/2 and HTTP/3 static strings) from "nginx" to
+# "openresty" - inaccurate branding for an image that isn't the official
+# OpenResty bundle, and nothing else in the patch set depends on it. Not
+# applying it is what keeps the header honest. The previous approach - apply
+# it, then revert it with src/patches/zzz-nginx-server-header-revert.patch -
+# could not work: a static revert has to match one exact pre-image, so it
+# broke on every nginx version other than the 1.31.2 it was cut against, and
+# broke again whenever openresty's own patch was itself skipped as drifted.
+SKIPPED_PATCHES=server_header
 # ponytail: openresty patch source. Empty (default) tracks master, because
 # openresty only adds a patches/nginx/<ver>/ directory for a new nginx release
 # on master - a hard pin would break `make auto-update` the moment nginx bumps.
@@ -67,7 +77,9 @@ VER_OPENRESTY_PATCHES?=
 # is skipped whole rather than landing a subset and corrupting the source.
 # A skipped patch is a WARNING, never fatal, and the loop continues: stable
 # tracks fall back to an older mainline patch set whose context has already
-# drifted, so some official patches never apply here.
+# drifted, so some official patches never apply here. That tolerance means a
+# change we rely on can stop landing without failing the build, so the branding
+# check after the loop asserts the outcome we actually care about.
 # KNOWN GAP: the gate catches hunk failure, not fuzz. GNU patch defaults to
 # fuzz 2, so context drift of <=2 lines still applies (possibly at the wrong
 # offset) and the dry-run returns 0. `-F0` on both patch calls closes it, but
@@ -97,12 +109,17 @@ openresty-patches:
 		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
 	done; \
 	for patch_file in /patches/*.patch; do \
+		[ -e "$${patch_file}" ] || continue; \
 		echo "overriding openresty patch $${patch_file}"; \
 		cp "$${patch_file}" /nginx-${VER_NGINX}/patches/; \
 	done; \
 	cd /nginx-${VER_NGINX}; \
 	for patch_file in patches/*.patch; do \
-		if [ "$$(echo "$(SKIPPED_PATCHES)" | grep -qw "$${patch_file}"; echo $$?)" -eq 0 ]; then \
+		skip=""; \
+		for pattern in $(SKIPPED_PATCHES); do \
+			case "$${patch_file}" in *"$${pattern}"*) skip=1 ;; esac; \
+		done; \
+		if [ -n "$${skip}" ]; then \
 			echo "skipping openresty patch $${patch_file}"; \
 		else \
 			echo "applying openresty patch $${patch_file}"; \
@@ -113,6 +130,10 @@ openresty-patches:
 			fi; \
 		fi; \
 	done; \
+	if grep -l openresty src/core/nginx.h src/http/ngx_http_header_filter_module.c src/http/v2/ngx_http_v2_filter_module.c src/http/v3/ngx_http_v3_filter_module.c 2>/dev/null; then \
+		echo "FATAL: openresty branding survived in the files listed above - the Server header would not say nginx" >&2; \
+		exit 1; \
+	fi; \
 
 core:
 # NGINX
@@ -492,9 +513,8 @@ test: .prereq-test .start-test-daemons
 	# header is literally "nginx" - openresty/openresty's own official nginx
 	# patches (see `make openresty-patches` above) rename that header to
 	# "openresty", which this image doesn't want to claim (it isn't the
-	# official OpenResty bundle) - reverted by src/patches/
-	# zzz-nginx-server-header-revert.patch, applied after openresty's own
-	# patches, so no test changes are needed here.
+	# official OpenResty bundle) - that patch is in SKIPPED_PATCHES and never
+	# applied, so no test changes are needed here.
 	-cd /lua-resty-core-${VER_LUA_RESTY_CORE} \
 		&& $(MAKE) OPENRESTY_PREFIX=/usr/local/openresty-debug test;
 	cd /lua-resty-lrucache-${VER_LUA_RESTY_LRUCACHE} \
