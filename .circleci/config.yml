@@ -308,9 +308,16 @@ commands:
                 command: |
                   set -euo pipefail
                   ARCH=$(dpkg --print-architecture)
-                  IMAGE_ID=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort | head -n1)
-                  TAG=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
-                  make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
+                  # Scan every unique image (mainline + stable) that push-<< parameters.distro >> will publish
+                  ALL_IDS=$(docker images | grep nginx-lua | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $3 }' | sort -u || true)
+                  if [ -z "$ALL_IDS" ]; then
+                    echo "FATAL: no nginx-lua images found for << parameters.distro >>-${ARCH}"
+                    exit 1
+                  fi
+                  for IMAGE_ID in $ALL_IDS; do
+                    TAG=$(docker images | grep nginx-lua | grep "${IMAGE_ID}" | grep "<< parameters.distro >>-${ARCH}" | awk '{ print $2 }' | sort | head -n1)
+                    make scan-image IMAGE="fabiocicerchia/nginx-lua:${TAG}"
+                  done
             - run:
                 name: Push images
                 command: |
