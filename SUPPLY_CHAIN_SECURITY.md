@@ -266,3 +266,6 @@ data (Recital 30).
 - MaxMind GeoLite2 databases are downloaded during CI **testing only**
 - Test GeoIP data is not included in published images
 - CI credentials (MAXMIND_ACCOUNT_ID) are stored as CircleCI secrets
+- Publishing credentials (Docker Hub, GHCR, GitHub tokens) live only in the
+  `nginx-lua` CircleCI context, restricted to the `main` branch; branch builds
+  never receive them
