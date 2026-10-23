@@ -17,6 +17,7 @@ mirrored index separately (see `make sign-manifest`).
 
 import argparse
 import common
+import docker_ops
 
 GHCR_REPO = "ghcr.io/fabiocicerchia/nginx-lua/nginx-lua"
 
@@ -38,7 +39,7 @@ def mirror_images(nginx_version, os_distro, os_version, dry_run=False):
             print(cmd)
             continue
 
-        if common.run_command(cmd, True)[0] != 0:
+        if docker_ops.run_command(cmd, True)[0] != 0:
             print(f"FATAL: Failed to mirror {source} to {target}")
             return 1
 
