@@ -15,7 +15,8 @@ workflows:
   # Publishing credentials (DOCKER_HUB_USER/TOKEN, GHCR_USER/TOKEN,
   # GITHUB_TOKEN) live only in the "nginx-lua" CircleCI context, which is
   # restricted to the main branch. Branch builds run branch-controlled code
-  # (Makefile, bin/*, pip deps, Dockerfiles), so they get no context at all:
+  # (Makefile, bin/*, pip deps, Dockerfiles), so they get no context at all
+  # (they still see the project-level MaxMind and read-only pull credentials):
   # the "builds" workflow runs everywhere except main, and "release" runs only
   # on main with the context attached to the jobs that publish.
   nightly:
@@ -182,7 +183,9 @@ commands:
             # pull anonymously (also the fork-PR path).
             TOKEN="${DOCKER_HUB_PULL_TOKEN:-${DOCKER_HUB_TOKEN:-}}"
             if [ -n "${TOKEN}" ]; then
-              echo "${TOKEN}" | docker login --username "${DOCKER_HUB_USER:-fabiocicerchia}" --password-stdin
+              # Pull login is an optimisation: never fail the job over it.
+              echo "${TOKEN}" | docker login --username "${DOCKER_HUB_USER:-fabiocicerchia}" --password-stdin \
+                || echo "Docker Hub login failed — pulling anonymously"
             else
               echo "No Docker Hub token available — pulling anonymously"
             fi
@@ -292,9 +295,10 @@ commands:
             - run:
                 name: Push images
                 command: |
-                  # Push-capable login happens only here, on main (this whole
-                  # block is gated on the main branch). It also covers the
-                  # cosign signing step below, which writes to the registry.
+                  # Log in with the push token right before pushing (this block
+                  # is main-only). On main the pull login above may already have
+                  # used it if no DOCKER_HUB_PULL_TOKEN is set; this makes the
+                  # push independent of that. Also covers cosign signing below.
                   echo "${DOCKER_HUB_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
                   make -j $(nproc) push-<< parameters.distro >>
                 environment:
