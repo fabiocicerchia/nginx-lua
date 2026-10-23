@@ -12,6 +12,12 @@ orbs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
+  # Publishing credentials (DOCKER_HUB_USER/TOKEN, GHCR_USER/TOKEN,
+  # GITHUB_TOKEN) live only in the "nginx-lua" CircleCI context, which is
+  # restricted to the main branch. Branch builds run branch-controlled code
+  # (Makefile, bin/*, pip deps, Dockerfiles), so they get no context at all:
+  # the "builds" workflow runs everywhere except main, and "release" runs only
+  # on main with the context attached to the jobs that publish.
   nightly:
     triggers:
       - schedule:
@@ -21,16 +27,19 @@ workflows:
               only:
                 - main
     jobs:
-      - Nightly Update
+      - Nightly Update:
+          context: nginx-lua
       - Verify Published Signatures
 
   builds:
+    unless:
+      equal: [main, << pipeline.git.branch >>]
     jobs:
-      - Docker AMD:
+      - Docker AMD: &docker-amd
           name: Docker AMD << matrix.distro >>
           matrix:
             parameters:
-              distro:
+              distro: &distros
                 [
                   "almalinux",
                   "alpine",
@@ -39,92 +48,61 @@ workflows:
                   "fedora",
                   "ubuntu",
                 ]
-          filters:
+          filters: &no-tags
             tags:
               ignore: /.*/
-      - Docker ARM:
+      - Docker ARM: &docker-arm
           name: Docker ARM << matrix.distro >>
           matrix:
             parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-          filters:
-            tags:
-              ignore: /.*/
-      - Package AMD:
+              distro: *distros
+          filters: *no-tags
+      - Package AMD: &package-amd
           name: Package AMD << matrix.distro >>
           requires:
             - Docker AMD << matrix.distro >>
           matrix:
             parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-          filters:
-            tags:
-              ignore: /.*/
-      - Package ARM:
+              distro: *distros
+          filters: *no-tags
+      - Package ARM: &package-arm
           name: Package ARM << matrix.distro >>
           requires:
             - Docker ARM << matrix.distro >>
           matrix:
             parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-          filters:
-            tags:
-              ignore: /.*/
+              distro: *distros
+          filters: *no-tags
+
+  release:
+    when:
+      equal: [main, << pipeline.git.branch >>]
+    jobs:
+      - Docker AMD:
+          <<: *docker-amd
+          context: nginx-lua
+      - Docker ARM:
+          <<: *docker-arm
+          context: nginx-lua
+      - Package AMD: *package-amd
+      - Package ARM: *package-arm
       - Docker Bundle:
           name: Docker Bundle << matrix.distro >>
+          context: nginx-lua
           requires:
             - Package AMD << matrix.distro >>
             - Package ARM << matrix.distro >>
           matrix:
             parameters:
-              distro:
-                [
-                  "almalinux",
-                  "alpine",
-                  "amazonlinux",
-                  "debian",
-                  "fedora",
-                  "ubuntu",
-                ]
-          filters:
-            branches:
-              only: main
+              distro: *distros
       - Metadata:
+          context: nginx-lua
           requires:
             - Docker Bundle
-          filters:
-            branches:
-              only: main
       - Release:
+          context: nginx-lua
           requires:
             - Metadata
-          filters:
-            branches:
-              only: main
 
 commands:
   install_cosign:
@@ -198,17 +176,15 @@ commands:
             # Authenticate before the base-image FROM pulls below (in "Build
             # docker image") so they count against our account's quota rather
             # than the shared per-IP anonymous limit.
-            # This step runs on every branch, and branch builds execute
-            # branch-controlled code (Makefile, bin/*, pip deps, Dockerfiles),
-            # so it must NEVER use the push-capable DOCKER_HUB_TOKEN. Use a
-            # read-only Docker Hub PAT (DOCKER_HUB_PULL_TOKEN) if configured,
-            # otherwise pull anonymously (also the fork-PR path, where CircleCI
-            # withholds secrets). The push token is used only in the main-only
-            # "Push images" step below.
-            if [ -n "${DOCKER_HUB_PULL_TOKEN:-}" ]; then
-              echo "${DOCKER_HUB_PULL_TOKEN}" | docker login --username "${DOCKER_HUB_USER}" --password-stdin
+            # DOCKER_HUB_TOKEN exists only in the main-only "nginx-lua"
+            # context, so branch builds never see it. They use a read-only
+            # DOCKER_HUB_PULL_TOKEN (project-level) if configured, otherwise
+            # pull anonymously (also the fork-PR path).
+            TOKEN="${DOCKER_HUB_PULL_TOKEN:-${DOCKER_HUB_TOKEN:-}}"
+            if [ -n "${TOKEN}" ]; then
+              echo "${TOKEN}" | docker login --username "${DOCKER_HUB_USER:-fabiocicerchia}" --password-stdin
             else
-              echo "No DOCKER_HUB_PULL_TOKEN available — pulling anonymously"
+              echo "No Docker Hub token available — pulling anonymously"
             fi
 
       - run:
