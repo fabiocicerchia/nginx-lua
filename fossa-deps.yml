@@ -51,8 +51,8 @@ remote-dependencies:
 
 # https://github.com/openresty/lua-resty-dns/tags
 - name: lua-resty-dns
-  url: "https://github.com/openresty/lua-resty-dns/archive/v0.23.tar.gz"
-  version: "0.23"
+  url: "https://github.com/openresty/lua-resty-dns/archive/v0.24.tar.gz"
+  version: "0.24"
 
 # https://github.com/openresty/lua-resty-memcached/tags
 - name: lua-resty-memcached
@@ -91,8 +91,8 @@ remote-dependencies:
 
 # https://github.com/openresty/lua-resty-websocket/tags
 - name: lua-resty-websocket
-  url: "https://github.com/openresty/lua-resty-websocket/archive/v0.15.tar.gz"
-  version: "0.15"
+  url: "https://github.com/openresty/lua-resty-websocket/archive/v0.16.tar.gz"
+  version: "0.16"
 
 # https://github.com/openresty/lua-upstream-nginx-module/tags
 - name: lua-upstream-nginx-module
