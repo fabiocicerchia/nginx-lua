@@ -112,7 +112,7 @@ ENV VER_CLOUDFLARE_COOKIE=$VER_CLOUDFLARE_COOKIE
 
 # lua-resty-dns
 # https://github.com/openresty/lua-resty-dns
-ARG VER_OPENRESTY_DNS=0.23
+ARG VER_OPENRESTY_DNS=0.24
 ENV VER_OPENRESTY_DNS=$VER_OPENRESTY_DNS
 
 # lua-resty-lrucache
@@ -153,7 +153,7 @@ ENV VER_OPENRESTY_HEALTHCHECK=$VER_OPENRESTY_HEALTHCHECK
 
 # lua-resty-websocket
 # https://github.com/openresty/lua-resty-websocket
-ARG VER_OPENRESTY_WEBSOCKET=0.15
+ARG VER_OPENRESTY_WEBSOCKET=0.16
 ENV VER_OPENRESTY_WEBSOCKET=$VER_OPENRESTY_WEBSOCKET
 
 # lua-tablepool
@@ -181,7 +181,7 @@ ENV VER_MISC_NGINX=$VER_MISC_NGINX
 # Provides the echo/echo_sleep directives this project's own test: target
 # depends on: lua-resty-core, lua-resty-upstream-healthcheck, lua-resty-redis,
 # and lua-resty-memcached's own vendored test suites all use them.
-ARG VER_ECHO_NGINX=0.65
+ARG VER_ECHO_NGINX=0.66
 ENV VER_ECHO_NGINX=$VER_ECHO_NGINX
 
 # stream-lua-nginx-module
