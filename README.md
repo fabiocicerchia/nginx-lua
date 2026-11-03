@@ -45,9 +45,9 @@ Need help implementing this? [Get in touch](https://fabiocicerchia.it/contact).
 <!-- START_SUPPORTED_TAGS -->
 - [`almalinux`, `1-almalinux`, `1.31-almalinux`, `1.31.8-almalinux`, `1-almalinux10.2-20261027`, `1.31-almalinux10.2-20261027`, `1.31.8-almalinux10.2-20261027`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/almalinux/10.2-20261027/Dockerfile)
 - [`1`, `1.31`, `1.31.8`, `alpine`, `latest`, `1-alpine`, `1.31-alpine`, `1.31.8-alpine`, `1-alpine3.24.3`, `1.31-alpine3.24.3`, `1.31.8-alpine3.24.3`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/alpine/3.24.3/Dockerfile)
-- [`amazonlinux`, `1-amazonlinux`, `1.31-amazonlinux`, `1.31.8-amazonlinux`, `1-amazonlinux2023.12.20261021.0`, `1.31-amazonlinux2023.12.20261021.0`, `1.31.8-amazonlinux2023.12.20261021.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/amazonlinux/2023.12.20261021.0/Dockerfile)
+- [`amazonlinux`, `1-amazonlinux`, `1.31-amazonlinux`, `1.31.8-amazonlinux`, `1-amazonlinux2023.12.20261102.0`, `1.31-amazonlinux2023.12.20261102.0`, `1.31.8-amazonlinux2023.12.20261102.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/amazonlinux/2023.12.20261102.0/Dockerfile)
 - [`debian`, `1-debian`, `1.31-debian`, `1-debian13.7`, `1.31.8-debian`, `1.31-debian13.7`, `1.31.8-debian13.7`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/debian/13.7/Dockerfile)
-- [`fedora`, `1-fedora`, `1-fedora44`, `1.31-fedora`, `1.31-fedora44`, `1.31.8-fedora`, `1.31.8-fedora44`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/fedora/44/Dockerfile)
+- [`fedora`, `1-fedora`, `1-fedora45`, `1.31-fedora`, `1.31-fedora45`, `1.31.8-fedora`, `1.31.8-fedora45`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/fedora/45/Dockerfile)
 - [`ubuntu`, `1-ubuntu`, `1.31-ubuntu`, `1-ubuntu26.04`, `1.31.8-ubuntu`, `1.31-ubuntu26.04`, `1.31.8-ubuntu26.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.8/ubuntu/26.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
