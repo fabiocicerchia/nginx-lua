@@ -169,11 +169,11 @@ DEPENDENCIES = [
         tarball_pattern="https://github.com/openresty/set-misc-nginx-module/archive/v{ver}.tar.gz",
     ),
     dict(
-         key='echo_nginx',
-         fossa_name='echo-nginx-module',
-         repo_url="https://github.com/openresty/echo-nginx-module",
-         is_commit=False,
-         tarball_pattern="https://github.com/openresty/echo-nginx-module/archive/v{ver}.tar.gz",
+        key="echo_nginx",
+        fossa_name="echo-nginx-module",
+        repo_url="https://github.com/openresty/echo-nginx-module",
+        is_commit=False,
+        tarball_pattern="https://github.com/openresty/echo-nginx-module/archive/v{ver}.tar.gz",
     ),
     dict(
         key="openresty_streamlua",
