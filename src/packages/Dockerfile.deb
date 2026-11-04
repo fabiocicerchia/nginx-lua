@@ -9,7 +9,8 @@ ENV DISTRO=$DISTRO
 
 WORKDIR /
 
-RUN apt-get update && apt-get install -y ruby binutils
+RUN apt-get update && apt-get install -y --no-install-recommends ruby binutils \
+    && rm -rf /var/lib/apt/lists/*
 
 # https://rubygems.org/gems/fpm
 ARG FPM_VERSION=1.15.1

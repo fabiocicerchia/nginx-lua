@@ -9,7 +9,8 @@ ENV DISTRO=$DISTRO
 
 WORKDIR /
 
-RUN yum install -y ruby-devel binutils rpm-build gcc
+RUN yum install -y ruby-devel binutils rpm-build gcc \
+    && yum clean all
 
 # https://rubygems.org/gems/fpm
 ARG FPM_VERSION=1.15.1
@@ -19,8 +20,8 @@ ARG FPM_OUTPUT_TYPE=rpm
 
 # WORKAROUND
 # REF: https://github.com/jordansissel/fpm/issues/2076
-RUN find /usr/local/share/*gems/gems -name "rpm.rb"
-RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--buildroot", "#{build_path}\/BUILD"\]/g' /usr/local/share/*gems/gems/fpm-*/lib/fpm/package/rpm.rb
+RUN find /usr/local/share/*gems/gems -name "rpm.rb" \
+    && sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--buildroot", "#{build_path}\/BUILD"\]/g' /usr/local/share/*gems/gems/fpm-*/lib/fpm/package/rpm.rb
 
 COPY *.sh /
 
