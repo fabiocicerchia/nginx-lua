@@ -19,6 +19,7 @@
 # Ref: https://github.com/CircleCI-Public/sign-and-publish-examples
 set -euo pipefail
 
+# shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/lib-retry.sh"
 
 IMAGE_REF="$1"

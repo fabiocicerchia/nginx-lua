@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC1091,SC2207
+# shellcheck disable=SC1091,SC2207,SC2154 # SC2154: vars come from sourced supported_versions
 # Security scanning suite for nginx-lua Docker images
 # Ref: Cyber Resilience Act Article 11 - vulnerability handling
 # Ref: NIS2 Article 21(2)(e) - vulnerability handling and disclosure
