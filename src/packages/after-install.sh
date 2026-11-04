@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+# shellcheck source=/dev/null
 . /etc/os-release
 
 if [ "$ID" = "alpine" ]; then
