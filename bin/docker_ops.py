@@ -48,7 +48,7 @@ def run_command(command, print_stdout=True):
     """Run a shell command and return exit code and output."""
     print(f"Running: {command}")
 
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # nosec B603 - argv via shlex, no shell
         shlex.split(command), shell=False, stdout=subprocess.PIPE
     )
 
@@ -70,7 +70,7 @@ def get_build_date():
     becomes a genuine no-op instead of silently pushing a new, unsigned
     digest under an already-signed tag and orphaning the earlier signature.
     """
-    commit_epoch = subprocess.check_output(
+    commit_epoch = subprocess.check_output(  # nosec B603 - fixed git argv, no shell
         shlex.split(GIT_COMMIT_DATE_COMMAND), text=True
     ).strip()
     return datetime.fromtimestamp(int(commit_epoch), tz=timezone.utc).strftime(
@@ -103,7 +103,7 @@ def build_image(nginx_version, os_distro, os_version, arch):
     """Build Docker image for given configuration."""
     dockerfile_path = common.get_dockerfile_path(nginx_version, os_distro, os_version)
     tags = common.generate_tags(nginx_version, os_distro, os_version, arch)
-    vcs_ref = subprocess.check_output(
+    vcs_ref = subprocess.check_output(  # nosec B603 - fixed git argv, no shell
         shlex.split(GIT_REV_PARSE_COMMAND), text=True
     ).strip()
 

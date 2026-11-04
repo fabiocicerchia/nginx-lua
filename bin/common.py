@@ -209,7 +209,7 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     for script_file in glob.glob(f"{SRC_DIR}/*.sh"):
         dest = tpl_folder / Path(script_file).name
         shutil.copyfile(script_file, dest)
-        os.chmod(dest, 0o750)
+        os.chmod(dest, 0o700)
 
     # Copy patches
     patches_folder = tpl_folder / PATCHES_DIR

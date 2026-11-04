@@ -33,7 +33,7 @@ def main():
 
     common.for_mainline_and_stable(docker_ops.build_image, versions, os_distro, arch)
 
-    stdout = subprocess.check_output(
+    stdout = subprocess.check_output(  # nosec B603 - fixed docker argv, no shell
         docker_ops.DOCKER_IMAGES_COMMAND.split(), text=True
     )
     print(stdout)

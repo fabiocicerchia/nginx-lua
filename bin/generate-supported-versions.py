@@ -18,7 +18,7 @@ import requests
 def run_command(cmd: List[str], capture_output: bool = True) -> str:
     """Run a shell command and return the result."""
     try:
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603 - argv list, no shell
             cmd, capture_output=capture_output, text=True, check=True
         )
         return result.stdout
