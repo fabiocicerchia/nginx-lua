@@ -24,14 +24,9 @@ RUN sed -i -e 's/args = \["rpmbuild", "-bb"\]/args = \["rpmbuild", "-bb", "--bui
 
 COPY *.sh /
 
-# depends from nginx 1.25.2
-# pcre  -> fedora & amazonlinux
-# pcre2 -> almalinux
-RUN PCRE_VER="pcre >= 8.44"; \
-    if [ "${DISTRO}" == "almalinux" ]; then \
-      PCRE_VER="pcre2 >= 10"; \
-    fi; \
-    source /etc/os-release \
+# nginx is built against pcre2-devel on every rpm distro (see tpl/Dockerfile.*);
+# PCRE1 ("pcre") is no longer shipped from Fedora 45.
+RUN source /etc/os-release \
     && fpm \
       --verbose \
       --name nginx-lua \
@@ -57,7 +52,7 @@ RUN PCRE_VER="pcre >= 8.44"; \
       --replaces openresty \
       --depends "gettext >= 0.21" \
       --depends "libmaxminddb >= 1.5.2" \
-      --depends "${PCRE_VER}" \
+      --depends "pcre2 >= 10" \
       --depends "shadow-utils >= 2:4.9" \
       --chdir / \
       after-install.sh \
