@@ -208,9 +208,8 @@ def setup_dockerfile(nginx_version, os_distro, os_version):
     # Copy shell scripts
     for script_file in glob.glob(f"{SRC_DIR}/*.sh"):
         dest = tpl_folder / Path(script_file).name
-        dest.unlink(missing_ok=True)  # previous run left it read-only
         shutil.copyfile(script_file, dest)
-        os.chmod(dest, 0o500)
+        os.chmod(dest, 0o750)
 
     # Copy patches
     patches_folder = tpl_folder / PATCHES_DIR

@@ -12,7 +12,7 @@ entrypoint_log() {
 }
 
 if [ "$1" = "nginx" ] || [ "$1" = "nginx-debug" ]; then
-    if /usr/bin/find "/docker-entrypoint.d/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read -r _; then
+    if /usr/bin/find "/docker-entrypoint.d/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
         entrypoint_log "$0: /docker-entrypoint.d/ is not empty, will attempt to perform configuration"
 
         entrypoint_log "$0: Looking for shell scripts in /docker-entrypoint.d/"
@@ -21,7 +21,6 @@ if [ "$1" = "nginx" ] || [ "$1" = "nginx-debug" ]; then
                 *.envsh)
                     if [ -x "$f" ]; then
                         entrypoint_log "$0: Sourcing $f";
-                        # shellcheck source=/dev/null
                         . "$f"
                     else
                         # warn on shell scripts without exec bit

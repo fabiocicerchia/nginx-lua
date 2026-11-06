@@ -25,7 +25,7 @@ get_cpuset() {
   for token in $( tr ',' ' ' < "$cpusetroot/$cpusetfile" ); do
     case "$token" in
       *-*)
-        count=$( seq "${token%-*}" "${token#*-}" | wc -l )
+        count=$( seq $(echo "$token" | tr '-' ' ') | wc -l )
         ncpu=$(( ncpu+count ))
         ;;
       *)

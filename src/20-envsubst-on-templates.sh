@@ -11,7 +11,7 @@ entrypoint_log() {
 }
 
 add_stream_block() {
-  conffile="/etc/nginx/nginx.conf"
+  local conffile="/etc/nginx/nginx.conf"
 
   if grep -q -E "\s*stream\s*\{" "$conffile"; then
     entrypoint_log "$ME: $conffile contains a stream block; include $stream_output_dir/*.conf to enable stream templates"
@@ -29,14 +29,14 @@ END
 }
 
 auto_envsubst() {
-  template_dir="${NGINX_ENVSUBST_TEMPLATE_DIR:-/etc/nginx/templates}"
-  suffix="${NGINX_ENVSUBST_TEMPLATE_SUFFIX:-.template}"
-  output_dir="${NGINX_ENVSUBST_OUTPUT_DIR:-/etc/nginx/conf.d}"
-  stream_suffix="${NGINX_ENVSUBST_STREAM_TEMPLATE_SUFFIX:-.stream-template}"
-  stream_output_dir="${NGINX_ENVSUBST_STREAM_OUTPUT_DIR:-/etc/nginx/stream-conf.d}"
-  filter="${NGINX_ENVSUBST_FILTER:-}"
+  local template_dir="${NGINX_ENVSUBST_TEMPLATE_DIR:-/etc/nginx/templates}"
+  local suffix="${NGINX_ENVSUBST_TEMPLATE_SUFFIX:-.template}"
+  local output_dir="${NGINX_ENVSUBST_OUTPUT_DIR:-/etc/nginx/conf.d}"
+  local stream_suffix="${NGINX_ENVSUBST_STREAM_TEMPLATE_SUFFIX:-.stream-template}"
+  local stream_output_dir="${NGINX_ENVSUBST_STREAM_OUTPUT_DIR:-/etc/nginx/stream-conf.d}"
+  local filter="${NGINX_ENVSUBST_FILTER:-}"
 
-  # shellcheck disable=SC2016,SC2046 # literal ${VAR} list for envsubst; splitting env names is intended
+  local template defined_envs relative_path output_path subdir
   defined_envs=$(printf '${%s} ' $(awk -v filter="$filter" 'END { for (name in ENVIRON) { print ( name ~ filter ) ? name : "" } }' < /dev/null))
   [ -d "$template_dir" ] || return 0
   if [ ! -w "$output_dir" ]; then

@@ -15,7 +15,7 @@ _spec = importlib.util.spec_from_file_location(
 )
 if _spec is None or _spec.loader is None:
     raise ImportError("cannot load mirror-ghcr.py")
-mirror_ghcr =importlib.util.module_from_spec(_spec)
+mirror_ghcr = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mirror_ghcr)
 
 SOURCE = "fabiocicerchia/nginx-lua:1.2.3-alpine"

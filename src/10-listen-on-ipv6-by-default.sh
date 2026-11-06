@@ -30,7 +30,6 @@ touch /$DEFAULT_CONF_FILE 2>/dev/null || { entrypoint_log "$ME: info: can not mo
 grep -q "listen  \[::\]:80;" /$DEFAULT_CONF_FILE && { entrypoint_log "$ME: info: IPv6 listen already enabled"; exit 0; }
 
 if [ -f "/etc/os-release" ]; then
-    # shellcheck source=/dev/null
     . /etc/os-release
 else
     entrypoint_log "$ME: info: can not guess the operating system"

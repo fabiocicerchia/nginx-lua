@@ -158,9 +158,7 @@ def get_stream_lua_commit_for_api_version(required_version):
         raw.raise_for_status()
         m = re.search(r"ngx_stream_lua_version\s+(\d+)", raw.text)
         if not m:
-            raise RuntimeError(
-                f"Could not find ngx_stream_lua_version in {sha}:{api_path}"
-            )
+            raise RuntimeError(f"Could not find ngx_stream_lua_version in {sha}:{api_path}")
         return int(m.group(1))
 
     for commit in bump_commits:
@@ -168,9 +166,7 @@ def get_stream_lua_commit_for_api_version(required_version):
         if api_version_at(sha) == required_version + 1:
             parents = commit.get("parents", [])
             if not parents:
-                raise RuntimeError(
-                    f"Commit {sha} bumping to {required_version + 1} has no parent"
-                )
+                raise RuntimeError(f"Commit {sha} bumping to {required_version + 1} has no parent")
             return parents[0]["sha"]
 
     raise RuntimeError(
@@ -240,12 +236,8 @@ def main():
     # when an even newer RC gets the same treatment (ships in an official
     # OpenResty release) ahead of its own next stable tag.
     VERIFIED_RESTY_CORE_RC = "0.1.34rc2"
-    latest_stable_resty_core = get_latest_tag(
-        "https://github.com/openresty/lua-resty-core"
-    )
-    if version_tuple(latest_stable_resty_core) >= version_tuple(
-        VERIFIED_RESTY_CORE_RC
-    ):
+    latest_stable_resty_core = get_latest_tag("https://github.com/openresty/lua-resty-core")
+    if version_tuple(latest_stable_resty_core) >= version_tuple(VERIFIED_RESTY_CORE_RC):
         resty_core_ver = latest_stable_resty_core
         print(
             f"lua-resty-core: using stable tag {resty_core_ver} "
@@ -267,12 +259,8 @@ def main():
     )
 
     # Same lock as lua-nginx-module above, for the stream subsystem.
-    required_stream_api_version = get_resty_core_required_stream_lua_api_version(
-        resty_core_ver
-    )
-    pinned_stream_lua = get_stream_lua_commit_for_api_version(
-        required_stream_api_version
-    )
+    required_stream_api_version = get_resty_core_required_stream_lua_api_version(resty_core_ver)
+    pinned_stream_lua = get_stream_lua_commit_for_api_version(required_stream_api_version)
     print(
         f"lua-resty-core {resty_core_ver} pins ngx_stream_lua_version to "
         f"{required_stream_api_version} -> commit {pinned_stream_lua}",
@@ -307,9 +295,7 @@ def main():
     # The pair below is what actually breaks at runtime when it desyncs
     # (every resty test bails with "ngx_http_lua_module X required"), and it
     # desyncs silently - fail the nightly here instead of in the image build.
-    emitted_pin = get_resty_core_required_lua_module(
-        template_vars["ver_lua_resty_core"]
-    )
+    emitted_pin = get_resty_core_required_lua_module(template_vars["ver_lua_resty_core"])
     if emitted_pin != template_vars["ver_lua_nginx_module"]:
         raise RuntimeError(
             f"version pair desync: lua-resty-core "
