@@ -34,6 +34,7 @@ fail() { FAIL=$((FAIL + 1)); echo "  FAIL: $1"; }
 warn() { WARN=$((WARN + 1)); echo "  WARN: $1"; }
 section() { echo ""; echo "=== $1 ==="; }
 
+# shellcheck disable=SC2329 # invoked via trap
 cleanup() {
     if [ -n "$TMPDIR" ] && [ -d "$TMPDIR" ]; then
         rm -rf "$TMPDIR"
@@ -124,7 +125,6 @@ done
 # ─────────────────────────────────────────────────────────────────────────────
 section "3. Verify default Dockerfile == mainline Alpine"
 
-ALPINE_VER=$(echo "$SUPPORTED_VERSIONS" | grep "^alpine=" | cut -d= -f2)
 DEFAULT_HASH=$(grep "^[a-f0-9]\\+  Dockerfile$" "$TMPDIR/SHA256SUMS" | awk '{print $1}')
 ALPINE_PATTERN="Dockerfile-nginx${NGINX_MAINLINE}-alpine"
 ALPINE_HASH=$(grep "$ALPINE_PATTERN" "$TMPDIR/SHA256SUMS" | awk '{print $1}')
@@ -142,7 +142,6 @@ fi
 # ─────────────────────────────────────────────────────────────────────────────
 section "4. Verify packages for all OS (ARM + AMD)"
 
-EXPECTED_PACKAGES=()
 for DISTRO in $DISTROS; do
     case "$DISTRO" in
         alpine)
@@ -194,7 +193,7 @@ section "5. Download all assets and verify SHA256SUMS"
 
 # Download all files listed in SHA256SUMS
 DOWNLOAD_FAIL=0
-while IFS='  ' read -r hash filename; do
+while IFS='  ' read -r _ filename; do
     if download_asset "$filename" "$TMPDIR/$filename"; then
         : # OK
     else
@@ -351,7 +350,7 @@ for NGINX_VER in "$NGINX_MAINLINE" "$NGINX_STABLE"; do
         RELEASE_DOCKERFILE=$(echo "$CHECKSUM_FILES" | grep "Dockerfile-nginx${NGINX_VER}-${DISTRO}" || true)
         if [ -n "$RELEASE_DOCKERFILE" ]; then
             # Extract OS version from release filename
-            RELEASE_OS=$(echo "$RELEASE_DOCKERFILE" | sed "s/Dockerfile-nginx${NGINX_VER}-${DISTRO}//")
+            RELEASE_OS=${RELEASE_DOCKERFILE//Dockerfile-nginx${NGINX_VER}-${DISTRO}/}
             if [ "$RELEASE_OS" = "$OS_VER" ]; then
                 pass "Release/DockerHub OS version consistent: ${DISTRO}${OS_VER}"
             else

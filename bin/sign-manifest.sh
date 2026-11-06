@@ -22,6 +22,7 @@
 # Ref: NIS2 Article 21(2)(d) - supply chain security
 set -euo pipefail
 
+# shellcheck disable=SC1091
 source "$(dirname "${BASH_SOURCE[0]}")/lib-retry.sh"
 
 IMAGE_REF="$1"
@@ -74,7 +75,7 @@ if [ -z "$PLATFORMS" ]; then
     exit 1
 fi
 echo "Index covers platforms:"
-echo "$PLATFORMS" | sed 's/^/  /'
+echo "  ${PLATFORMS//$'\n'/$'\n'  }"
 
 rm -f "$MANIFEST_RAW_FILE"
 
