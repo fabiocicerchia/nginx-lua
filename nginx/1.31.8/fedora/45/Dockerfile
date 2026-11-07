@@ -393,7 +393,8 @@ RUN set -eux \
     && rpm --import https://src.fedoraproject.org/rpms/fedora-repos/raw/rawhide/f/RPM-GPG-KEY-fedora-$(. /etc/os-release; echo $VERSION_ID)-primary \
     && yum install -y \
         $BUILD_DEPS \
-        $NGINX_BUILD_DEPS
+        $NGINX_BUILD_DEPS \
+    && yum clean all
 
 COPY tpl/Makefile Makefile
 COPY tpl/.env.dist .env.dist
@@ -410,7 +411,8 @@ RUN set -eux \
 # envsubst
 # ##############################################################################
     && yum install -y \
-        gettext
+        gettext \
+    && yum clean all
 
 RUN make test
 
@@ -479,7 +481,8 @@ ENV PKG_DEPS=$PKG_DEPS
 # hadolint ignore=SC2086
 RUN set -eux \
     && yum install -y \
-        $PKG_DEPS
+        $PKG_DEPS \
+    && yum clean all
 
 COPY --from=builder --chown=101:101 /etc/nginx /etc/nginx
 COPY --from=builder --chown=101:101 /usr/bin/envsubst /usr/local/bin/envsubst
