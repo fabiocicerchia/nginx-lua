@@ -1,0 +1,695 @@
+{
+ "excluded": {
+  "clusterfuzzlite/build": [
+   {
+    "candidate": "The ClusterFuzzLite build compiles fuzz_config_parser.c with the fuzzing engine's compiler and flags into a fuzz_config_parser binary in the output directory",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/build.sh"
+   }
+  ],
+  "clusterfuzzlite/dockerfile": [
+   {
+    "candidate": "The fuzzing build image starts from the OSS-Fuzz base-builder image",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/Dockerfile#FROM gcr.io/oss-fuzz-base/base-builder"
+   },
+   {
+    "candidate": "The repository is copied into $SRC/nginx-lua and used as the working directory",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/Dockerfile#COPY . $SRC/nginx-lua"
+   },
+   {
+    "candidate": "The ClusterFuzzLite build script is placed at $SRC/build.sh for the fuzz build to run",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/Dockerfile#COPY .clusterfuzzlite/build.sh $SRC/build.sh"
+   }
+  ],
+  "clusterfuzzlite/fuzz-config-parser": [
+   {
+    "candidate": "The fuzz harness picks one of three parsers (directive name, size value, listen address) based on the first input byte, and ignores inputs shorter than 2 bytes",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#LLVMFuzzerTestOneInput"
+   },
+   {
+    "candidate": "A directive name that starts with a digit is rejected, and the name ends at ';', '{', '}' or a NUL byte",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_directive"
+   },
+   {
+    "candidate": "Size values such as '10m' or '256k' use k/m/g suffixes as multiples of 1024; input is cut off at 63 bytes; 'g' multiplication can overflow a signed long (undefined behaviour the harness itself would trigger)",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_size_value"
+   },
+   {
+    "candidate": "A listen address is accepted as a plain port or host:port with port 0-65535; a host:port with an empty or non-numeric port is accepted as port 0",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_listen_address"
+   },
+   {
+    "candidate": "Fuzzing nginx-lua configuration parsing finds crashes in directive, size and listen handling",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#LLVMFuzzerTestOneInput"
+   }
+  ],
+  "nginx-lua/dockerfile": [
+   {
+    "candidate": "Hardening compiler/linker flags (stack protector, FORTIFY_SOURCE, relro, now, pie)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#NGX_CFLAGS"
+   },
+   {
+    "candidate": "Per-architecture build dependency selection (BUILD_DEPS_AMD64 / BUILD_DEPS_ARM64V8)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#builder"
+   },
+   {
+    "candidate": "Build-time make deps/core/luarocks and make test with test daemons (memcached, redis, mariadb)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#builder"
+   },
+   {
+    "candidate": "Linking nginx against PCRE2 instead of PCRE1",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#NGINX_BUILD_DEPS"
+   },
+   {
+    "candidate": "Multi-stage copy of only selected builder paths into the final image",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#final stage COPY"
+   },
+   {
+    "candidate": "apk upgrade of all packages at build time",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#final stage RUN apk upgrade"
+   },
+   {
+    "candidate": "Smoke test of envsubst, nginx -V/-t, luajit, lua, luarocks during build",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#final stage RUN smoke test"
+   },
+   {
+    "candidate": "Compiled-in paths (prefix, pid, lock, temp paths, modules path)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "Dockerfile#NGINX_BUILD_CONFIG"
+   },
+   {
+    "candidate": "Official-image compatibility env vars NGINX_VERSION, NJS_VERSION, PKG_RELEASE",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "Dockerfile#base"
+   },
+   {
+    "candidate": "Version pins for every bundled resty library",
+    "covered_by": "observability.image-metadata.component-version-labels",
+    "reason": "DUPLICATE_OF",
+    "source": "Dockerfile#base"
+   },
+   {
+    "candidate": "Installation of bundled resty libraries (redis, mysql, cookie, ...)",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "tpl/Makefile (not part of this module)"
+   },
+   {
+    "candidate": "nginx-debug binary shipped alongside nginx",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "Dockerfile#final stage COPY"
+   },
+   {
+    "candidate": "Licenses shipped under /licenses and support.sh",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "Dockerfile#final stage COPY"
+   },
+   {
+    "candidate": "Commented-out upstream package install block",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "Dockerfile#final stage RUN"
+   },
+   {
+    "candidate": "Access logs go to stdout and error logs go to stderr",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#final stage RUN (log forwarding)"
+   },
+   {
+    "candidate": "The container ships timezone data, CA certificates and envsubst",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#final stage RUN (runtime packages)"
+   },
+   {
+    "candidate": "The lua command runs LuaJIT",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#final stage RUN (lua alias)"
+   },
+   {
+    "candidate": "LuaRocks is available to install more Lua modules",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#final stage COPY (luarocks)"
+   }
+  ],
+  "nginx-lua/makefile": [
+   {
+    "candidate": "help target prints the banner and a coloured list of targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#help"
+   },
+   {
+    "candidate": "build targets per distro and arch run docker-build.py",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#build-single"
+   },
+   {
+    "candidate": "docker-test targets map arm64 to arm64v8 and run test.sh",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#test-all"
+   },
+   {
+    "candidate": "test-security targets run test-security.sh per distro",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#test-security"
+   },
+   {
+    "candidate": "push, bundle and mirror-ghcr targets call their scripts",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#push-all"
+   },
+   {
+    "candidate": "cleanup-docker-images removes temporary per-arch tags",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#cleanup-docker-images"
+   },
+   {
+    "candidate": "qemu target installs multiarch emulation",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#qemu"
+   },
+   {
+    "candidate": "packages build .apk/.deb/.rpm for mainline and stable per distro and arch",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#.package-base"
+   },
+   {
+    "candidate": "package-test installs packages for both tracks",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#.package-test-base"
+   },
+   {
+    "candidate": "auto-commit-metadata opens a [ci skip] metadata PR only when metadata changed",
+    "covered_by": "updates.auto-update.opens-pull-request-only-when-changed",
+    "reason": "DUPLICATE_OF",
+    "source": "Makefile#auto-commit-metadata"
+   },
+   {
+    "candidate": "ghr release tool download is pinned to a SHA256",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "Makefile#release"
+   },
+   {
+    "candidate": "generate-supported-versions, generate-dockerfiles, generate-deps-env, generate-fossa-deps, update-tags, update-readme delegate to scripts",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#auto-update"
+   },
+   {
+    "candidate": "generate-metadata runs docker-metadata.py per distro",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#generate-metadata"
+   },
+   {
+    "candidate": "scan-image fails on CRITICAL vulnerabilities",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Makefile#scan-image"
+   },
+   {
+    "candidate": "sign-image, sign-manifest and verify-image delegate to signing scripts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Makefile#sign-image"
+   },
+   {
+    "candidate": "benchmark target",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#benchmark"
+   },
+   {
+    "candidate": "changelog since previous tag",
+    "covered_by": "release.github.one-release-per-nginx-track",
+    "reason": "DUPLICATE_OF",
+    "source": "Makefile#changelog"
+   }
+  ]
+ },
+ "lifted": {
+  "clusterfuzzlite/build": [],
+  "clusterfuzzlite/dockerfile": [],
+  "clusterfuzzlite/fuzz-config-parser": [],
+  "nginx-lua/dockerfile": [
+   {
+    "from_source": "Dockerfile#base",
+    "rule": "container-runtime.process-lifecycle.nginx-user-owns-files"
+   }
+  ],
+  "nginx-lua/makefile": [
+   {
+    "from_source": "Makefile#pull-nginx-entrypoints",
+    "rule": "updates.entrypoints.tampered-local-copy-blocks-refresh"
+   },
+   {
+    "from_source": "Makefile#pull-nginx-entrypoints",
+    "rule": "updates.entrypoints.only-from-tagged-upstream-release"
+   },
+   {
+    "from_source": "Makefile#release",
+    "rule": "release.github.already-released-track-is-skipped"
+   },
+   {
+    "from_source": "Makefile#build-single",
+    "rule": "build.pipeline.skip-when-no-image-changes"
+   }
+  ]
+ },
+ "retired": [],
+ "scenarios": {
+  "container-runtime.default-config.001": {
+   "file": "specs/container-runtime/default-config/running-the-container.feature",
+   "fingerprint": "6680ec96c6c3",
+   "human": false,
+   "rule": "container-runtime.defaults.foreground-nginx-on-web-ports",
+   "source": "Dockerfile#CMD",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "container-runtime.default-config.002": {
+   "file": "specs/container-runtime/default-config/running-the-container.feature",
+   "fingerprint": "6680ec96c6c3",
+   "human": false,
+   "rule": "observability.health-checks.http-probe-on-localhost",
+   "source": "Dockerfile#HEALTHCHECK",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "container-runtime.default-config.003": {
+   "file": "specs/container-runtime/default-config/running-the-container.feature",
+   "fingerprint": "e2c312e58cdd",
+   "human": false,
+   "rule": "container-runtime.process-lifecycle.graceful-stop",
+   "source": "Dockerfile#STOPSIGNAL",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "container-runtime.default-config.004": {
+   "file": "specs/container-runtime/default-config/running-the-container.feature",
+   "fingerprint": "9104a1b38319",
+   "human": false,
+   "rule": "container-runtime.process-lifecycle.nginx-user-owns-files",
+   "source": "Dockerfile#base",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "image-build.dockerfile-generation.001": {
+   "file": "specs/image-build/dockerfile-generation/skipping-unchanged-builds.feature",
+   "fingerprint": "9fe7d6fc0e35",
+   "human": false,
+   "rule": "build.pipeline.skip-when-no-image-changes",
+   "source": "Makefile#build-single",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "observability.image-metadata.001": {
+   "file": "specs/observability/image-metadata/image-metadata-labels.feature",
+   "fingerprint": "a7b12dbba08a",
+   "human": false,
+   "rule": "observability.image-metadata.component-version-labels",
+   "source": "Dockerfile#LABEL",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "observability.image-metadata.002": {
+   "file": "specs/observability/image-metadata/image-metadata-labels.feature",
+   "fingerprint": "a7b12dbba08a",
+   "human": false,
+   "rule": "observability.image-metadata.build-provenance-labels",
+   "source": "Dockerfile#LABEL",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "observability.image-metadata.003": {
+   "file": "specs/observability/image-metadata/image-metadata-labels.feature",
+   "fingerprint": "a7b12dbba08a",
+   "human": false,
+   "rule": "observability.image-metadata.target-platform-labels",
+   "source": "Dockerfile#LABEL",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.automated-updates.001": {
+   "file": "specs/release-distribution/automated-updates/refreshing-upstream-entrypoints.feature",
+   "fingerprint": "34999c24f847",
+   "human": false,
+   "rule": "updates.entrypoints.tampered-local-copy-blocks-refresh",
+   "source": "Makefile#pull-nginx-entrypoints",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.automated-updates.002": {
+   "file": "specs/release-distribution/automated-updates/refreshing-upstream-entrypoints.feature",
+   "fingerprint": "34999c24f847",
+   "human": false,
+   "rule": "updates.entrypoints.only-from-tagged-upstream-release",
+   "source": "Makefile#pull-nginx-entrypoints",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.automated-updates.003": {
+   "file": "specs/release-distribution/automated-updates/refreshing-upstream-entrypoints.feature",
+   "fingerprint": "34999c24f847",
+   "human": false,
+   "rule": "updates.entrypoints.refresh-records-new-checksums",
+   "source": "Makefile#pull-nginx-entrypoints",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.automated-updates.004": {
+   "file": "specs/release-distribution/automated-updates/refreshing-upstream-entrypoints.feature",
+   "fingerprint": "008c13a448f7",
+   "human": false,
+   "rule": "updates.auto-update.opens-pull-request-only-when-changed",
+   "source": "Makefile#auto-update-and-commit",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.github-releases.001": {
+   "file": "specs/release-distribution/github-releases/github-releases-per-track.feature",
+   "fingerprint": "2442751660ae",
+   "human": false,
+   "rule": "release.github.one-release-per-nginx-track",
+   "source": "Makefile#release",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "release-distribution.github-releases.002": {
+   "file": "specs/release-distribution/github-releases/github-releases-per-track.feature",
+   "fingerprint": "2442751660ae",
+   "human": false,
+   "rule": "release.github.already-released-track-is-skipped",
+   "source": "Makefile#release",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "scripting.lua-runtime.001": {
+   "file": "specs/scripting/lua-runtime/lua-tooling-in-the-image.feature",
+   "fingerprint": "0a30f929eac8",
+   "human": false,
+   "rule": "web-serving.http-serving.bundled-modules",
+   "source": "Dockerfile#NGINX_BUILD_CONFIG",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Serving HTTP/1.1, HTTP/2 and HTTP/3 traffic with TLS, threads and async file I/O.",
+      "slug": "http-serving",
+      "title": "HTTP serving"
+     },
+     {
+      "description": "Compression, response substitution/addition, slicing, media streaming (MP4/FLV), WebDAV and random index.",
+      "slug": "content-handling",
+      "title": "Content handling"
+     },
+     {
+      "description": "Layer-4 proxying with TLS, SSL preread, real-IP and Lua scripting for streams.",
+      "slug": "stream-proxy",
+      "title": "TCP/UDP stream proxying"
+     },
+     {
+      "description": "Proxying mail protocols with optional TLS.",
+      "slug": "mail-proxy",
+      "title": "Mail proxy"
+     }
+    ],
+    "description": "The nginx server capabilities compiled into the image for serving and proxying traffic.",
+    "slug": "web-serving",
+    "title": "Web Serving"
+   },
+   {
+    "areas": [
+     {
+      "description": "LuaJIT-based Lua execution in nginx, with the lua command aliased to luajit.",
+      "slug": "lua-runtime",
+      "title": "Lua runtime"
+     },
+     {
+      "description": "Preinstalled resty libraries for Redis, MySQL, Memcached, DNS, WebSockets, cookies, uploads, strings, locks and caching.",
+      "slug": "lua-libraries",
+      "title": "Bundled Lua libraries"
+     },
+     {
+      "description": "LuaRocks available in the image to install additional Lua modules.",
+      "slug": "lua-packages",
+      "title": "Lua package management"
+     },
+     {
+      "description": "njs module for request handling written in JavaScript.",
+      "slug": "javascript-scripting",
+      "title": "JavaScript scripting"
+     },
+     {
+      "description": "Extra directives for setting variables, echoing responses and manipulating headers (set-misc, echo, headers-more).",
+      "slug": "config-helpers",
+      "title": "Configuration helpers"
+     }
+    ],
+    "description": "Running custom Lua and JavaScript logic inside the web server.",
+    "slug": "scripting",
+    "title": "Scripting & Extensibility"
+   },
+   {
+    "areas": [
+     {
+      "description": "Lua-driven upstream balancing and upstream introspection.",
+      "slug": "load-balancing",
+      "title": "Load balancing"
+     },
+     {
+      "description": "Active health checking of upstream servers.",
+      "slug": "upstream-health",
+      "title": "Upstream health checks"
+     },
+     {
+      "description": "Limiting requests, connections and traffic per key.",
+      "slug": "rate-limiting",
+      "title": "Rate limiting"
+     },
+     {
+      "description": "GeoIP2 lookups for routing and access decisions based on client location.",
+      "slug": "geolocation",
+      "title": "Geolocation"
+     },
+     {
+      "description": "Subrequest authentication, secure links and real client IP resolution.",
+      "slug": "access-control",
+      "title": "Access control"
+     }
+    ],
+    "description": "Controlling, routing and protecting the traffic passing through the server.",
+    "slug": "traffic-management",
+    "title": "Traffic Management"
+   },
+   {
+    "areas": [
+     {
+      "description": "Entrypoint scripts for IPv6 listening, local resolvers, config templating via envsubst and worker tuning.",
+      "slug": "startup",
+      "title": "Startup & entrypoint"
+     },
+     {
+      "description": "Shipped nginx.conf and default site, exposed ports 80/443 and foreground start command.",
+      "slug": "default-config",
+      "title": "Default configuration"
+     },
+     {
+      "description": "Graceful shutdown on SIGQUIT, non-root nginx user and file ownership.",
+      "slug": "process-lifecycle",
+      "title": "Process lifecycle"
+     },
+     {
+      "description": "Timezone support, CA certificates and runtime environment variables.",
+      "slug": "environment-settings",
+      "title": "Environment settings"
+     }
+    ],
+    "description": "How the published image behaves when a user runs it.",
+    "slug": "container-runtime",
+    "title": "Container Runtime"
+   },
+   {
+    "areas": [
+     {
+      "description": "Prometheus metrics from Lua and nginx stub status.",
+      "slug": "metrics",
+      "title": "Metrics"
+     },
+     {
+      "description": "Access and error logs forwarded to the container's stdout/stderr.",
+      "slug": "logging",
+      "title": "Logging"
+     },
+     {
+      "description": "Periodic HTTP health probe reporting container health.",
+      "slug": "health-checks",
+      "title": "Container health checks"
+     },
+     {
+      "description": "Labels and generated metadata recording component versions, platform and build provenance.",
+      "slug": "image-metadata",
+      "title": "Image metadata"
+     }
+    ],
+    "description": "Seeing what the server and image are doing.",
+    "slug": "observability",
+    "title": "Observability"
+   },
+   {
+    "areas": [
+     {
+      "description": "Building images for Alpine, Debian, Ubuntu, Fedora, AlmaLinux and Amazon Linux on amd64 and arm64.",
+      "slug": "multi-distro-images",
+      "title": "Multi-distro, multi-arch images"
+     },
+     {
+      "description": "Compiling nginx and modules from source with hardening compiler/linker flags and pinned component versions.",
+      "slug": "hardened-compilation",
+      "title": "Hardened compilation"
+     },
+     {
+      "description": "Generating per-version, per-distro Dockerfiles and skipping builds when nothing relevant changed.",
+      "slug": "dockerfile-generation",
+      "title": "Dockerfile generation"
+     },
+     {
+      "description": "Building .apk, .deb and .rpm packages for stable and mainline nginx.",
+      "slug": "system-packages",
+      "title": "System packages"
+     }
+    ],
+    "description": "Producing nginx-lua images and packages across distributions and architectures.",
+    "slug": "image-build",
+    "title": "Image Build"
+   },
+   {
+    "areas": [
+     {
+      "description": "Pushing, bundling multi-arch manifests, mirroring to GHCR and cleaning temporary tags.",
+      "slug": "registry-publishing",
+      "title": "Registry publishing"
+     },
+     {
+      "description": "Per-nginx-track releases with Dockerfile artifacts, checksums and changelogs.",
+      "slug": "github-releases",
+      "title": "GitHub releases"
+     },
+     {
+      "description": "Signing images and manifests, attaching and verifying SBOMs.",
+      "slug": "signing-sbom",
+      "title": "Signing & SBOM"
+     },
+     {
+      "description": "Refreshing supported versions, upstream entrypoints, dependency lists, tags and README via automated PRs.",
+      "slug": "automated-updates",
+      "title": "Automated dependency updates"
+     }
+    ],
+    "description": "Publishing, signing and keeping released artifacts up to date.",
+    "slug": "release-distribution",
+    "title": "Release & Distribution"
+   },
+   {
+    "areas": [
+     {
+      "description": "Build-time module test suites, smoke tests and per-distro image tests.",
+      "slug": "image-testing",
+      "title": "Image testing"
+     },
+     {
+      "description": "Verifying system packages install correctly on each distro and architecture.",
+      "slug": "package-testing",
+      "title": "Package install testing"
+     },
+     {
+      "description": "Vulnerability scanning of images and integrity checks of upstream files.",
+      "slug": "security-scanning",
+      "title": "Security scanning"
+     },
+     {
+      "description": "Continuous fuzzing of configuration parsing (directives, sizes, listen addresses).",
+      "slug": "fuzzing",
+      "title": "Fuzzing"
+     },
+     {
+      "description": "Performance benchmarking of the built images.",
+      "slug": "benchmarking",
+      "title": "Benchmarking"
+     }
+    ],
+    "description": "Verifying that images, packages and configuration handling are correct and safe.",
+    "slug": "quality-assurance",
+    "title": "Quality & Security Assurance"
+   }
+  ]
+ }
+}

@@ -1,0 +1,150 @@
+{
+ "retired": [],
+ "scenarios": {},
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Detects whether the command is nginx, discovers and runs the /docker-entrypoint.d scripts in order, then execs the main process.",
+      "slug": "entrypoint-orchestration",
+      "title": "Entrypoint orchestration"
+     },
+     {
+      "description": "Controls how much the entrypoint reports during boot, including quiet mode for silencing startup messages.",
+      "slug": "startup-logging",
+      "title": "Startup logging"
+     },
+     {
+      "description": "Lets users drop their own shell or env-sourcing scripts into the init directory and have them run with the right permissions.",
+      "slug": "startup-hook-extensibility",
+      "title": "Custom startup hooks"
+     }
+    ],
+    "description": "How the nginx-lua container boots: running startup hooks in order and then handing control to nginx.",
+    "slug": "container-startup",
+    "title": "Container startup"
+   },
+   {
+    "areas": [
+     {
+      "description": "Renders nginx config templates by substituting environment variables into them and writing the results to the output directory.",
+      "slug": "config-templating",
+      "title": "Configuration templates"
+     },
+     {
+      "description": "Enables listening on IPv6 in the default server config when the host supports it and the file is unmodified.",
+      "slug": "ipv6-listening",
+      "title": "IPv6 listening"
+     },
+     {
+      "description": "Discovers the container's local nameservers and exposes them as an environment variable for use in resolver directives.",
+      "slug": "dns-resolvers",
+      "title": "DNS resolvers"
+     },
+     {
+      "description": "Sizes nginx worker processes to the CPUs actually available to the container, honouring cgroup limits and cpusets.",
+      "slug": "worker-tuning",
+      "title": "Worker process tuning"
+     }
+    ],
+    "description": "Automatic adjustment of the nginx configuration from the container environment at startup.",
+    "slug": "runtime-configuration",
+    "title": "Runtime configuration"
+   },
+   {
+    "areas": [
+     {
+      "description": "Downloads every upstream source and checks it against pinned SHA256 checksums, failing the build on mismatch.",
+      "slug": "source-integrity",
+      "title": "Verified source downloads"
+     },
+     {
+      "description": "Fetches the OpenResty patch set, applies each patch all-or-nothing, skips drifted or excluded ones and records the patch revision.",
+      "slug": "nginx-patching",
+      "title": "Nginx patching"
+     },
+     {
+      "description": "Configures and compiles nginx itself with the chosen build flags and bundled modules.",
+      "slug": "core-compilation",
+      "title": "Core server compilation"
+     },
+     {
+      "description": "Builds LuaJIT, the ngx_lua and stream Lua modules, lua-resty-core and LuaRocks so Lua code can run inside nginx.",
+      "slug": "lua-runtime",
+      "title": "Lua runtime"
+     }
+    ],
+    "description": "Producing the nginx binary with Lua support from upstream sources.",
+    "slug": "server-build",
+    "title": "Server build"
+   },
+   {
+    "areas": [
+     {
+      "description": "Lua clients for Redis, MySQL, Memcached and DNS used from request handlers.",
+      "slug": "data-store-clients",
+      "title": "Data store clients"
+     },
+     {
+      "description": "Rate limiting, upstream health checks, balancers and upstream inspection libraries.",
+      "slug": "traffic-control",
+      "title": "Traffic control and load balancing"
+     },
+     {
+      "description": "Cookies, uploads, websockets, header manipulation, echo, string helpers, locks, LRU cache and similar request-handling helpers.",
+      "slug": "http-utilities",
+      "title": "HTTP utilities"
+     },
+     {
+      "description": "Prometheus metrics export and GeoIP2 lookups available to nginx configurations.",
+      "slug": "metrics-and-geo",
+      "title": "Metrics and geolocation"
+     },
+     {
+      "description": "Non-Lua and supporting extensions such as njs, the devel kit, shell, signal and table-pool libraries.",
+      "slug": "scripting-extensions",
+      "title": "Additional scripting extensions"
+     }
+    ],
+    "description": "The extra nginx modules and Lua libraries shipped with the image.",
+    "slug": "bundled-modules",
+    "title": "Bundled modules and libraries"
+   },
+   {
+    "areas": [
+     {
+      "description": "Creates the nginx user and group with a fixed ID across Alpine, Debian-family and RPM-family systems after install.",
+      "slug": "system-user-setup",
+      "title": "Service account setup"
+     },
+     {
+      "description": "Shows the maintainer's message inviting users to sponsor or contribute to the project.",
+      "slug": "project-support-notice",
+      "title": "Project support notice"
+     }
+    ],
+    "description": "Installing nginx-lua as an OS package and presenting the project to its users.",
+    "slug": "packaging-distribution",
+    "title": "Packaging and distribution"
+   },
+   {
+    "areas": [
+     {
+      "description": "Runs the upstream test suites for nginx-lua and its bundled modules against the freshly built binary.",
+      "slug": "test-suite-execution",
+      "title": "Test suite execution"
+     },
+     {
+      "description": "Starts real Memcached (plain and TLS), Redis/Valkey and MySQL daemons with throwaway certificates so library tests talk to live servers.",
+      "slug": "test-backing-services",
+      "title": "Test backing services"
+     }
+    ],
+    "description": "Verifying the built server and its libraries against their own test suites during the build.",
+    "slug": "quality-assurance",
+    "title": "Quality assurance"
+   }
+  ]
+ }
+}
