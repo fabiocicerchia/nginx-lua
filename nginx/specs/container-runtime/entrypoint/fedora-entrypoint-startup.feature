@@ -3,7 +3,7 @@ Feature: Container start-up hooks
   Operators running the Fedora image get their configuration hooks executed in order before nginx starts, and a sponsorship banner at start.
 
   Background:
-    Given Given the nginx-lua Fedora 44 image for nginx 1.31.6
+    Given the nginx-lua Fedora 44 image for nginx 1.31.6
 
   @id:nginx.container-runtime.entrypoint.311 @rule:container-runtime.entrypoint.hooks-run-in-version-order-before-nginx @inferred @source:nginx/1.31.6/fedora/44/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Start-up hooks run in version order before nginx launches
@@ -15,9 +15,9 @@ Feature: Container start-up hooks
 
   @id:nginx.container-runtime.entrypoint.312 @rule:container-runtime.entrypoint.non-executable-hooks-are-skipped @inferred @source:nginx/1.31.6/fedora/44/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Hooks that are not executable are ignored with a notice
-    Given the hook directory contains a script file without the executable bit
+    Given the hook directory contains a script 40-custom.sh without the executable bit
     When the operator starts the container with the default nginx command
-    Then the log says "Ignoring <file>, not executable"
+    Then the log says "Ignoring /docker-entrypoint.d/40-custom.sh, not executable"
     And the script is not run
     And nginx still starts
 

@@ -3,7 +3,7 @@ Feature: Enabling IPv6 on the default site
   Intended to let the default site accept IPv6 connections automatically.
 
   Background:
-    Given Given the AlmaLinux 9.4 nginx-lua image is started
+    Given the AlmaLinux 9.4 nginx-lua image is started
 
   @id:nginx.container-runtime.ipv6-listen.008 @rule:runtime.ipv6.not-enabled-on-almalinux @inferred @source:nginx/1.25.5/almalinux/9.4-20240506/tpl/10-listen-on-ipv6-by-default.sh @questionable
   Scenario: IPv6 listening is not enabled on AlmaLinux images

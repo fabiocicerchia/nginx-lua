@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Operators running the Alpine image rely on startup hooks to configure nginx before it serves traffic, and on clear controls over logging and usage reporting.
 
   Background:
-    Given Given the nginx-lua image based on Alpine 3.22.2 (the 3.22.1 image ships identical scripts)
+    Given the nginx-lua image based on Alpine 3.22.2 (the 3.22.1 image ships identical scripts)
 
   @id:nginx.container-runtime.entrypoint.180 @rule:startup.entrypoint.runs-hooks-in-version-order @inferred @source:nginx/1.29.2/alpine/3.22.2/tpl/docker-entrypoint.sh#entrypoint_log
   Scenario: Executable startup hooks run in version order before nginx starts
@@ -23,7 +23,7 @@ Feature: Container startup hooks
     Examples:
       | command | outcome                                                                                          |
       | nginx   | the log says "Ignoring /docker-entrypoint.d/custom.sh, not executable" and the script is not run |
-      | sh      | no hooks are looked up and the shell starts immediately                                          |
+      | sh      | no hooks are looked up and the shell starts directly                                |
 
   @id:nginx.container-runtime.entrypoint.182 @rule:startup.entrypoint.quiet-logs @inferred @source:nginx/1.29.2/alpine/3.22.2/tpl/docker-entrypoint.sh#entrypoint_log
   Scenario: Quiet mode silences startup messages

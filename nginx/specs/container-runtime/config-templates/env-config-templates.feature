@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Operators supply environment variables and get nginx configuration files generated from templates at startup.
 
   Background:
-    Given Given the nginx-lua 1.19.10 Debian 10.9 image
+    Given the nginx-lua 1.19.10 Debian 10.9 image
 
   @id:nginx.container-runtime.config-templates.008 @rule:container.templates.render-env-into-config @inferred @source:nginx/1.19.10/debian/10.9/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Template files are rendered into the configuration folder with environment values

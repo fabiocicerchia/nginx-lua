@@ -3,7 +3,7 @@ Feature: Fedora image runtime defaults
   Gives operators a container that logs to Docker, reports its health and stops gracefully.
 
   Background:
-    Given Given the Fedora 44 or 45 nginx-lua image
+    Given the Fedora 44 nginx-lua image for nginx 1.31.8
 
   @id:nginx.image-build.image-layout.096 @rule:image.layout.logs-and-health-exposed-to-docker @inferred @source:nginx/1.31.8/fedora/44/Dockerfile#final stage
   Scenario: Logs go to the container log and health is checked over HTTP

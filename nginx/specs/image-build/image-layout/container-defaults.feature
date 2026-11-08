@@ -3,7 +3,7 @@ Feature: Default container behaviour of the image
   Gives operators a container that runs nginx in the foreground, logs to the container log collector and reports its health.
 
   Background:
-    Given Given the nginx-lua Fedora 43 image for nginx 1.29.4
+    Given the nginx-lua Fedora 43 image for nginx 1.29.4
 
   @id:nginx.image-build.image-layout.064 @rule:image.defaults.nginx-foreground-on-web-ports @inferred @source:nginx/1.29.4/fedora/43/Dockerfile#CMD
   Scenario: The container runs nginx in the foreground and advertises web ports
@@ -25,4 +25,4 @@ Feature: Default container behaviour of the image
     Given the container is running
     When the container runtime runs its health check
     Then the container is healthy when http://localhost/ answers with a success status
-    And the container is unhealthy after the request fails or exceeds 3 seconds
+    And the container becomes unhealthy after consecutive requests fail or exceed 3 seconds

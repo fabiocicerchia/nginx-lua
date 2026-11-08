@@ -3,7 +3,7 @@ Feature: Configuration from environment templates
   Lets an operator generate nginx configuration files from templates using container environment variables.
 
   Background:
-    Given Given the nginx-lua 1.19.4 Ubuntu 20.04 image
+    Given the nginx-lua 1.19.4 Ubuntu 20.04 image
 
   @id:nginx.container-runtime.config-templates.046 @rule:runtime.templates.render-env-into-conf-d @inferred @source:nginx/1.19.4/ubuntu/20.04/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Templates are rendered with environment values into the nginx config directory

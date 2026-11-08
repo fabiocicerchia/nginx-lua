@@ -24,7 +24,7 @@ Feature: Signing per-architecture images
 
   @id:bin.supply-chain-security.image-signing.003 @rule:supply-chain-security.image-signing.requires-signing-tools @inferred @source:bin/sign-image.sh#sign-image
   Scenario Outline: Signing is refused when a required tool is missing
-    Given a required tool is not installed
+    Given <missing_tool> is not installed
     When the operator signs the image
     Then the command exits with status 1
     And the output names the missing tool: <message>

@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Lets operators configure nginx through environment variables by rendering template files at container start.
 
   Background:
-    Given Given the Fedora nginx-lua image is used
+    Given the Fedora nginx-lua image is used
 
   @id:nginx.container-runtime.config-templates.027 @rule:container-runtime.config-templates.variable-substitution @inferred @source:nginx/1.19.3/fedora/33/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Template files are rendered with environment variables
@@ -22,7 +22,7 @@ Feature: Rendering configuration from templates
     And nginx still starts
 
   @id:nginx.container-runtime.config-templates.029 @rule:platform-support.fedora.startup-scripts-shipped @inferred @source:nginx/1.19.3/fedora/34/Dockerfile#COPY @questionable
-  Scenario: The Fedora 34 image ships the startup scripts it copies
-    Given the Fedora 34 image build context
+  Scenario: The Fedora 34 image build copies startup scripts missing from its build context
+    Given the Fedora 34 image build context, which lacks the IPv6 and template startup scripts
     When the operator builds the Fedora 34 image
-    Then the image contains the IPv6 and template startup scripts in the startup hook directory
+    Then the build fails because those startup scripts cannot be copied into the startup hook directory

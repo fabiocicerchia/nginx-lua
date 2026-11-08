@@ -6,5 +6,6 @@ Feature: Container startup hooks
   Scenario: Setting NGINX_ENTRYPOINT_QUIET_LOGS silences startup messages
     Given NGINX_ENTRYPOINT_QUIET_LOGS is set to 1
     When the operator starts the container with the nginx command
-    Then no entrypoint messages are printed
+    Then no entrypoint configuration messages are printed
+    And the support banner is still printed
     And nginx starts normally

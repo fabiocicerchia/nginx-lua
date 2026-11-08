@@ -3,7 +3,7 @@ Feature: Running nginx 1.19.4 with Lua on CentOS 8
   Operators who run the nginx-lua CentOS 8 image for nginx 1.19.4 rely on its logging, health, shutdown and security behaviour in their container platform.
 
   Background:
-    Given Given the nginx 1.19.4 image based on CentOS 8 is running as a container
+    Given the nginx 1.19.4 image based on CentOS 8 is running as a container
 
   @id:nginx.platform-support.rpm-enterprise.017 @rule:image.runtime.healthcheck-on-port-80 @inferred @source:nginx/1.19.4/centos/8/Dockerfile#HEALTHCHECK @questionable
   Scenario: A container whose nginx does not answer on port 80 is reported unhealthy
@@ -16,5 +16,5 @@ Feature: Running nginx 1.19.4 with Lua on CentOS 8
   Scenario: Building with the extended option off does not produce a usable nginx
     Given the image is built with EXTENDED_IMAGE set to 0
     When the operator builds the image
-    Then the compile step is skipped because it sits behind the extended-image test in the same command chain
-    And the build then fails when the nginx binary is copied into the final image
+    Then nginx is not compiled
+    And the image build fails at the nginx build step instead of producing an image

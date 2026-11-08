@@ -3,7 +3,7 @@ Feature: Tuning worker processes to available CPUs
   Operators opt in to sizing nginx workers to the CPUs the container may really use.
 
   Background:
-    Given Given the nginx-lua Alpine image started with the nginx command
+    Given the nginx-lua Alpine image started with the nginx command
 
   @id:nginx.container-runtime.worker-tuning.033 @rule:workers.autotune.opt-in-uses-smallest-cpu-limit @inferred @source:nginx/1.29.2/alpine/3.22.2/tpl/30-tune-worker-processes.sh
   Scenario Outline: With autotune enabled, worker_processes is set to the smallest CPU limit

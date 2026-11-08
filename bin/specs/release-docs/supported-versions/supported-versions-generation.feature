@@ -36,7 +36,7 @@ Feature: Publishing the supported versions list
 
   @id:bin.release-docs.supported-versions.005 @rule:release-docs.supported-versions.registry-fallback @inferred @source:bin/generate-supported-versions.py#fetch_specific
   Scenario: The registry is consulted when the official images listing is unavailable
-    Given Docker's official images listing cannot be read or has no matching version for alpine
+    Given Docker's official images listing cannot be read
     And the registry holds an alpine latest image whose content matches the tag 3.20.3
     When the maintainer generates the supported versions
     Then a warning that the official images listing could not be fetched is shown

@@ -3,7 +3,7 @@ Feature: Image runtime contract
   Defines what operators can rely on when running the published AlmaLinux image: ports, logs, shutdown and health.
 
   Background:
-    Given Given the AlmaLinux 10.2 nginx-lua image
+    Given the AlmaLinux 10.2 nginx-lua image
 
   @id:nginx.image-build.image-layout.087 @rule:image-build.image-layout.graceful-stop-and-ports @inferred @source:nginx/1.31.4/almalinux/10.2-20260602/Dockerfile#STOPSIGNAL
   Scenario: The container stops gracefully and exposes ports 80 and 443

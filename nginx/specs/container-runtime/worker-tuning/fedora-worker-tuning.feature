@@ -3,7 +3,7 @@ Feature: Worker process auto-tuning
   Operators in CPU-limited containers can size nginx workers to the CPUs actually available.
 
   Background:
-    Given Given the nginx-lua Fedora 44 image for nginx 1.31.6
+    Given the nginx-lua Fedora 44 image for nginx 1.31.6
 
   @id:nginx.container-runtime.worker-tuning.058 @rule:container-runtime.worker-tuning.opt-in-lowest-cpu-limit @inferred @source:nginx/1.31.6/fedora/44/tpl/30-tune-worker-processes.sh#ncpu
   Scenario: With auto-tuning enabled, workers match the lowest CPU limit

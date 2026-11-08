@@ -3,7 +3,7 @@ Feature: Start-up banner and usage tracking
   Informs operators about project support and reports boot statistics to the maintainer unless disabled.
 
   Background:
-    Given Given the Fedora 40 image of nginx 1.25.5 with Lua support
+    Given the Fedora 40 image of nginx 1.25.5 with Lua support
 
   @id:nginx.developer-tooling.support-scripts.007 @rule:runtime.support.boot-hit-opt-out @inferred @source:nginx/1.25.5/fedora/40/tpl/support.sh @questionable
   Scenario Outline: Each start reports the OS and nginx version unless tracking is skipped

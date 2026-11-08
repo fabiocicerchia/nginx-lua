@@ -8,5 +8,5 @@ Feature: Verifying signed manifests
     And the CircleCI organization and project identities are configured
     When the operator signs the manifest for fabiocicerchia/nginx-lua:1.29.7-alpine
     Then the signature is checked against the CircleCI issuer for the organization and the project's pipeline-definition identity
-    And the output ends with "Index signature verified" and "Signed: index <digest>"
+    And the output ends with "Index signature verified" and "Signed: index" followed by the index digest
     And if verification fails the command exits non-zero

@@ -46,8 +46,8 @@ Feature: Signing multi-arch manifests
     And nothing is signed
 
   @id:bin.supply-chain-security.image-signing.011 @rule:supply-chain-security.image-signing.usage-on-missing-reference @inferred @source:bin/sign-manifest.sh#sign-manifest @questionable
-  Scenario: Running without an image reference shows usage
+  Scenario: Running without an image reference fails before showing usage
     Given no image reference is supplied
     When the operator runs the signing command with no arguments
-    Then the command exits non-zero
-    And the intended output is the usage line and an example reference
+    Then the command exits non-zero without signing anything
+    And the usage line and example reference are not shown, because the missing argument aborts the command first

@@ -20,7 +20,7 @@ Feature: Starting the container
 
   @id:src.container-startup.entrypoint-flow.003 @rule:container-startup.entrypoint-flow.environment-scripts-sourced @inferred @source:src/docker-entrypoint.sh#entrypoint_log @questionable
   Scenario: Executable environment scripts are sourced so their variables reach later startup steps
-    Given the startup directory contains an executable environment script "15-vars" that exports a variable
+    Given the startup directory contains an executable environment script "15-vars.envsh" that exports a variable
     When the operator starts the container with the command "nginx"
     Then the log shows "Sourcing" followed by the script path
     And later startup scripts see the exported variable

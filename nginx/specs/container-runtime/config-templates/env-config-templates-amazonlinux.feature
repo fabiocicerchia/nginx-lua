@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Operators configure nginx per environment by supplying template files whose environment variable references are filled in at startup.
 
   Background:
-    Given Given the nginx 1.20.0 Amazon Linux image is started with the default command
+    Given the nginx 1.20.0 Amazon Linux image is started with the default command
 
   @id:nginx.container-runtime.config-templates.118 @rule:container.templates.render-with-environment-variables @inferred @source:nginx/1.20.0/amazonlinux/2.0.20210421.0/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Templates are rendered into the configuration directory using environment variables

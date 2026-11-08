@@ -3,7 +3,7 @@ Feature: Bundled Lua runtime and libraries
   Lets developers use Lua scripting and common OpenResty libraries in nginx without installing anything.
 
   Background:
-    Given Given the nginx-lua 1.22.0 image on Ubuntu 22.04
+    Given the nginx-lua 1.22.0 image on Ubuntu 22.04
 
   @id:nginx.image-build.lua-runtime.001 @rule:image-build.lua-runtime.bundled-libraries @inferred @source:nginx/1.22.0/ubuntu/22.04/tpl/Makefile#deps @questionable
   Scenario Outline: Common OpenResty Lua libraries can be loaded

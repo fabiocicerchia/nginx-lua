@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Operators running the Fedora 44 image get configuration scripts executed in a predictable order before nginx starts.
 
   Background:
-    Given Given the nginx 1.30.4 Fedora 44 image
+    Given the nginx 1.30.4 Fedora 44 image
 
   @id:nginx.container-runtime.entrypoint.249 @rule:container-runtime.entrypoint.quiet-logs-silences-hooks @inferred @source:nginx/1.30.4/fedora/44/tpl/docker-entrypoint.sh#entrypoint_log @questionable
   Scenario: Quiet mode suppresses the entrypoint's log lines

@@ -3,7 +3,7 @@ Feature: Listening on IPv6 by default
   Lets operators running the container on an IPv6-capable host get the default web server answering on IPv6 without editing configuration, while never overwriting customised configuration.
 
   Background:
-    Given Given the container starts with the default startup scripts
+    Given the container starts with the default startup scripts
 
   @id:src.auto-configuration.ipv6-listen.001 @rule:auto-configuration.ipv6-listen.enabled-on-pristine-default-config @inferred @source:src/10-listen-on-ipv6-by-default.sh#sed
   Scenario: The default site also listens on IPv6 when the host supports it and the config is unmodified

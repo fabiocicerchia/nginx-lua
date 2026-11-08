@@ -3,7 +3,7 @@ Feature: Rendering nginx config from environment-based templates
   Lets an operator ship config templates and have container environment variables filled in at startup, so one image serves many environments.
 
   Background:
-    Given Given the container starts with the default template, suffix and output settings
+    Given the container starts with the default template, suffix and output settings
 
   @id:src.auto-configuration.template-substitution.001 @rule:autoconfig.templates.render-with-environment @inferred @source:src/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Templates are rendered with environment variables into live config

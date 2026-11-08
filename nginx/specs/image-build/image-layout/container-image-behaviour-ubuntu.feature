@@ -9,7 +9,7 @@ Feature: Operating the nginx image
   Scenario: The container is reported unhealthy when the home page fails
     Given the container is running
     When the orchestrator runs the 30-second health probe and http://localhost/ returns an error or takes over 3 seconds
-    Then the probe fails and the container is marked unhealthy
+    Then the probe fails and, after consecutive failures, the container is marked unhealthy
 
   @id:nginx.image-build.image-layout.058 @rule:image.stop.graceful-shutdown @inferred @source:nginx/1.28.3/ubuntu/24.04/Dockerfile#STOPSIGNAL
   Scenario: Stopping the container shuts nginx down gracefully

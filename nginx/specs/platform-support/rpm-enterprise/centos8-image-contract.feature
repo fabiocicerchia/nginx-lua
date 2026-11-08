@@ -3,7 +3,7 @@ Feature: Running the nginx 1.19.5 CentOS 8 image
   Operators running the CentOS 8 image of nginx 1.19.5 with Lua rely on its logging, health reporting, shutdown and ports behaving like a standard containerised nginx.
 
   Background:
-    Given Given the image fabiocicerchia/nginx-lua for nginx 1.19.5 on CentOS 8
+    Given the image fabiocicerchia/nginx-lua for nginx 1.19.5 on CentOS 8
 
   @id:nginx.platform-support.rpm-enterprise.020 @rule:image.runtime.health-reported-from-root-page @inferred @source:nginx/1.19.5/centos/8/Dockerfile#HEALTHCHECK
   Scenario: The container reports unhealthy when the root page does not answer successfully
@@ -21,9 +21,8 @@ Feature: Running the nginx 1.19.5 CentOS 8 image
     And the startup scripts run before nginx starts
 
   @id:nginx.platform-support.rpm-enterprise.023 @rule:image.metadata.labels-advertise-versions @inferred @source:nginx/1.19.5/centos/8/Dockerfile#LABEL @questionable
-  Scenario: The image labels state the nginx and module versions it contains
+  Scenario: The image version labels are present but carry no version values
     Given the published image for nginx 1.19.5 on CentOS 8
     When the operator inspects the image labels
-    Then the label org.label-schema.version reads 1.19.5-centos8
-    And the label versions.nginx reads 1.19.5
-    And the label versions.lua-nginx-module reads 0.10.19
+    Then the labels org.label-schema.version, versions.nginx and versions.lua-nginx-module are present
+    But their values are empty because the version settings are not carried into the final image

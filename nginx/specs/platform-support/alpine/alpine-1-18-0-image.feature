@@ -3,7 +3,7 @@ Feature: Running nginx 1.18.0 with Lua on Alpine
   Operators pulling the 1.18.0 Alpine images get a ready-to-run nginx with Lua support that logs to Docker and reports its health.
 
   Background:
-    Given Given the nginx-lua image "fabiocicerchia/nginx-lua:1.18.0-alpine3.12.0" is available
+    Given the nginx-lua image "fabiocicerchia/nginx-lua:1.18.0-alpine3.12.0" is available
 
   @id:nginx.platform-support.alpine.004 @rule:image.runtime.logs-to-container-output @inferred @source:nginx/1.18.0/alpine/3.12.0/Dockerfile#ln -sf /dev/stdout /var/log/nginx/access.log
   Scenario: Access and error logs appear in the container log

@@ -3,7 +3,7 @@ Feature: Running startup hooks before nginx
   Lets operators customise container start-up by dropping scripts into a directory that run before nginx launches.
 
   Background:
-    Given Given the nginx-lua Debian image is started
+    Given the nginx-lua Debian image
 
   @id:nginx.container-runtime.entrypoint.155 @rule:runtime.entrypoint.quiet-logs-silence-hook-messages @inferred @source:nginx/1.28.1/debian/13.3/tpl/docker-entrypoint.sh#entrypoint_log @questionable
   Scenario: Quiet mode silences start-up messages

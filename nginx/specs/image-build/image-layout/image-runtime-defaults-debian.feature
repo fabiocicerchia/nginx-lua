@@ -3,7 +3,7 @@ Feature: Image runtime defaults
   Gives operators an image that exposes web ports, logs to Docker and reports its own health.
 
   Background:
-    Given Given the nginx-lua Debian 12.5 image for nginx 1.25.4
+    Given the nginx-lua Debian 12.5 image for nginx 1.25.4
 
   @id:nginx.image-build.image-layout.045 @rule:image-build.image-layout.logs-to-container-output @inferred @source:nginx/1.25.4/debian/12.5/Dockerfile#base
   Scenario: Access and error logs appear in the container's standard output and error

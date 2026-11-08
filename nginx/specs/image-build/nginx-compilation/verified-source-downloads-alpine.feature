@@ -3,7 +3,7 @@ Feature: Verified source downloads at build time
   Protects image consumers from tampered or drifted upstream sources by checking pinned checksums while building.
 
   Background:
-    Given Given an image build is downloading an upstream source archive
+    Given an image build is downloading an upstream source archive
 
   @id:nginx.image-build.nginx-compilation.007 @rule:image.supply-chain.checksum-mismatch-fails-build @inferred @source:nginx/1.30.2/alpine/3.23.4/tpl/Makefile#secure_download
   Scenario: A download that does not match its pinned checksum fails the build

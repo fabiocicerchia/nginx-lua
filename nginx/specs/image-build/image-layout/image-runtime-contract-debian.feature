@@ -3,7 +3,7 @@ Feature: Logging and health of the running image
   Lets operators collect nginx logs with Docker and see container health.
 
   Background:
-    Given Given the nginx-lua Debian image 1.29.5 is running
+    Given the nginx-lua Debian image 1.29.5 is running
 
   @id:nginx.image-build.image-layout.068 @rule:image.health.reports-http-root @inferred @source:nginx/1.29.5/debian/13.3/Dockerfile#HEALTHCHECK
   Scenario: The container is reported healthy only while http://localhost/ answers successfully

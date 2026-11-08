@@ -3,7 +3,7 @@ Feature: nginx build contents
   Tells operators which nginx modules the image supports so their configuration works as written.
 
   Background:
-    Given Given the nginx-lua 1.22.0 image on Ubuntu 22.04
+    Given the nginx-lua 1.22.0 image on Ubuntu 22.04
 
   @id:nginx.image-build.nginx-compilation.001 @rule:image-build.nginx-compilation.bundled-modules @inferred @source:nginx/1.22.0/ubuntu/22.04/Dockerfile#NGINX_BUILD_CONFIG
   Scenario Outline: The nginx binary includes Lua, headers-more and common optional modules
@@ -24,7 +24,7 @@ Feature: nginx build contents
 
   @id:nginx.image-build.nginx-compilation.002 @rule:image-build.nginx-compilation.debug-binary @inferred @source:nginx/1.22.0/ubuntu/22.04/tpl/Makefile#core
   Scenario: A debug-enabled nginx binary ships alongside the normal one
-    Given the container is running
+    Given the image has been built
     When the operator starts the container with the command "nginx-debug -g 'daemon off;'"
     Then nginx-debug runs in the foreground
     And its build includes the debug option

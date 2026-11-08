@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Lets operators supply nginx configuration with environment variables substituted at container start.
 
   Background:
-    Given Given the Fedora 44 or 45 nginx-lua image
+    Given the Fedora 44 or 45 nginx-lua image
 
   @id:nginx.container-runtime.config-templates.1153 @rule:runtime.templates.variables-substituted-into-config @inferred @source:nginx/1.31.8/fedora/44/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Environment variables are substituted into template files at start-up

@@ -3,7 +3,7 @@ Feature: Running startup scripts before nginx starts
   Lets operators customise a container at boot by dropping scripts into /docker-entrypoint.d/ and have them run before nginx launches.
 
   Background:
-    Given Given the nginx-lua Fedora 43 image for nginx 1.29.4
+    Given the nginx-lua Fedora 43 image for nginx 1.29.4
 
   @id:nginx.container-runtime.entrypoint.206 @rule:runtime.entrypoint.quiet-logs-silence-startup-messages @inferred @source:nginx/1.29.4/fedora/43/tpl/docker-entrypoint.sh#entrypoint_log @questionable
   Scenario: Quiet mode silences startup messages

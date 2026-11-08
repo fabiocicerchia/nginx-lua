@@ -3,7 +3,7 @@ Feature: Worker process tuning
   Operators can have nginx size its workers to the CPUs the container may really use.
 
   Background:
-    Given Given the nginx-lua Debian 13 image is started with the default nginx command
+    Given the nginx-lua Debian 13 image is started with the default nginx command
 
   @id:nginx.container-runtime.worker-tuning.031 @rule:container-runtime.worker-tuning.opt-in-autotune-uses-smallest-cpu-limit @inferred @source:nginx/1.29.1/debian/13.1/tpl/30-tune-worker-processes.sh
   Scenario: With autotune on, workers match the smallest CPU limit the container has

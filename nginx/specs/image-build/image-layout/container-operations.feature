@@ -3,7 +3,7 @@ Feature: Operating the container
   Gives operators container logs, health status and graceful shutdown that work with standard Docker tooling.
 
   Background:
-    Given Given the Fedora 38 image of nginx 1.25.2 with Lua
+    Given the Fedora 38 image of nginx 1.25.2 with Lua
 
   @id:nginx.image-build.image-layout.035 @rule:image-build.image-layout.logs-go-to-container-log @inferred @source:nginx/1.25.2/fedora/38/Dockerfile#base
   Scenario: Access and error logs appear in the container log

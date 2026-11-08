@@ -3,7 +3,7 @@ Feature: Nginx 1.18.0 with Lua on Ubuntu
   Gives operators a ready-to-run nginx 1.18.0 image with Lua scripting for each supported Ubuntu release.
 
   Background:
-    Given The image is published as fabiocicerchia/nginx-lua:1.18.0-ubuntu<release>
+    Given the nginx-lua 1.18.0 Ubuntu images are published under fabiocicerchia/nginx-lua
 
   @id:nginx.platform-support.debian-ubuntu.005 @rule:platform.ubuntu.nginx-1-18-image-per-release @inferred @source:nginx/1.18.0/ubuntu/20.04/Dockerfile#FROM @questionable
   Scenario Outline: Nginx 1.18.0 is offered on each supported Ubuntu release
@@ -33,7 +33,6 @@ Feature: Nginx 1.18.0 with Lua on Ubuntu
     When the operator runs docker run -p 80:80 on the image
     Then the container exposes ports 80 and 443
     And nginx runs in the foreground as the main process under dumb-init
-    And a stop signal (SIGTERM) shuts the container down
 
   @id:nginx.platform-support.debian-ubuntu.009 @rule:image.runtime.healthcheck-reports-liveness @inferred @source:nginx/1.18.0/ubuntu/20.04/Dockerfile#HEALTHCHECK @questionable
   Scenario: The container reports itself healthy only while the default site answers

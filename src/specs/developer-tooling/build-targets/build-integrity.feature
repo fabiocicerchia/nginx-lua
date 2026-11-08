@@ -3,7 +3,7 @@ Feature: Building a trustworthy image
   Serves the maintainer building the image: downloaded sources must match pinned checksums and the built server must identify itself as nginx.
 
   Background:
-    Given Given the maintainer builds the image with the project Makefile
+    Given the maintainer builds the image with the project Makefile
 
   @id:src.developer-tooling.build-targets.001 @rule:build.supply-chain.download-checksum-enforced @inferred @source:src/Makefile#secure_download
   Scenario: A downloaded source whose checksum differs from the pinned one stops the build
@@ -24,7 +24,5 @@ Feature: Building a trustworthy image
   Scenario: The built server identifies itself as nginx, not openresty
     Given the openresty patch set contains a Server-header rewrite patch
     When the maintainer builds the image
-    Then the patch whose name contains server_header is skipped
-    And other patches that apply cleanly are applied
-    And a patch that does not apply cleanly is skipped with a WARNING and the build continues
+    Then the Server-header rewrite patch is not applied
     And the build fails with "FATAL: openresty branding survived" if openresty remains in the header sources

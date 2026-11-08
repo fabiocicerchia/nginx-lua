@@ -3,7 +3,7 @@ Feature: Worker process tuning
   Lets an operator size nginx workers to the CPUs actually granted to the container.
 
   Background:
-    Given Given the nginx-lua image for Ubuntu 26.04 is started with the default nginx command
+    Given the nginx-lua image for Ubuntu 26.04 is started with the default nginx command
 
   @id:nginx.container-runtime.worker-tuning.046 @rule:container-runtime.worker-tuning.limited-by-cpu-allocation @inferred @source:nginx/1.30.1/ubuntu/26.04/tpl/30-tune-worker-processes.sh
   Scenario Outline: Auto-tuned worker count is the smallest CPU limit that applies

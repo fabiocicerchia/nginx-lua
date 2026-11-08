@@ -3,7 +3,7 @@ Feature: Alpine image runtime contract
   Gives operators a predictable container: ports, logging, health and shutdown behaviour.
 
   Background:
-    Given Given the alpine nginx-lua 1.25.3 image
+    Given the alpine nginx-lua 1.25.3 image
 
   @id:nginx.image-build.image-layout.039 @rule:image.layout.logs-go-to-container-output @inferred @source:nginx/1.25.3/alpine/3.19.1/Dockerfile#Dockerfile
   Scenario: Access and error logs are forwarded to the container log

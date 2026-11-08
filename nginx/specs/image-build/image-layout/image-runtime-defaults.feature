@@ -3,7 +3,7 @@ Feature: Container defaults an operator relies on
   Gives operators standard Docker behaviour: logs on the container log stream, exposed web ports and a health status.
 
   Background:
-    Given Given the nginx-lua Debian image 1.19.5 is running
+    Given the nginx-lua Debian image 1.19.5 is running
 
   @id:nginx.image-build.image-layout.003 @rule:image.health.reports-unhealthy-when-root-fails @inferred @source:nginx/1.19.5/debian/10.6/Dockerfile#HEALTHCHECK
   Scenario: The container reports unhealthy when the root page does not answer successfully

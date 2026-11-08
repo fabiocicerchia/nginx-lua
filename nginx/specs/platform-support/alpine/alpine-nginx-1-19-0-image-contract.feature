@@ -3,11 +3,11 @@ Feature: Running nginx 1.19.0 with Lua on Alpine
   Operators who deploy the nginx 1.19.0 Alpine images get a container that serves web traffic, logs to the Docker collector and reports its own health.
 
   Background:
-    Given Given the operator has pulled an nginx-lua 1.19.0 Alpine image
+    Given the operator has pulled an nginx-lua 1.19.0 Alpine image
 
   @id:nginx.platform-support.alpine.008 @rule:image-runtime.ports.http-and-https-exposed @inferred @source:nginx/1.19.0/alpine/3.12.0/Dockerfile#EXPOSE
   Scenario Outline: The image advertises HTTP and HTTPS ports
-    Given the operator has pulled the nginx 1.19.0 image on Alpine 3.12.0
+    Given the operator has pulled the nginx 1.19.0 image on Alpine <alpine_release>
     When the operator inspects the image
     Then port 80 is listed as exposed
     And port 443 is listed as exposed
@@ -45,7 +45,7 @@ Feature: Running nginx 1.19.0 with Lua on Alpine
 
   @id:nginx.platform-support.alpine.012 @rule:image-runtime.shutdown.stop-signal-per-release @inferred @source:nginx/1.19.0/alpine/3.12.0/Dockerfile#STOPSIGNAL @questionable
   Scenario Outline: Stopping the container sends the image's declared stop signal
-    Given the container is running
+    Given a container from the nginx 1.19.0 image on Alpine <alpine_release> is running
     When the operator stops the container
     Then the container receives <signal> as its stop signal
 

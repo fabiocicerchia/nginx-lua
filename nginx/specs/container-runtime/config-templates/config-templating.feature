@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Lets operators generate nginx configuration from environment variables at container start.
 
   Background:
-    Given Given the Fedora 33 nginx-lua 1.19.10 image
+    Given the Fedora 33 nginx-lua 1.19.10 image
 
   @id:nginx.container-runtime.config-templates.013 @rule:container.templates.unwritable-output-is-skipped @inferred @source:nginx/1.19.10/fedora/33/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Rendering is skipped with an error message when the output directory is not writable

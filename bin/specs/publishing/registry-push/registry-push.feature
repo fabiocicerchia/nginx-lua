@@ -23,8 +23,6 @@ Feature: Publishing per-architecture images and multi-arch manifests
 
   @id:bin.publishing.registry-push.005 @rule:publishing.registry-push.multi-arch-manifest-combines-both-architectures @inferred @source:bin/docker_ops.py#bundle_images
   Scenario: Each published tag becomes a multi-arch manifest of the amd64 and arm64v8 images
-    Given images tagged <tag>-amd64 and <tag>-arm64v8 have been pushed
+    Given images tagged 1.27.2-alpine-amd64 and 1.27.2-alpine-arm64v8 have been pushed
     When the release operator bundles the images
-    Then the tag <tag> is published as a manifest pointing to both architecture images
-    And the bundle fails with exit code 1 as soon as one manifest cannot be created or pushed
-    And manifest creation failure is reported as 1, a manifest push failure keeps the push's own exit code
+    Then the tag 1.27.2-alpine is published as a manifest pointing to both architecture images

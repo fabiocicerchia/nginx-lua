@@ -3,7 +3,7 @@ Feature: Image runtime defaults
   Operators get an image that serves on standard ports, logs to the container log stream and reports its health.
 
   Background:
-    Given Given the nginx 1.25.2 Alpine image
+    Given the nginx 1.25.2 Alpine image
 
   @id:nginx.image-build.image-layout.034 @rule:image.runtime.defaults-ports-logs-health @inferred @source:nginx/1.25.2/alpine/3.18.4/Dockerfile#Dockerfile
   Scenario: The image serves on 80 and 443, logs to container output and reports health

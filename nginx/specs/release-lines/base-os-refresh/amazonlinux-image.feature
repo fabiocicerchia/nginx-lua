@@ -4,11 +4,11 @@ Feature: Amazon Linux base refresh
 
   @id:nginx.release-lines.base-os-refresh.005 @rule:release-lines.base-os-refresh.os-version-labelled @inferred @source:nginx/1.28.1/amazonlinux/2023.10.20260120.4/Dockerfile#LABEL
   Scenario Outline: Each Amazon Linux 2023 rebuild states its base OS version in its image labels
-    Given images exist for Amazon Linux 2023.10.20260105.0 and 2023.10.20260120.4
+    Given the nginx 1.28.1 image built on Amazon Linux <point release>
     When the operator inspects the image labels
-    Then versions.os is the matching point release
+    Then versions.os is <point release>
     And the version label is 1.28.1-amazonlinux<point release>
-    And the suggested run command exposes port 80
+    And the suggested run command publishes port 80
 
     Examples:
       | point release      |

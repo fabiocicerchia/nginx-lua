@@ -3,7 +3,7 @@ Feature: CentOS 8 nginx 1.19.2 image with Lua
   Serves operators who run the nginx-lua image on CentOS 8.1.1911 or 8.2.2004 and rely on its Lua support, log forwarding, ports and stop behaviour.
 
   Background:
-    Given Given the operator runs the fabiocicerchia/nginx-lua image for nginx 1.19.2 on CentOS 8.1.1911 or 8.2.2004
+    Given the operator runs the fabiocicerchia/nginx-lua image for nginx 1.19.2 on CentOS 8.1.1911 or 8.2.2004
 
   @id:nginx.platform-support.rpm-enterprise.011 @rule:image.lua.nginx-built-with-lua-modules @inferred @source:nginx/1.19.2/centos/8.2.2004/Dockerfile#builder
   Scenario: The image runs nginx 1.19.2 with Lua support compiled in

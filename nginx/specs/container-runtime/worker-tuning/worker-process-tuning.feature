@@ -3,14 +3,14 @@ Feature: Worker process tuning
   Lets an operator size nginx workers to the CPU actually available to the container.
 
   Background:
-    Given Given the Amazon Linux nginx-lua image 1.29.0
+    Given the Amazon Linux nginx-lua image 1.29.0
 
   @id:nginx.container-runtime.worker-tuning.029 @rule:runtime.workers.autotune-uses-lowest-cpu-limit @inferred @source:nginx/1.29.0/amazonlinux/2023.8.20250715.0/tpl/30-tune-worker-processes.sh#ceildiv
   Scenario Outline: Tuned worker count follows the lowest CPU limit
     Given the autotune option is enabled
-    And the container has 8 online CPUs and a CPU quota of 2.5 CPUs
+    And the container has <online CPUs> online CPUs and a CPU limit of: <quota>
     When the operator starts the container with the default command
-    Then nginx.conf has "worker_processes 3;"
+    Then nginx.conf has "worker_processes <worker_processes>;"
     And the previous worker_processes line is kept commented out
 
     Examples:

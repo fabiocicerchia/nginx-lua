@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Operators running the Debian 13 image get startup scripts executed before nginx launches, and can silence or opt out of the boot messages.
 
   Background:
-    Given Given the nginx-lua Debian 13 image is started
+    Given the nginx-lua Debian 13 image
 
   @id:nginx.container-runtime.entrypoint.174 @rule:container-runtime.entrypoint.hooks-run-in-order-before-nginx @inferred @source:nginx/1.29.1/debian/13.1/tpl/docker-entrypoint.sh#entrypoint_log
   Scenario: Startup scripts run in version order before nginx starts

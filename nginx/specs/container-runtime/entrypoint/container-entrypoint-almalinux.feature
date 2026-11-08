@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets operators customise container start-up by dropping scripts into a hooks directory that run before nginx launches.
 
   Background:
-    Given Given the AlmaLinux 9.2 nginx 1.25.2 image
+    Given the AlmaLinux 9.2 nginx 1.25.2 image
 
   @id:nginx.container-runtime.entrypoint.057 @rule:container-runtime.entrypoint.hooks-run-in-version-order @inferred @source:nginx/1.25.2/almalinux/9.2-20230718/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Executable startup scripts run in natural order before nginx starts
@@ -14,10 +14,10 @@ Feature: Container startup hooks
     And nginx then runs in the foreground as the main process
 
   @id:nginx.container-runtime.entrypoint.058 @rule:container-runtime.entrypoint.non-executable-hooks-ignored @inferred @source:nginx/1.25.2/almalinux/9.2-20230718/tpl/docker-entrypoint.sh#docker-entrypoint
-  Scenario Outline: Hooks that are not executable or not shell scripts are skipped with a notice
-    Given the hooks directory holds <file> with the given permission
+  Scenario Outline: Each hook file is logged according to its type and execute permission
+    Given the hooks directory holds <file>
     When the operator starts the container with the default nginx command
-    Then the log shows <message>
+    Then the log shows "<message>"
 
     Examples:
       | file                        | message                                               |

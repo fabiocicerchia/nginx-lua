@@ -8,8 +8,8 @@ Feature: Running nginx 1.18.0 with Lua on Fedora
   @id:nginx.platform-support.fedora.005 @rule:platform.fedora.image-tag-per-release @inferred @source:nginx/1.18.0/fedora/33/Dockerfile#LABEL
   Scenario Outline: Each supported Fedora release has its own 1.18.0 image
     Given the nginx 1.18.0 image line is published for Fedora
-    When the operator starts the image for a chosen Fedora release
-    Then the container is based on that Fedora release
+    When the operator starts the image for Fedora <release>
+    Then the container is based on Fedora <release>
     And its description reads "Nginx 1.18.0 with LUA support based on fedora <release>."
     And its documented run command uses the tag "1.18.0-fedora<release>"
 

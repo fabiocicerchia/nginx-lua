@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Operators of the AlmaLinux nginx image rely on startup scripts being run in a predictable order before nginx starts.
 
   Background:
-    Given Given the AlmaLinux nginx-lua image is started
+    Given the AlmaLinux nginx-lua image
 
   @id:nginx.container-runtime.entrypoint.192 @rule:container-runtime.entrypoint.usage-tracking-opt-out @inferred @source:nginx/1.29.3/almalinux/9.7-20251119/tpl/support.sh#support @questionable
   Scenario: Each start reports a usage hit to a third-party service unless opted out

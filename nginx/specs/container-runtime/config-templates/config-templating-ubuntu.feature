@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Operators supply nginx config templates with environment variables that are filled in at container start.
 
   Background:
-    Given Given the nginx-lua Ubuntu 26.04 image
+    Given the nginx-lua Ubuntu 26.04 image
 
   @id:nginx.container-runtime.config-templates.1020 @rule:runtime.templates.render-env-variables @inferred @source:nginx/1.31.1/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Templates are rendered into configuration files using environment variables
@@ -15,10 +15,9 @@ Feature: Rendering configuration from templates
 
   @id:nginx.container-runtime.config-templates.1021 @rule:runtime.templates.paths-and-filter-configurable @inferred @source:nginx/1.31.1/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario Outline: Template locations, suffixes and substituted variables can be configured
-    Given templates exist in a custom directory
-    When the operator starts the container with a custom template directory, suffix, output directory or variable filter
-    Then templates in the custom directory with the custom suffix are rendered into the custom output directory
-    And only variables whose names match NGINX_ENVSUBST_FILTER are substituted
+    Given <setting> defaults to <default>
+    When the operator starts the container with <setting> set to a custom value
+    Then template rendering uses the custom value instead of <default>
 
     Examples:
       | setting                        | default                |

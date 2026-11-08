@@ -3,7 +3,7 @@ Feature: Running the Alpine nginx 1.19.1 image
   Operators running the nginx 1.19.1 Lua image on Alpine rely on it logging to the container log, reporting health and stopping gracefully.
 
   Background:
-    Given Given the operator runs the fabiocicerchia/nginx-lua image tagged 1.19.1-alpine3.12.0
+    Given the operator runs the fabiocicerchia/nginx-lua image tagged 1.19.1-alpine3.12.0
 
   @id:nginx.platform-support.alpine.013 @rule:image.runtime.health-reported-by-root-page @inferred @source:nginx/1.19.1/alpine/3.12.0/Dockerfile#HEALTHCHECK @questionable
   Scenario: The container is reported unhealthy when the web server does not answer

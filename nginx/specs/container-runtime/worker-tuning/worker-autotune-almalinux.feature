@@ -3,7 +3,7 @@ Feature: Sizing nginx workers to available CPUs
   Lets operators opt in to nginx worker count matching the CPUs the container may really use.
 
   Background:
-    Given Given the AlmaLinux nginx-lua image is started with the command nginx
+    Given the AlmaLinux nginx-lua image is started with the command nginx
 
   @id:nginx.container-runtime.worker-tuning.048 @rule:container-runtime.worker-tuning.limited-to-smallest-cpu-limit @inferred @source:nginx/1.30.5/almalinux/10.2-20260902/tpl/30-tune-worker-processes.sh#ceildiv
   Scenario Outline: Worker count follows the smallest CPU limit that applies

@@ -3,7 +3,7 @@ Feature: Worker process autotuning
   Lets an operator size nginx workers to the CPUs actually available to the container.
 
   Background:
-    Given Given the Fedora 42 image for nginx 1.29.3
+    Given the Fedora 42 image for nginx 1.29.3
 
   @id:nginx.container-runtime.worker-tuning.040 @rule:container-runtime.worker-tuning.default-untouched @inferred @source:nginx/1.29.3/fedora/42/tpl/30-tune-worker-processes.sh
   Scenario: Without the opt-in variable the worker setting is left alone

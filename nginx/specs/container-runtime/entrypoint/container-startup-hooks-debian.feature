@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets operators prepare nginx configuration at container start by dropping scripts into the startup directory.
 
   Background:
-    Given Given the nginx-lua Debian image is started with the default nginx command
+    Given the nginx-lua Debian 13.7 image
 
   @id:nginx.container-runtime.entrypoint.319 @rule:container-runtime.entrypoint.quiet-logs-and-non-nginx-commands @inferred @source:nginx/1.31.7/debian/13.7/tpl/docker-entrypoint.sh#entrypoint_log
   Scenario: Startup hooks are skipped for other commands and the logs can be silenced

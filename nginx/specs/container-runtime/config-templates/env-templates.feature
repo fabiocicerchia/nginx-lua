@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Operators supply nginx configuration with environment variables substituted at startup.
 
   Background:
-    Given Given the nginx-lua Debian 11.5 image for nginx 1.23.2
+    Given the nginx-lua Debian 11.5 image for nginx 1.23.2
 
   @id:nginx.container-runtime.config-templates.264 @rule:container.templates.unwritable-output-is-reported @inferred @source:nginx/1.23.2/debian/11.5/tpl/20-envsubst-on-templates.sh#auto_envsubst @questionable
   Scenario: An unwritable output directory is reported and nginx still starts

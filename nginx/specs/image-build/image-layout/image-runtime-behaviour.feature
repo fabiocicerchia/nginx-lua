@@ -3,7 +3,7 @@ Feature: Image operating behaviour
   Gives operators container logs, health status and graceful shutdown that fit standard container tooling.
 
   Background:
-    Given Given the nginx-lua alpine image is running
+    Given the nginx-lua alpine image is running
 
   @id:nginx.image-build.image-layout.075 @rule:image.health.container-reports-health @inferred @source:nginx/1.30.2/alpine/3.23.4/Dockerfile#HEALTHCHECK @questionable
   Scenario: The container is reported unhealthy when the root page cannot be fetched

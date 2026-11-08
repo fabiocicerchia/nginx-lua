@@ -3,14 +3,14 @@ Feature: Running nginx 1.17.10 with Lua on Fedora
   Serves operators who deploy the nginx-lua image on a Fedora base (releases 29 to 33) and expect the same nginx 1.17.10 with Lua behaviour on each.
 
   Background:
-    Given Given the operator uses the image fabiocicerchia/nginx-lua tagged 1.17.10-fedora<release>
+    Given the operator uses a fabiocicerchia/nginx-lua 1.17.10 Fedora image
 
   @id:nginx.platform-support.fedora.001 @rule:platform-support.fedora.image-per-fedora-release @inferred @source:nginx/1.17.10/fedora/33/Dockerfile#FROM
   Scenario Outline: Each supported Fedora release has its own nginx 1.17.10 image
-    Given the Fedora release is one of 29, 30, 31, 32 or 33
-    When the operator runs the image published for that Fedora release
-    Then the image is built on the matching Fedora release
-    And the image description reads "Nginx 1.17.10 with LUA support based on fedora <release>"
+    Given the Fedora release is <release>
+    When the operator runs the image tagged 1.17.10-fedora<release>
+    Then the image is built on Fedora <release>
+    And the image description reads "Nginx 1.17.10 with LUA support based on fedora <release>."
     And nginx 1.17.10 is the version running
 
     Examples:
@@ -26,7 +26,7 @@ Feature: Running nginx 1.17.10 with Lua on Fedora
     Given the container is started with port 80 published
     When the operator starts the container
     Then the container exposes ports 80 and 443
-    And nginx runs in the foreground as the container's main process
+    And nginx runs in the foreground under the dumb-init init process
     And access and error logs appear in the container log output
 
   @id:nginx.platform-support.fedora.003 @rule:container-runtime.image.healthcheck-reports-unhealthy-when-root-page-fails @inferred @source:nginx/1.17.10/fedora/33/Dockerfile#HEALTHCHECK @questionable

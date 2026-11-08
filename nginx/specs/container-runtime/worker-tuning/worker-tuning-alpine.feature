@@ -3,7 +3,7 @@ Feature: Sizing nginx workers to the container's CPU allowance
   Lets an operator opt in to a worker count that respects CPU limits instead of the host's core count.
 
   Background:
-    Given Given the container image nginx-lua on Alpine 3.24.2
+    Given the container image nginx-lua on Alpine 3.24.2
 
   @id:nginx.container-runtime.worker-tuning.061 @rule:container.workers.limited-by-smallest-cpu-allowance @inferred @source:nginx/1.31.7/alpine/3.24.2/tpl/30-tune-worker-processes.sh#ceildiv
   Scenario Outline: Worker count follows the smallest CPU allowance the container has

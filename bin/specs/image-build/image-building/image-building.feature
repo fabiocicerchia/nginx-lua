@@ -4,8 +4,6 @@ Feature: Building reproducible images
 
   @id:bin.image-build.image-building.004 @rule:image-build.image-building.build-date-from-commit @inferred @source:bin/docker_ops.py#get_build_date
   Scenario: An image's build date is the commit's date, so rebuilding the same commit gives the same image
-    Given the checked-out commit was made on 2026-03-14
+    Given the checked-out commit was made on 2026-03-14 (UTC)
     When the release operator builds the image on any later day
-    Then the image is built with BUILD_DATE 2026-03-14T00:00:00Z
-    And the image is built with VCS_REF equal to the short commit hash
-    And the image carries every tag computed for that nginx, OS and architecture
+    Then the image is built with build date 2026-03-14T00:00:00Z

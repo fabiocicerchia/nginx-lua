@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Operators supply nginx configuration as templates with environment variables so one image serves many environments.
 
   Background:
-    Given Given the nginx-lua image on Fedora is started with the command nginx
+    Given the nginx-lua image on Fedora is started with the command nginx
 
   @id:nginx.container-runtime.config-templates.266 @rule:config-templates.envsubst.locations-are-configurable @inferred @source:nginx/1.23.2/fedora/36/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Template directory, suffix and output directory can be overridden

@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Lets operators configure nginx through environment variables by turning template files into real config at start.
 
   Background:
-    Given The 20-envsubst-on-templates.sh hook runs at start
+    Given The container starts with the default nginx command
     And Default template folder /etc/nginx/templates, suffix .template, output /etc/nginx/conf.d
 
   @id:nginx.container-runtime.config-templates.653 @rule:runtime.templates.stream-templates-enabled-in-main-config @inferred @source:nginx/1.28.3/ubuntu/24.04/tpl/20-envsubst-on-templates.sh#add_stream_block @questionable

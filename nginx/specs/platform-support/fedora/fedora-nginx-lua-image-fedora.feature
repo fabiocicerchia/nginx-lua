@@ -3,14 +3,14 @@ Feature: Running nginx 1.19.1 with Lua on Fedora
   Serves operators who deploy the nginx 1.19.1 Lua image on Fedora 32 or 33 and expect it to run, log and stop like a normal container.
 
   Background:
-    Given Given the nginx-lua image for nginx 1.19.1 built on Fedora
+    Given the nginx-lua image for nginx 1.19.1 built on Fedora
 
   @id:nginx.platform-support.fedora.011 @rule:platform.fedora.http-and-https-ports-exposed @inferred @source:nginx/1.19.1/fedora/33/Dockerfile#EXPOSE
   Scenario: The container serves on ports 80 and 443
     Given a container started with the default command
     When the operator inspects the image's exposed ports
     Then ports 80 and 443 are exposed
-    And nginx runs in the foreground as `nginx -g 'daemon off;'`
+    And the default command runs nginx in the foreground
 
   @id:nginx.platform-support.fedora.012 @rule:platform.fedora.container-health-reflects-http-response @inferred @source:nginx/1.19.1/fedora/33/Dockerfile#HEALTHCHECK
   Scenario: The container is reported unhealthy when the home page fails

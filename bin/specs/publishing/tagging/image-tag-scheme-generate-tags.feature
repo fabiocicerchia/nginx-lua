@@ -26,7 +26,7 @@ Feature: Image tag scheme
     And no tag of the compat image is the same as a tag of the standard image
 
   @id:bin.publishing.tagging.007 @rule:publishing.tagging.amazonlinux-2018-no-distro-alias @inferred @source:bin/generate_tags.py#tag_names
-  Scenario: Amazon Linux 2018 never claims the unversioned distro alias
+  Scenario: Amazon Linux 2018 never claims the 1-amazonlinux alias
     Given Dockerfiles for amazonlinux 2018.03 and amazonlinux 2023 on nginx 1.25.3
     When the maintainer generates the tags page
     Then 1-amazonlinux appears only on the amazonlinux 2023 image

@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets operators rely on configuration scripts running before nginx starts, and on other commands bypassing them.
 
   Background:
-    Given Given an AlmaLinux 8.7 nginx-lua image
+    Given an AlmaLinux 8.7 nginx-lua image
 
   @id:nginx.container-runtime.entrypoint.024 @rule:container-runtime.entrypoint.hooks-run-before-nginx @inferred @source:nginx/1.23.3/almalinux/8.7-20221201/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Startup scripts run in version order before nginx starts
@@ -29,10 +29,10 @@ Feature: Container startup hooks
 
   @id:nginx.container-runtime.entrypoint.028 @rule:container-runtime.entrypoint.boot-usage-ping-opt-out @inferred @source:nginx/1.23.3/almalinux/8.7-20221201/tpl/support.sh#support @questionable
   Scenario Outline: Each boot reports usage to the maintainer unless SKIP_TRACK is 1
-    Given SKIP_TRACK is not set to 1
+    Given SKIP_TRACK is <SKIP_TRACK>
     When the operator starts a container
     Then a support banner is printed
-    And a request carrying the OS name and nginx version is sent to the maintainer's tracking site, with a 5 second limit
+    And whether a request carrying the OS name and nginx version is sent to the maintainer's tracking site, with a 5 second limit, is <tracking request sent>
 
     Examples:
       | SKIP_TRACK | tracking request sent |

@@ -3,7 +3,7 @@ Feature: Rendering configuration from environment variables
   Lets operators generate nginx configuration from templates filled with container environment variables.
 
   Background:
-    Given Given the nginx-lua image based on Alpine 3.15.0 with nginx 1.21.4
+    Given the nginx-lua image based on Alpine 3.15.0 with nginx 1.21.4
 
   @id:nginx.container-runtime.config-templates.160 @rule:container-runtime.config-templates.render-from-env @inferred @source:nginx/1.21.4/alpine/3.15.0/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Template files are rendered into the configuration directory

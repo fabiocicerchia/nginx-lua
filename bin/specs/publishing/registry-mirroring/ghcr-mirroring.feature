@@ -3,7 +3,7 @@ Feature: Mirroring published images to GitHub Container Registry
   Lets operators publish the default-distro nginx-lua images to GHCR as a secondary channel carrying the same tags as Docker Hub.
 
   Background:
-    Given Given the supported versions list defines a mainline and a stable nginx version and the alpine version
+    Given the supported versions list defines a mainline and a stable nginx version and the alpine version
 
   @id:bin.publishing.registry-mirroring.001 @rule:publishing.registry-mirroring.same-tags-as-docker-hub @inferred @source:bin/mirror-ghcr.py#mirror_images
   Scenario: Every Docker Hub tag of the default distro is copied to GHCR

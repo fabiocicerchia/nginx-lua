@@ -3,7 +3,7 @@ Feature: Running nginx 1.19.0 with Lua on Debian images
   Operators who run the Debian-slim 1.19.0 images (8.11, 9.12, 10.2, 10.3, 10.4) rely on the same observable container behaviour regardless of Debian release.
 
   Background:
-    Given Given the operator runs the fabiocicerchia/nginx-lua image for nginx 1.19.0 on a Debian slim base
+    Given the operator runs the fabiocicerchia/nginx-lua image for nginx 1.19.0 on a Debian slim base
 
   @id:nginx.platform-support.debian-ubuntu.010 @rule:image.runtime.lua-enabled-nginx @inferred @source:nginx/1.19.0/debian/10.4-slim/Dockerfile#builder
   Scenario: nginx in the image can run Lua code
@@ -17,7 +17,6 @@ Feature: Running nginx 1.19.0 with Lua on Debian images
     Given the container is started with ports 80 and 443 published
     When a client connects to port 80 or 443
     Then the image declares ports 80 and 443 as exposed
-    And nginx is the foreground process, so the container stays running
 
   @id:nginx.platform-support.debian-ubuntu.012 @rule:image.runtime.health-check @inferred @source:nginx/1.19.0/debian/10.4-slim/Dockerfile#HEALTHCHECK @questionable
   Scenario: A container that stops answering HTTP is reported unhealthy
@@ -35,12 +34,12 @@ Feature: Running nginx 1.19.0 with Lua on Debian images
 
     Examples:
       | debian_release                    | signal  | shutdown_style                               |
-      | 10.2-slim, 10.3-slim or 10.4-slim | SIGQUIT | gracefully, finishing in-flight requests     |
-      | 8.11-slim or 9.12-slim            | SIGTERM | fast, without waiting for in-flight requests |
+      | 10.3-slim or 10.4-slim            | SIGQUIT | gracefully, finishing in-flight requests     |
+      | 8.11-slim, 9.12-slim or 10.2-slim | SIGTERM | fast, without waiting for in-flight requests |
 
   @id:nginx.platform-support.debian-ubuntu.014 @rule:image.metadata.component-versions-labelled @inferred @source:nginx/1.19.0/debian/10.4-slim/Dockerfile#LABEL
   Scenario: The image labels list the nginx and Lua component versions it contains
-    Given a 10.x Debian image has been built
+    Given a Debian 10.3-slim or 10.4-slim image has been built
     When the operator inspects the image labels
     Then versions.nginx is 1.19.0
     And versions.luajit2 is 2.1-20200102

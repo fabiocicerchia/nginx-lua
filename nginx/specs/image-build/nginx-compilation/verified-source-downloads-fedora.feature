@@ -3,7 +3,7 @@ Feature: Refusing tampered upstream sources during the build
   Protects image consumers by failing the build when a downloaded nginx or Lua component does not match its pinned checksum.
 
   Background:
-    Given Given the Fedora 43 nginx-lua image build
+    Given the Fedora 43 nginx-lua image build
 
   @id:nginx.image-build.nginx-compilation.006 @rule:image-build.nginx-compilation.checksum-mismatch-fails-build @inferred @source:nginx/1.29.7/fedora/43/tpl/Makefile#secure_download @questionable
   Scenario: A source archive with the wrong checksum fails the build

@@ -3,7 +3,7 @@ Feature: Rendering configuration from templates
   Lets operators ship nginx configuration as templates filled with container environment variables.
 
   Background:
-    Given Given the nginx-lua Debian 13.5 image with templates folder /etc/nginx/templates and output folder /etc/nginx/conf.d
+    Given the nginx-lua Debian 13.5 image with templates folder /etc/nginx/templates and output folder /etc/nginx/conf.d
 
   @id:nginx.container-runtime.config-templates.873 @rule:runtime.templates.locations-are-configurable @inferred @source:nginx/1.30.2/debian/13.5/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario Outline: Template folder, suffix and output folder can be changed by environment variables

@@ -46,7 +46,7 @@ Feature: Generating release notes
 
   @id:bin.release-docs.changelog.006 @rule:release-docs.changelog.lists-supported-versions @inferred @source:bin/generate-changelog.sh#main
   Scenario: Release notes end with the supported versions
-    Given the supported versions list contains the line ("nginx 1.27.0" "Debian 12")
+    Given the supported versions list contains the lines "nginx_mainline=1.27.0" and "debian=12"
     When the release manager generates the changelog
     Then the output ends with a "## Supported Versions" section
-    And the section shows " - nginx 1.27.0 debian 12" in lower case without parentheses or quotes
+    And the section shows " - nginx_mainline=1.27.0" and " - debian=12", lower-cased and with any parentheses or quotes removed

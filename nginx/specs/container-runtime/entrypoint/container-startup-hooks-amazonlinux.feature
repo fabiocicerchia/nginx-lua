@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets operators customise the container at start-up with hook scripts and keep logs quiet, while nginx still launches.
 
   Background:
-    Given Given the amazonlinux nginx-lua image
+    Given the amazonlinux nginx-lua image
 
   @id:nginx.container-runtime.entrypoint.142 @rule:container.entrypoint.hooks-run-only-for-nginx @inferred @source:nginx/1.27.5/amazonlinux/2023.7.20250609.0/tpl/docker-entrypoint.sh#entrypoint_log
   Scenario: Startup hooks run in version order only when the container starts nginx

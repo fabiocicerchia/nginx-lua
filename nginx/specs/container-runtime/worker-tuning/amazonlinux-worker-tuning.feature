@@ -3,7 +3,7 @@ Feature: Sizing nginx workers to the container's CPU allowance
   Operators can opt in to having worker_processes matched to the CPUs actually available to the container.
 
   Background:
-    Given Given the nginx-lua image based on Amazon Linux 2023
+    Given the nginx-lua image based on Amazon Linux 2023
 
   @id:nginx.container-runtime.worker-tuning.016 @rule:container-runtime.worker-tuning.opt-in-autotune @inferred @source:nginx/1.27.2/amazonlinux/2023.6.20241111.0/tpl/30-tune-worker-processes.sh#ncpu
   Scenario: Worker processes are set to the smallest of the available CPU limits when auto-tuning is enabled

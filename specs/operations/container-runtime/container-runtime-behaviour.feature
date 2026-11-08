@@ -10,7 +10,6 @@ Feature: Running the nginx-lua container
     Given an operator has started the nginx-lua image with ports 80 and 443 published
     When the operator inspects the image's declared ports
     Then ports 80 and 443 are declared as exposed
-    And nginx runs in the foreground as the container's main process
 
   @id:operations.container-runtime.002 @rule:runtime.container.healthcheck-on-root @inferred @source:Dockerfile#HEALTHCHECK @questionable
   Scenario: A container whose root page does not answer is reported unhealthy

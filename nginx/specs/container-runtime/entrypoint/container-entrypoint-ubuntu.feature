@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets operators customise the container at start-up with hook scripts before nginx launches, while other commands run untouched.
 
   Background:
-    Given Given the nginx-lua Ubuntu 26.04 image
+    Given the nginx-lua Ubuntu 26.04 image
 
   @id:nginx.container-runtime.entrypoint.252 @rule:container-runtime.entrypoint.non-nginx-commands-bypass-hooks @inferred @source:nginx/1.30.4/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Running another command skips all startup configuration

@@ -3,7 +3,7 @@ Feature: Configuration from templates
   Lets an operator generate nginx configuration from environment variables without editing the image.
 
   Background:
-    Given Given the nginx 1.19.3 Amazon Linux 2.0.20200722.0 image
+    Given the nginx 1.19.3 Amazon Linux 2.0.20200722.0 image
 
   @id:nginx.container-runtime.config-templates.021 @rule:config-templates.envsubst.templates-rendered-from-environment @inferred @source:nginx/1.19.3/amazonlinux/2.0.20200722.0/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Template files are rendered with environment variables into the config directory

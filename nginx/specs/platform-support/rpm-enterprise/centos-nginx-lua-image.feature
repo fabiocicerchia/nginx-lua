@@ -3,7 +3,7 @@ Feature: Running nginx 1.18.0 with Lua on CentOS images
   Serves operators who run the fabiocicerchia/nginx-lua 1.18.0 image on CentOS 7.8.2003, 8.1.1911 or 8.2.2004 and need the same container contract on each.
 
   Background:
-    Given Given the image fabiocicerchia/nginx-lua:1.18.0 on a CentOS base (7.8.2003, 8.1.1911 or 8.2.2004)
+    Given the image fabiocicerchia/nginx-lua:1.18.0 on a CentOS base (7.8.2003, 8.1.1911 or 8.2.2004)
 
   @id:nginx.platform-support.rpm-enterprise.006 @rule:image.runtime.serves-http-on-80-and-443-in-foreground @inferred @source:nginx/1.18.0/centos/8.2.2004/Dockerfile#EXPOSE
   Scenario: The container runs nginx in the foreground and advertises ports 80 and 443
@@ -40,4 +40,4 @@ Feature: Running nginx 1.18.0 with Lua on CentOS images
     When the operator runs nginx -V in the container
     Then the build options include the Lua nginx module 0.10.15 and the nginx development kit 0.3.1
     And the build options include http_ssl, http_v2, http_geoip, stream and mail modules
-    And nginx runs as user nginx (uid 32548)
+    And the build options set nginx as the worker user and group

@@ -3,7 +3,7 @@ Feature: Configuration from environment-variable templates
   Lets operators generate nginx configuration from templates using container environment variables.
 
   Background:
-    Given Given the Amazon Linux nginx-lua image 1.31.8
+    Given the Amazon Linux nginx-lua image 1.31.8
 
   @id:nginx.container-runtime.config-templates.1146 @rule:container-runtime.config-templates.undefined-variables-untouched @inferred @source:nginx/1.31.8/amazonlinux/2023.12.20261021.0/tpl/20-envsubst-on-templates.sh#auto_envsubst
   Scenario: Variables not defined in the environment are left as written

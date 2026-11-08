@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets an operator customise a container at start-up by dropping scripts into the hook directory, then launches nginx.
 
   Background:
-    Given Given the nginx-lua image for nginx 1.21.1 on Fedora 34
+    Given the nginx-lua image for nginx 1.21.1 on Fedora 34
 
   @id:nginx.container-runtime.entrypoint.005 @rule:runtime.entrypoint.runs-executable-hooks-before-nginx @inferred @source:nginx/1.21.1/fedora/34/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Executable startup scripts run before nginx starts

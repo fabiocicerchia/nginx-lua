@@ -3,7 +3,7 @@ Feature: Sizing nginx workers to the container's CPU allowance
   Operators who opt in get worker_processes matched to the CPUs the container may actually use.
 
   Background:
-    Given Given the nginx 1.27.4 Alpine image
+    Given the nginx 1.27.4 Alpine image
 
   @id:nginx.container-runtime.worker-tuning.020 @rule:container-runtime.worker-tuning.smallest-cpu-limit-wins @inferred @source:nginx/1.27.4/alpine/3.21.3/tpl/30-tune-worker-processes.sh#ceildiv
   Scenario: Workers match the smallest of online CPUs, cpuset and CPU quota

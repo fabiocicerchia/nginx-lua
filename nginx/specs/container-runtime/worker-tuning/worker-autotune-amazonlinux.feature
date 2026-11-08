@@ -3,7 +3,7 @@ Feature: Worker process tuning
   Lets an operator size nginx workers to the CPU actually available to the container.
 
   Background:
-    Given Given the Amazon Linux nginx-lua image
+    Given the Amazon Linux nginx-lua image
 
   @id:nginx.container-runtime.worker-tuning.030 @rule:container.workers.autotune-opt-in-uses-smallest-cpu-limit @inferred @source:nginx/1.29.1/amazonlinux/2023.9.20250929.0/tpl/30-tune-worker-processes.sh#ncpu
   Scenario: Worker count follows the smallest CPU limit when autotune is enabled

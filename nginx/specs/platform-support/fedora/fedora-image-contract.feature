@@ -3,14 +3,14 @@ Feature: Running nginx with Lua on Fedora images
   Operators who deploy the Fedora 32, 33 and 34 images need a container that serves HTTP, logs to Docker, reports health and stops gracefully.
 
   Background:
-    Given Given the nginx 1.19.2 Lua image built on Fedora <fedora_release>
+    Given the nginx 1.19.2 Lua image built on Fedora 32, 33 or 34
 
   @id:nginx.platform-support.fedora.014 @rule:image.runtime.serves-http-and-https-ports @inferred @source:nginx/1.19.2/fedora/32/Dockerfile#EXPOSE
   Scenario: The container advertises HTTP and HTTPS ports and starts nginx in the foreground
     Given a container started from the image with no command override
     When the operator starts the container
     Then ports 80 and 443 are exposed
-    And nginx runs in the foreground as the container's main process
+    And nginx runs in the foreground under the dumb-init init process
 
   @id:nginx.platform-support.fedora.015 @rule:image.runtime.reports-health-by-home-page @inferred @source:nginx/1.19.2/fedora/32/Dockerfile#HEALTHCHECK
   Scenario: The container is reported unhealthy when the home page does not answer

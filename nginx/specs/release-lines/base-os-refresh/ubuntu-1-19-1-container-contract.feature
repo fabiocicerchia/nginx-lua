@@ -3,7 +3,7 @@ Feature: Running the nginx 1.19.1 Ubuntu container
   Operators running the nginx 1.19.1 Lua image on Ubuntu 20.04 or 20.10 rely on how the container starts, logs, reports health and stops.
 
   Background:
-    Given Given the nginx-lua image for nginx 1.19.1 is built on Ubuntu
+    Given the nginx-lua image for nginx 1.19.1 is built on Ubuntu
 
   @id:nginx.release-lines.base-os-refresh.001 @rule:image.runtime.nginx-runs-in-foreground @inferred @source:nginx/1.19.1/ubuntu/20.04/Dockerfile#CMD
   Scenario: The container runs nginx in the foreground and serves on ports 80 and 443

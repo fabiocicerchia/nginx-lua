@@ -16,10 +16,9 @@ Feature: Generating the pinned dependency environment
   @id:bin.dependencies.build-environment.002 @rule:dependencies.build-environment.resty-core-rc-floor @inferred @source:bin/generate-deps-env.py#main
   Scenario Outline: A verified release candidate is kept until a stable lua-resty-core release catches up
     Given the verified lua-resty-core pin is 0.1.34rc2
+    And the latest stable lua-resty-core tag is <latest_stable>
     When the maintainer generates the dependency environment file
-    Then with latest stable tag 0.1.32 the file pins lua-resty-core to 0.1.34rc2
-    And with latest stable tag 0.1.34 the file pins lua-resty-core to 0.1.34
-    And with latest stable tag 0.1.35 the file pins lua-resty-core to 0.1.35
+    Then the file pins lua-resty-core to <pinned>
 
     Examples:
       | latest_stable | pinned    |

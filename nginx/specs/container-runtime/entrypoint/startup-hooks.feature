@@ -3,7 +3,7 @@ Feature: Container startup hooks
   Lets an operator customise the container at start by dropping scripts into a directory before nginx launches.
 
   Background:
-    Given Given the nginx 1.19.3 Amazon Linux 2.0.20200722.0 image
+    Given the nginx 1.19.3 Amazon Linux 2.0.20200722.0 image
 
   @id:nginx.container-runtime.entrypoint.001 @rule:entrypoint.startup-hooks.executable-scripts-run-before-nginx @inferred @source:nginx/1.19.3/amazonlinux/2.0.20200722.0/tpl/docker-entrypoint.sh#docker-entrypoint
   Scenario: Executable startup scripts run before nginx starts

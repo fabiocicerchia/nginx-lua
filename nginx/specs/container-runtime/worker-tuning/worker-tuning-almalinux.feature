@@ -3,14 +3,14 @@ Feature: Worker process autotuning
   Operators can have nginx size its worker processes to the CPU the container may actually use.
 
   Background:
-    Given Given the nginx-lua image based on AlmaLinux 9.6 is used
+    Given the nginx-lua image based on AlmaLinux 9.6 is used
 
   @id:nginx.container-runtime.worker-tuning.021 @rule:container.workers.autotune-is-opt-in @inferred @source:nginx/1.27.5/almalinux/9.6-20250611/tpl/30-tune-worker-processes.sh
   Scenario: Worker processes are left unchanged unless autotune is requested
-    Given nginx.conf sets "worker_processes auto;"
+    Given nginx.conf sets "worker_processes  auto;"
     And NGINX_ENTRYPOINT_WORKER_PROCESSES_AUTOTUNE is unset
     When the operator starts the container with the default nginx command
-    Then nginx.conf still contains "worker_processes auto;"
+    Then nginx.conf still contains "worker_processes  auto;"
 
   @id:nginx.container-runtime.worker-tuning.022 @rule:container.workers.use-smallest-cpu-limit @inferred @source:nginx/1.27.5/almalinux/9.6-20250611/tpl/30-tune-worker-processes.sh
   Scenario Outline: With autotune on, worker count is the smallest of the online CPUs, cpuset and CPU quota limits

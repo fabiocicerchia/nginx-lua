@@ -3,7 +3,7 @@ Feature: Alpine image contents and runtime defaults
   Consumers of the Alpine image expect nginx with Lua, standard ports, container-friendly logs and a health probe.
 
   Background:
-    Given Given the nginx-lua image built on Alpine 3.22.2 with nginx 1.29.2
+    Given the nginx-lua image built on Alpine 3.22.2 with nginx 1.29.2
 
   @id:nginx.image-build.image-layout.062 @rule:image.runtime.defaults @inferred @source:nginx/1.29.2/alpine/3.22.2/Dockerfile#HEALTHCHECK
   Scenario: The image serves on 80 and 443, logs to the container output and reports health
@@ -11,7 +11,7 @@ Feature: Alpine image contents and runtime defaults
     When the operator inspects the image and its logs
     Then ports 80 and 443 are exposed
     And access and error logs go to stdout and stderr
-    And the container is unhealthy after a failed "curl --fail http://localhost/" (every 30s, 3s timeout)
+    And health is checked with "curl --fail http://localhost/" every 30s with a 3s timeout
     And stopping sends SIGQUIT for a graceful shutdown
 
   @id:nginx.image-build.image-layout.063 @rule:image.nginx.includes-lua-and-modules @inferred @source:nginx/1.29.2/alpine/3.22.2/Dockerfile#NGINX_BUILD_CONFIG

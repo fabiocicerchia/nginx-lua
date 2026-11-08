@@ -3,7 +3,7 @@ Feature: Configuration from templates
   Operators supply nginx config templates with variable placeholders that are rendered at container start.
 
   Background:
-    Given Given the nginx 1.25.2 Alpine image
+    Given the nginx 1.25.2 Alpine image
 
   @id:nginx.container-runtime.config-templates.346 @rule:templates.render.output-dir-not-writable @inferred @source:nginx/1.25.2/alpine/3.18.4/tpl/20-envsubst-on-templates.sh#auto_envsubst @questionable
   Scenario: Templates are not rendered when the output directory is not writable

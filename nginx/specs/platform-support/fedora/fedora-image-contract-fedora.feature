@@ -3,7 +3,7 @@ Feature: Fedora image runtime contract
   Consumers of the Fedora images rely on the published ports, health check, log routing and non-root nginx user.
 
   Background:
-    Given Given the image fabiocicerchia/nginx-lua:1.23.4-fedora37 or -fedora38
+    Given the image fabiocicerchia/nginx-lua:1.23.4-fedora37 or -fedora38
 
   @id:nginx.platform-support.fedora.018 @rule:image.fedora.runtime-contract @inferred @source:nginx/1.23.4/fedora/38/Dockerfile#FROM base
   Scenario: The image exposes web ports, forwards logs to Docker and reports health

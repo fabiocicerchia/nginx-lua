@@ -3,7 +3,7 @@ Feature: Running the CentOS nginx 1.17.10 Lua images
   Operators who deploy the nginx 1.17.10 images on CentOS 7.8.2003, 8.1.1911 or 8.2.2004 rely on one runtime contract: how the container starts, which ports it offers, where logs go, who it runs as and when it counts as healthy.
 
   Background:
-    Given Given the nginx-lua image for nginx 1.17.10 built on a CentOS base
+    Given the nginx-lua image for nginx 1.17.10 built on a CentOS base
 
   @id:nginx.platform-support.rpm-enterprise.001 @rule:image.runtime.starts-nginx-foreground-on-web-ports @inferred @source:nginx/1.17.10/centos/7.8.2003/Dockerfile#ENTRYPOINT
   Scenario Outline: The container starts nginx in the foreground and offers ports 80 and 443

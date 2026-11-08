@@ -3,7 +3,7 @@ Feature: Running nginx-lua 1.19.3 on CentOS 8
   Operators who deploy the nginx 1.19.3 Lua image on CentOS 8 rely on its documented runtime contract: ports, logs, health, shutdown and bundled modules.
 
   Background:
-    Given Given the operator has pulled fabiocicerchia/nginx-lua:1.19.3-centos8
+    Given the operator has pulled fabiocicerchia/nginx-lua:1.19.3-centos8
 
   @id:nginx.platform-support.rpm-enterprise.015 @rule:image.nginx.lua-modules-included @inferred @source:nginx/1.19.3/centos/8/Dockerfile#builder @questionable
   Scenario: nginx is built with Lua support and the standard modules
@@ -15,12 +15,9 @@ Feature: Running nginx-lua 1.19.3 on CentOS 8
 
   @id:nginx.platform-support.rpm-enterprise.016 @rule:image.platform.centos-point-release-tags @inferred @source:nginx/1.19.3/centos/8.1.1911/Dockerfile#base
   Scenario Outline: Each published CentOS tag is built on its matching CentOS release
-    Given tags centos8, centos8.1.1911 and centos8.2.2004 for nginx 1.19.3
-    When the operator pulls a tag and inspects its version label
-    Then the 8 tag is based on centos:8
-    And the 8.1.1911 tag is based on centos:8.1.1911
-    And the 8.2.2004 tag is based on centos:8.2.2004
-    And each reports version 1.19.3-centos<tag>
+    Given the nginx 1.19.3 image published for CentOS <tag>
+    When the operator inspects the base image of that tag
+    Then the image is built on <base image>
 
     Examples:
       | tag      | base image      |

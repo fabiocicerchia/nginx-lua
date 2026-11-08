@@ -3,7 +3,7 @@ Feature: Configuration from environment-variable templates
   Operators render nginx configuration files from templates using container environment variables.
 
   Background:
-    Given Given the nginx 1.19.6 Amazon Linux image
+    Given the nginx 1.19.6 Amazon Linux image
 
   @id:nginx.container-runtime.config-templates.067 @rule:container-runtime.config-templates.unwritable-output-is-reported-not-fatal @inferred @source:nginx/1.19.6/amazonlinux/2.0.20210126.0/tpl/20-envsubst-on-templates.sh#auto_envsubst @questionable
   Scenario: An unwritable output directory is reported and nginx still starts

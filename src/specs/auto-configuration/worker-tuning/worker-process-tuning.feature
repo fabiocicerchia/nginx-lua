@@ -3,7 +3,7 @@ Feature: Tuning worker processes to available CPUs
   Lets an operator have nginx size its worker processes to the CPUs actually available to the container, instead of the host's total.
 
   Background:
-    Given Given the nginx configuration at /etc/nginx/nginx.conf contains a worker_processes directive
+    Given the nginx configuration at /etc/nginx/nginx.conf contains a worker_processes directive
 
   @id:src.auto-configuration.worker-tuning.001 @rule:worker-tuning.autotune.limited-by-available-cpus @inferred @source:src/30-tune-worker-processes.sh#get_quota_v2
   Scenario Outline: Worker processes match the smallest CPU limit the container has

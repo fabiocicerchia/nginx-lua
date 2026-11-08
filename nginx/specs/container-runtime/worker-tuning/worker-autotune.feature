@@ -3,7 +3,7 @@ Feature: Worker process autotuning
   Lets an operator size nginx workers to the CPUs the container may use.
 
   Background:
-    Given Given the AlmaLinux 9.2 nginx-lua image is started
+    Given the AlmaLinux 9.2 nginx-lua image is started
 
   @id:nginx.container-runtime.worker-tuning.001 @rule:runtime.workers.autotune-opt-in-limits-to-cpu-allowance @inferred @source:nginx/1.25.1/almalinux/9.2-20230718/tpl/30-tune-worker-processes.sh
   Scenario Outline: Worker processes follow the container CPU allowance when autotune is enabled
