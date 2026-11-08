@@ -1,0 +1,1694 @@
+{
+ "excluded": {
+  "bin/benchmark": [
+   {
+    "candidate": "Provisioning an Ubuntu VM with Docker, docker-compose and Node.js for load testing",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "bin/benchmark.sh#SETUP (lines 5-23)"
+   },
+   {
+    "candidate": "Running five Artillery load-test rounds per image flavour (nginx, nginx-lua, openresty) and per distro (almalinux, alpine, amazonlinux, ubuntu, debian, fedora) into artillery.*.txt files",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "bin/benchmark.sh#RUN (lines 25-129)"
+   },
+   {
+    "candidate": "Printing an averaged median score per image flavour and per distro (drops the highest and lowest of the sorted medians, averages three values)",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "bin/benchmark.sh (lines 131-161)"
+   }
+  ],
+  "bin/cleanup-docker-images": [
+   {
+    "candidate": "429 retry with Retry-After backoff",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/cleanup-docker-images.py#request_with_backoff"
+   },
+   {
+    "candidate": "Paginated tag listing and delay between deletes",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/cleanup-docker-images.py#list_tags"
+   },
+   {
+    "candidate": "Login token exchange with Docker Hub",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/cleanup-docker-images.py#get_token"
+   }
+  ],
+  "bin/common": [
+   {
+    "candidate": "read_file / write_file",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/common.py#read_file"
+   },
+   {
+    "candidate": "get_version_parts",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#get_version_parts"
+   },
+   {
+    "candidate": "get_tarball_path",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/common.py#get_tarball_path"
+   },
+   {
+    "candidate": "get_supported_os / constants",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/common.py#get_supported_os"
+   },
+   {
+    "candidate": "get_dockerfile_path",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#get_dockerfile_path"
+   }
+  ],
+  "bin/deps-manifest": [
+   {
+    "candidate": "Each third-party module has a pinned entry (key, display name, repo URL, tarball URL pattern)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/deps_manifest.py#DEPENDENCIES"
+   },
+   {
+    "candidate": "Two modules (lua-resty-cookie, stream-lua-nginx-module) are pinned to a commit instead of a tag",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/deps_manifest.py#DEPENDENCIES"
+   },
+   {
+    "candidate": "A vendored SSL header (Eric Young) is listed statically at version 0.0.0 for license scanning",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/deps_manifest.py#STATIC_DEPENDENCIES"
+   },
+   {
+    "candidate": "Manifest keeps the version file and the license-scan declarations in sync",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/deps_manifest.py"
+   }
+  ],
+  "bin/docker-build": [
+   {
+    "candidate": "Dockerfile path, tag and build-arg computation in build_image",
+    "covered_by": "image-build.image-building.mainline-and-stable-per-os-arch",
+    "reason": "DUPLICATE_OF",
+    "source": "bin/docker_ops.py#build_image"
+   },
+   {
+    "candidate": "Parsing of the supported versions file",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#load_supported_versions"
+   }
+  ],
+  "bin/docker-bundle": [
+   {
+    "candidate": "Argument parsing requiring the os_distro positional",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/docker-bundle.py#main"
+   },
+   {
+    "candidate": "Reading supported versions file key=value lines",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#load_supported_versions"
+   },
+   {
+    "candidate": "Tag set computation for each image",
+    "covered_by": "publishing.tags (other module)",
+    "reason": "DUPLICATE_OF",
+    "source": "bin/common.py#generate_tags"
+   }
+  ],
+  "bin/docker-metadata": [
+   {
+    "candidate": "Inspect locally before pulling to avoid registry rate limits",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/docker_ops.py#generate_metadata"
+   },
+   {
+    "candidate": "Required os_distro command-line argument parsing",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/docker-metadata.py#main"
+   }
+  ],
+  "bin/docker-ops": [
+   {
+    "candidate": "run_command shell wrapper (shlex split, no shell, prints command)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/docker_ops.py#run_command"
+   },
+   {
+    "candidate": "Docker/git command and build-arg constants, architecture list, date format",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/docker_ops.py"
+   },
+   {
+    "candidate": "Creating the tarball output directory before build",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/docker_ops.py#build_docker_image"
+   },
+   {
+    "candidate": "Local-first inspect to avoid Docker Hub rate limits",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/docker_ops.py#generate_metadata"
+   }
+  ],
+  "bin/docker-push": [
+   {
+    "candidate": "Per-arch images pushed without -unsigned suffix, signing done on manifest",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/docker_ops.py#push_images"
+   },
+   {
+    "candidate": "Tag set computed per image",
+    "covered_by": "publishing.tagging",
+    "reason": "DUPLICATE_OF",
+    "source": "bin/docker_ops.py#push_images"
+   },
+   {
+    "candidate": "os_distro argument parsing",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/docker-push.py#main"
+   },
+   {
+    "candidate": "Parsing of supported versions file",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/common.py#load_supported_versions"
+   }
+  ],
+  "bin/download-and-verify": [
+   {
+    "candidate": "A download matching its pinned checksum is accepted",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/download-and-verify.sh#download-and-verify"
+   },
+   {
+    "candidate": "A download that does not match its pinned checksum is rejected and deleted",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/download-and-verify.sh#download-and-verify"
+   },
+   {
+    "candidate": "A download without a pinned checksum is kept with a warning and its hash is reported",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/download-and-verify.sh#download-and-verify"
+   },
+   {
+    "candidate": "A failed download aborts the build",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/download-and-verify.sh#download-and-verify"
+   }
+  ],
+  "bin/generate-changelog": [
+   {
+    "candidate": "git fetch --all --tags before logging",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-changelog.sh#main"
+   },
+   {
+    "candidate": "CHANGELOG file written as a side effect via tee",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-changelog.sh#main"
+   },
+   {
+    "candidate": "escaping of double quotes and stripping of bullet prefixes",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/generate-changelog.sh#main"
+   }
+  ],
+  "bin/generate-deps-env": [
+   {
+    "candidate": "GitHub owner/repo URL parsing",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-deps-env.py#github_owner_repo"
+   },
+   {
+    "candidate": "Streaming download in 8 KB chunks and request timeouts",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-deps-env.py#compute_sha256"
+   },
+   {
+    "candidate": "Template loading and formatting",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/generate-deps-env.py#load_template"
+   },
+   {
+    "candidate": "Dependency list from deps_manifest",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/generate-deps-env.py#main"
+   }
+  ],
+  "bin/generate-dockerfiles": [
+   {
+    "candidate": "Copying shell scripts, patches, licenses and config files next to each Dockerfile",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/common.py#setup_dockerfile"
+   },
+   {
+    "candidate": "Environment file placeholder substitution and file permission bits",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#patch_dockerfile"
+   },
+   {
+    "candidate": "Parsing the supported versions file as key=value lines",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#load_supported_versions"
+   }
+  ],
+  "bin/generate-fossa-deps": [
+   {
+    "candidate": "Parsing of the defaults file (comments, blank lines, split on first '=')",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-fossa-deps.py#load_env_dist"
+   },
+   {
+    "candidate": "Trailing newline and blank-line formatting of output file",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/generate-fossa-deps.py#main"
+   }
+  ],
+  "bin/generate-supported-versions": [
+   {
+    "candidate": "Version tag sort key and regex filtering",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-supported-versions.py#_filter_and_sort_tags"
+   },
+   {
+    "candidate": "run_command subprocess wrapper exiting on failure",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate-supported-versions.py#run_command"
+   },
+   {
+    "candidate": "fetch_mainline and fetch_stable wrappers",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/generate-supported-versions.py#fetch_mainline"
+   }
+  ],
+  "bin/generate-tags": [
+   {
+    "candidate": "Tags within a line sorted by first character only",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate_tags.py#main"
+   },
+   {
+    "candidate": "Dockerfile glob and path regex",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/generate_tags.py#DOCKERFILE_REGEX"
+   }
+  ],
+  "bin/lib-retry": [
+   {
+    "candidate": "Exponential backoff delay values and sleep timing",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/lib-retry.sh#retry_on_rate_limit"
+   },
+   {
+    "candidate": "Temporary output file creation and cleanup",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/lib-retry.sh#retry_on_rate_limit"
+   }
+  ],
+  "bin/mirror-ghcr": [
+   {
+    "candidate": "tag_name prefix stripping",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/mirror-ghcr.py#tag_name"
+   },
+   {
+    "candidate": "Cosign signatures not copied by imagetools",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/mirror-ghcr.py"
+   }
+  ],
+  "bin/package-base-nginx": [
+   {
+    "candidate": "Docker build of Dockerfile.<type> with build args",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "bin/package-base-nginx.sh#main"
+   },
+   {
+    "candidate": "Extracting package via a temporary container and docker cp",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/package-base-nginx.sh#main"
+   },
+   {
+    "candidate": "Listing package contents with in-image tooling, failures ignored",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/package-base-nginx.sh#main"
+   },
+   {
+    "candidate": "OS version looked up from supported_versions file",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/package-base-nginx.sh#main"
+   }
+  ],
+  "bin/package-test-base": [
+   {
+    "candidate": "Container lifecycle: removing a stale test container, mounting dist, sleep infinity, listing /app",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/package-test-base.sh#main"
+   },
+   {
+    "candidate": "Shell strict mode and command tracing (set -euox pipefail)",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "bin/package-test-base.sh"
+   }
+  ],
+  "bin/readme-tags": [
+   {
+    "candidate": "Parsing key=value lines of the supported versions file",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/common.py#load_supported_versions"
+   },
+   {
+    "candidate": "Tag set computation per image",
+    "covered_by": "publishing.tagging (tag scheme module)",
+    "reason": "DUPLICATE_OF",
+    "source": "bin/common.py#generate_tags"
+   }
+  ],
+  "bin/scan-vulnerabilities": [
+   {
+    "candidate": "Usage message when no image reference is given",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/scan-vulnerabilities.sh#IMAGE_REF"
+   },
+   {
+    "candidate": "Misconfiguration scan is advisory only (|| true)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/scan-vulnerabilities.sh#trivy image --scanners misconfig"
+   },
+   {
+    "candidate": "An image with fixable vulnerabilities at or above the threshold fails the scan",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/scan-vulnerabilities.sh#trivy image --exit-code"
+   }
+  ],
+  "bin/sign-image": [
+   {
+    "candidate": "SPDX SBOM generated alongside CycloneDX",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/sign-image.sh#sign-image"
+   },
+   {
+    "candidate": "Retry on registry rate limits",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/sign-image.sh#sign-image"
+   }
+  ],
+  "bin/sign-manifest": [
+   {
+    "candidate": "Temporary manifest file and cleanup trap",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/sign-manifest.sh#sign-manifest"
+   },
+   {
+    "candidate": "Retry on registry rate limit around cosign and syft calls",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/sign-manifest.sh#sign-manifest"
+   },
+   {
+    "candidate": "Default VCS_REF from git short HEAD",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bin/sign-manifest.sh#sign-manifest"
+   },
+   {
+    "candidate": "Signing is refused when a required tool is missing",
+    "covered_by": "supply-chain-security.image-signing.requires-signing-tools",
+    "reason": "DUPLICATE_OF",
+    "source": "bin/sign-manifest.sh#sign-manifest"
+   }
+  ],
+  "bin/update-readme": [
+   {
+    "candidate": "The README's supported-tags section is regenerated and the rest is left intact",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/update-readme.sh#update-readme"
+   },
+   {
+    "candidate": "A README without the section markers is overwritten with a broken result",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/update-readme.sh#update-readme"
+   }
+  ],
+  "bin/validate-release": [
+   {
+    "candidate": "Temp directory cleanup and PASS/FAIL/WARN counters",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/validate-release.sh#cleanup"
+   },
+   {
+    "candidate": "git fetch of tags before validation",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/validate-release.sh"
+   },
+   {
+    "candidate": "Per-arch digest extraction with jq",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bin/validate-release.sh#section-7"
+   },
+   {
+    "candidate": "Every supported OS has a mainline and stable Dockerfile at the tagged OS version",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-2"
+   },
+   {
+    "candidate": "The default Dockerfile is identical to the mainline Alpine Dockerfile",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-3"
+   },
+   {
+    "candidate": "Every OS ships packages for both x86-64 and ARM",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-4"
+   },
+   {
+    "candidate": "Every release asset downloads and matches its published checksum",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-5"
+   },
+   {
+    "candidate": "Release Dockerfiles are byte-identical to those at the tagged commit",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-6"
+   },
+   {
+    "candidate": "Any failed check makes the release validation fail",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-SUMMARY"
+   },
+   {
+    "candidate": "Published images must carry a valid signature from the project's pipeline",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-7"
+   },
+   {
+    "candidate": "Published images carry a CycloneDX SBOM attestation",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-7"
+   },
+   {
+    "candidate": "Without cosign the signature checks are skipped with a warning, not failed",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-7"
+   },
+   {
+    "candidate": "Each release image is published on Docker Hub for amd64 and arm64 at the release OS version",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "bin/validate-release.sh#section-8"
+   }
+  ],
+  "bin/verify-image": []
+ },
+ "lifted": {
+  "bin/benchmark": [],
+  "bin/cleanup-docker-images": [],
+  "bin/common": [],
+  "bin/deps-manifest": [],
+  "bin/docker-build": [],
+  "bin/docker-bundle": [],
+  "bin/docker-metadata": [],
+  "bin/docker-ops": [],
+  "bin/docker-push": [],
+  "bin/download-and-verify": [],
+  "bin/generate-changelog": [],
+  "bin/generate-deps-env": [],
+  "bin/generate-dockerfiles": [],
+  "bin/generate-fossa-deps": [],
+  "bin/generate-supported-versions": [],
+  "bin/generate-tags": [],
+  "bin/lib-retry": [],
+  "bin/mirror-ghcr": [],
+  "bin/package-base-nginx": [],
+  "bin/package-test-base": [],
+  "bin/readme-tags": [],
+  "bin/scan-vulnerabilities": [],
+  "bin/sign-image": [],
+  "bin/sign-manifest": [],
+  "bin/update-readme": [],
+  "bin/validate-release": [],
+  "bin/verify-image": []
+ },
+ "retired": [],
+ "scenarios": {
+  "bin.dependencies.build-environment.001": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "8ed5ca82cd5a",
+   "human": false,
+   "rule": "dependencies.build-environment.resty-core-lua-module-pair-consistent",
+   "source": "bin/generate-deps-env.py#get_resty_core_required_lua_module",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.build-environment.002": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "3b6d26c02243",
+   "human": false,
+   "rule": "dependencies.build-environment.resty-core-rc-floor",
+   "source": "bin/generate-deps-env.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.build-environment.003": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "873f90e045ed",
+   "human": false,
+   "rule": "dependencies.build-environment.stream-lua-commit-matches-resty-core",
+   "source": "bin/generate-deps-env.py#get_stream_lua_commit_for_api_version",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.build-environment.004": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "51089d35ff41",
+   "human": false,
+   "rule": "dependencies.build-environment.other-deps-track-latest",
+   "source": "bin/generate-deps-env.py#get_latest_tag",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.build-environment.005": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "33886e2c62c3",
+   "human": false,
+   "rule": "dependencies.build-environment.checksum-per-dependency",
+   "source": "bin/generate-deps-env.py#compute_sha256",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.build-environment.006": {
+   "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
+   "fingerprint": "3b6d26c02243",
+   "human": false,
+   "rule": "dependencies.build-environment.generation-fails-without-output-on-upstream-error",
+   "source": "bin/generate-deps-env.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.license-inventory.001": {
+   "file": "bin/specs/dependencies/license-inventory/fossa-dependency-declarations.feature",
+   "fingerprint": "3f60d1385131",
+   "human": false,
+   "rule": "dependencies.license-inventory.declarations-match-pinned-versions",
+   "source": "bin/generate-fossa-deps.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.license-inventory.002": {
+   "file": "bin/specs/dependencies/license-inventory/fossa-dependency-declarations.feature",
+   "fingerprint": "3f60d1385131",
+   "human": false,
+   "rule": "dependencies.license-inventory.static-components-always-listed",
+   "source": "bin/generate-fossa-deps.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.dependencies.license-inventory.003": {
+   "file": "bin/specs/dependencies/license-inventory/fossa-dependency-declarations.feature",
+   "fingerprint": "3f60d1385131",
+   "human": false,
+   "rule": "dependencies.license-inventory.refuses-unpinned-component",
+   "source": "bin/generate-fossa-deps.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.base-packages.001": {
+   "file": "bin/specs/image-build/base-packages/nginx-base-packaging.feature",
+   "fingerprint": "b9deda78a20c",
+   "human": false,
+   "rule": "image-build.base-packages.native-package-type-per-distro",
+   "source": "bin/package-base-nginx.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.base-packages.002": {
+   "file": "bin/specs/image-build/base-packages/nginx-base-packaging.feature",
+   "fingerprint": "b9deda78a20c",
+   "human": false,
+   "rule": "image-build.base-packages.alpine-package-name-includes-arch",
+   "source": "bin/package-base-nginx.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.base-packages.003": {
+   "file": "bin/specs/image-build/base-packages/nginx-base-packaging.feature",
+   "fingerprint": "b9deda78a20c",
+   "human": false,
+   "rule": "image-build.base-packages.rebuild-replaces-same-version-only",
+   "source": "bin/package-base-nginx.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.base-packages.004": {
+   "file": "bin/specs/image-build/base-packages/nginx-base-packaging.feature",
+   "fingerprint": "db17f92bab1a",
+   "human": false,
+   "rule": "image-build.base-packages.arguments-required",
+   "source": "bin/package-base-nginx.sh#parse_arguments",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.dockerfile-generation.001": {
+   "file": "bin/specs/image-build/dockerfile-generation/dockerfile-generation.feature",
+   "fingerprint": "b70d67d079b8",
+   "human": false,
+   "rule": "image-build.dockerfile.placeholders-filled",
+   "source": "bin/common.py#patch_dockerfile",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.dockerfile-generation.002": {
+   "file": "bin/specs/image-build/dockerfile-generation/dockerfile-generation.feature",
+   "fingerprint": "238bb741a883",
+   "human": false,
+   "rule": "image-build.dockerfile.build-context-bundled",
+   "source": "bin/common.py#setup_dockerfile",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.dockerfile-generation.003": {
+   "file": "bin/specs/image-build/dockerfile-generation/dockerfile-generation-generate-dockerfiles.feature",
+   "fingerprint": "5c241241674d",
+   "human": false,
+   "rule": "image-build.dockerfile-generation.covers-mainline-and-stable-per-os",
+   "source": "bin/generate-dockerfiles.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.dockerfile-generation.004": {
+   "file": "bin/specs/image-build/dockerfile-generation/dockerfile-generation-generate-dockerfiles.feature",
+   "fingerprint": "5c241241674d",
+   "human": false,
+   "rule": "image-build.dockerfile-generation.root-dockerfile-is-newest-alpine",
+   "source": "bin/generate-dockerfiles.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-building.001": {
+   "file": "bin/specs/image-build/image-building/building-images.feature",
+   "fingerprint": "f8c91516e1d5",
+   "human": false,
+   "rule": "image-build.image-building.mainline-and-stable-per-os-arch",
+   "source": "bin/docker-build.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-building.002": {
+   "file": "bin/specs/image-build/image-building/building-images.feature",
+   "fingerprint": "f8c91516e1d5",
+   "human": false,
+   "rule": "image-build.image-building.arm64-alias",
+   "source": "bin/docker-build.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-building.003": {
+   "file": "bin/specs/image-build/image-building/building-images.feature",
+   "fingerprint": "b86ea693f3a8",
+   "human": false,
+   "rule": "image-build.image-building.stop-on-first-failure",
+   "source": "bin/common.py#for_mainline_and_stable",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-building.004": {
+   "file": "bin/specs/image-build/image-building/image-building.feature",
+   "fingerprint": "05a7a55f08de",
+   "human": false,
+   "rule": "image-build.image-building.build-date-from-commit",
+   "source": "bin/docker_ops.py#get_build_date",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-metadata.001": {
+   "file": "bin/specs/image-build/image-metadata/image-metadata-docs.feature",
+   "fingerprint": "d87cd2ad6644",
+   "human": false,
+   "rule": "image-build.image-metadata.mainline-and-stable-pages",
+   "source": "bin/docker-metadata.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-metadata.002": {
+   "file": "bin/specs/image-build/image-metadata/image-metadata-docs.feature",
+   "fingerprint": "4ec983085c2a",
+   "human": false,
+   "rule": "image-build.image-metadata.missing-image-skipped-silently",
+   "source": "bin/docker_ops.py#generate_metadata",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-metadata.003": {
+   "file": "bin/specs/image-build/image-metadata/image-metadata-docs-docker-ops.feature",
+   "fingerprint": "4ec983085c2a",
+   "human": false,
+   "rule": "image-build.image-metadata.metadata-page-per-tag",
+   "source": "bin/docker_ops.py#generate_metadata",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.image-build.image-metadata.004": {
+   "file": "bin/specs/image-build/image-metadata/image-metadata-docs-docker-ops.feature",
+   "fingerprint": "4ec983085c2a",
+   "human": false,
+   "rule": "image-build.image-metadata.unavailable-image-silently-skipped",
+   "source": "bin/docker_ops.py#generate_metadata",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.image-cleanup.001": {
+   "file": "bin/specs/publishing/image-cleanup/dockerhub-temp-tag-cleanup.feature",
+   "fingerprint": "71c970f11310",
+   "human": false,
+   "rule": "publishing.image-cleanup.only-per-arch-tags-deleted",
+   "source": "bin/cleanup-docker-images.py#should_delete",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.image-cleanup.002": {
+   "file": "bin/specs/publishing/image-cleanup/dockerhub-temp-tag-cleanup.feature",
+   "fingerprint": "dd71d5312cc7",
+   "human": false,
+   "rule": "publishing.image-cleanup.requires-credentials",
+   "source": "bin/cleanup-docker-images.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.image-cleanup.003": {
+   "file": "bin/specs/publishing/image-cleanup/dockerhub-temp-tag-cleanup.feature",
+   "fingerprint": "dd71d5312cc7",
+   "human": false,
+   "rule": "publishing.image-cleanup.aborts-on-repeated-permission-denial",
+   "source": "bin/cleanup-docker-images.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.image-cleanup.004": {
+   "file": "bin/specs/publishing/image-cleanup/dockerhub-temp-tag-cleanup.feature",
+   "fingerprint": "dd71d5312cc7",
+   "human": false,
+   "rule": "publishing.image-cleanup.other-failures-do-not-stop-run",
+   "source": "bin/cleanup-docker-images.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-mirroring.001": {
+   "file": "bin/specs/publishing/registry-mirroring/ghcr-mirroring.feature",
+   "fingerprint": "8e86efeba921",
+   "human": false,
+   "rule": "publishing.registry-mirroring.same-tags-as-docker-hub",
+   "source": "bin/mirror-ghcr.py#mirror_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-mirroring.002": {
+   "file": "bin/specs/publishing/registry-mirroring/ghcr-mirroring.feature",
+   "fingerprint": "8e86efeba921",
+   "human": false,
+   "rule": "publishing.registry-mirroring.dry-run-changes-nothing",
+   "source": "bin/mirror-ghcr.py#mirror_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-mirroring.003": {
+   "file": "bin/specs/publishing/registry-mirroring/ghcr-mirroring.feature",
+   "fingerprint": "8e86efeba921",
+   "human": false,
+   "rule": "publishing.registry-mirroring.stops-on-first-failure",
+   "source": "bin/mirror-ghcr.py#mirror_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.001": {
+   "file": "bin/specs/publishing/registry-push/multi-arch-manifests.feature",
+   "fingerprint": "dce8ac3f89bb",
+   "human": false,
+   "rule": "publishing.manifests.bundle-both-architectures-per-tag",
+   "source": "bin/docker-bundle.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.002": {
+   "file": "bin/specs/publishing/registry-push/multi-arch-manifests.feature",
+   "fingerprint": "62bc32586327",
+   "human": false,
+   "rule": "publishing.manifests.stop-on-first-failure",
+   "source": "bin/docker_ops.py#bundle_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.003": {
+   "file": "bin/specs/publishing/registry-push/registry-push.feature",
+   "fingerprint": "ea75e62055eb",
+   "human": false,
+   "rule": "publishing.registry-push.transient-failure-retried-once",
+   "source": "bin/docker_ops.py#push_docker_image",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.004": {
+   "file": "bin/specs/publishing/registry-push/registry-push.feature",
+   "fingerprint": "bcbf168d6c8a",
+   "human": false,
+   "rule": "publishing.registry-push.per-arch-scope",
+   "source": "bin/docker_ops.py#push_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.005": {
+   "file": "bin/specs/publishing/registry-push/registry-push.feature",
+   "fingerprint": "62bc32586327",
+   "human": false,
+   "rule": "publishing.registry-push.multi-arch-manifest-combines-both-architectures",
+   "source": "bin/docker_ops.py#bundle_images",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.006": {
+   "file": "bin/specs/publishing/registry-push/registry-push-docker-push.feature",
+   "fingerprint": "4e9c73522f06",
+   "human": false,
+   "rule": "publishing.registry-push.mainline-then-stable-stop-on-failure",
+   "source": "bin/docker-push.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.registry-push.007": {
+   "file": "bin/specs/publishing/registry-push/registry-push-docker-push.feature",
+   "fingerprint": "460377d8b5fa",
+   "human": false,
+   "rule": "publishing.registry-push.only-own-architecture",
+   "source": "bin/docker-push.py#detect_arch",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.001": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme.feature",
+   "fingerprint": "e41bfee935dd",
+   "human": false,
+   "rule": "publishing.tagging.broad-tags-mainline-only",
+   "source": "bin/common.py#generate_tags",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.002": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme.feature",
+   "fingerprint": "e41bfee935dd",
+   "human": false,
+   "rule": "publishing.tagging.default-distro-short-tags",
+   "source": "bin/common.py#generate_tags",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.003": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme.feature",
+   "fingerprint": "e41bfee935dd",
+   "human": false,
+   "rule": "publishing.tagging.architecture-suffix",
+   "source": "bin/common.py#generate_tags",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.004": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "ef3500258d30",
+   "human": false,
+   "rule": "publishing.tagging.alpine-claims-short-and-latest-aliases",
+   "source": "bin/generate_tags.py#tag_names",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.005": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "ef3500258d30",
+   "human": false,
+   "rule": "publishing.tagging.non-alpine-has-no-bare-aliases",
+   "source": "bin/generate_tags.py#tag_names",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.006": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "ef3500258d30",
+   "human": false,
+   "rule": "publishing.tagging.compat-variant-suffix",
+   "source": "bin/generate_tags.py#tag_names",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.007": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "ef3500258d30",
+   "human": false,
+   "rule": "publishing.tagging.amazonlinux-2018-no-distro-alias",
+   "source": "bin/generate_tags.py#tag_names",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.008": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "76b4b090b401",
+   "human": false,
+   "rule": "publishing.tagging.moving-alias-goes-to-latest-dockerfile",
+   "source": "bin/generate_tags.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.publishing.tagging.009": {
+   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
+   "fingerprint": "ef3500258d30",
+   "human": false,
+   "rule": "publishing.tagging.alpine-bare-patch-tag-trailing-dash",
+   "source": "bin/generate_tags.py#tag_names",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.quality.test-base.001": {
+   "file": "bin/specs/quality/test-base/package-install-check.feature",
+   "fingerprint": "ad5ae9013e3f",
+   "human": false,
+   "rule": "quality.package-test.installs-and-ships-runtime-tools",
+   "source": "bin/package-test-base.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.quality.test-base.002": {
+   "file": "bin/specs/quality/test-base/package-install-check.feature",
+   "fingerprint": "ad5ae9013e3f",
+   "human": false,
+   "rule": "quality.package-test.package-format-per-distro",
+   "source": "bin/package-test-base.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.quality.test-base.003": {
+   "file": "bin/specs/quality/test-base/package-install-check.feature",
+   "fingerprint": "64a3f537fd5f",
+   "human": false,
+   "rule": "quality.package-test.requires-three-arguments",
+   "source": "bin/package-test-base.sh#parse_arguments",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.quality.test-base.004": {
+   "file": "bin/specs/quality/test-base/package-install-check.feature",
+   "fingerprint": "fd7d08eb6ac1",
+   "human": false,
+   "rule": "quality.package-test.help-available",
+   "source": "bin/package-test-base.sh#show_help",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.001": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "fd7d08eb6ac1",
+   "human": false,
+   "rule": "release-docs.changelog.usage-help",
+   "source": "bin/generate-changelog.sh#show_help",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.002": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "09f6aee31c94",
+   "human": false,
+   "rule": "release-docs.changelog.requires-three-arguments",
+   "source": "bin/generate-changelog.sh#parse_arguments",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.003": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "f405cc29fc70",
+   "human": false,
+   "rule": "release-docs.changelog.lists-commits-since-previous-tag",
+   "source": "bin/generate-changelog.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.004": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "f405cc29fc70",
+   "human": false,
+   "rule": "release-docs.changelog.excludes-automated-commits",
+   "source": "bin/generate-changelog.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.005": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "f405cc29fc70",
+   "human": false,
+   "rule": "release-docs.changelog.compare-link",
+   "source": "bin/generate-changelog.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.changelog.006": {
+   "file": "bin/specs/release-docs/changelog/release-changelog.feature",
+   "fingerprint": "f405cc29fc70",
+   "human": false,
+   "rule": "release-docs.changelog.lists-supported-versions",
+   "source": "bin/generate-changelog.sh#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.readme-and-tags-docs.001": {
+   "file": "bin/specs/release-docs/readme-and-tags-docs/readme-tag-listing.feature",
+   "fingerprint": "702fc7c84e5c",
+   "human": false,
+   "rule": "release-docs.readme.tag-line-links-dockerfile",
+   "source": "bin/common.py#print_tags",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.readme-and-tags-docs.002": {
+   "file": "bin/specs/release-docs/readme-and-tags-docs/tags-page.feature",
+   "fingerprint": "76b4b090b401",
+   "human": false,
+   "rule": "release-docs.tags.supported-and-unsupported-split",
+   "source": "bin/generate_tags.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.readme-and-tags-docs.003": {
+   "file": "bin/specs/release-docs/readme-and-tags-docs/readme-tag-listing-readme-tags.feature",
+   "fingerprint": "48871ea6f5ff",
+   "human": false,
+   "rule": "release-docs.readme-tags.one-line-per-os-mainline",
+   "source": "bin/readme-tags.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.release-validation.001": {
+   "file": "bin/specs/release-docs/release-validation/release-validation.feature",
+   "fingerprint": "79fdda5b61e4",
+   "human": false,
+   "rule": "release.validation.tag-required",
+   "source": "bin/validate-release.sh#usage",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.release-validation.002": {
+   "file": "bin/specs/release-docs/release-validation/release-validation.feature",
+   "fingerprint": "d6e433dcba47",
+   "human": false,
+   "rule": "release.validation.checksum-manifest-required",
+   "source": "bin/validate-release.sh#download_asset",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.supported-versions.001": {
+   "file": "bin/specs/release-docs/supported-versions/supported-versions-matrix.feature",
+   "fingerprint": "a24dba835fda",
+   "human": false,
+   "rule": "release-docs.supported-versions.mainline-and-stable-per-os",
+   "source": "bin/common.py#get_supported_versions",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.supported-versions.002": {
+   "file": "bin/specs/release-docs/supported-versions/supported-versions-matrix.feature",
+   "fingerprint": "b86ea693f3a8",
+   "human": false,
+   "rule": "release-docs.supported-versions.stop-on-first-failure",
+   "source": "bin/common.py#for_mainline_and_stable",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.supported-versions.003": {
+   "file": "bin/specs/release-docs/supported-versions/supported-versions-generation.feature",
+   "fingerprint": "10fced46a9f8",
+   "human": false,
+   "rule": "release-docs.supported-versions.lists-latest-versions",
+   "source": "bin/generate-supported-versions.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.supported-versions.004": {
+   "file": "bin/specs/release-docs/supported-versions/supported-versions-generation.feature",
+   "fingerprint": "10fced46a9f8",
+   "human": false,
+   "rule": "release-docs.supported-versions.abort-without-overwrite",
+   "source": "bin/generate-supported-versions.py#main",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.release-docs.supported-versions.005": {
+   "file": "bin/specs/release-docs/supported-versions/supported-versions-generation.feature",
+   "fingerprint": "338a5ca9cda8",
+   "human": false,
+   "rule": "release-docs.supported-versions.registry-fallback",
+   "source": "bin/generate-supported-versions.py#fetch_specific",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.shared-tooling.retry-resilience.001": {
+   "file": "bin/specs/shared-tooling/retry-resilience/rate-limit-retry.feature",
+   "fingerprint": "d0cbb4887310",
+   "human": false,
+   "rule": "shared-tooling.retry.rate-limit-is-retried",
+   "source": "bin/lib-retry.sh#retry_on_rate_limit",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.shared-tooling.retry-resilience.002": {
+   "file": "bin/specs/shared-tooling/retry-resilience/rate-limit-retry.feature",
+   "fingerprint": "d0cbb4887310",
+   "human": false,
+   "rule": "shared-tooling.retry.gives-up-after-max-retries",
+   "source": "bin/lib-retry.sh#retry_on_rate_limit",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.shared-tooling.retry-resilience.003": {
+   "file": "bin/specs/shared-tooling/retry-resilience/rate-limit-retry.feature",
+   "fingerprint": "d0cbb4887310",
+   "human": false,
+   "rule": "shared-tooling.retry.other-failures-fail-immediately",
+   "source": "bin/lib-retry.sh#retry_on_rate_limit",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.001": {
+   "file": "bin/specs/supply-chain-security/image-signing/per-arch-image-signing.feature",
+   "fingerprint": "fa34cd66bb8c",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.pushed-image-is-signed-with-sbom",
+   "source": "bin/sign-image.sh#sign-image",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.002": {
+   "file": "bin/specs/supply-chain-security/image-signing/per-arch-image-signing.feature",
+   "fingerprint": "fa34cd66bb8c",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.refuses-unpushed-image",
+   "source": "bin/sign-image.sh#sign-image",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.003": {
+   "file": "bin/specs/supply-chain-security/image-signing/per-arch-image-signing.feature",
+   "fingerprint": "fa34cd66bb8c",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.requires-signing-tools",
+   "source": "bin/sign-image.sh#sign-image",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.004": {
+   "file": "bin/specs/supply-chain-security/image-signing/per-arch-image-signing.feature",
+   "fingerprint": "fa34cd66bb8c",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.usage-requires-image-reference",
+   "source": "bin/sign-image.sh#sign-image",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.005": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.manifest-list-signed-keyless",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.006": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.index-sbom-per-platform",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.007": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.sbom-optional-when-syft-missing",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.008": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.refuses-unresolvable-index",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.009": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.refuses-index-without-linux-platforms",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-signing.011": {
+   "file": "bin/specs/supply-chain-security/image-signing/signing-multi-arch-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-signing.usage-on-missing-reference",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.001": {
+   "file": "bin/specs/supply-chain-security/image-verification/verifying-signed-manifests.feature",
+   "fingerprint": "85610d0075e2",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.index-signature-verified-after-signing",
+   "source": "bin/sign-manifest.sh#sign-manifest",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.002": {
+   "file": "bin/specs/supply-chain-security/image-verification/verify-published-image.feature",
+   "fingerprint": "ecbaed407ef6",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.signature-from-release-pipeline-required",
+   "source": "bin/verify-image.sh#OIDC_ISSUER",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.003": {
+   "file": "bin/specs/supply-chain-security/image-verification/verify-published-image.feature",
+   "fingerprint": "ecbaed407ef6",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.unsigned-image-refused",
+   "source": "bin/verify-image.sh#OIDC_ISSUER",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.004": {
+   "file": "bin/specs/supply-chain-security/image-verification/verify-published-image.feature",
+   "fingerprint": "ecbaed407ef6",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.sbom-attestation-checked",
+   "source": "bin/verify-image.sh#OIDC_ISSUER",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.005": {
+   "file": "bin/specs/supply-chain-security/image-verification/verify-published-image.feature",
+   "fingerprint": "ecbaed407ef6",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.cosign-required",
+   "source": "bin/verify-image.sh#OIDC_ISSUER",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.image-verification.006": {
+   "file": "bin/specs/supply-chain-security/image-verification/verify-published-image.feature",
+   "fingerprint": "24c74fb3e079",
+   "human": false,
+   "rule": "supply-chain-security.image-verification.image-reference-required",
+   "source": "bin/verify-image.sh#IMAGE_REF",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.vulnerability-scanning.001": {
+   "file": "bin/specs/supply-chain-security/vulnerability-scanning/image-vulnerability-gate.feature",
+   "fingerprint": "7f0c72720cff",
+   "human": false,
+   "rule": "vulnerability-scanning.gate.threshold-and-exit-code-configurable",
+   "source": "bin/scan-vulnerabilities.sh#SEVERITY_THRESHOLD",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.vulnerability-scanning.002": {
+   "file": "bin/specs/supply-chain-security/vulnerability-scanning/image-vulnerability-gate.feature",
+   "fingerprint": "7dff7c93ebc5",
+   "human": false,
+   "rule": "vulnerability-scanning.gate.clean-image-passes",
+   "source": "bin/scan-vulnerabilities.sh#REPORT_DIR",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.vulnerability-scanning.003": {
+   "file": "bin/specs/supply-chain-security/vulnerability-scanning/image-vulnerability-gate.feature",
+   "fingerprint": "3dc61e51bdfa",
+   "human": false,
+   "rule": "vulnerability-scanning.gate.scanner-required",
+   "source": "bin/scan-vulnerabilities.sh#command -v trivy",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bin.supply-chain-security.vulnerability-scanning.004": {
+   "file": "bin/specs/supply-chain-security/vulnerability-scanning/image-vulnerability-gate.feature",
+   "fingerprint": "130314c82eba",
+   "human": false,
+   "rule": "vulnerability-scanning.gate.secrets-in-image-fail-scan",
+   "source": "bin/scan-vulnerabilities.sh#SECRET_EXIT",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Central list of pinned upstream components and their versions, used as the single source of truth.",
+      "slug": "version-manifest",
+      "title": "Version manifest"
+     },
+     {
+      "description": "Turning the manifest into environment settings consumed by builds.",
+      "slug": "build-environment",
+      "title": "Build environment variables"
+     },
+     {
+      "description": "Fetching source archives and checking their integrity before use.",
+      "slug": "verified-downloads",
+      "title": "Verified downloads"
+     },
+     {
+      "description": "Producing dependency declarations for license and compliance scanning.",
+      "slug": "license-inventory",
+      "title": "License inventory"
+     }
+    ],
+    "description": "Tracking, resolving and fetching the upstream components that go into the nginx-lua images.",
+    "slug": "dependencies",
+    "title": "Dependency management"
+   },
+   {
+    "areas": [
+     {
+      "description": "Generating Dockerfiles for each supported nginx, OS and variant combination.",
+      "slug": "dockerfile-generation",
+      "title": "Dockerfile generation"
+     },
+     {
+      "description": "Building images and bundling build outputs per variant.",
+      "slug": "image-building",
+      "title": "Image building"
+     },
+     {
+      "description": "Packaging the nginx base and the test base used by the images.",
+      "slug": "base-packages",
+      "title": "Base packages"
+     },
+     {
+      "description": "Labels and descriptive metadata attached to built images.",
+      "slug": "image-metadata",
+      "title": "Image metadata"
+     }
+    ],
+    "description": "Producing the container images and the packages they are made from.",
+    "slug": "image-build",
+    "title": "Image build"
+   },
+   {
+    "areas": [
+     {
+      "description": "Computing the set of tags each image is published under.",
+      "slug": "tagging",
+      "title": "Tag scheme"
+     },
+     {
+      "description": "Pushing images and manifests to the primary registry.",
+      "slug": "registry-push",
+      "title": "Registry push"
+     },
+     {
+      "description": "Copying published images to the GitHub container registry mirror.",
+      "slug": "registry-mirroring",
+      "title": "Registry mirroring"
+     },
+     {
+      "description": "Removing obsolete or stale images from registries.",
+      "slug": "image-cleanup",
+      "title": "Image cleanup"
+     }
+    ],
+    "description": "Getting built images to registries with the right names and tags.",
+    "slug": "publishing",
+    "title": "Publishing and distribution"
+   },
+   {
+    "areas": [
+     {
+      "description": "Cryptographically signing images and multi-arch manifests.",
+      "slug": "image-signing",
+      "title": "Image signing"
+     },
+     {
+      "description": "Checking signatures and integrity of published images.",
+      "slug": "image-verification",
+      "title": "Image verification"
+     },
+     {
+      "description": "Scanning images for known vulnerabilities and reporting results.",
+      "slug": "vulnerability-scanning",
+      "title": "Vulnerability scanning"
+     }
+    ],
+    "description": "Proving images are trustworthy and free of known vulnerabilities.",
+    "slug": "supply-chain-security",
+    "title": "Supply-chain security"
+   },
+   {
+    "areas": [
+     {
+      "description": "Generating release notes from project history.",
+      "slug": "changelog",
+      "title": "Changelog"
+     },
+     {
+      "description": "Keeping the README and published tag listings up to date.",
+      "slug": "readme-and-tags-docs",
+      "title": "README and tag tables"
+     },
+     {
+      "description": "Publishing which nginx and OS versions are supported.",
+      "slug": "supported-versions",
+      "title": "Supported versions"
+     },
+     {
+      "description": "Checking a release is complete and consistent before it ships.",
+      "slug": "release-validation",
+      "title": "Release validation"
+     }
+    ],
+    "description": "Keeping release notes, docs and release readiness current.",
+    "slug": "release-docs",
+    "title": "Release and documentation"
+   },
+   {
+    "areas": [
+     {
+      "description": "Load-testing the built server to track performance.",
+      "slug": "benchmarking",
+      "title": "Benchmarking"
+     },
+     {
+      "description": "Providing the base environment the image tests run on.",
+      "slug": "test-base",
+      "title": "Test base"
+     }
+    ],
+    "description": "Measuring how the images behave.",
+    "slug": "quality",
+    "title": "Performance and quality"
+   },
+   {
+    "areas": [
+     {
+      "description": "Shared utilities for configuration, logging and process handling.",
+      "slug": "common-helpers",
+      "title": "Common helpers"
+     },
+     {
+      "description": "Reusable wrappers around Docker commands.",
+      "slug": "docker-operations",
+      "title": "Docker operations"
+     },
+     {
+      "description": "Retrying flaky network and registry operations.",
+      "slug": "retry-resilience",
+      "title": "Retry and resilience"
+     }
+    ],
+    "description": "Common helpers underpinning the other scripts.",
+    "slug": "shared-tooling",
+    "title": "Shared tooling"
+   }
+  ]
+ }
+}
