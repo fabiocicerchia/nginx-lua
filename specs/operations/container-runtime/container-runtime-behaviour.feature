@@ -5,12 +5,6 @@ Feature: Running the nginx-lua container
   Background:
     Given The nginx-lua image has been built and started with its default command
 
-  @id:operations.container-runtime.001 @rule:runtime.container.serves-http-and-https-ports @inferred @source:Dockerfile#EXPOSE
-  Scenario: The container serves web traffic on ports 80 and 443
-    Given an operator has started the nginx-lua image with ports 80 and 443 published
-    When the operator inspects the image's declared ports
-    Then ports 80 and 443 are declared as exposed
-
   @id:operations.container-runtime.002 @rule:runtime.container.healthcheck-on-root @inferred @source:Dockerfile#HEALTHCHECK @questionable
   Scenario: A container whose root page does not answer is reported unhealthy
     Given a running nginx-lua container whose root URL stops returning a success status

@@ -13,16 +13,3 @@ Feature: Publishing per-architecture images and multi-arch manifests
     And when the second attempt succeeds the push completes with exit code 0
     And when the second attempt also fails the output shows "FATAL: Failed to push image" with the tag and the exit code is non-zero
     And no further tags are pushed after the failing one
-
-  @id:bin.publishing.registry-push.004 @rule:publishing.registry-push.per-arch-scope @inferred @source:bin/docker_ops.py#push_images
-  Scenario: Pushing for one architecture publishes only that architecture's tags
-    Given the operator names a single architecture such as arm64v8
-    When the release operator pushes the images
-    Then only tags carrying that architecture are pushed
-    And when no architecture is named, both amd64 and arm64v8 tags are pushed
-
-  @id:bin.publishing.registry-push.005 @rule:publishing.registry-push.multi-arch-manifest-combines-both-architectures @inferred @source:bin/docker_ops.py#bundle_images
-  Scenario: Each published tag becomes a multi-arch manifest of the amd64 and arm64v8 images
-    Given images tagged 1.27.2-alpine-amd64 and 1.27.2-alpine-arm64v8 have been pushed
-    When the release operator bundles the images
-    Then the tag 1.27.2-alpine is published as a manifest pointing to both architecture images

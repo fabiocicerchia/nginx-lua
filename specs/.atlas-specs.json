@@ -193,28 +193,11 @@
    }
   ]
  },
- "retired": [],
+ "retired": [
+  "build-and-packaging.container-image.001",
+  "operations.container-runtime.001"
+ ],
  "scenarios": {
-  "build-and-packaging.container-image.001": {
-   "file": "specs/build-and-packaging/container-image/container-image-contract.feature",
-   "fingerprint": "a7b12dbba08a",
-   "human": false,
-   "rule": "image.labels.report-component-versions",
-   "source": "Dockerfile#LABEL",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "operations.container-runtime.001": {
-   "file": "specs/operations/container-runtime/container-runtime-behaviour.feature",
-   "fingerprint": "af63595bfc31",
-   "human": false,
-   "rule": "runtime.container.serves-http-and-https-ports",
-   "source": "Dockerfile#EXPOSE",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
   "operations.container-runtime.002": {
    "file": "specs/operations/container-runtime/container-runtime-behaviour.feature",
    "fingerprint": "6680ec96c6c3",

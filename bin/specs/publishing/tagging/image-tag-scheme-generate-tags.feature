@@ -38,9 +38,3 @@ Feature: Image tag scheme
     When the maintainer generates the tags page
     Then alpine, 1-alpine, 1.25, 1 and latest are listed only on the alpine 3.20 entry
     And 1.25.3-alpine3.19 stays on the alpine 3.19 entry
-
-  @id:bin.publishing.tagging.009 @rule:publishing.tagging.alpine-bare-patch-tag-trailing-dash @inferred @source:bin/generate_tags.py#tag_names @questionable
-  Scenario: A standard Alpine image is published under a tag ending in a dash
-    Given a standard Dockerfile for nginx 1.25.3 on alpine 3.20
-    When the maintainer generates the tags page
-    Then the listed tags include 1.25.3- with a trailing dash

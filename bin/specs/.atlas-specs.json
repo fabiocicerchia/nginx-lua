@@ -605,7 +605,14 @@
   "bin/validate-release": [],
   "bin/verify-image": []
  },
- "retired": [],
+ "retired": [
+  "bin.image-build.image-metadata.003",
+  "bin.image-build.image-metadata.004",
+  "bin.publishing.registry-push.004",
+  "bin.publishing.registry-push.005",
+  "bin.publishing.tagging.009",
+  "bin.release-docs.supported-versions.002"
+ ],
  "scenarios": {
   "bin.dependencies.build-environment.001": {
    "file": "bin/specs/dependencies/build-environment/deps-env-generation.feature",
@@ -837,26 +844,6 @@
    "test": "",
    "tests": []
   },
-  "bin.image-build.image-metadata.003": {
-   "file": "bin/specs/image-build/image-metadata/image-metadata-docs-docker-ops.feature",
-   "fingerprint": "4ec983085c2a",
-   "human": false,
-   "rule": "image-build.image-metadata.metadata-page-per-tag",
-   "source": "bin/docker_ops.py#generate_metadata",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "bin.image-build.image-metadata.004": {
-   "file": "bin/specs/image-build/image-metadata/image-metadata-docs-docker-ops.feature",
-   "fingerprint": "4ec983085c2a",
-   "human": false,
-   "rule": "image-build.image-metadata.unavailable-image-silently-skipped",
-   "source": "bin/docker_ops.py#generate_metadata",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
   "bin.publishing.image-cleanup.001": {
    "file": "bin/specs/publishing/image-cleanup/dockerhub-temp-tag-cleanup.feature",
    "fingerprint": "71c970f11310",
@@ -957,26 +944,6 @@
    "test": "",
    "tests": []
   },
-  "bin.publishing.registry-push.004": {
-   "file": "bin/specs/publishing/registry-push/registry-push.feature",
-   "fingerprint": "bcbf168d6c8a",
-   "human": false,
-   "rule": "publishing.registry-push.per-arch-scope",
-   "source": "bin/docker_ops.py#push_images",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "bin.publishing.registry-push.005": {
-   "file": "bin/specs/publishing/registry-push/registry-push.feature",
-   "fingerprint": "62bc32586327",
-   "human": false,
-   "rule": "publishing.registry-push.multi-arch-manifest-combines-both-architectures",
-   "source": "bin/docker_ops.py#bundle_images",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
   "bin.publishing.registry-push.006": {
    "file": "bin/specs/publishing/registry-push/registry-push-docker-push.feature",
    "fingerprint": "4e9c73522f06",
@@ -1073,16 +1040,6 @@
    "human": false,
    "rule": "publishing.tagging.moving-alias-goes-to-latest-dockerfile",
    "source": "bin/generate_tags.py#main",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "bin.publishing.tagging.009": {
-   "file": "bin/specs/publishing/tagging/image-tag-scheme-generate-tags.feature",
-   "fingerprint": "ef3500258d30",
-   "human": false,
-   "rule": "publishing.tagging.alpine-bare-patch-tag-trailing-dash",
-   "source": "bin/generate_tags.py#tag_names",
    "status": "inferred",
    "test": "",
    "tests": []
@@ -1243,16 +1200,6 @@
    "human": false,
    "rule": "release-docs.supported-versions.mainline-and-stable-per-os",
    "source": "bin/common.py#get_supported_versions",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "bin.release-docs.supported-versions.002": {
-   "file": "bin/specs/release-docs/supported-versions/supported-versions-matrix.feature",
-   "fingerprint": "b86ea693f3a8",
-   "human": false,
-   "rule": "release-docs.supported-versions.stop-on-first-failure",
-   "source": "bin/common.py#for_mainline_and_stable",
    "status": "inferred",
    "test": "",
    "tests": []

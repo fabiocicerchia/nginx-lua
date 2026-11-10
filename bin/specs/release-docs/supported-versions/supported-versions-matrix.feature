@@ -9,10 +9,3 @@ Feature: Supported versions matrix
     Then 12 image definitions are listed, two per OS
     And each OS lists mainline first and then stable, at the OS version from the list
     And paths look like "nginx/<nginx_version>/<os>/<os_version>/Dockerfile"
-
-  @id:bin.release-docs.supported-versions.002 @rule:release-docs.supported-versions.stop-on-first-failure @inferred @source:bin/common.py#for_mainline_and_stable
-  Scenario: A batch run over mainline and stable stops at the first failing version
-    Given an operation that fails for the mainline version
-    When the operator runs it for mainline and stable of one OS
-    Then the run exits with status 1
-    And the stable version is not processed
