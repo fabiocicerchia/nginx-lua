@@ -1,0 +1,978 @@
+{
+ "excluded": {
+  "1-30-6/almalinux": [
+   {
+    "candidate": "Image build (nginx compilation, Lua modules, OpenResty library versions, packages, layout, ports, log symlinks)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/Dockerfile"
+   },
+   {
+    "candidate": "Makefile build/test targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/Makefile"
+   },
+   {
+    "candidate": "Test daemons for the image's test suite",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "Support-the-project banner printed at startup",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery details",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Startup hooks run in version order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "A non-executable startup script is ignored with a notice",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup hooks are skipped when a non-nginx command is run",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Setting NGINX_ENTRYPOINT_QUIET_LOGS silences startup messages",
+    "covered_by": "container-runtime.entrypoint.quiet-logs",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "The default site is not switched to IPv6 on this AlmaLinux image",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "IPv6 enabling is skipped when the host cannot or should not change the configuration",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Template files are rendered with environment variables at startup",
+    "covered_by": "container-runtime.config-templates.render-from-env",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Template directory, suffix, output directory and variable filter can be customised",
+    "covered_by": "container-runtime.config-templates.settings-overridable",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "An unwritable output directory is reported and nginx still starts",
+    "covered_by": "container-runtime.config-templates.unwritable-output-reported",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into the main configuration",
+    "covered_by": "container-runtime.config-templates.stream-templates",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "Worker processes follow the container's CPU limit when autotune is enabled",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Worker processes are left unchanged unless autotune is enabled",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/almalinux/10.2-20261027/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   }
+  ],
+  "1-30-6/alpine": [
+   {
+    "candidate": "Dockerfile compilation flags, module list, build dependencies, version pins, multi-stage layout, labels",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/alpine/3.24.3/Dockerfile"
+   },
+   {
+    "candidate": "tpl/Makefile targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/Makefile"
+   },
+   {
+    "candidate": "start-test-daemons.sh helper services",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "support.sh sponsorship banner text",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery details",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Startup scripts run in version order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "A startup script without execute permission is skipped with a warning",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are skipped when the container runs another command",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Entrypoint messages can be silenced",
+    "covered_by": "container.entrypoint.quiet-logs-switch",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "The default site is not switched to IPv6 on the Alpine image",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/10-listen-on-ipv6-by-default.sh#alpine-case"
+   },
+   {
+    "candidate": "IPv6 enabling is skipped when the host has no IPv6",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/10-listen-on-ipv6-by-default.sh#ipv6-check"
+   },
+   {
+    "candidate": "Worker processes are only tuned when the operator opts in",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/tpl/30-tune-worker-processes.sh#autotune-guard"
+   },
+   {
+    "candidate": "Access and error logs go to the container log",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/Dockerfile#access-log-symlinks"
+   },
+   {
+    "candidate": "The image serves ports 80 and 443 and reports health",
+    "covered_by": "image.layout.ports-and-health",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/alpine/3.24.3/Dockerfile#HEALTHCHECK"
+   },
+   {
+    "candidate": "Stopping the container shuts nginx down gracefully",
+    "covered_by": "image.layout.graceful-stop",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/alpine/3.24.3/Dockerfile#STOPSIGNAL"
+   },
+   {
+    "candidate": "Lua tooling is available in the image",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/alpine/3.24.3/Dockerfile#smoke-test"
+   }
+  ],
+  "1-30-6/amazonlinux": [
+   {
+    "candidate": "Dockerfile build stages, pinned module and dependency versions, compiler flags, nginx configure options, yum package lists, make test",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/Dockerfile"
+   },
+   {
+    "candidate": "Makefile targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/Makefile"
+   },
+   {
+    "candidate": "start-test-daemons.sh helper memcached/mysql/redis daemons",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "support.sh sponsorship banner printed at startup",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 CPU detection internals",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Startup scripts run in version order before nginx launches",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "A startup script without execute permission is skipped with a notice",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Running a command other than nginx skips configuration",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into nginx.conf",
+    "covered_by": "runtime.templates.stream-templates-enabled",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "Opting in sets worker processes to the container's CPU limit",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Worker processes are untouched unless tuning is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "The default site is not switched to IPv6 on Amazon Linux",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Access and error logs go to the container log",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/Dockerfile#final-stage"
+   },
+   {
+    "candidate": "The container exposes web ports and reports health from the root page",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/amazonlinux/2023.12.20261102.0/Dockerfile#final-stage"
+   }
+  ],
+  "1-30-6/debian": [
+   {
+    "candidate": "Dockerfile multi-stage build, ports, healthcheck, log symlinks",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/debian/13.7/Dockerfile"
+   },
+   {
+    "candidate": "Makefile per-image targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/debian/13.7/tpl/Makefile"
+   },
+   {
+    "candidate": "start-test-daemons.sh helper services",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.30.6/debian/13.7/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "support.sh sponsorship banner",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.30.6/debian/13.7/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/debian/13.7/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Executable startup scripts run in natural order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are skipped when a different command is run",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup messages can be silenced",
+    "covered_by": "container-runtime.entrypoint.quiet-logs",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/debian/13.7/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "Template files are rendered with environment values into the config directory",
+    "covered_by": "container-runtime.config-templates.render-env-vars",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/debian/13.7/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into nginx.conf",
+    "covered_by": "container-runtime.config-templates.stream-templates",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/debian/13.7/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "The default site listens on IPv6 when the container supports it",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "The default site is left unchanged when IPv6 cannot or should not be enabled",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Worker count follows the smallest CPU limit only when autotune is enabled",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Autotune is skipped with an error when nginx.conf is read-only",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/debian/13.7/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   }
+  ],
+  "1-30-6/ubuntu": [
+   {
+    "candidate": "Makefile build, test and deps targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/Makefile"
+   },
+   {
+    "candidate": "Test daemons (memcached, mysql, redis) startup",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "Sponsorship banner printed at start",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/support.sh"
+   },
+   {
+    "candidate": "Compiler flags, nginx modules, pinned library versions",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "Build and runtime OS packages, multi-stage layering, smoke test",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.30.6/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "Container health check via curl",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery helpers",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Executable startup scripts run in natural version order and others are skipped",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are skipped when the container runs another command",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Setting the quiet flag silences the startup messages",
+    "covered_by": "container-runtime.entrypoint.quiet-logs",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "An unwritable output directory is reported but nginx still starts",
+    "covered_by": "container-runtime.config-templates.unwritable-output-does-not-block-start",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and a stream block is added to the main configuration",
+    "covered_by": "container-runtime.config-templates.stream-templates",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "Worker count is set to the smallest CPU limit only when autotune is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "The default site is not switched to IPv6 on the Ubuntu image",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.30.6/ubuntu/26.04/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Access and error logs go to the container's output streams",
+    "covered_by": "image-build.image-layout.logs-to-container-output",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/ubuntu/26.04/Dockerfile#base"
+   },
+   {
+    "candidate": "Stopping the container asks nginx to finish in-flight requests",
+    "covered_by": "image-build.image-layout.graceful-stop",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.30.6/ubuntu/26.04/Dockerfile#base"
+   }
+  ],
+  "1-31-8/almalinux": [
+   {
+    "candidate": "10.2-20261027 vs 10.2-20261002 differences (base date and four module bumps)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/almalinux/10.2-20261027/Dockerfile"
+   }
+  ],
+  "1-31-8/alpine": [
+   {
+    "candidate": "Dockerfile (Alpine 3.24.3, nginx 1.31.8 compile, Lua modules, user/dirs)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/alpine/3.24.3/Dockerfile"
+   },
+   {
+    "candidate": "Makefile build/tag/publish targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/Makefile"
+   },
+   {
+    "candidate": "start-test-daemons.sh helper services",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "support.sh sponsorship banner printed at start",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery details",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Executable startup scripts run in version order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Non-executable or unknown startup files are skipped with a notice",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are skipped when another command is run",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Quiet mode silences startup messages",
+    "covered_by": "runtime.entrypoint.quiet-logs",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "Template files are rendered with environment variables into the config directory",
+    "covered_by": "runtime.templates.rendered-from-environment",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Template directory, suffix, output and variable filter can be overridden",
+    "covered_by": "runtime.templates.locations-configurable",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "An unwritable output directory is reported and nothing is rendered",
+    "covered_by": "runtime.templates.unwritable-output-reported",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into the main configuration",
+    "covered_by": "runtime.templates.stream-templates-enabled",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "The unmodified default site gains an IPv6 listener",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "The default site is left unchanged when IPv6 change is unsafe",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Worker count follows the smallest CPU allowance when autotune is on",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Worker count is untouched unless autotune is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/alpine/3.24.3/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   }
+  ],
+  "1-31-8/debian": [
+   {
+    "candidate": "Dockerfile image build, packages, layers",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/debian/13.7/Dockerfile"
+   },
+   {
+    "candidate": "Makefile targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/debian/13.7/tpl/Makefile"
+   },
+   {
+    "candidate": "start-test-daemons helper",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.31.8/debian/13.7/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "support.sh shared helpers",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.31.8/debian/13.7/tpl/support.sh"
+   },
+   {
+    "candidate": "cgroup v1/v2 path discovery details",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.31.8/debian/13.7/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Executable startup scripts run in version order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are skipped when a different command is run",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup messages can be silenced",
+    "covered_by": "container-runtime.entrypoint.quiet-logs",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/debian/13.7/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "The unmodified default site also listens on IPv6",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "A customised or already-updated default site is left unchanged",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Template files are rendered with environment values into the config directory",
+    "covered_by": "container-runtime.config-templates.render-env-into-conf",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/debian/13.7/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Only variables matching the filter are substituted",
+    "covered_by": "container-runtime.config-templates.filter-limits-substitution",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/debian/13.7/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "An unwritable output directory is reported and startup continues",
+    "covered_by": "container-runtime.config-templates.unwritable-output-reported",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/debian/13.7/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into nginx.conf",
+    "covered_by": "container-runtime.config-templates.stream-templates-included",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/debian/13.7/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "Opt-in tuning sets workers to the smallest CPU limit",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Worker count is untouched unless tuning is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/debian/13.7/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   }
+  ],
+  "1-31-8/fedora": [
+   {
+    "candidate": "Fedora 45 image behaviours",
+    "covered_by": "Same as Fedora 44; only version labels differ",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/fedora/45/Dockerfile"
+   }
+  ],
+  "1-31-8/ubuntu": [
+   {
+    "candidate": "Dockerfile multi-stage build, compiler/linker hardening flags, module list, pinned versions, build deps",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "Smoke test and make test during image build",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "Makefile build/test targets",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/Makefile"
+   },
+   {
+    "candidate": "Starting memcached, redis and MariaDB test daemons",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/start-test-daemons.sh"
+   },
+   {
+    "candidate": "Image labels with component versions",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "nginx user/group uid 101 creation",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile"
+   },
+   {
+    "candidate": "cgroup v1/v2 path parsing helpers",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Executable startup scripts run in version order before nginx starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts without execute permission are skipped with a notice",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Startup scripts are not run when the container is given another command",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/docker-entrypoint.sh#docker-entrypoint.sh"
+   },
+   {
+    "candidate": "Setting the quiet switch silences startup messages",
+    "covered_by": "runtime.entrypoint.quiet-logs-switch",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/docker-entrypoint.sh#entrypoint_log"
+   },
+   {
+    "candidate": "A project-support message is printed at every container start",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/support.sh#support.sh"
+   },
+   {
+    "candidate": "Template files are rendered into the configuration directory with variable values",
+    "covered_by": "runtime.templates.variables-substituted-into-conf",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Template locations and suffix can be overridden by the operator",
+    "covered_by": "runtime.templates.directories-and-suffix-configurable",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Only variables matching the filter are substituted",
+    "covered_by": "runtime.templates.filter-limits-substituted-variables",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "An unwritable output directory is reported and templates are not rendered",
+    "covered_by": "runtime.templates.unwritable-output-reported",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#auto_envsubst"
+   },
+   {
+    "candidate": "Stream templates are rendered and wired into the main configuration",
+    "covered_by": "runtime.templates.stream-templates-enable-stream-block",
+    "reason": "DUPLICATE_OF",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/20-envsubst-on-templates.sh#add_stream_block"
+   },
+   {
+    "candidate": "Worker processes are left untouched unless autotune is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "Worker count equals the smallest of online CPUs, cpuset and CPU quota",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "A read-only main configuration is reported and left unchanged",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/30-tune-worker-processes.sh#30-tune-worker-processes.sh"
+   },
+   {
+    "candidate": "The default site listens on IPv6 when the host supports it",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "An already customised or already IPv6-enabled default site is not modified",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/tpl/10-listen-on-ipv6-by-default.sh#10-listen-on-ipv6-by-default.sh"
+   },
+   {
+    "candidate": "Access and error logs are available through the container log output",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile#final-stage"
+   },
+   {
+    "candidate": "The image serves HTTP and HTTPS ports in the foreground and stops gracefully",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile#final-stage"
+   },
+   {
+    "candidate": "The container reports unhealthy when the root page does not answer successfully",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "nginx/1.31.8/ubuntu/26.04/Dockerfile#final-stage"
+   }
+  ]
+ },
+ "lifted": {},
+ "retired": [],
+ "scenarios": {},
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Fetching and compiling nginx for the selected version with its configured modules.",
+      "slug": "nginx-compilation",
+      "title": "nginx compilation"
+     },
+     {
+      "description": "Bundling LuaJIT, the Lua nginx module and related Lua libraries into the image.",
+      "slug": "lua-runtime",
+      "title": "Lua runtime"
+     },
+     {
+      "description": "Installing OS packages such as pcre, zlib and openssl needed to build and run nginx.",
+      "slug": "dependencies",
+      "title": "Build dependencies"
+     },
+     {
+      "description": "Users, directories, ports, logging and default configuration baked into the final image.",
+      "slug": "image-layout",
+      "title": "Image layout"
+     }
+    ],
+    "description": "How each nginx-lua container image is assembled from source on top of a base OS.",
+    "slug": "image-build",
+    "title": "Image build"
+   },
+   {
+    "areas": [
+     {
+      "description": "Images based on Debian (including slim) and Ubuntu LTS releases.",
+      "slug": "debian-ubuntu",
+      "title": "Debian and Ubuntu"
+     },
+     {
+      "description": "Minimal musl-based images on Alpine releases.",
+      "slug": "alpine",
+      "title": "Alpine"
+     },
+     {
+      "description": "Images on CentOS, AlmaLinux and Amazon Linux.",
+      "slug": "rpm-enterprise",
+      "title": "RHEL-family"
+     },
+     {
+      "description": "Images on current Fedora releases.",
+      "slug": "fedora",
+      "title": "Fedora"
+     }
+    ],
+    "description": "The operating system families and releases on which images are offered.",
+    "slug": "platform-support",
+    "title": "Platform support"
+   },
+   {
+    "areas": [
+     {
+      "description": "Early releases with minimal startup tooling and older distro bases.",
+      "slug": "legacy-releases",
+      "title": "Legacy releases (1.17-1.21)"
+     },
+     {
+      "description": "Stable-branch and mainline releases with the full startup script set.",
+      "slug": "stable-releases",
+      "title": "Stable releases (1.22-1.30)"
+     },
+     {
+      "description": "Per-release rebuilds against newer base OS point releases.",
+      "slug": "base-os-refresh",
+      "title": "Base OS refresh"
+     }
+    ],
+    "description": "The matrix of nginx versions published and how they evolve over time.",
+    "slug": "release-lines",
+    "title": "Release lines"
+   },
+   {
+    "areas": [
+     {
+      "description": "The docker entrypoint that runs startup hooks before launching nginx.",
+      "slug": "entrypoint",
+      "title": "Entrypoint"
+     },
+     {
+      "description": "Automatically enabling IPv6 listen directives in the default configuration.",
+      "slug": "ipv6-listen",
+      "title": "IPv6 listening"
+     },
+     {
+      "description": "Rendering configuration files from templates using environment variables.",
+      "slug": "config-templates",
+      "title": "Config templating"
+     },
+     {
+      "description": "Setting nginx worker processes from available CPU resources.",
+      "slug": "worker-tuning",
+      "title": "Worker tuning"
+     }
+    ],
+    "description": "What the container does when it starts and while it runs.",
+    "slug": "container-runtime",
+    "title": "Container runtime behaviour"
+   },
+   {
+    "areas": [
+     {
+      "description": "Per-image Makefile targets for building, tagging and publishing.",
+      "slug": "build-targets",
+      "title": "Build targets"
+     },
+     {
+      "description": "Starting helper services inside the image so its behaviour can be tested.",
+      "slug": "test-daemons",
+      "title": "Test daemons"
+     },
+     {
+      "description": "Shared shell helpers used by entrypoint and startup scripts.",
+      "slug": "support-scripts",
+      "title": "Support scripts"
+     }
+    ],
+    "description": "Makefiles and scripts used to build, test and maintain the images.",
+    "slug": "developer-tooling",
+    "title": "Build and test tooling"
+   }
+  ]
+ }
+}

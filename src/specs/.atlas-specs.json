@@ -1,0 +1,526 @@
+{
+ "excluded": {
+  "packages/after-install": [
+   {
+    "candidate": "Sourcing /etc/os-release to detect distro",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/packages/after-install.sh#after-install.sh"
+   },
+   {
+    "candidate": "Choice between addgroup/adduser and groupadd/useradd tool variants",
+    "covered_by": "packaging.post-install.nginx-system-account",
+    "reason": "DUPLICATE_OF",
+    "source": "src/packages/after-install.sh#after-install.sh"
+   },
+   {
+    "candidate": "Installing the package creates an unprivileged nginx account with fixed id 101",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/packages/after-install.sh#after-install.sh"
+   }
+  ],
+  "packages/nginx-lua": [
+   {
+    "candidate": "Choice between Alpine and shadow-utils tools to create the account",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/packages/nginx-lua.post-install"
+   },
+   {
+    "candidate": "A missing nginx user and group are created as a system account without login",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/packages/nginx-lua.post-install#post-install"
+   },
+   {
+    "candidate": "An existing nginx user and group are left untouched on install",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/packages/nginx-lua.post-install#post-install"
+   }
+  ],
+  "src/10-listen-on-ipv6-by-default": [
+   {
+    "candidate": "Checksum tool choice (md5sum vs sha1sum, dpkg-query vs apk manifest)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/10-listen-on-ipv6-by-default.sh#case"
+   },
+   {
+    "candidate": "IPv6 listening is skipped without failing startup when it cannot or need not be applied",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/10-listen-on-ipv6-by-default.sh#exit-guards"
+   },
+   {
+    "candidate": "Restarting a container does not add the IPv6 listener twice",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/10-listen-on-ipv6-by-default.sh#grep-check"
+   }
+  ],
+  "src/15-local-resolvers": [],
+  "src/20-envsubst-on-templates": [
+   {
+    "candidate": "Silencing messages with NGINX_ENTRYPOINT_QUIET_LOGS",
+    "covered_by": "startup-logging rules of other modules",
+    "reason": "DUPLICATE_OF",
+    "source": "src/20-envsubst-on-templates.sh#entrypoint_log"
+   },
+   {
+    "candidate": "Missing template directory silently skipped",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "src/20-envsubst-on-templates.sh#auto_envsubst"
+   }
+  ],
+  "src/30-tune-worker-processes": [
+   {
+    "candidate": "cgroup v1/v2 path discovery from mountinfo",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/30-tune-worker-processes.sh#get_cgroup_v1_path"
+   },
+   {
+    "candidate": "Comment-out marker with date and .bak suffix",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/30-tune-worker-processes.sh#L188"
+   },
+   {
+    "candidate": "ceildiv helper",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "src/30-tune-worker-processes.sh#ceildiv"
+   },
+   {
+    "candidate": "Worker processes are left alone unless autotuning is requested",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/30-tune-worker-processes.sh#L10"
+   },
+   {
+    "candidate": "A read-only configuration is reported and startup continues",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/30-tune-worker-processes.sh#L12"
+   }
+  ],
+  "src/docker-entrypoint": [
+   {
+    "candidate": "/support.sh invoked before set -e",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/docker-entrypoint.sh"
+   },
+   {
+    "candidate": "find -follow symlink handling and sort -V ordering detail",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/docker-entrypoint.sh"
+   }
+  ],
+  "src/makefile": [
+   {
+    "candidate": "core target: download, configure, compile nginx and debug binary, install",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "src/Makefile#core"
+   },
+   {
+    "candidate": "deps targets downloading and installing Lua modules, njs, geoip2, etc.",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "src/Makefile#deps"
+   },
+   {
+    "candidate": "EXTENDED_IMAGE switch for optional modules",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "src/Makefile#deps"
+   },
+   {
+    "candidate": "luarocks target",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "src/Makefile#luarocks"
+   },
+   {
+    "candidate": "test target running upstream suites, prerequisites and residual known failures",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/Makefile#test"
+   },
+   {
+    "candidate": ".start-test-daemons wrapper",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/Makefile#.start-test-daemons"
+   },
+   {
+    "candidate": "Recording the openresty patch commit in patches/.openresty-ref and falling back to older patch version",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "src/Makefile#openresty-patches"
+   },
+   {
+    "candidate": "Removal of test-only cjson.so and redisbloom.so from shipped image",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "src/Makefile#test"
+   }
+  ],
+  "src/start-test-daemons": [
+   {
+    "candidate": "Start memcached (plain and TLS) with a throwaway CA chain for library tests",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/start-test-daemons.sh#memcached"
+   },
+   {
+    "candidate": "Start Redis/Valkey on 127.0.0.1:6379, optionally with the redisbloom module",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/start-test-daemons.sh#REDIS_SERVER"
+   },
+   {
+    "candidate": "Start MariaDB with seeded users, databases and ed25519 auth for lua-resty-mysql tests",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/start-test-daemons.sh#mariadbd"
+   },
+   {
+    "candidate": "Regenerate bundled test certificates with stronger keys",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "src/start-test-daemons.sh#openssl"
+   }
+  ],
+  "src/support": [
+   {
+    "candidate": "The container prints the project support message when it starts",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/support.sh#support.sh"
+   },
+   {
+    "candidate": "The support message is still printed when startup logs are quieted",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "src/support.sh#support.sh"
+   }
+  ]
+ },
+ "lifted": {
+  "packages/after-install": [],
+  "packages/nginx-lua": [],
+  "src/10-listen-on-ipv6-by-default": [],
+  "src/15-local-resolvers": [],
+  "src/20-envsubst-on-templates": [],
+  "src/30-tune-worker-processes": [],
+  "src/docker-entrypoint": [],
+  "src/makefile": [
+   {
+    "from_source": "src/Makefile#secure_download",
+    "rule": "build.supply-chain.download-checksum-enforced"
+   },
+   {
+    "from_source": "src/Makefile#openresty-patches",
+    "rule": "build.branding.server-header-stays-nginx"
+   }
+  ],
+  "src/start-test-daemons": [],
+  "src/support": []
+ },
+ "retired": [],
+ "scenarios": {
+  "src.auto-configuration.ipv6-listen.001": {
+   "file": "src/specs/auto-configuration/ipv6-listen/ipv6-default-listen.feature",
+   "fingerprint": "811161291d6a",
+   "human": false,
+   "rule": "auto-configuration.ipv6-listen.enabled-on-pristine-default-config",
+   "source": "src/10-listen-on-ipv6-by-default.sh#sed",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.ipv6-listen.002": {
+   "file": "src/specs/auto-configuration/ipv6-listen/ipv6-default-listen.feature",
+   "fingerprint": "d69e3527dfbb",
+   "human": false,
+   "rule": "auto-configuration.ipv6-listen.customised-config-untouched",
+   "source": "src/10-listen-on-ipv6-by-default.sh#case",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.ipv6-listen.003": {
+   "file": "src/specs/auto-configuration/ipv6-listen/ipv6-default-listen.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.startup-logging.quiet-logs-suppress-ipv6-messages",
+   "source": "src/10-listen-on-ipv6-by-default.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.local-resolvers.001": {
+   "file": "src/specs/auto-configuration/local-resolvers/local-resolvers.feature",
+   "fingerprint": "ca5c1702dd20",
+   "human": false,
+   "rule": "auto-configuration.local-resolvers.exposed-when-enabled",
+   "source": "src/15-local-resolvers.envsh#NGINX_LOCAL_RESOLVERS",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.local-resolvers.002": {
+   "file": "src/specs/auto-configuration/local-resolvers/local-resolvers.feature",
+   "fingerprint": "589f439fae01",
+   "human": false,
+   "rule": "auto-configuration.local-resolvers.disabled-by-default",
+   "source": "src/15-local-resolvers.envsh#NGINX_ENTRYPOINT_LOCAL_RESOLVERS",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.template-substitution.001": {
+   "file": "src/specs/auto-configuration/template-substitution/env-templates.feature",
+   "fingerprint": "a9c1a73f4fd1",
+   "human": false,
+   "rule": "autoconfig.templates.render-with-environment",
+   "source": "src/20-envsubst-on-templates.sh#auto_envsubst",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.template-substitution.002": {
+   "file": "src/specs/auto-configuration/template-substitution/env-templates.feature",
+   "fingerprint": "a9c1a73f4fd1",
+   "human": false,
+   "rule": "autoconfig.templates.only-defined-variables-substituted",
+   "source": "src/20-envsubst-on-templates.sh#auto_envsubst",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.template-substitution.003": {
+   "file": "src/specs/auto-configuration/template-substitution/env-templates.feature",
+   "fingerprint": "a9c1a73f4fd1",
+   "human": false,
+   "rule": "autoconfig.templates.filter-limits-substitution",
+   "source": "src/20-envsubst-on-templates.sh#auto_envsubst",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.template-substitution.004": {
+   "file": "src/specs/auto-configuration/template-substitution/env-templates.feature",
+   "fingerprint": "578e759a1852",
+   "human": false,
+   "rule": "autoconfig.templates.stream-templates-enable-stream-block",
+   "source": "src/20-envsubst-on-templates.sh#add_stream_block",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.template-substitution.005": {
+   "file": "src/specs/auto-configuration/template-substitution/env-templates.feature",
+   "fingerprint": "a9c1a73f4fd1",
+   "human": false,
+   "rule": "autoconfig.templates.unwritable-output-does-not-block-startup",
+   "source": "src/20-envsubst-on-templates.sh#auto_envsubst",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.auto-configuration.worker-tuning.001": {
+   "file": "src/specs/auto-configuration/worker-tuning/worker-process-tuning.feature",
+   "fingerprint": "53de29c86cd6",
+   "human": false,
+   "rule": "worker-tuning.autotune.limited-by-available-cpus",
+   "source": "src/30-tune-worker-processes.sh#get_quota_v2",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.entrypoint-flow.001": {
+   "file": "src/specs/container-startup/entrypoint-flow/container-entrypoint.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.entrypoint-flow.scripts-run-before-nginx",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.entrypoint-flow.002": {
+   "file": "src/specs/container-startup/entrypoint-flow/container-entrypoint.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.entrypoint-flow.non-executable-scripts-ignored",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.entrypoint-flow.003": {
+   "file": "src/specs/container-startup/entrypoint-flow/container-entrypoint.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.entrypoint-flow.environment-scripts-sourced",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.entrypoint-flow.004": {
+   "file": "src/specs/container-startup/entrypoint-flow/container-entrypoint.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.entrypoint-flow.empty-directory-skips-configuration",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.entrypoint-flow.005": {
+   "file": "src/specs/container-startup/entrypoint-flow/container-entrypoint.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.entrypoint-flow.other-commands-bypass-scripts",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.container-startup.startup-logging.001": {
+   "file": "src/specs/container-startup/startup-logging/container-startup-logging.feature",
+   "fingerprint": "5545c466ddd0",
+   "human": false,
+   "rule": "container-startup.startup-logging.quiet-logs",
+   "source": "src/docker-entrypoint.sh#entrypoint_log",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.developer-tooling.build-targets.001": {
+   "file": "src/specs/developer-tooling/build-targets/build-integrity.feature",
+   "fingerprint": "84d3d25126f4",
+   "human": false,
+   "rule": "build.supply-chain.download-checksum-enforced",
+   "source": "src/Makefile#secure_download",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.developer-tooling.build-targets.002": {
+   "file": "src/specs/developer-tooling/build-targets/build-integrity.feature",
+   "fingerprint": "84d3d25126f4",
+   "human": false,
+   "rule": "build.supply-chain.unpinned-checksum-warned",
+   "source": "src/Makefile#secure_download",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "src.developer-tooling.build-targets.003": {
+   "file": "src/specs/developer-tooling/build-targets/build-integrity.feature",
+   "fingerprint": "848acfba272a",
+   "human": false,
+   "rule": "build.branding.server-header-stays-nginx",
+   "source": "src/Makefile#openresty-patches",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "The container entrypoint runs the startup scripts in order and then launches nginx or the requested command.",
+      "slug": "entrypoint-flow",
+      "title": "Entrypoint flow"
+     },
+     {
+      "description": "Startup scripts report what they did or skipped, and the entrypoint can be quieted.",
+      "slug": "startup-logging",
+      "title": "Startup logging"
+     }
+    ],
+    "description": "What happens automatically when the nginx-lua container starts, before the server accepts traffic.",
+    "slug": "container-startup",
+    "title": "Container startup"
+   },
+   {
+    "areas": [
+     {
+      "description": "Default server config is switched to also listen on IPv6 when the host supports it.",
+      "slug": "ipv6-listen",
+      "title": "IPv6 listening"
+     },
+     {
+      "description": "The system's DNS resolvers are discovered and exposed for use in nginx configuration.",
+      "slug": "local-resolvers",
+      "title": "DNS resolver detection"
+     },
+     {
+      "description": "Config templates are rendered with environment variables into live nginx configuration.",
+      "slug": "template-substitution",
+      "title": "Environment-based templates"
+     },
+     {
+      "description": "The number of nginx worker processes is set from available CPUs, including container limits.",
+      "slug": "worker-tuning",
+      "title": "Worker process tuning"
+     }
+    ],
+    "description": "Self-tuning of nginx settings to the environment it runs in.",
+    "slug": "auto-configuration",
+    "title": "Automatic configuration"
+   },
+   {
+    "areas": [
+     {
+      "description": "Scripts run after package installation to put the module, service and files in place.",
+      "slug": "package-post-install",
+      "title": "Post-install setup"
+     },
+     {
+      "description": "Building and shipping the product as native packages for supported Linux distributions.",
+      "slug": "package-distribution",
+      "title": "Distribution packages"
+     }
+    ],
+    "description": "Installing nginx-lua as an OS package and preparing the system afterwards.",
+    "slug": "packaging",
+    "title": "Packaging and installation"
+   },
+   {
+    "areas": [
+     {
+      "description": "The Makefile commands for building, installing, linting and packaging the project.",
+      "slug": "build-targets",
+      "title": "Build and make targets"
+     },
+     {
+      "description": "Helper services started in the background so integration tests have something to talk to.",
+      "slug": "test-daemons",
+      "title": "Test daemons"
+     },
+     {
+      "description": "Common shell functions reused by the project's scripts.",
+      "slug": "shared-helpers",
+      "title": "Shared script helpers"
+     }
+    ],
+    "description": "Build, test and helper scripts used by people working on the project.",
+    "slug": "developer-tooling",
+    "title": "Developer tooling"
+   }
+  ]
+ }
+}

@@ -1,0 +1,327 @@
+{
+ "excluded": {
+  "clusterfuzzlite/build": [
+   {
+    "candidate": "Fuzz target fuzz_config_parser is compiled with the fuzzing engine and written to the output directory",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/build.sh"
+   },
+   {
+    "candidate": "Build script aborts on any error or unset variable (bash -eu)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/build.sh"
+   }
+  ],
+  "clusterfuzzlite/dockerfile": [
+   {
+    "candidate": "Fuzz build image copies the repository and build script onto the OSS-Fuzz base builder",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": ".clusterfuzzlite/Dockerfile"
+   }
+  ],
+  "clusterfuzzlite/fuzz-config-parser": [
+   {
+    "candidate": "Fuzz entry point routes the first input byte (mod 3) to the directive, size-value or listen-address parser and ignores inputs shorter than 2 bytes",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#LLVMFuzzerTestOneInput"
+   },
+   {
+    "candidate": "Directive-name parsing: rejects a leading digit, stops at ';', '{', '}' or NUL",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_directive"
+   },
+   {
+    "candidate": "Size-value parsing: 10m / 256k / 1g suffix multipliers, input truncated to 63 bytes",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_size_value"
+   },
+   {
+    "candidate": "Listen-address parsing: host:port or plain port, valid range 0-65535, input truncated to 255 bytes",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c#parse_listen_address"
+   },
+   {
+    "candidate": "Fuzzing guarantees that real nginx configuration parsing does not crash",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": ".clusterfuzzlite/fuzz_config_parser.c"
+   }
+  ],
+  "nginx-lua/dockerfile": [
+   {
+    "candidate": "Alpine base, multi-stage builder, apk dependency lists, COPY --from layering",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#builder"
+   },
+   {
+    "candidate": "Compiler and linker hardening flags (stack protector, RELRO, PIE, FORTIFY_SOURCE)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#NGX_CFLAGS"
+   },
+   {
+    "candidate": "nginx configure options and module list (--with-*, --add-module)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#NGINX_BUILD_CONFIG"
+   },
+   {
+    "candidate": "Version pins for each Lua and nginx module",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#VER_*"
+   },
+   {
+    "candidate": "Test-only daemons and Perl dependencies (memcached, redis, mariadb, Test::Nginx)",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Dockerfile#BUILD_DEPS_BASE"
+   },
+   {
+    "candidate": "lua as alias of luajit",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#RUN-fix-lua-alias"
+   },
+   {
+    "candidate": "envsubst relocation, tzdata, apk upgrade",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#RUN-gettext"
+   },
+   {
+    "candidate": "nginx user and group with uid/gid 101",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Dockerfile#RUN-addgroup"
+   },
+   {
+    "candidate": "Entrypoint scripts, default.conf and nginx.conf behaviour",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#ENTRYPOINT"
+   },
+   {
+    "candidate": "Access and error logs appear in the container's log output",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#RUN-forward-logs"
+   },
+   {
+    "candidate": "An image that fails its tests or smoke test is not produced",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Dockerfile#smoke-test"
+   }
+  ],
+  "nginx-lua/makefile": [
+   {
+    "candidate": "Per-distro/arch build, test, push, bundle, package targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#build-single"
+   },
+   {
+    "candidate": "Skipping build/test/push when no nginx/ or src/ files changed (FORCE=YES overrides)",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#SKIP"
+   },
+   {
+    "candidate": "help target output",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "Makefile#help"
+   },
+   {
+    "candidate": "qemu setup",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#qemu"
+   },
+   {
+    "candidate": "auto-update-and-commit / auto-commit-metadata PR creation",
+    "covered_by": "",
+    "reason": "TECH_INFRA",
+    "source": "Makefile#auto-update-and-commit"
+   },
+   {
+    "candidate": "generate-* , update-tags, update-readme targets",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#generate-dockerfiles"
+   },
+   {
+    "candidate": "scan-image, sign-image, sign-manifest, verify-image delegation",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "Makefile#sign-image"
+   },
+   {
+    "candidate": "benchmark, changelog, mirror-ghcr, cleanup-docker-images",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#benchmark"
+   }
+  ]
+ },
+ "lifted": {
+  "clusterfuzzlite/build": [],
+  "clusterfuzzlite/dockerfile": [],
+  "clusterfuzzlite/fuzz-config-parser": [],
+  "nginx-lua/dockerfile": [],
+  "nginx-lua/makefile": [
+   {
+    "from_source": "Makefile#pull-nginx-entrypoints",
+    "rule": "build.entrypoints.refuse-tampered-files"
+   },
+   {
+    "from_source": "Makefile#pull-nginx-entrypoints",
+    "rule": "build.entrypoints.require-tagged-upstream"
+   },
+   {
+    "from_source": "Makefile#release",
+    "rule": "build.release.one-release-per-nginx-version"
+   }
+  ]
+ },
+ "retired": [
+  "build-and-packaging.container-image.001",
+  "operations.container-runtime.001"
+ ],
+ "scenarios": {
+  "operations.container-runtime.002": {
+   "file": "specs/operations/container-runtime/container-runtime-behaviour.feature",
+   "fingerprint": "6680ec96c6c3",
+   "human": false,
+   "rule": "runtime.container.healthcheck-on-root",
+   "source": "Dockerfile#HEALTHCHECK",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "operations.container-runtime.003": {
+   "file": "specs/operations/container-runtime/container-runtime-behaviour.feature",
+   "fingerprint": "e2c312e58cdd",
+   "human": false,
+   "rule": "runtime.container.graceful-stop",
+   "source": "Dockerfile#STOPSIGNAL",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "operations.developer-workflow.001": {
+   "file": "specs/operations/developer-workflow/maintainer-release-and-update-safeguards.feature",
+   "fingerprint": "34999c24f847",
+   "human": false,
+   "rule": "build.entrypoints.refuse-tampered-files",
+   "source": "Makefile#pull-nginx-entrypoints",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "operations.developer-workflow.002": {
+   "file": "specs/operations/developer-workflow/maintainer-release-and-update-safeguards.feature",
+   "fingerprint": "34999c24f847",
+   "human": false,
+   "rule": "build.entrypoints.require-tagged-upstream",
+   "source": "Makefile#pull-nginx-entrypoints",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "operations.developer-workflow.003": {
+   "file": "specs/operations/developer-workflow/maintainer-release-and-update-safeguards.feature",
+   "fingerprint": "2442751660ae",
+   "human": false,
+   "rule": "build.release.one-release-per-nginx-version",
+   "source": "Makefile#release",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "operations.developer-workflow.004": {
+   "file": "specs/operations/developer-workflow/maintainer-release-and-update-safeguards.feature",
+   "fingerprint": "2442751660ae",
+   "human": false,
+   "rule": "build.release.verified-release-tool",
+   "source": "Makefile#release",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Fetching and compiling nginx and its Lua modules with the Makefile targets.",
+      "slug": "source-build",
+      "title": "Source build"
+     },
+     {
+      "description": "Building the nginx-lua Docker image used to run the server.",
+      "slug": "container-image",
+      "title": "Container image"
+     },
+     {
+      "description": "Selecting versions, modules and compile options for a build.",
+      "slug": "build-configuration",
+      "title": "Build configuration"
+     }
+    ],
+    "description": "Compiling nginx with Lua support and producing installable artifacts.",
+    "slug": "build-and-packaging",
+    "title": "Build and packaging"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running ClusterFuzzLite fuzz jobs on code changes, including its build script and image.",
+      "slug": "continuous-fuzzing",
+      "title": "Continuous fuzzing"
+     },
+     {
+      "description": "Fuzzing the nginx configuration parser with generated inputs to catch crashes.",
+      "slug": "config-parser-fuzzing",
+      "title": "Config parser fuzzing"
+     },
+     {
+      "description": "The container and build setup that provides the toolchain and instrumentation for fuzzing.",
+      "slug": "fuzz-environment",
+      "title": "Fuzz environment"
+     }
+    ],
+    "description": "Automated checks that find defects and vulnerabilities before release.",
+    "slug": "quality-and-security",
+    "title": "Quality and security"
+   },
+   {
+    "areas": [
+     {
+      "description": "How the image starts, exposes and runs nginx with Lua enabled.",
+      "slug": "container-runtime",
+      "title": "Container runtime"
+     },
+     {
+      "description": "Make targets that developers use to build, test and clean locally.",
+      "slug": "developer-workflow",
+      "title": "Developer workflow"
+     }
+    ],
+    "description": "Running and maintaining nginx-lua in deployed environments.",
+    "slug": "operations",
+    "title": "Operations"
+   }
+  ]
+ }
+}
