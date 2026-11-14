@@ -9,6 +9,7 @@ set -eu
 
 # .env.dist is plain shell KEY=value syntax - source it directly for
 # VER_OPENRESTY_MYSQL/VER_OPENRESTY_REDIS below, same as the Makefile does.
+# shellcheck source=/dev/null
 . ./.env.dist
 
 # track_sizes: without it, memcached's `stats sizes` command reports
@@ -39,11 +40,11 @@ memcached-tls -d -u root -p 11212 -Z -o ssl_chain_cert=/tmp/memcached-tls-chain.
 # gives lua-resty-redis's t/module.t a real "bf" module to test against.
 REDIS_SERVER=$(command -v redis-server || command -v valkey-server || command -v redis6-server)
 if [ -f /usr/local/lib/redisbloom.so ]; then
-	REDIS_LOADMODULE="--loadmodule /usr/local/lib/redisbloom.so"
+	set -- --loadmodule /usr/local/lib/redisbloom.so
 else
-	REDIS_LOADMODULE=""
+	set --
 fi
-$REDIS_SERVER --daemonize yes --port 6379 --bind 127.0.0.1 $REDIS_LOADMODULE
+"$REDIS_SERVER" --daemonize yes --port 6379 --bind 127.0.0.1 "$@"
 
 mkdir -p /var/run/mysql
 mariadb-install-db --user=root --datadir=/var/lib/mysql --auth-root-authentication-method=normal > /var/log/mariadb-install.log 2>&1
@@ -78,7 +79,7 @@ nohup mariadbd --user=root --datadir=/var/lib/mysql \
 	--ssl-cert="/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.crt" \
 	--ssl-key="/lua-resty-mysql-${VER_OPENRESTY_MYSQL}/t/data/test.key" \
 	> /var/log/mariadbd.log 2>&1 &
-for i in $(seq 1 30); do mariadb-admin --socket=/var/run/mysql/mysql.sock ping 2>/dev/null && break; sleep 1; done
+for _ in $(seq 1 30); do mariadb-admin --socket=/var/run/mysql/mysql.sock ping 2>/dev/null && break; sleep 1; done
 
 # Fresh mariadb-install-db data dirs ship an anonymous ''@'<host>' user;
 # it outranks 'ngx_test'@'%' for any connection whose client host
