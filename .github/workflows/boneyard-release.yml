@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0 # the base side is generated from the base ref
 
-      - uses: fabiocicerchia/sbom-diff@f908506c6e70e3d5a8749b162c1188b6d2df24ee # v1.1.1
+      - uses: fabiocicerchia/sbom-diff@4c0954e86cc21493cc8e58b0ccfd5cee554c109a # v1.2.0
         with:
           # No comment and no gate: gandalf-pr-review.yml and dependency-review
           # already speak on the pull request. This run exists for the record.
