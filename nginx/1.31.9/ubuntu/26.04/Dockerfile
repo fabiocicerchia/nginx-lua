@@ -73,7 +73,7 @@ ENV VER_GEOIP=$VER_GEOIP
 # consistently in the system. If needed to use the latest Lua version (ie >=5.4)
 # the os system package would be required, resulting in a system with multiple
 # versions available.
-ARG VER_LUAJIT=2.1-20261107
+ARG VER_LUAJIT=2.1-20261117
 ENV VER_LUAJIT=$VER_LUAJIT
 ARG LUAJIT_LIB=/usr/local/lib
 ENV LUAJIT_LIB=$LUAJIT_LIB
@@ -109,7 +109,7 @@ ENV VER_LUAROCKS=$VER_LUAROCKS
 
 # headers-more-nginx-module
 # https://github.com/openresty/headers-more-nginx-module
-ARG VER_OPENRESTY_HEADERS=0.41
+ARG VER_OPENRESTY_HEADERS=0.42
 ENV VER_OPENRESTY_HEADERS=$VER_OPENRESTY_HEADERS
 
 # lua-resty-cookie
@@ -208,7 +208,7 @@ ENV VER_OPENRESTY_UPLOAD=$VER_OPENRESTY_UPLOAD
 
 # lua-resty-lock
 # https://github.com/openresty/lua-resty-lock/tags
-ARG VER_OPENRESTY_LOCK=0.09
+ARG VER_OPENRESTY_LOCK=0.10
 ENV VER_OPENRESTY_LOCK=$VER_OPENRESTY_LOCK
 
 # lua-resty-balancer
