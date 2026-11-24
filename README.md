@@ -43,12 +43,12 @@ Need help implementing this? [Get in touch](https://fabiocicerchia.it/contact).
 ## Supported tags and respective `Dockerfile` links
 
 <!-- START_SUPPORTED_TAGS -->
-- [`almalinux`, `1-almalinux`, `1.31-almalinux`, `1.31.9-almalinux`, `1-almalinux10.3-20261116`, `1.31-almalinux10.3-20261116`, `1.31.9-almalinux10.3-20261116`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/almalinux/10.3-20261116/Dockerfile)
-- [`1`, `1.31`, `1.31.9`, `alpine`, `latest`, `1-alpine`, `1.31-alpine`, `1.31.9-alpine`, `1-alpine3.24.4`, `1.31-alpine3.24.4`, `1.31.9-alpine3.24.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/alpine/3.24.4/Dockerfile)
-- [`amazonlinux`, `1-amazonlinux`, `1.31-amazonlinux`, `1.31.9-amazonlinux`, `1-amazonlinux2023.12.20261117.0`, `1.31-amazonlinux2023.12.20261117.0`, `1.31.9-amazonlinux2023.12.20261117.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/amazonlinux/2023.12.20261117.0/Dockerfile)
-- [`debian`, `1-debian`, `1.31-debian`, `1-debian13.7`, `1.31.9-debian`, `1.31-debian13.7`, `1.31.9-debian13.7`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/debian/13.7/Dockerfile)
-- [`fedora`, `1-fedora`, `1-fedora45`, `1.31-fedora`, `1.31-fedora45`, `1.31.9-fedora`, `1.31.9-fedora45`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/fedora/45/Dockerfile)
-- [`ubuntu`, `1-ubuntu`, `1.31-ubuntu`, `1-ubuntu26.04`, `1.31.9-ubuntu`, `1.31-ubuntu26.04`, `1.31.9-ubuntu26.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.9/ubuntu/26.04/Dockerfile)
+- [`almalinux`, `1-almalinux`, `1.31-almalinux`, `1.31.10-almalinux`, `1-almalinux10.3-20261116`, `1.31-almalinux10.3-20261116`, `1.31.10-almalinux10.3-20261116`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/almalinux/10.3-20261116/Dockerfile)
+- [`1`, `1.31`, `alpine`, `latest`, `1.31.10`, `1-alpine`, `1.31-alpine`, `1-alpine3.24.4`, `1.31.10-alpine`, `1.31-alpine3.24.4`, `1.31.10-alpine3.24.4`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/alpine/3.24.4/Dockerfile)
+- [`amazonlinux`, `1-amazonlinux`, `1.31-amazonlinux`, `1.31.10-amazonlinux`, `1-amazonlinux2023.12.20261120.0`, `1.31-amazonlinux2023.12.20261120.0`, `1.31.10-amazonlinux2023.12.20261120.0`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/amazonlinux/2023.12.20261120.0/Dockerfile)
+- [`debian`, `1-debian`, `1.31-debian`, `1-debian13.7`, `1.31.10-debian`, `1.31-debian13.7`, `1.31.10-debian13.7`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/debian/13.7/Dockerfile)
+- [`fedora`, `1-fedora`, `1-fedora45`, `1.31-fedora`, `1.31-fedora45`, `1.31.10-fedora`, `1.31.10-fedora45`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/fedora/45/Dockerfile)
+- [`ubuntu`, `1-ubuntu`, `1.31-ubuntu`, `1-ubuntu26.04`, `1.31.10-ubuntu`, `1.31-ubuntu26.04`, `1.31.10-ubuntu26.04`](https://github.com/fabiocicerchia/nginx-lua/blob/main/nginx/1.31.10/ubuntu/26.04/Dockerfile)
 <!-- END_SUPPORTED_TAGS -->
 
 **Note:** The full list of supported/unsupported tags can be found on [`docs/TAGS.md`](https://github.com/fabiocicerchia/nginx-lua/blob/main/docs/TAGS.md).
